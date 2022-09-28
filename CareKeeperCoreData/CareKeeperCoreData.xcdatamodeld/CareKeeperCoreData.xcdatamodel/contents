@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="false" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21279" systemVersion="21G115" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Activity" representedClassName="Activity" syncable="YES" codeGenerationType="class">
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="when" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="behavior" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Behavior" inverseName="activities" inverseEntity="Behavior"/>
+        <relationship name="caree" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Caree" inverseName="activities" inverseEntity="Caree"/>
+    </entity>
+    <entity name="Behavior" representedClassName="Behavior" syncable="YES" codeGenerationType="class">
+        <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="activities" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Activity" inverseName="behavior" inverseEntity="Activity"/>
+        <relationship name="caree" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Caree" inverseName="behaviors" inverseEntity="Caree"/>
+    </entity>
+    <entity name="Caree" representedClassName="Caree" syncable="YES" codeGenerationType="class">
+        <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="activities" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Activity" inverseName="caree" inverseEntity="Activity"/>
+        <relationship name="behaviors" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Behavior" inverseName="caree" inverseEntity="Behavior"/>
+    </entity>
     <entity name="Item" representedClassName="Item" syncable="YES" codeGenerationType="class">
         <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
     </entity>
-    <elements>
-        <element name="Item" positionX="-63" positionY="-18" width="128" height="44"/>
-    </elements>
 </model>

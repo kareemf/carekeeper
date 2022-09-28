@@ -1,10 +1,3 @@
-//
-//  CareKeeperCoreDataApp.swift
-//  CareKeeperCoreData
-//
-//  Created by Kareem Francis on 9/27/22.
-//
-
 import SwiftUI
 
 @main

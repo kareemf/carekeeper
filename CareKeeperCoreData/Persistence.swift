@@ -1,10 +1,3 @@
-//
-//  Persistence.swift
-//  CareKeeperCoreData
-//
-//  Created by Kareem Francis on 9/27/22.
-//
-
 import CoreData
 
 struct PersistenceController {

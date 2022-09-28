@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  CareKeeperCoreData
-//
-//  Created by Kareem Francis on 9/27/22.
-//
-
 import SwiftUI
 import CoreData
 
@@ -12,21 +5,21 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Caree.name, ascending: false)],
         animation: .default)
-    private var items: FetchedResults<Item>
+    private var carees: FetchedResults<Caree>
 
     var body: some View {
         NavigationView {
             List {
-                ForEach(items) { item in
+                ForEach(carees) { caree in
                     NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
+                        Text("Caree \(caree.name ?? "")")
                     } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
+                        Text(caree.name ?? "")
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .onDelete(perform: deleteCarees)
             }
             .toolbar {
 #if os(iOS)
@@ -35,8 +28,8 @@ struct ContentView: View {
                 }
 #endif
                 ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                    Button(action: addCaree) {
+                        Label("Add Caree", systemImage: "plus")
                     }
                 }
             }
@@ -44,10 +37,10 @@ struct ContentView: View {
         }
     }
 
-    private func addItem() {
+    private func addCaree() {
         withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
+            let newCaree = Caree(context: viewContext)
+            newCaree.dateCreated = Date()
 
             do {
                 try viewContext.save()
@@ -60,9 +53,9 @@ struct ContentView: View {
         }
     }
 
-    private func deleteItems(offsets: IndexSet) {
+    private func deleteCarees(offsets: IndexSet) {
         withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
+            offsets.map { carees[$0] }.forEach(viewContext.delete)
 
             do {
                 try viewContext.save()
