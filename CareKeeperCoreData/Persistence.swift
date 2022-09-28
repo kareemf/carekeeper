@@ -1,8 +1,9 @@
 import CoreData
+import Combine
 
-struct PersistenceController {
+class PersistenceController {
     static let shared = PersistenceController()
-
+    
     static var preview: PersistenceController = {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
@@ -20,19 +21,65 @@ struct PersistenceController {
         }
         return result
     }()
-
+    
+    // TODO: vary by platform
+    private static let authorName = "CareKeeper"
+    private static let remoteDataImportAuthorName = "CareKeeper Data Import"
+    
+    
     let container: NSPersistentContainer
-
+    private var subscriptions = [AnyCancellable]()
+    private lazy var historyRequestQueue = DispatchQueue(label: "history")
+    
+    private var lastHistoryToken: NSPersistentHistoryToken?
+    private lazy var tokenFileURL: URL = {
+        let url = NSPersistentContainer.defaultDirectoryURL()
+            .appendingPathComponent("CareKeeper", isDirectory: true)
+        do {
+            try FileManager.default
+                .createDirectory(
+                    at: url,
+                    withIntermediateDirectories: true,
+                    attributes: nil)
+        } catch {
+            // log any errors
+        }
+        return url.appendingPathComponent("token.data", isDirectory: false)
+    }()
+    
+    
+    
     init(inMemory: Bool = false) {
         container = NSPersistentContainer(name: "CareKeeperCoreData")
+        
+        let persistentStoreDescription = container.persistentStoreDescriptions.first!
+        
         if inMemory {
-            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
+            persistentStoreDescription.url = URL(fileURLWithPath: "/dev/null")
+        } else {
+            do {
+                try container.viewContext.setQueryGenerationFrom(.current)
+            } catch {
+                // log any errors
+            }
         }
+        
+        // Generate notifications on change
+        persistentStoreDescription.setOption(
+            true as NSNumber,
+            forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey
+        )
+        
+        // Persist change history
+        persistentStoreDescription.setOption(
+            true as NSNumber,
+            forKey: NSPersistentHistoryTrackingKey)
+        
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
-                // Replace this implementation with code to handle the error appropriately.
+                // TODO: Replace this implementation with code to handle the error appropriately.
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-
+                
                 /*
                  Typical reasons for an error here include:
                  * The parent directory does not exist, cannot be created, or disallows writing.
@@ -44,6 +91,89 @@ struct PersistenceController {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
+        
         container.viewContext.automaticallyMergesChangesFromParent = true
+        container.viewContext.transactionAuthor = PersistenceController.authorName
+        
+        // Sub to notifications
+        loadHistoryToken()
+        
+        NotificationCenter.default
+            .publisher(for: .NSPersistentStoreRemoteChange)
+            .sink { [self] in
+                self.processRemoteStoreChange($0)
+            }
+            .store(in: &subscriptions)
+        
     }
+    
+    func processRemoteStoreChange(_ notification: Notification) -> Void {
+        print("Store Notification", notification)
+        
+        historyRequestQueue.async {
+            let backgroundContext = self.container.newBackgroundContext()
+            
+            backgroundContext.performAndWait {
+                let request = NSPersistentHistoryChangeRequest
+                    .fetchHistory(after: self.lastHistoryToken)
+                
+                do {
+                    let result = try backgroundContext.execute(request) as? NSPersistentHistoryResult
+                    
+                    guard
+                        let transactions = result?.result as? [NSPersistentHistoryTransaction],
+                        !transactions.isEmpty
+                    else {
+                        return
+                    }
+                    
+                    print("History transactions", transactions)
+                    
+                    if let newToken = transactions.last?.token {
+                        self.storeHistoryToken(newToken)
+                    }
+                    
+                } catch {
+                    // log any errors
+                }
+            }
+        }
+    }
+    
+    private func storeHistoryToken(_ token: NSPersistentHistoryToken) {
+        do {
+            let data = try NSKeyedArchiver
+                .archivedData(withRootObject: token, requiringSecureCoding: true)
+            try data.write(to: tokenFileURL)
+            lastHistoryToken = token
+        } catch {
+            // log any errors
+        }
+    }
+    
+    private func loadHistoryToken() {
+        do {
+            let tokenData = try Data(contentsOf: tokenFileURL)
+            lastHistoryToken = try NSKeyedUnarchiver
+                .unarchivedObject(ofClass: NSPersistentHistoryToken.self, from: tokenData)
+        } catch {
+            // log any errors
+        }
+    }
+    
+    private func mergeChanges(from transactions: [NSPersistentHistoryTransaction]) {
+        let context = container.viewContext
+        context.perform {
+            transactions.forEach { transaction in
+                guard let userInfo = transaction.objectIDNotification().userInfo else {
+                    return
+                }
+                
+                NSManagedObjectContext
+                    .mergeChanges(fromRemoteContextSave: userInfo, into: [context])
+            }
+        }
+    }
+    
+    
 }
