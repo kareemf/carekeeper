@@ -47,7 +47,7 @@ class PersistenceController {
         return url.appendingPathComponent("token.data", isDirectory: false)
     }()
     
-    
+    private var watchConnectivity = WatchConnectivityController.shared
     
     init(inMemory: Bool = false) {
         container = NSPersistentContainer(name: "CareKeeperCoreData")
@@ -129,9 +129,13 @@ class PersistenceController {
                     
                     print("History transactions", transactions)
                     
+                    self.mergeChanges(from: transactions)
+                    
                     if let newToken = transactions.last?.token {
                         self.storeHistoryToken(newToken)
                     }
+                    
+                    self.watchConnectivity.send(notification: notification)
                     
                 } catch {
                     // log any errors
