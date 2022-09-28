@@ -8,6 +8,7 @@
     </entity>
     <entity name="Behavior" representedClassName="Behavior" syncable="YES" codeGenerationType="class">
         <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="icon" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="activities" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Activity" inverseName="behavior" inverseEntity="Activity"/>
         <relationship name="caree" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Caree" inverseName="behaviors" inverseEntity="Caree"/>

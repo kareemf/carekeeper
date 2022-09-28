@@ -14,7 +14,8 @@ struct ContentView: View {
             List {
                 ForEach(carees) { caree in
                     NavigationLink {
-                        Text("Caree \(caree.name ?? "")")
+                        //Text("Caree \(caree.name ?? "")")
+                        CareeDetailView(caree: caree, viewContext: viewContext)
                     } label: {
                         Text(caree.name ?? "")
                     }
@@ -35,12 +36,26 @@ struct ContentView: View {
             }
             Text("Select an item")
         }
+        .navigationTitle("In My Care")
     }
 
     private func addCaree() {
         withAnimation {
             let newCaree = Caree(context: viewContext)
             newCaree.dateCreated = Date()
+            newCaree.name = "foo"
+            
+            let behavior = Behavior(context: viewContext)
+            
+            behavior.caree = newCaree
+            behavior.name = "behave"
+            newCaree.dateCreated = Date()
+            
+            let activity = Activity(context: viewContext)
+            activity.caree = newCaree
+            activity.behavior = behavior
+            activity.when = Date()
+            
 
             do {
                 try viewContext.save()
