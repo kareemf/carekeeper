@@ -14,13 +14,15 @@
 		514B883F28E3873700B81198 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B883E28E3873700B81198 /* Assets.xcassets */; };
 		514B884328E3873700B81198 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B884228E3873700B81198 /* Preview Assets.xcassets */; };
 		514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */; };
-		514B885228E3875100B81198 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B885128E3875100B81198 /* ContentView.swift */; };
 		514B885428E3875100B81198 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B885328E3875100B81198 /* Assets.xcassets */; };
 		514B885728E3875100B81198 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B885628E3875100B81198 /* Preview Assets.xcassets */; };
 		514B885C28E3D7A800B81198 /* WatchConnectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B885B28E3D7A800B81198 /* WatchConnectivity.swift */; };
 		514B885D28E3D7A800B81198 /* WatchConnectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B885B28E3D7A800B81198 /* WatchConnectivity.swift */; };
 		514B885F28E3EEC800B81198 /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B885E28E3EEC800B81198 /* CareeDetailView.swift */; };
 		514B886028E3EEC800B81198 /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B885E28E3EEC800B81198 /* CareeDetailView.swift */; };
+		514B888728E50E8800B81198 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883C28E3873500B81198 /* ContentView.swift */; };
+		514B888828E50E8800B81198 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883728E3873500B81198 /* Persistence.swift */; };
+		514B888C28E50FCF00B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 514B883928E3873500B81198 /* CareKeeperCoreData.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,7 +36,6 @@
 		514B884228E3873700B81198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		514B884D28E3875000B81198 /* CareKeeperWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CareKeeperWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWatchApp.swift; sourceTree = "<group>"; };
-		514B885128E3875100B81198 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		514B885328E3875100B81198 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		514B885628E3875100B81198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		514B885B28E3D7A800B81198 /* WatchConnectivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchConnectivity.swift; sourceTree = "<group>"; };
@@ -105,7 +106,6 @@
 			isa = PBXGroup;
 			children = (
 				514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */,
-				514B885128E3875100B81198 /* ContentView.swift */,
 				514B885328E3875100B81198 /* Assets.xcassets */,
 				514B885528E3875100B81198 /* Preview Content */,
 			);
@@ -234,7 +234,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				514B885D28E3D7A800B81198 /* WatchConnectivity.swift in Sources */,
-				514B885228E3875100B81198 /* ContentView.swift in Sources */,
+				514B888728E50E8800B81198 /* ContentView.swift in Sources */,
+				514B888C28E50FCF00B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,
+				514B888828E50E8800B81198 /* Persistence.swift in Sources */,
 				514B886028E3EEC800B81198 /* CareeDetailView.swift in Sources */,
 				514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */,
 			);
@@ -396,10 +398,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CareKeeperCoreData/CareKeeperCoreData.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperCoreData/Preview Content\"";
-				DEVELOPMENT_TEAM = 8C7EB23ZZP;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -420,6 +423,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = kareemf.CareKeeperCoreData;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = YES;

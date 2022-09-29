@@ -131,11 +131,13 @@ class PersistenceController {
                     
                     self.mergeChanges(from: transactions)
                     
+                    
                     if let newToken = transactions.last?.token {
                         self.storeHistoryToken(newToken)
                     }
                     
-                    self.watchConnectivity.send(notification: notification)
+                    
+                    self.watchConnectivity.send(context: self.container.viewContext)
                     
                 } catch {
                     // log any errors
@@ -167,6 +169,7 @@ class PersistenceController {
     
     private func mergeChanges(from transactions: [NSPersistentHistoryTransaction]) {
         let context = container.viewContext
+        
         context.perform {
             transactions.forEach { transaction in
                 guard let userInfo = transaction.objectIDNotification().userInfo else {

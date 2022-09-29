@@ -4,6 +4,8 @@ import CoreData
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
+    @StateObject private var watchConnectivity = WatchConnectivityController.shared
+
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Caree.name, ascending: false)],
         animation: .default)
@@ -34,9 +36,14 @@ struct ContentView: View {
                     }
                 }
             }
+            .navigationTitle("In My Care")
+            .alert(item: $watchConnectivity.notificationMessageRecived) { message in
+                 Alert(title: Text(message.text),
+                       dismissButton: .default(Text("Dismiss")))
+            }
             Text("Select an item")
         }
-        .navigationTitle("In My Care")
+        
     }
 
     private func addCaree() {

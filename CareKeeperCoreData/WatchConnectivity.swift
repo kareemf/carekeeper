@@ -110,7 +110,7 @@ class WatchConnectivityController: NSObject, WCSessionDelegate, ObservableObject
     }
     #endif
     
-    public func send(notification: Notification) {
+    public func send(context: NSManagedObjectContext) {
         guard WCSession.default.activationState == .activated else {
             print("Watch: session inactive")
             self.notificationMessageRecived = NotificationMessage(text: "Watch session inactive")
@@ -134,18 +134,40 @@ class WatchConnectivityController: NSObject, WCSessionDelegate, ObservableObject
         let dateFormatter = DateFormatter()
         dateFormatter.timeStyle = .medium
         let timeStamp = dateFormatter.string(from: Date())
+        
+        //        TODO: error handling
+//        let json = try! JSONEncoder().encode(notification.userInfo)
+        
+//        print(notification.userInfo)
+        
+    
 
         messageSent = [
             ConnectivityKey.timeStamp.rawValue: timeStamp,
             ConnectivityKey.messageType.rawValue: ConnectivityKey.syncInit.rawValue,
-            ConnectivityKey.message.rawValue: notification
+            "insertedObjects": context.insertedObjects.map({ obj in
+                obj.entity.attributesByName
+            }),
+            "updatedObjects": context.updatedObjects.map({ obj in
+                obj.entity.attributesByName
+            }),
+            "deletedObjects": context.deletedObjects.map({ obj in
+                obj.entity.attributesByName
+            }),
         ]
 
         WCSession.default.sendMessage(messageSent!, replyHandler: nil, errorHandler: { error in
             DispatchQueue.main.async { [weak self] in
+                print("Watch: send: Cannot send message: \(String(describing: error))")
                 self?.notificationMessageRecived = NotificationMessage(text: "Cannot send message: \(String(describing: error))")
             }
         })
+        
+//        do{
+//            try WCSession.default.updateApplicationContext(messageSent!)
+//        } catch {
+//            print("Watch updateApplicationContext error", error)
+//        }
 
         //        TODO: transferUserInfo for non sims
         //        userInfoSent = [ConnectivityKey.timeStamp.rawValue: timeStamp, "carees": carees]
