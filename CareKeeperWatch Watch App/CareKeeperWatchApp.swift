@@ -1,9 +1,9 @@
-//
-//  CareKeeperWatchApp.swift
-//  CareKeeperWatch Watch App
-//
-//  Created by Kareem Francis on 9/27/22.
-//
+func ??<T>(lhs: Binding<Optional<T>>, rhs: T) -> Binding<T> {
+    Binding(
+        get: { lhs.wrappedValue ?? rhs },
+        set: { lhs.wrappedValue = $0 }
+    )
+}
 
 import SwiftUI
 
@@ -13,7 +13,7 @@ struct CareKeeperWatch_Watch_AppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            CareeListView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }

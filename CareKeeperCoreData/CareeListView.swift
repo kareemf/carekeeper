@@ -1,10 +1,13 @@
 import SwiftUI
 import CoreData
 
-struct ContentView: View {
+struct CareeListView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
     @StateObject private var watchConnectivity = WatchConnectivityController.shared
+    
+    @State private var isPresentingNewCareeView = false
+    @State private var name = ""
 
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Caree.name, ascending: false)],
@@ -16,7 +19,6 @@ struct ContentView: View {
             List {
                 ForEach(carees) { caree in
                     NavigationLink {
-                        //Text("Caree \(caree.name ?? "")")
                         CareeDetailView(caree: caree, viewContext: viewContext)
                     } label: {
                         Text(caree.name ?? "")
@@ -31,7 +33,9 @@ struct ContentView: View {
                 }
 #endif
                 ToolbarItem {
-                    Button(action: addCaree) {
+                    Button(action: {
+                        isPresentingNewCareeView = true
+                    }) {
                         Label("Add Caree", systemImage: "plus")
                     }
                 }
@@ -41,31 +45,38 @@ struct ContentView: View {
                  Alert(title: Text(message.text),
                        dismissButton: .default(Text("Dismiss")))
             }
-            Text("Select an item")
+            .sheet(isPresented: $isPresentingNewCareeView) {
+                NavigationView {
+                    VStack {
+                        TextField("Name", text: $name)
+                            .toolbar {
+                                ToolbarItem(placement: .cancellationAction) {
+                                    Button("Cancel") {
+                                        isPresentingNewCareeView = false
+                                    }
+                                }
+                                ToolbarItem(placement: .confirmationAction) {
+                                    Button("Add") {
+                                        isPresentingNewCareeView = false
+                                        addCaree()
+                                    }.disabled(name.isEmpty)
+                                }
+                            }
+                    }
+                }
+            }
         }
-        
     }
 
     private func addCaree() {
         withAnimation {
             let newCaree = Caree(context: viewContext)
             newCaree.dateCreated = Date()
-            newCaree.name = "foo"
+            newCaree.name = name
             
-            let behavior = Behavior(context: viewContext)
-            
-            behavior.caree = newCaree
-            behavior.name = "behave"
-            newCaree.dateCreated = Date()
-            
-            let activity = Activity(context: viewContext)
-            activity.caree = newCaree
-            activity.behavior = behavior
-            activity.when = Date()
-            
-
             do {
                 try viewContext.save()
+                name = ""
             } catch {
                 // Replace this implementation with code to handle the error appropriately.
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
@@ -100,6 +111,6 @@ private let itemFormatter: DateFormatter = {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        CareeListView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }

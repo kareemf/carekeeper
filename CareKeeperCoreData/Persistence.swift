@@ -137,7 +137,7 @@ class PersistenceController {
                     }
                     
                     
-                    self.watchConnectivity.send(context: self.container.viewContext)
+//                    self.watchConnectivity.send(context: self.container.viewContext)
                     
                 } catch {
                     // log any errors

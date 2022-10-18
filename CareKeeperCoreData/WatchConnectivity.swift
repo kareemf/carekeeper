@@ -120,7 +120,7 @@ class WatchConnectivityController: NSObject, WCSessionDelegate, ObservableObject
         #if !os(watchOS)
         guard WCSession.default.isWatchAppInstalled else {
             print("Watch: isWatchAppInstalled false")
-            self.notificationMessageRecived = NotificationMessage(text: "Watch app not installed")
+//            self.notificationMessageRecived = NotificationMessage(text: "Watch app not installed")
             return
         }
         #else

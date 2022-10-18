@@ -10,7 +10,7 @@
 		514B883628E3873500B81198 /* CareKeeperCoreDataApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883528E3873500B81198 /* CareKeeperCoreDataApp.swift */; };
 		514B883828E3873500B81198 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883728E3873500B81198 /* Persistence.swift */; };
 		514B883B28E3873500B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 514B883928E3873500B81198 /* CareKeeperCoreData.xcdatamodeld */; };
-		514B883D28E3873500B81198 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883C28E3873500B81198 /* ContentView.swift */; };
+		514B883D28E3873500B81198 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883C28E3873500B81198 /* CareeListView.swift */; };
 		514B883F28E3873700B81198 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B883E28E3873700B81198 /* Assets.xcassets */; };
 		514B884328E3873700B81198 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B884228E3873700B81198 /* Preview Assets.xcassets */; };
 		514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */; };
@@ -20,9 +20,19 @@
 		514B885D28E3D7A800B81198 /* WatchConnectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B885B28E3D7A800B81198 /* WatchConnectivity.swift */; };
 		514B885F28E3EEC800B81198 /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B885E28E3EEC800B81198 /* CareeDetailView.swift */; };
 		514B886028E3EEC800B81198 /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B885E28E3EEC800B81198 /* CareeDetailView.swift */; };
-		514B888728E50E8800B81198 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883C28E3873500B81198 /* ContentView.swift */; };
+		514B888728E50E8800B81198 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883C28E3873500B81198 /* CareeListView.swift */; };
 		514B888828E50E8800B81198 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883728E3873500B81198 /* Persistence.swift */; };
 		514B888C28E50FCF00B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 514B883928E3873500B81198 /* CareKeeperCoreData.xcdatamodeld */; };
+		5189F0FE28F89FE70097E7E4 /* BehaviorEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F0FD28F89FE70097E7E4 /* BehaviorEditView.swift */; };
+		5189F0FF28F89FE70097E7E4 /* BehaviorEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F0FD28F89FE70097E7E4 /* BehaviorEditView.swift */; };
+		5189F10128F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10028F8CC8C0097E7E4 /* ActivityDetailView.swift */; };
+		5189F10228F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10028F8CC8C0097E7E4 /* ActivityDetailView.swift */; };
+		5189F10428F8CEB10097E7E4 /* BehaviorListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10328F8CEB10097E7E4 /* BehaviorListItemView.swift */; };
+		5189F10528F8CEB10097E7E4 /* BehaviorListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10328F8CEB10097E7E4 /* BehaviorListItemView.swift */; };
+		5189F10828F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10728F8CF880097E7E4 /* ActivityTrackingViewStep1.swift */; };
+		5189F10928F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10728F8CF880097E7E4 /* ActivityTrackingViewStep1.swift */; };
+		5189F10B28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */; };
+		5189F10C28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,7 +40,7 @@
 		514B883528E3873500B81198 /* CareKeeperCoreDataApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperCoreDataApp.swift; sourceTree = "<group>"; };
 		514B883728E3873500B81198 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		514B883A28E3873500B81198 /* CareKeeperCoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CareKeeperCoreData.xcdatamodel; sourceTree = "<group>"; };
-		514B883C28E3873500B81198 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		514B883C28E3873500B81198 /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
 		514B883E28E3873700B81198 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		514B884028E3873700B81198 /* CareKeeperCoreData.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CareKeeperCoreData.entitlements; sourceTree = "<group>"; };
 		514B884228E3873700B81198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -40,6 +50,12 @@
 		514B885628E3875100B81198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		514B885B28E3D7A800B81198 /* WatchConnectivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchConnectivity.swift; sourceTree = "<group>"; };
 		514B885E28E3EEC800B81198 /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
+		514D926E28F7AED100CBF67E /* Scraps.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Scraps.md; sourceTree = "<group>"; };
+		5189F0FD28F89FE70097E7E4 /* BehaviorEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorEditView.swift; sourceTree = "<group>"; };
+		5189F10028F8CC8C0097E7E4 /* ActivityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailView.swift; sourceTree = "<group>"; };
+		5189F10328F8CEB10097E7E4 /* BehaviorListItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorListItemView.swift; sourceTree = "<group>"; };
+		5189F10728F8CF880097E7E4 /* ActivityTrackingViewStep1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTrackingViewStep1.swift; sourceTree = "<group>"; };
+		5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTrackingViewStep2.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,10 +97,15 @@
 		514B883428E3873500B81198 /* CareKeeperCoreData */ = {
 			isa = PBXGroup;
 			children = (
+				5189F10628F8CF700097E7E4 /* ActivityTracking */,
+				5189F10328F8CEB10097E7E4 /* BehaviorListItemView.swift */,
+				5189F10028F8CC8C0097E7E4 /* ActivityDetailView.swift */,
+				5189F0FD28F89FE70097E7E4 /* BehaviorEditView.swift */,
 				514B883528E3873500B81198 /* CareKeeperCoreDataApp.swift */,
 				514B883728E3873500B81198 /* Persistence.swift */,
-				514B883C28E3873500B81198 /* ContentView.swift */,
+				514B883C28E3873500B81198 /* CareeListView.swift */,
 				514B885B28E3D7A800B81198 /* WatchConnectivity.swift */,
+				514D926E28F7AED100CBF67E /* Scraps.md */,
 				514B883E28E3873700B81198 /* Assets.xcassets */,
 				514B884028E3873700B81198 /* CareKeeperCoreData.entitlements */,
 				514B883928E3873500B81198 /* CareKeeperCoreData.xcdatamodeld */,
@@ -118,6 +139,15 @@
 				514B885628E3875100B81198 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		5189F10628F8CF700097E7E4 /* ActivityTracking */ = {
+			isa = PBXGroup;
+			children = (
+				5189F10728F8CF880097E7E4 /* ActivityTrackingViewStep1.swift */,
+				5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */,
+			);
+			path = ActivityTracking;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -222,10 +252,15 @@
 			files = (
 				514B885C28E3D7A800B81198 /* WatchConnectivity.swift in Sources */,
 				514B883628E3873500B81198 /* CareKeeperCoreDataApp.swift in Sources */,
+				5189F10828F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
 				514B883828E3873500B81198 /* Persistence.swift in Sources */,
-				514B883D28E3873500B81198 /* ContentView.swift in Sources */,
+				5189F10B28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */,
+				514B883D28E3873500B81198 /* CareeListView.swift in Sources */,
 				514B885F28E3EEC800B81198 /* CareeDetailView.swift in Sources */,
+				5189F0FE28F89FE70097E7E4 /* BehaviorEditView.swift in Sources */,
+				5189F10128F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */,
 				514B883B28E3873500B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,
+				5189F10428F8CEB10097E7E4 /* BehaviorListItemView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -234,11 +269,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				514B885D28E3D7A800B81198 /* WatchConnectivity.swift in Sources */,
-				514B888728E50E8800B81198 /* ContentView.swift in Sources */,
+				514B888728E50E8800B81198 /* CareeListView.swift in Sources */,
+				5189F10928F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
 				514B888C28E50FCF00B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,
+				5189F10C28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */,
 				514B888828E50E8800B81198 /* Persistence.swift in Sources */,
 				514B886028E3EEC800B81198 /* CareeDetailView.swift in Sources */,
+				5189F0FF28F89FE70097E7E4 /* BehaviorEditView.swift in Sources */,
+				5189F10228F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */,
 				514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */,
+				5189F10528F8CEB10097E7E4 /* BehaviorListItemView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,6 +400,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CareKeeperCoreData/CareKeeperCoreData.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperCoreData/Preview Content\"";
@@ -382,8 +423,9 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = kareemf.CareKeeperCoreData;
+				PRODUCT_BUNDLE_IDENTIFIER = kareemf.CareKeeper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -402,7 +444,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperCoreData/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 8C7EB23ZZP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -421,7 +463,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = kareemf.CareKeeperCoreData;
+				PRODUCT_BUNDLE_IDENTIFIER = kareemf.CareKeeper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
