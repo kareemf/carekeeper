@@ -27,13 +27,13 @@ class PersistenceController {
     private static let remoteDataImportAuthorName = "CareKeeper Data Import"
     
     
-    let container: NSPersistentContainer
+    let container: NSPersistentCloudKitContainer
     private var subscriptions = [AnyCancellable]()
     private lazy var historyRequestQueue = DispatchQueue(label: "history")
     
     private var lastHistoryToken: NSPersistentHistoryToken?
     private lazy var tokenFileURL: URL = {
-        let url = NSPersistentContainer.defaultDirectoryURL()
+        let url = NSPersistentCloudKitContainer.defaultDirectoryURL()
             .appendingPathComponent("CareKeeper", isDirectory: true)
         do {
             try FileManager.default
@@ -50,7 +50,7 @@ class PersistenceController {
     private var watchConnectivity = WatchConnectivityController.shared
     
     init(inMemory: Bool = false) {
-        container = NSPersistentContainer(name: "CareKeeperCoreData")
+        container = NSPersistentCloudKitContainer(name: "CareKeeperCoreData")
         
         let persistentStoreDescription = container.persistentStoreDescriptions.first!
         
