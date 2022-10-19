@@ -18,6 +18,12 @@ class PersistenceController {
             behavior.caree = caree
             behavior.icon = "🏃🏾"
             
+            let behavior2 = Behavior(context: viewContext)
+            behavior2.dateCreated = Date()
+            behavior2.name = "Behavior"
+            behavior2.caree = caree
+//            behavior2.icon = "🏃🏾"
+            
             let activity = Activity(context: viewContext)
             activity.dateCreated = Date()
             activity.when = activity.dateCreated

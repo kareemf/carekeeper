@@ -74,7 +74,7 @@ struct CareeDetailView: View {
                         }
                 }
             }
-            Section(header: Text("Activity")) {
+            Section(header: Text("Activity").foregroundColor(.green)) {
                 NavigationLink(destination: ActivityTrackingViewStep1(caree: caree, isPresentingView: $isPresentingActivityTrackingView, behaviors: behaviors, saveAction: saveAction), isActive: $isPresentingActivityTrackingView) {
                     Button(action: {
                         self.isPresentingActivityTrackingView = true
@@ -87,7 +87,7 @@ struct CareeDetailView: View {
             }
             
             
-            Section(header: Text("Behaviors")) {
+            Section(header: Text("Behaviors").foregroundColor(.mint)) {
                 Button(action: {
                     let newBehavior = Behavior(context: viewContext)
                     newBehavior.caree = caree
@@ -95,7 +95,7 @@ struct CareeDetailView: View {
                     self.selectedBehavior = newBehavior
                     self.isPresentingBehaviorEditView = true
                 }) {
-                    Label("Create Behavior To Track", systemImage: "plus")
+                    Label("Create Behavior", systemImage: "plus")
                         .font(.headline)
                 }
                 .foregroundColor(.mint)
@@ -112,10 +112,11 @@ struct CareeDetailView: View {
                         BehaviorListItemView(behavior: behavior)
                     }
                     .foregroundColor(.mint)
+                    
                 }.onDelete(perform: deleteBehaviors)
             }
             
-            Section(header: Text("Activities")) {
+            Section(header: Text("Activities").foregroundColor(.red)) {
                 if activities.isEmpty {
                     Text("No activities tracked yet")
                 }
@@ -136,6 +137,8 @@ struct CareeDetailView: View {
                             }
                         }
                     }
+                    .foregroundColor(.red)
+                    
                 }.onDelete(perform: deleteActivities)
             }
         }

@@ -9,6 +9,20 @@ struct ActivityTrackingViewStep2: View {
     @Environment(\.dismiss) var dismiss
     
     let saveAction: () -> Void
+    
+    func handleSavePress() {
+        let newActivity = Activity(context: viewContext)
+        
+        newActivity.caree = caree
+        newActivity.behavior = behavior
+        newActivity.notes = notes
+        newActivity.when = Date()
+        
+        isPresentingView = false
+        saveAction()
+//                TODO: not needed if isPresentingView works as intended
+        dismiss()
+    }
 
     var body: some View {
         VStack {
@@ -16,19 +30,11 @@ struct ActivityTrackingViewStep2: View {
             Form {
                 TextField("Notes", text: $notes)
             }
-            Button("Save") {
-                let newActivity = Activity(context: viewContext)
-                
-                newActivity.caree = caree
-                newActivity.behavior = behavior
-                newActivity.notes = notes
-                newActivity.when = Date()
-                
-                isPresentingView = false
-                saveAction()
-//                TODO: not needed if isPresentingView works as intended
-                dismiss()
+            Button("Done") {
+                handleSavePress()
             }
+            .font(.system(.headline, design: .rounded))
+            .foregroundColor(.red)
         }
     }
 }

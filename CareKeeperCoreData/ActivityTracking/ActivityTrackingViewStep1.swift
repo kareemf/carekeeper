@@ -20,10 +20,15 @@ struct ActivityTrackingViewStep1: View {
                 
                 ForEach(behaviors) { behavior in
                     NavigationLink(destination: ActivityTrackingViewStep2(caree: caree, behavior: behavior, isPresentingView: $isPresentingView, saveAction: saveAction)) {
-                        Text("\(behavior.icon ?? "")\(behavior.name ?? "")")
+                        BehaviorListItem(behavior: behavior)
+                            .frame(height: 100.0)
+                            .foregroundColor(.mint)
                     }
                 }
             }
+#if os(watchOS)
+            .listStyle(CarouselListStyle())
+#endif
         }.onAppear(perform: {
 //                TODO: not needed if isPresentingView works as intended
             if !isPresentingView {
@@ -31,6 +36,26 @@ struct ActivityTrackingViewStep1: View {
             }
 
         })
+    }
+}
+
+struct BehaviorListItem: View {
+    var behavior: Behavior
+
+    var body: some View {
+        HStack {
+            if behavior.icon != nil {
+                Text(behavior.icon ?? "")
+                    .font(.title)                
+            }
+
+            VStack(alignment: .leading) {
+                Text(behavior.name ?? "")
+                    .font(.system(.headline, design: .rounded))
+                Text("\(behavior.activities?.count ?? 0) activities")
+
+            }
+        }
     }
 }
 

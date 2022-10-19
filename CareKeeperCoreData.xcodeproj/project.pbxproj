@@ -497,7 +497,7 @@
 				INFOPLIST_FILE = "CareKeeperWatch-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = CareKeeperWatch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = kareemf.CareKeeper;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -529,7 +529,7 @@
 				INFOPLIST_FILE = "CareKeeperWatch-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = CareKeeperWatch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = kareemf.CareKeeper;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

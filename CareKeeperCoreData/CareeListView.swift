@@ -20,12 +20,17 @@ struct CareeListView: View {
                 ForEach(carees) { caree in
                     NavigationLink {
                         CareeDetailView(caree: caree)
+                            .frame(height: 100.0)
                     } label: {
-                        Text(caree.name ?? "")
+                        // Text(caree.name ?? "")
+                        CareeListItem(caree: caree)
                     }
                 }
                 .onDelete(perform: deleteCarees)
             }
+#if os(watchOS)
+            .listStyle(CarouselListStyle())
+#endif
 //            TODO: fix inactive toolbar after edit
             .toolbar {
 #if os(iOS)
@@ -100,6 +105,24 @@ struct CareeListView: View {
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            }
+        }
+    }
+}
+
+struct CareeListItem: View {
+    var caree: Caree
+
+    var body: some View {
+        HStack {
+            // Text(caree.emoji)
+            //     .font(.title)
+            VStack(alignment: .leading) {
+                Text(caree.name ?? "")
+                    .font(.system(.headline, design: .rounded))
+                Text("\(caree.behaviors?.count ?? 0) behaviors")
+                Text("\(caree.activities?.count ?? 0) activities")
+
             }
         }
     }
