@@ -19,13 +19,14 @@ struct CareeListView: View {
             List {
                 ForEach(carees) { caree in
                     NavigationLink {
-                        CareeDetailView(caree: caree, viewContext: viewContext)
+                        CareeDetailView(caree: caree)
                     } label: {
                         Text(caree.name ?? "")
                     }
                 }
                 .onDelete(perform: deleteCarees)
             }
+//            TODO: fix inactive toolbar after edit
             .toolbar {
 #if os(iOS)
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -46,22 +47,23 @@ struct CareeListView: View {
                        dismissButton: .default(Text("Dismiss")))
             }
             .sheet(isPresented: $isPresentingNewCareeView) {
+//                TODO: fix height and focus
                 NavigationView {
-                    VStack {
+                    Form {
                         TextField("Name", text: $name)
-                            .toolbar {
-                                ToolbarItem(placement: .cancellationAction) {
-                                    Button("Cancel") {
-                                        isPresentingNewCareeView = false
-                                    }
-                                }
-                                ToolbarItem(placement: .confirmationAction) {
-                                    Button("Add") {
-                                        isPresentingNewCareeView = false
-                                        addCaree()
-                                    }.disabled(name.isEmpty)
-                                }
+                    }
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                isPresentingNewCareeView = false
                             }
+                        }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Add") {
+                                isPresentingNewCareeView = false
+                                addCaree()
+                            }.disabled(name.isEmpty)
+                        }
                     }
                 }
             }
@@ -88,6 +90,7 @@ struct CareeListView: View {
 
     private func deleteCarees(offsets: IndexSet) {
         withAnimation {
+//            TODO: cascade delete to behaviors and activities
             offsets.map { carees[$0] }.forEach(viewContext.delete)
 
             do {

@@ -37,6 +37,8 @@
 
 /* Begin PBXFileReference section */
 		5101151928FF57A70009D7EC /* CareKeeperWatch Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeperWatch Watch App.entitlements"; sourceTree = "<group>"; };
+		5101151A28FF5B2A0009D7EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		5101151B28FF5B390009D7EC /* CareKeeperWatch-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "CareKeeperWatch-Watch-App-Info.plist"; sourceTree = SOURCE_ROOT; };
 		514B883228E3873500B81198 /* CareKeeperCoreData.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CareKeeperCoreData.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		514B883528E3873500B81198 /* CareKeeperCoreDataApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperCoreDataApp.swift; sourceTree = "<group>"; };
 		514B883728E3873500B81198 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
@@ -98,6 +100,7 @@
 		514B883428E3873500B81198 /* CareKeeperCoreData */ = {
 			isa = PBXGroup;
 			children = (
+				5101151A28FF5B2A0009D7EC /* Info.plist */,
 				5189F10628F8CF700097E7E4 /* ActivityTracking */,
 				5189F10328F8CEB10097E7E4 /* BehaviorListItemView.swift */,
 				5189F10028F8CC8C0097E7E4 /* ActivityDetailView.swift */,
@@ -127,6 +130,7 @@
 		514B884E28E3875000B81198 /* CareKeeperWatch Watch App */ = {
 			isa = PBXGroup;
 			children = (
+				5101151B28FF5B390009D7EC /* CareKeeperWatch-Watch-App-Info.plist */,
 				5101151928FF57A70009D7EC /* CareKeeperWatch Watch App.entitlements */,
 				514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */,
 				514B885328E3875100B81198 /* Assets.xcassets */,
@@ -410,6 +414,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CareKeeperCoreData/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -450,6 +455,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CareKeeperCoreData/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -488,6 +494,7 @@
 				DEVELOPMENT_TEAM = 8C7EB23ZZP;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "CareKeeperWatch-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = CareKeeperWatch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "";
@@ -519,6 +526,7 @@
 				DEVELOPMENT_TEAM = 8C7EB23ZZP;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "CareKeeperWatch-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = CareKeeperWatch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "";

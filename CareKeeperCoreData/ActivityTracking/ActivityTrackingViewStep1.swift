@@ -4,6 +4,7 @@ struct ActivityTrackingViewStep1: View {
     @ObservedObject var caree: Caree
     @Binding var isPresentingView: Bool
     var behaviors: [Behavior]
+    @Environment(\.dismiss) var dismiss
 
     let saveAction: () -> Void
     
@@ -23,21 +24,30 @@ struct ActivityTrackingViewStep1: View {
                     }
                 }
             }
-        }
+        }.onAppear(perform: {
+//                TODO: not needed if isPresentingView works as intended
+            if !isPresentingView {
+                dismiss()
+            }
+
+        })
     }
 }
 
 struct TrackActivityView_Previews: PreviewProvider {
-//    static var caree = Caree.sampleData[0]
+    static let viewContext = PersistenceController.preview.container.viewContext
+    static let fetchCareeRequest = Caree.fetchRequest()
+    static let carees = try! viewContext.fetch(fetchCareeRequest)
     
     static var previews: some View {
         NavigationView {
-            Text("TODO")
-//            ActivityTrackingViewStep1(
-//                caree: .constant(caree),
-//                isPresentingView: .constant(true),
-//                saveAction: {}
-//            )
+            ActivityTrackingViewStep1(
+                caree: carees[0],
+                isPresentingView: .constant(true),
+                behaviors: carees[0].behaviors!.allObjects as! [Behavior],
+                saveAction: {}
+            )
+            .environment(\.managedObjectContext, viewContext)
         }
     }
 }

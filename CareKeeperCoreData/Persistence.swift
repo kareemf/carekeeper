@@ -7,9 +7,22 @@ class PersistenceController {
     static var preview: PersistenceController = {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-        for _ in 0..<10 {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
+        for i in 0..<10 {
+            let caree = Caree(context: viewContext)
+            caree.dateCreated = Date()
+            caree.name = "Caree \(i)"
+            
+            let behavior = Behavior(context: viewContext)
+            behavior.dateCreated = Date()
+            behavior.name = "Behavior"
+            behavior.caree = caree
+            behavior.icon = "🏃🏾"
+            
+            let activity = Activity(context: viewContext)
+            activity.dateCreated = Date()
+            activity.when = activity.dateCreated
+            activity.caree = caree
+            activity.behavior = behavior
         }
         do {
             try viewContext.save()

@@ -2,18 +2,19 @@ import SwiftUI
 import CoreData
 
 struct CareeDetailView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+
     @ObservedObject private var caree: Caree
-    private var viewContext: NSManagedObjectContext
     
-    @State private var name: String
+    @State private var name: String = ""
     @State private var isPresentingEditView = false
     
-    @State private var activities: [Activity]
+    @State private var activities: [Activity] = []
     @State private var selectedActivity: Activity?
     @State private var isPresentingActivityTrackingView = false
     @State private var isPresentingActivityDetailView = false
     
-    @State private var behaviors: [Behavior]
+    @State private var behaviors: [Behavior] = []
     @State private var selectedBehavior: Behavior?
     @State private var isPresentingBehaviorEditView = false
     
@@ -36,13 +37,8 @@ struct CareeDetailView: View {
         }
     }
     
-    init(caree: Caree, viewContext: NSManagedObjectContext) {
+    init(caree: Caree) {
         self.caree = caree
-        self.viewContext = viewContext
-        self.name = caree.name ?? ""
-        
-        activities = CareeDetailView.fetchActivities(caree, viewContext)
-        behaviors = CareeDetailView.fetchBehaviors(caree, viewContext)
     }
     
     private static func fetchActivities(_ caree: Caree, _ viewContext: NSManagedObjectContext) -> [Activity] {
@@ -143,11 +139,15 @@ struct CareeDetailView: View {
                 }.onDelete(perform: deleteActivities)
             }
         }
+        .onAppear(perform: {
+            activities = CareeDetailView.fetchActivities(caree, viewContext)
+            behaviors = CareeDetailView.fetchBehaviors(caree, viewContext)
+        })
         .navigationTitle(caree.name ?? "")
         .toolbar {
             ToolbarItem(placement: .automatic) {
                 if isPresentingEditView == true {
-                    Button("Done") {
+                    Button("Done") {                    
                         isPresentingEditView = false
                     }
                 } else {
@@ -161,7 +161,7 @@ struct CareeDetailView: View {
         .sheet(isPresented: .constant(isPresentingSheet)) {
             NavigationView {
                 if isPresentingBehaviorEditView {
-                    BehaviorEditView(data: selectedBehavior!)
+                    BehaviorEditView(behavior: selectedBehavior!)
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
                                 Button("Cancel") {
@@ -186,7 +186,7 @@ struct CareeDetailView: View {
                     
                 }
                 else if isPresentingActivityDetailView {
-                    ActivityDetailView(data: selectedActivity!)
+                    ActivityDetailView(activity: selectedActivity!)
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
                                 Button("Cancel") {
@@ -207,6 +207,7 @@ struct CareeDetailView: View {
     
     private func deleteBehaviors(offsets: IndexSet) {
         withAnimation {
+//            TODO: soft delete behaviors that still have activities
             offsets.map { behaviors[$0] }.forEach(viewContext.delete)
             saveAction()
         }
@@ -221,8 +222,14 @@ struct CareeDetailView: View {
 }
 
 struct CareeDetailView_Previews: PreviewProvider {
+    static let viewContext = PersistenceController.preview.container.viewContext
+    static let fetchCareeRequest = Caree.fetchRequest()
+    static let carees = try! viewContext.fetch(fetchCareeRequest)
+    
     static var previews: some View {
-        //        CareeDetailView()
-        Text("")
+        NavigationView {
+            CareeDetailView(caree: carees[0])
+                .environment(\.managedObjectContext, viewContext)
+        }
     }
 }
