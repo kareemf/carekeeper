@@ -7,7 +7,6 @@ struct CareeListView: View {
     @StateObject private var watchConnectivity = WatchConnectivityController.shared
     
     @State private var isPresentingNewCareeView = false
-    @State private var name = ""
 
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Caree.name, ascending: false)],
@@ -20,10 +19,9 @@ struct CareeListView: View {
                 ForEach(carees) { caree in
                     NavigationLink {
                         CareeDetailView(caree: caree)
-                            .frame(height: 100.0)
                     } label: {
-                        // Text(caree.name ?? "")
                         CareeListItem(caree: caree)
+                            .frame(height: 100.0)
                     }
                 }
                 .onDelete(perform: deleteCarees)
@@ -31,7 +29,6 @@ struct CareeListView: View {
 #if os(watchOS)
             .listStyle(CarouselListStyle())
 #endif
-//            TODO: fix inactive toolbar after edit
             .toolbar {
 #if os(iOS)
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -53,42 +50,7 @@ struct CareeListView: View {
             }
             .sheet(isPresented: $isPresentingNewCareeView) {
 //                TODO: fix height and focus
-                NavigationView {
-                    Form {
-                        TextField("Name", text: $name)
-                    }
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("Cancel") {
-                                isPresentingNewCareeView = false
-                            }
-                        }
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button("Add") {
-                                isPresentingNewCareeView = false
-                                addCaree()
-                            }.disabled(name.isEmpty)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private func addCaree() {
-        withAnimation {
-            let newCaree = Caree(context: viewContext)
-            newCaree.dateCreated = Date()
-            newCaree.name = name
-            
-            do {
-                try viewContext.save()
-                name = ""
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                CareeAddView(isPresenting: $isPresentingNewCareeView)
             }
         }
     }
@@ -114,15 +76,55 @@ struct CareeListItem: View {
     var caree: Caree
 
     var body: some View {
-        HStack {
-            // Text(caree.emoji)
-            //     .font(.title)
-            VStack(alignment: .leading) {
-                Text(caree.name ?? "")
-                    .font(.system(.headline, design: .rounded))
-                Text("\(caree.behaviors?.count ?? 0) behaviors")
-                Text("\(caree.activities?.count ?? 0) activities")
+        VStack(alignment: .leading) {
+            Text(caree.name ?? "")
+                .font(.system(.headline, design: .rounded))
+            Text("\(caree.behaviors?.count ?? 0) behaviors")
+            Text("\(caree.activities?.count ?? 0) activities")
+        }
+    }
+}
 
+struct CareeAddView: View {
+    @State private var name = ""
+    @Binding var isPresenting: Bool
+    @Environment(\.managedObjectContext) private var viewContext
+    
+    private func addCaree() {
+        withAnimation {
+            let newCaree = Caree(context: viewContext)
+            newCaree.dateCreated = Date()
+            newCaree.name = name
+            
+            do {
+                try viewContext.save()
+                name = ""
+            } catch {
+                // Replace this implementation with code to handle the error appropriately.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                let nsError = error as NSError
+                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            }
+        }
+    }
+
+    var body: some View {
+        NavigationView {
+            Form {
+                TextField("Name", text: $name)
+            }
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        isPresenting = false
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Add") {
+                        isPresenting = false
+                        addCaree()
+                    }.disabled(name.isEmpty)
+                }
             }
         }
     }
