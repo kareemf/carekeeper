@@ -9,10 +9,8 @@ struct ActivityTrackingViewStep1: View {
     let saveAction: () -> Void
     
     var body: some View {
-//        TODO: location
 //        TODO: dynamic fields like quaintity, rating
         VStack{
-            Text("Behavior To Track")
             List {
                 if behaviors.count == 0 {
                     Text("Configure some behaviors to track for \(caree.name ?? "") first")
@@ -29,8 +27,10 @@ struct ActivityTrackingViewStep1: View {
 #if os(watchOS)
             .listStyle(CarouselListStyle())
 #endif
-        }.onAppear(perform: {
-//                TODO: not needed if isPresentingView works as intended
+        }
+        .navigationTitle("\(caree.name ?? "") - Behavior To Track")
+        .onAppear(perform: {
+//            TODO: not needed if isPresentingView works as intended
             if !isPresentingView {
                 dismiss()
             }
@@ -53,7 +53,13 @@ struct BehaviorListItem: View {
                 Text(behavior.name ?? "")
                     .font(.system(.headline, design: .rounded))
                 Text("\(behavior.activities?.count ?? 0) activities")
-
+                
+                if behavior.enableLocations {
+                    HStack {
+                        Image(systemName: "location")
+                        Text("requests allowed")
+                    }
+                }
             }
         }
     }

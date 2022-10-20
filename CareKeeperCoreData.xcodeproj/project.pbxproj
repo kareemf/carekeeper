@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5101151D2900D7E50009D7EC /* LocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5101151C2900D7E50009D7EC /* LocationController.swift */; };
+		5101151E2900D7E50009D7EC /* LocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5101151C2900D7E50009D7EC /* LocationController.swift */; };
+		510115212900F64B0009D7EC /* UserLocationMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510115202900F64B0009D7EC /* UserLocationMap.swift */; };
+		510115222900F64B0009D7EC /* UserLocationMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510115202900F64B0009D7EC /* UserLocationMap.swift */; };
 		514B883628E3873500B81198 /* CareKeeperCoreDataApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883528E3873500B81198 /* CareKeeperCoreDataApp.swift */; };
 		514B883828E3873500B81198 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883728E3873500B81198 /* Persistence.swift */; };
 		514B883B28E3873500B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 514B883928E3873500B81198 /* CareKeeperCoreData.xcdatamodeld */; };
@@ -39,6 +43,8 @@
 		5101151928FF57A70009D7EC /* CareKeeperWatch Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeperWatch Watch App.entitlements"; sourceTree = "<group>"; };
 		5101151A28FF5B2A0009D7EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5101151B28FF5B390009D7EC /* CareKeeperWatch-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "CareKeeperWatch-Watch-App-Info.plist"; sourceTree = SOURCE_ROOT; };
+		5101151C2900D7E50009D7EC /* LocationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LocationController.swift; path = ../LocationController.swift; sourceTree = "<group>"; };
+		510115202900F64B0009D7EC /* UserLocationMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLocationMap.swift; sourceTree = "<group>"; };
 		514B883228E3873500B81198 /* CareKeeperCoreData.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CareKeeperCoreData.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		514B883528E3873500B81198 /* CareKeeperCoreDataApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperCoreDataApp.swift; sourceTree = "<group>"; };
 		514B883728E3873500B81198 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
@@ -79,6 +85,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5101151F2900DB190009D7EC /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				514B885B28E3D7A800B81198 /* WatchConnectivity.swift */,
+				514B883728E3873500B81198 /* Persistence.swift */,
+				5101151C2900D7E50009D7EC /* LocationController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
 		514B882928E3873500B81198 = {
 			isa = PBXGroup;
 			children = (
@@ -100,21 +116,21 @@
 		514B883428E3873500B81198 /* CareKeeperCoreData */ = {
 			isa = PBXGroup;
 			children = (
+				5101151F2900DB190009D7EC /* Controllers */,
 				5101151A28FF5B2A0009D7EC /* Info.plist */,
 				5189F10628F8CF700097E7E4 /* ActivityTracking */,
 				5189F10328F8CEB10097E7E4 /* BehaviorListItemView.swift */,
 				5189F10028F8CC8C0097E7E4 /* ActivityDetailView.swift */,
 				5189F0FD28F89FE70097E7E4 /* BehaviorEditView.swift */,
 				514B883528E3873500B81198 /* CareKeeperCoreDataApp.swift */,
-				514B883728E3873500B81198 /* Persistence.swift */,
 				514B883C28E3873500B81198 /* CareeListView.swift */,
-				514B885B28E3D7A800B81198 /* WatchConnectivity.swift */,
 				514D926E28F7AED100CBF67E /* Scraps.md */,
 				514B883E28E3873700B81198 /* Assets.xcassets */,
 				514B884028E3873700B81198 /* CareKeeperCoreData.entitlements */,
 				514B883928E3873500B81198 /* CareKeeperCoreData.xcdatamodeld */,
 				514B884128E3873700B81198 /* Preview Content */,
 				514B885E28E3EEC800B81198 /* CareeDetailView.swift */,
+				510115202900F64B0009D7EC /* UserLocationMap.swift */,
 			);
 			path = CareKeeperCoreData;
 			sourceTree = "<group>";
@@ -261,11 +277,13 @@
 				5189F10828F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
 				514B883828E3873500B81198 /* Persistence.swift in Sources */,
 				5189F10B28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */,
+				510115212900F64B0009D7EC /* UserLocationMap.swift in Sources */,
 				514B883D28E3873500B81198 /* CareeListView.swift in Sources */,
 				514B885F28E3EEC800B81198 /* CareeDetailView.swift in Sources */,
 				5189F0FE28F89FE70097E7E4 /* BehaviorEditView.swift in Sources */,
 				5189F10128F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */,
 				514B883B28E3873500B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,
+				5101151D2900D7E50009D7EC /* LocationController.swift in Sources */,
 				5189F10428F8CEB10097E7E4 /* BehaviorListItemView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -279,11 +297,13 @@
 				5189F10928F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
 				514B888C28E50FCF00B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,
 				5189F10C28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */,
+				510115222900F64B0009D7EC /* UserLocationMap.swift in Sources */,
 				514B888828E50E8800B81198 /* Persistence.swift in Sources */,
 				514B886028E3EEC800B81198 /* CareeDetailView.swift in Sources */,
 				5189F0FF28F89FE70097E7E4 /* BehaviorEditView.swift in Sources */,
 				5189F10228F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */,
 				514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */,
+				5101151E2900D7E50009D7EC /* LocationController.swift in Sources */,
 				5189F10528F8CEB10097E7E4 /* BehaviorListItemView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

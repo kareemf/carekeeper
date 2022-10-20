@@ -74,6 +74,7 @@ struct CareeDetailView: View {
                         }
                 }
             }
+            
             Section(header: Text("Activity").foregroundColor(.green)) {
                 NavigationLink(destination: ActivityTrackingViewStep1(caree: caree, isPresentingView: $isPresentingActivityTrackingView, behaviors: behaviors, saveAction: saveAction), isActive: $isPresentingActivityTrackingView) {
                     Button(action: {
@@ -83,10 +84,10 @@ struct CareeDetailView: View {
                             .font(.headline)
                     }
                     .foregroundColor(.green)
+                    .frame(height: 100.0)
                 }
             }
-            
-            
+                        
             Section(header: Text("Behaviors").foregroundColor(.mint)) {
                 Button(action: {
                     let newBehavior = Behavior(context: viewContext)

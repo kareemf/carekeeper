@@ -17,12 +17,12 @@ class PersistenceController {
             behavior.name = "Behavior"
             behavior.caree = caree
             behavior.icon = "🏃🏾"
+            behavior.enableLocations = true
             
             let behavior2 = Behavior(context: viewContext)
             behavior2.dateCreated = Date()
             behavior2.name = "Behavior"
             behavior2.caree = caree
-//            behavior2.icon = "🏃🏾"
             
             let activity = Activity(context: viewContext)
             activity.dateCreated = Date()
@@ -199,7 +199,5 @@ class PersistenceController {
                     .mergeChanges(fromRemoteContextSave: userInfo, into: [context])
             }
         }
-    }
-    
-    
+    }        
 }

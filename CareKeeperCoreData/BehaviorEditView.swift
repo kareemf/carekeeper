@@ -3,8 +3,15 @@ import SwiftUI
 
 struct BehaviorEditView: View {
     @ObservedObject var behavior: Behavior
-    @State private var newTag = ""
-
+    @State private var trackQuantity = false
+    @State private var unit = ""
+    @State private var isPresentingActivityTrackingView = false
+    
+    private var navTitle: String {
+        let isNew: Bool = behavior.objectID.isTemporaryID
+        return isNew ? "New Behavior" : "Behavior - \(behavior.name ?? "")"
+    }
+    
     var body: some View {
         Form {
             Section(header: Text("Info")) {
@@ -13,7 +20,33 @@ struct BehaviorEditView: View {
 //                TODO: limit to single char
                 TextField("Icon", text: $behavior.icon ?? "")
             }
+            
+            Section(header: Text("Properties")) {
+                Toggle(isOn: $behavior.enableLocations) {
+                        Text("Allow Locations Requests")
+                }
+//                Toggle(isOn: $trackQuantity) {
+//                        Text("Track Quantities")
+//                }
+//                if trackQuantity {
+//                    TextField("Default Units", text: $unit)
+//                }
+            }
+            
+//            Section(header: Text("Activity").foregroundColor(.green)) {
+//                NavigationLink(destination: ActivityTrackingViewStep2(caree: behavior.caree!, behavior: behavior, isPresentingView: $isPresentingActivityTrackingView, saveAction: {}), isActive: $isPresentingActivityTrackingView) {
+//                    Button(action: {
+//                        self.isPresentingActivityTrackingView = true
+//                    }) {
+//                        Label("Track Activity", systemImage: "timer")
+//                            .font(.headline)
+//                    }
+//                    .foregroundColor(.green)
+//                    .frame(height: 100.0)
+//                }
+//            }
         }
+        .navigationTitle(.constant(navTitle))
     }
 }
 
@@ -23,6 +56,8 @@ struct BehaviorEditView_Previews: PreviewProvider {
     static let behaviors = try! viewContext.fetch(fetchCareeRequest)
     
     static var previews: some View {
-        BehaviorEditView(behavior: behaviors[0])
+        NavigationView {
+            BehaviorEditView(behavior: behaviors[0])
+        }
     }
 }
