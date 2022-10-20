@@ -52,6 +52,9 @@ struct CareeListView: View {
 //                TODO: fix height and focus
                 CareeAddView(isPresenting: $isPresentingNewCareeView)
             }
+            .refreshable {
+                viewContext.refreshAllObjects()
+            }
         }
     }
 
@@ -73,7 +76,7 @@ struct CareeListView: View {
 }
 
 struct CareeListItem: View {
-    var caree: Caree
+    @ObservedObject var caree: Caree
 
     var body: some View {
         VStack(alignment: .leading) {
