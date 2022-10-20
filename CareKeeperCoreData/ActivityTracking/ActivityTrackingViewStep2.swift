@@ -57,7 +57,7 @@ struct ActivityTrackingViewStep2: View {
                             locationController.startUpdating()
                         }
                     }
-                    .onTapGesture {
+                    .onChange(of: trackLocation) { value in
                         if trackLocation {
                             locationController.startUpdating()
                         } else {
@@ -68,7 +68,7 @@ struct ActivityTrackingViewStep2: View {
             }
 #if !os(watchOS)
             if trackLocation {
-                UserLocationMap()
+                UserLocationMap(location: $locationController.location)
             }
 #endif
             

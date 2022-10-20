@@ -11,10 +11,10 @@ class LocationController: NSObject, CLLocationManagerDelegate, ObservableObject 
         super.init()
         
         locationManager.delegate = self
-        locationManager.requestWhenInUseAuthorization()
     }
     
     func startUpdating() {
+        locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
     }
     
@@ -26,6 +26,7 @@ class LocationController: NSObject, CLLocationManagerDelegate, ObservableObject 
         guard let location = locations.last else { return }
         
         DispatchQueue.main.async {
+            print("location update")
             self.location = location
         }
     }

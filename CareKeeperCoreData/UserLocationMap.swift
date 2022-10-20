@@ -3,9 +3,8 @@ import MapKit
 import SwiftUI
 
 extension MKCoordinateRegion {
-    
-    static func bronxZooRegion() -> MKCoordinateRegion {
-        MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 40.850581, longitude:  -73.87538), latitudinalMeters: 5000, longitudinalMeters: 5000)
+    static func bronxZooLocation() -> CLLocation {
+        CLLocation(latitude: 40.850581, longitude:  -73.87538)
     }
     
     func getBinding() -> Binding<MKCoordinateRegion>? {
@@ -14,14 +13,11 @@ extension MKCoordinateRegion {
 }
 
 struct UserLocationMap: View {
-    @StateObject private var locationController = LocationController.shared
+    @Binding var location: CLLocation?
     
     var region: Binding<MKCoordinateRegion>? {
-        guard let location = locationController.location else {
-            return MKCoordinateRegion.bronxZooRegion().getBinding()
-        }
-        
-        let region = MKCoordinateRegion(center: location.coordinate, latitudinalMeters: 500, longitudinalMeters: 500)
+        let regionLocation = location ?? MKCoordinateRegion.bronxZooLocation()
+        let region = MKCoordinateRegion(center: regionLocation.coordinate, latitudinalMeters: 500, longitudinalMeters: 500)
         
         return region.getBinding()
     }
@@ -36,6 +32,6 @@ struct UserLocationMap: View {
 
 struct UserLocationMap_Previews: PreviewProvider {
     static var previews: some View {
-        UserLocationMap()
+        UserLocationMap(location: .constant(MKCoordinateRegion.bronxZooLocation()))
     }
 }

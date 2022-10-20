@@ -5,6 +5,10 @@ import CoreData
 struct ActivityDetailView: View {
     @StateObject private var locationController = LocationController.shared
     @ObservedObject var activity: Activity
+    
+    var location: CLLocation {
+        CLLocation(latitude: activity.latitude, longitude: activity.longitude)
+    }
         
     var body: some View {
         VStack {
@@ -19,8 +23,7 @@ struct ActivityDetailView: View {
             }
 #if !os(watchOS)
             if activity.behavior?.enableLocations ?? false {
-//                TODO: pass location
-                UserLocationMap()
+                UserLocationMap(location: .constant(location))
             }
 #endif
 
