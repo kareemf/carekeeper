@@ -19,7 +19,7 @@ struct CareeDetailView: View {
     @State private var isPresentingBehaviorEditView = false
     
     private var isPresentingSheet: Bool {
-        isPresentingBehaviorEditView || isPresentingActivityDetailView
+        isPresentingBehaviorEditView || isPresentingActivityDetailView || isPresentingActivityTrackingView
     }
     
     private func saveAction() {
@@ -80,8 +80,7 @@ struct CareeDetailView: View {
             }
             
             Section(header: Text("Activity").foregroundColor(.green)) {
-                NavigationLink(destination: ActivityTrackingViewStep1(caree: caree, isPresentingView: $isPresentingActivityTrackingView, behaviors: behaviors)) {
-                    Button(action: {
+                Button(action: {
                         self.isPresentingActivityTrackingView = true
                     }) {
                         Label("Track Activity", systemImage: "timer")
@@ -89,7 +88,6 @@ struct CareeDetailView: View {
                     }
                     .foregroundColor(.green)
                     .frame(height: 100.0)
-                }
             }
             
             Section(header: Text("Behaviors").foregroundColor(.mint)) {
@@ -210,6 +208,16 @@ struct CareeDetailView: View {
                                 Button("Done") {
                                     saveAction()
                                     isPresentingActivityDetailView = false
+                                }
+                            }
+                        }
+                }
+                else if isPresentingActivityTrackingView {
+                    ActivityTrackingViewStep1(caree: caree, isPresentingView: $isPresentingActivityTrackingView, behaviors: behaviors)
+                    .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Cancel") {
+                                    isPresentingActivityTrackingView = false
                                 }
                             }
                         }

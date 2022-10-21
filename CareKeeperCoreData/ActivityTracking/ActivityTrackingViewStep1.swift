@@ -4,7 +4,6 @@ struct ActivityTrackingViewStep1: View {
     @ObservedObject var caree: Caree
     @Binding var isPresentingView: Bool
     var behaviors: [Behavior]
-    @Environment(\.dismiss) var dismiss
     
     var body: some View {
             VStack{
@@ -26,13 +25,6 @@ struct ActivityTrackingViewStep1: View {
 #endif
             }
         .navigationTitle("\(caree.name ?? "") - Behavior To Track")
-        .onAppear(perform: {
-            //            TODO: not needed if isPresentingView works as intended
-            if !isPresentingView {
-                dismiss()
-            }
-            
-        })
     }
 }
 

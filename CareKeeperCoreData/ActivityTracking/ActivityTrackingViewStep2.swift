@@ -15,7 +15,6 @@ struct ActivityTrackingViewStep2: View {
     @State private var unit = "Oz"
     
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.dismiss) var dismiss
         
     private func saveAction() {
         do {
@@ -49,8 +48,6 @@ struct ActivityTrackingViewStep2: View {
         
         isPresentingView = false
         saveAction()
-//        TODO: not needed if isPresentingView works as intended
-        dismiss()
     }
     
     var body: some View {
@@ -108,6 +105,7 @@ struct ActivityTrackingViewStep2_Previews: PreviewProvider {
             caree: carees[0],
             behavior: carees[0].behaviors!.allObjects.first(where: {($0 as! Behavior).enableLocations}) as! Behavior,
             isPresentingView: .constant(true)
+//            isPresentingView: true
         )
         .environment(\.managedObjectContext, viewContext)
     }
