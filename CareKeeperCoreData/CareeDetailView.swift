@@ -136,6 +136,10 @@ struct CareeDetailView: View {
                             if !(activity.notes?.isEmpty ?? true) {
                                 Text("🗒 \(activity.notes!)")
                             }
+                            
+                            if (activity.latitude != 0 || activity.longitude != 0) {
+                                Image(systemName: "location")
+                            }
                         }
                     }
                     .foregroundColor(.red)

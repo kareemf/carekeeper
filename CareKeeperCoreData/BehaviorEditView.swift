@@ -30,7 +30,7 @@ struct BehaviorEditView: View {
                 
                 if !isNew {
                     Section(header: Text("Activity").foregroundColor(.green)) {
-                        NavigationLink(destination: ActivityTrackingViewStep2(caree: behavior.caree!, behavior: behavior, isPresentingView: $isPresentingActivityTrackingView), isActive: $isPresentingActivityTrackingView) {
+                        NavigationLink(destination: ActivityTrackingViewStep2(caree: behavior.caree!, behavior: behavior, isPresentingView: $isPresentingActivityTrackingView)) {
                             Button(action: {
                                 self.isPresentingActivityTrackingView = true
                             }) {

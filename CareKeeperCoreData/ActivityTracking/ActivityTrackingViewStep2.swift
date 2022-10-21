@@ -67,6 +67,11 @@ struct ActivityTrackingViewStep2: View {
                                 locationController.startUpdating()
                             }
                         }
+                        .onDisappear {
+                            if trackLocation {
+                                locationController.stopUpdating()
+                            }
+                        }
                         .onChange(of: trackLocation) { value in
                             if trackLocation {
                                 locationController.startUpdating()
@@ -78,7 +83,7 @@ struct ActivityTrackingViewStep2: View {
                 }
 #if !os(watchOS)
                 if trackLocation {
-                    UserLocationMap(location: $locationController.location)
+                    UserLocationMap(location: $locationController.location, dropPinAtLocation: false)
                 }
 #endif
                 

@@ -22,8 +22,8 @@ struct ActivityDetailView: View {
                 }
             }
 #if !os(watchOS)
-            if activity.behavior?.enableLocations ?? false {
-                UserLocationMap(location: .constant(location))
+            if activity.latitude != 0 || activity.longitude != 0 {
+                UserLocationMap(location: .constant(location), showsUserLocation: false, dropPinAtLocation: true)
             }
 #endif
 
