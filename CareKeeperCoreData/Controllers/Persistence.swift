@@ -44,9 +44,13 @@ class PersistenceController {
         return result
     }()
     
-    // TODO: vary by platform
+#if os(watchOS)
+    private static let authorName = "CareKeeper watchOS"
+    private static let remoteDataImportAuthorName = "CareKeeper watchOS Data Import"
+#else
     private static let authorName = "CareKeeper"
     private static let remoteDataImportAuthorName = "CareKeeper Data Import"
+#endif
     
     
     let container: NSPersistentCloudKitContainer
@@ -204,17 +208,3 @@ class PersistenceController {
         }
     }        
 }
-//
-//extension PersistenceController: ObservableObject {
-//    @Published var state = ""
-//    func save() {
-//        do {
-//            try container.viewContext.save()
-//        } catch {
-//            // Replace this implementation with code to handle the error appropriately.
-//            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-//            let nsError = error as NSError
-//            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-//        }
-//    }
-//}
