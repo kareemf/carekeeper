@@ -44,20 +44,24 @@ struct CareeDetailView: View {
     private static func fetchActivities(_ caree: Caree, _ viewContext: NSManagedObjectContext) -> [Activity] {
         let predicate = NSPredicate(format: "caree == %@", caree)
         
-        let fetchActivitiesRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Activity")
-        fetchActivitiesRequest.predicate = predicate
+        let fetchActivitiesRequest = Activity.fetchRequest()
         
-        return try! viewContext.fetch(fetchActivitiesRequest) as? [Activity] ?? []
+        fetchActivitiesRequest.predicate = predicate
+        fetchActivitiesRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Activity.when, ascending: false)]
+        
+        return try! viewContext.fetch(fetchActivitiesRequest) as [Activity]
         
     }
     
     private static func fetchBehaviors(_ caree: Caree, _ viewContext: NSManagedObjectContext) -> [Behavior] {
         let predicate = NSPredicate(format: "caree == %@", caree)
         
-        let fetchBehaviorsRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Behavior")
+        let fetchBehaviorsRequest = Behavior.fetchRequest()
+
         fetchBehaviorsRequest.predicate = predicate
+        fetchBehaviorsRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Behavior.dateCreated, ascending: false)]
         
-        return try! viewContext.fetch(fetchBehaviorsRequest) as? [Behavior] ?? []
+        return try! viewContext.fetch(fetchBehaviorsRequest) as [Behavior]
     }
     
     var body: some View {
