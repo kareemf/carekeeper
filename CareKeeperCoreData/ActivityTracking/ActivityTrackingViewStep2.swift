@@ -16,10 +16,20 @@ struct ActivityTrackingViewStep2: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) var dismiss
+        
+    private func saveAction() {
+        do {
+            try viewContext.save()                        
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+    }
     
-    let saveAction: () -> Void
     
-    func handleSavePress() {
+    private func handleSavePress() {
         let newActivity = Activity(context: viewContext)
         
         newActivity.caree = caree
@@ -44,41 +54,41 @@ struct ActivityTrackingViewStep2: View {
     }
     
     var body: some View {
-        VStack {
-            Form {
-                TextField("Notes", text: $notes)
-                
-                if behavior.enableLocations {
-                    Toggle(isOn: $trackLocation) {
-                        Text("Pin Location")
-                    }
-                    .onAppear {
-                        if trackLocation {
-                            locationController.startUpdating()
+            VStack {
+                Form {
+                    TextField("Notes", text: $notes)
+                    
+                    if behavior.enableLocations {
+                        Toggle(isOn: $trackLocation) {
+                            Text("Pin Location")
                         }
-                    }
-                    .onChange(of: trackLocation) { value in
-                        if trackLocation {
-                            locationController.startUpdating()
-                        } else {
-                            locationController.stopUpdating()
+                        .onAppear {
+                            if trackLocation {
+                                locationController.startUpdating()
+                            }
+                        }
+                        .onChange(of: trackLocation) { value in
+                            if trackLocation {
+                                locationController.startUpdating()
+                            } else {
+                                locationController.stopUpdating()
+                            }
                         }
                     }
                 }
-            }
 #if !os(watchOS)
-            if trackLocation {
-                UserLocationMap(location: $locationController.location)
-            }
+                if trackLocation {
+                    UserLocationMap(location: $locationController.location)
+                }
 #endif
-            
-            Button("Done") {
-                handleSavePress()
-                locationController.stopUpdating()
+                
+                Button("Done") {
+                    handleSavePress()
+                    locationController.stopUpdating()
+                }
+                .font(.system(.headline, design: .rounded))
+                .foregroundColor(.red)
             }
-            .font(.system(.headline, design: .rounded))
-            .foregroundColor(.red)
-        }
         .navigationTitle("\(caree.name ?? "") - \(behavior.icon ?? "")\(behavior.name ?? "")")
     }
 }
@@ -89,14 +99,11 @@ struct ActivityTrackingViewStep2_Previews: PreviewProvider {
     static let carees = try! viewContext.fetch(fetchCareeRequest)
     
     static var previews: some View {
-        NavigationView{
-            ActivityTrackingViewStep2(
-                caree: carees[0],
-                behavior: carees[0].behaviors!.allObjects.first(where: {($0 as! Behavior).enableLocations}) as! Behavior,
-                isPresentingView: .constant(true),
-                saveAction: {}
-            )
-            .environment(\.managedObjectContext, viewContext)
-        }
+        ActivityTrackingViewStep2(
+            caree: carees[0],
+            behavior: carees[0].behaviors!.allObjects.first(where: {($0 as! Behavior).enableLocations}) as! Behavior,
+            isPresentingView: .constant(true)
+        )
+        .environment(\.managedObjectContext, viewContext)
     }
 }

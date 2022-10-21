@@ -3,7 +3,7 @@ import CoreData
 
 struct CareeDetailView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
+    
     @ObservedObject private var caree: Caree
     
     @State private var name: String = ""
@@ -76,7 +76,7 @@ struct CareeDetailView: View {
             }
             
             Section(header: Text("Activity").foregroundColor(.green)) {
-                NavigationLink(destination: ActivityTrackingViewStep1(caree: caree, isPresentingView: $isPresentingActivityTrackingView, behaviors: behaviors, saveAction: saveAction), isActive: $isPresentingActivityTrackingView) {
+                NavigationLink(destination: ActivityTrackingViewStep1(caree: caree, isPresentingView: $isPresentingActivityTrackingView, behaviors: behaviors)) {
                     Button(action: {
                         self.isPresentingActivityTrackingView = true
                     }) {
@@ -87,7 +87,7 @@ struct CareeDetailView: View {
                     .frame(height: 100.0)
                 }
             }
-                        
+            
             Section(header: Text("Behaviors").foregroundColor(.mint)) {
                 Button(action: {
                     let newBehavior = Behavior(context: viewContext)
@@ -153,6 +153,7 @@ struct CareeDetailView: View {
                 if isPresentingEditView == true {
                     Button("Done") {                    
                         isPresentingEditView = false
+                        //                        TODO: call save?
                     }
                 } else {
                     Button("Edit") {
@@ -211,7 +212,7 @@ struct CareeDetailView: View {
     
     private func deleteBehaviors(offsets: IndexSet) {
         withAnimation {
-//            TODO: soft delete behaviors that still have activities
+            //            TODO: soft delete behaviors that still have activities
             offsets.map { behaviors[$0] }.forEach(viewContext.delete)
             saveAction()
         }

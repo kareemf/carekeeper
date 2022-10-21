@@ -24,8 +24,12 @@ struct UserLocationMap: View {
     
     var body: some View {
         if let region = region {
-            Map(coordinateRegion: region, interactionModes: .all, showsUserLocation: true, userTrackingMode: .constant(.follow))
-                .ignoresSafeArea()
+            Map(coordinateRegion: region,
+                interactionModes: .all,
+                showsUserLocation: true,
+                userTrackingMode: .constant(.follow)
+            )
+            .ignoresSafeArea()
         }
     }
 }
