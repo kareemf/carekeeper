@@ -3,32 +3,31 @@ import CoreData
 
 struct CareeDetailView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    
+
     @ObservedObject private var caree: Caree
-    
+
     @State private var name: String = ""
     @State private var isPresentingEditView = false
-    
+
     @State private var activities: [Activity] = []
     @State private var selectedActivity: Activity?
     @State private var isPresentingActivityTrackingView = false
     @State private var isPresentingActivityDetailView = false
-    
+
     @State private var behaviors: [Behavior] = []
     @State private var selectedBehavior: Behavior?
     @State private var isPresentingBehaviorEditView = false
-    
+
     private var isPresentingSheet: Bool {
         isPresentingBehaviorEditView || isPresentingActivityDetailView || isPresentingActivityTrackingView
     }
-    
+
     private func saveAction() {
         do {
             try viewContext.save()
             activities = CareeDetailView.fetchActivities(caree, viewContext)
             behaviors = CareeDetailView.fetchBehaviors(caree, viewContext)
-            
-            
+
         } catch {
             // Replace this implementation with code to handle the error appropriately.
             // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
@@ -36,34 +35,43 @@ struct CareeDetailView: View {
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
     }
-    
+
     init(caree: Caree) {
         self.caree = caree
     }
-    
+
     private static func fetchActivities(_ caree: Caree, _ viewContext: NSManagedObjectContext) -> [Activity] {
         let predicate = NSPredicate(format: "caree == %@", caree)
-        
-        let fetchActivitiesRequest = Activity.fetchRequest()
-        
-        fetchActivitiesRequest.predicate = predicate
-        fetchActivitiesRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Activity.when, ascending: false)]
-        
-        return try! viewContext.fetch(fetchActivitiesRequest) as [Activity]
-        
+
+        let fetchRequest = Activity.fetchRequest()
+
+        fetchRequest.predicate = predicate
+        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Activity.when, ascending: false)]
+
+        do {
+            return try viewContext.fetch(fetchRequest) as [Activity]
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
     }
-    
+
     private static func fetchBehaviors(_ caree: Caree, _ viewContext: NSManagedObjectContext) -> [Behavior] {
         let predicate = NSPredicate(format: "caree == %@", caree)
-        
-        let fetchBehaviorsRequest = Behavior.fetchRequest()
 
-        fetchBehaviorsRequest.predicate = predicate
-        fetchBehaviorsRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Behavior.dateCreated, ascending: false)]
-        
-        return try! viewContext.fetch(fetchBehaviorsRequest) as [Behavior]
+        let fetchRequest = Behavior.fetchRequest()
+
+        fetchRequest.predicate = predicate
+        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Behavior.dateCreated, ascending: false)]
+
+        do {
+            return try viewContext.fetch(fetchRequest) as [Behavior]
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
     }
-    
+
     var body: some View {
         List {
             if isPresentingEditView == true {
@@ -78,7 +86,7 @@ struct CareeDetailView: View {
                         }
                 }
             }
-            
+
             Section(header: Text("Activity").foregroundColor(.green)) {
                 Button(action: {
                         self.isPresentingActivityTrackingView = true
@@ -89,12 +97,12 @@ struct CareeDetailView: View {
                     .foregroundColor(.green)
                     .frame(height: 100.0)
             }
-            
+
             Section(header: Text("Behaviors").foregroundColor(.mint)) {
                 Button(action: {
                     let newBehavior = Behavior(context: viewContext)
                     newBehavior.caree = caree
-                    
+
                     self.selectedBehavior = newBehavior
                     self.isPresentingBehaviorEditView = true
                 }) {
@@ -102,11 +110,11 @@ struct CareeDetailView: View {
                         .font(.headline)
                 }
                 .foregroundColor(.mint)
-                
+
                 if behaviors.isEmpty {
                     Text("No behaviors configured yet")
                 }
-                
+
                 ForEach(behaviors) { behavior in
                     Button(action: {
                         self.selectedBehavior = behavior
@@ -115,37 +123,36 @@ struct CareeDetailView: View {
                         BehaviorListItemView(behavior: behavior)
                     }
                     .foregroundColor(.mint)
-                    
+
                 }.onDelete(perform: deleteBehaviors)
             }
-            
+
             Section(header: Text("Activities").foregroundColor(.red)) {
                 if activities.isEmpty {
                     Text("No activities tracked yet")
                 }
-                
-                ForEach(activities){ activity in
+
+                ForEach(activities) { activity in
                     Button(action: {
                         self.selectedActivity = activity
                         self.isPresentingActivityDetailView = true
                     }) {
                         VStack(alignment: .leading) {
-                            
+
                             BehaviorListItemView(behavior: activity.behavior!)
                             Text("🗓 \(activity.when?.formatted(date: .abbreviated, time: .shortened) ?? "")")
-                            
-                            
+
                             if !(activity.notes?.isEmpty ?? true) {
                                 Text("🗒 \(activity.notes!)")
                             }
-                            
-                            if (activity.latitude != 0 || activity.longitude != 0) {
+
+                            if activity.latitude != 0 || activity.longitude != 0 {
                                 Image(systemName: "location")
                             }
                         }
                     }
                     .foregroundColor(.red)
-                    
+
                 }.onDelete(perform: deleteActivities)
             }
         }
@@ -157,7 +164,7 @@ struct CareeDetailView: View {
         .toolbar {
             ToolbarItem(placement: .automatic) {
                 if isPresentingEditView == true {
-                    Button("Done") {                    
+                    Button("Done") {
                         isPresentingEditView = false
                         //                        TODO: call save?
                     }
@@ -166,7 +173,7 @@ struct CareeDetailView: View {
                         isPresentingEditView = true
                     }
                 }
-                
+
             }
         }
         .sheet(isPresented: .constant(isPresentingSheet)) {
@@ -177,7 +184,7 @@ struct CareeDetailView: View {
                             ToolbarItem(placement: .cancellationAction) {
                                 Button("Cancel") {
                                     let isNew = selectedBehavior?.objectID.isTemporaryID ?? false
-                                    if ( isNew) {
+                                    if  isNew {
                                         viewContext.delete(selectedBehavior!)
                                     }
                                     isPresentingBehaviorEditView = false
@@ -186,7 +193,7 @@ struct CareeDetailView: View {
                             ToolbarItem(placement: .confirmationAction) {
                                 Button("Done") {
                                     let isNew = selectedBehavior?.objectID.isTemporaryID ?? false
-                                    if ( isNew) {
+                                    if  isNew {
                                         selectedBehavior?.dateCreated = Date()
                                     }
                                     saveAction()
@@ -194,9 +201,8 @@ struct CareeDetailView: View {
                                 }
                             }
                         }
-                    
-                }
-                else if isPresentingActivityDetailView {
+
+                } else if isPresentingActivityDetailView {
                     ActivityDetailView(activity: selectedActivity!)
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
@@ -211,8 +217,7 @@ struct CareeDetailView: View {
                                 }
                             }
                         }
-                }
-                else if isPresentingActivityTrackingView {
+                } else if isPresentingActivityTrackingView {
                     ActivityTrackingViewStep1(caree: caree, isPresentingView: $isPresentingActivityTrackingView, behaviors: behaviors)
                     .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
@@ -225,7 +230,7 @@ struct CareeDetailView: View {
             }
         }
     }
-    
+
     private func deleteBehaviors(offsets: IndexSet) {
         withAnimation {
             //            TODO: soft delete behaviors that still have activities
@@ -233,7 +238,7 @@ struct CareeDetailView: View {
             saveAction()
         }
     }
-    
+
     private func deleteActivities(offsets: IndexSet) {
         withAnimation {
             offsets.map { activities[$0] }.forEach(viewContext.delete)
@@ -245,8 +250,9 @@ struct CareeDetailView: View {
 struct CareeDetailView_Previews: PreviewProvider {
     static let viewContext = PersistenceController.preview.container.viewContext
     static let fetchCareeRequest = Caree.fetchRequest()
+    // swiftlint:disable:next force_try
     static let carees = try! viewContext.fetch(fetchCareeRequest)
-    
+
     static var previews: some View {
         NavigationView {
             CareeDetailView(caree: carees[0])

@@ -4,9 +4,9 @@ import SwiftUI
 
 extension MKCoordinateRegion {
     static func bronxZooLocation() -> CLLocation {
-        CLLocation(latitude: 40.850581, longitude:  -73.87538)
+        CLLocation(latitude: 40.850581, longitude: -73.87538)
     }
-    
+
     func getBinding() -> Binding<MKCoordinateRegion>? {
         return Binding<MKCoordinateRegion>(.constant(self))
     }
@@ -16,22 +16,26 @@ struct UserLocationMap: View {
     @Binding var location: CLLocation?
     @State var showsUserLocation: Bool = true
     @State var dropPinAtLocation: Bool = false
-    
+
     var region: Binding<MKCoordinateRegion>? {
         let regionLocation = location ?? MKCoordinateRegion.bronxZooLocation()
-        let region = MKCoordinateRegion(center: regionLocation.coordinate, latitudinalMeters: 500, longitudinalMeters: 500)
-        
+        let region = MKCoordinateRegion(
+            center: regionLocation.coordinate,
+            latitudinalMeters: 500,
+            longitudinalMeters: 500
+        )
+
         return region.getBinding()
     }
-    
+
     var annotations: [IdentifiablePlace] {
         guard let coordinate = location?.coordinate else { return [] }
-        
+
         let annotation = IdentifiablePlace(coordinate: coordinate)
-        
+
         return dropPinAtLocation ? [annotation] : []
     }
-    
+
     var body: some View {
         if let region = region {
             Map(
@@ -56,7 +60,6 @@ struct IdentifiablePlace: Identifiable {
         self.coordinate = coordinate
     }
 }
-
 
 struct UserLocationMap_Previews: PreviewProvider {
     static var previews: some View {

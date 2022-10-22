@@ -20,8 +20,6 @@
 		514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */; };
 		514B885428E3875100B81198 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B885328E3875100B81198 /* Assets.xcassets */; };
 		514B885728E3875100B81198 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B885628E3875100B81198 /* Preview Assets.xcassets */; };
-		514B885C28E3D7A800B81198 /* WatchConnectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B885B28E3D7A800B81198 /* WatchConnectivity.swift */; };
-		514B885D28E3D7A800B81198 /* WatchConnectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B885B28E3D7A800B81198 /* WatchConnectivity.swift */; };
 		514B885F28E3EEC800B81198 /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B885E28E3EEC800B81198 /* CareeDetailView.swift */; };
 		514B886028E3EEC800B81198 /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B885E28E3EEC800B81198 /* CareeDetailView.swift */; };
 		514B888728E50E8800B81198 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883C28E3873500B81198 /* CareeListView.swift */; };
@@ -57,7 +55,6 @@
 		514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWatchApp.swift; sourceTree = "<group>"; };
 		514B885328E3875100B81198 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		514B885628E3875100B81198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		514B885B28E3D7A800B81198 /* WatchConnectivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchConnectivity.swift; sourceTree = "<group>"; };
 		514B885E28E3EEC800B81198 /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
 		514D926E28F7AED100CBF67E /* Scraps.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Scraps.md; sourceTree = "<group>"; };
 		5189F0FD28F89FE70097E7E4 /* BehaviorEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorEditView.swift; sourceTree = "<group>"; };
@@ -65,6 +62,7 @@
 		5189F10328F8CEB10097E7E4 /* BehaviorListItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorListItemView.swift; sourceTree = "<group>"; };
 		5189F10728F8CF880097E7E4 /* ActivityTrackingViewStep1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTrackingViewStep1.swift; sourceTree = "<group>"; };
 		5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTrackingViewStep2.swift; sourceTree = "<group>"; };
+		51B42836290431A8007DF447 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,7 +86,6 @@
 		5101151F2900DB190009D7EC /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				514B885B28E3D7A800B81198 /* WatchConnectivity.swift */,
 				514B883728E3873500B81198 /* Persistence.swift */,
 				5101151C2900D7E50009D7EC /* LocationController.swift */,
 			);
@@ -131,6 +128,7 @@
 				514B884128E3873700B81198 /* Preview Content */,
 				514B885E28E3EEC800B81198 /* CareeDetailView.swift */,
 				510115202900F64B0009D7EC /* UserLocationMap.swift */,
+				51B42836290431A8007DF447 /* .swiftlint.yml */,
 			);
 			path = CareKeeperCoreData;
 			sourceTree = "<group>";
@@ -180,6 +178,7 @@
 			buildConfigurationList = 514B884628E3873700B81198 /* Build configuration list for PBXNativeTarget "CareKeeperCoreData" */;
 			buildPhases = (
 				514B882E28E3873500B81198 /* Sources */,
+				51B4283529033843007DF447 /* ShellScript */,
 				514B882F28E3873500B81198 /* Frameworks */,
 				514B883028E3873500B81198 /* Resources */,
 			);
@@ -267,12 +266,31 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		51B4283529033843007DF447 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint --fix && swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		514B882E28E3873500B81198 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				514B885C28E3D7A800B81198 /* WatchConnectivity.swift in Sources */,
 				514B883628E3873500B81198 /* CareKeeperCoreDataApp.swift in Sources */,
 				5189F10828F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
 				514B883828E3873500B81198 /* Persistence.swift in Sources */,
@@ -292,7 +310,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				514B885D28E3D7A800B81198 /* WatchConnectivity.swift in Sources */,
 				514B888728E50E8800B81198 /* CareeListView.swift in Sources */,
 				5189F10928F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
 				514B888C28E50FCF00B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,

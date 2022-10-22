@@ -13,7 +13,7 @@ class WatchConnectivityController: NSObject, WCSessionDelegate, ObservableObject
 //    public var onDataRecived: (([Caree]) -> Void)? = nil
 //
     enum ConnectivityKey: String {
-        case timeStamp = "timeStamp"
+        case timeStamp
         case message = "message"
         case messageType = "messageType"
         case syncInit = "syncInit"
@@ -25,10 +25,10 @@ class WatchConnectivityController: NSObject, WCSessionDelegate, ObservableObject
 //    @Published var data: [Caree] = []
 ////    @Published var userInfoSent: [String: Any]? = nil
 ////    @Published var userInfoRecived: [String: Any]? = nil
-    @Published var messageSent: [String: Any]? = nil
-    @Published var messageRecived: [String: Any]? = nil
-    @Published var notificationMessageRecived: NotificationMessage? = nil
-    
+    @Published var messageSent: [String: Any]?
+    @Published var messageRecived: [String: Any]?
+    @Published var notificationMessageRecived: NotificationMessage?
+
     override init() {
         super.init()
 
@@ -66,7 +66,7 @@ class WatchConnectivityController: NSObject, WCSessionDelegate, ObservableObject
 //
     func session(
         _ session: WCSession,
-        didReceiveMessage message: [String : Any]) {
+        didReceiveMessage message: [String: Any]) {
 //
             DispatchQueue.main.async { [weak self] in
                 self?.messageRecived = message
@@ -76,14 +76,14 @@ class WatchConnectivityController: NSObject, WCSessionDelegate, ObservableObject
                     print("Watch: unrecognized message type in", message)
                     return
                 }
-                
+
                 switch messageType {
                 case ConnectivityKey.syncInit.rawValue:
                     print("Watch: syncInit")
                     if let notification = message[ConnectivityKey.message.rawValue] as? Notification {
                         PersistenceController.shared.container.viewContext.mergeChanges(fromContextDidSave: notification)
                     }
-                    
+
                 default:
                     print("Watch: fell into default for messageType", messageType)
                 }
@@ -100,7 +100,7 @@ class WatchConnectivityController: NSObject, WCSessionDelegate, ObservableObject
 //
             }
     }
-    
+
     #if os(iOS)
     func sessionDidBecomeInactive(_ session: WCSession) {
     }
@@ -109,7 +109,7 @@ class WatchConnectivityController: NSObject, WCSessionDelegate, ObservableObject
         WCSession.default.activate()
     }
     #endif
-    
+
     public func send(context: NSManagedObjectContext) {
         guard WCSession.default.activationState == .activated else {
             print("Watch: session inactive")
@@ -134,13 +134,11 @@ class WatchConnectivityController: NSObject, WCSessionDelegate, ObservableObject
         let dateFormatter = DateFormatter()
         dateFormatter.timeStyle = .medium
         let timeStamp = dateFormatter.string(from: Date())
-        
+
         //        TODO: error handling
 //        let json = try! JSONEncoder().encode(notification.userInfo)
-        
+
 //        print(notification.userInfo)
-        
-    
 
         messageSent = [
             ConnectivityKey.timeStamp.rawValue: timeStamp,
@@ -153,7 +151,7 @@ class WatchConnectivityController: NSObject, WCSessionDelegate, ObservableObject
             }),
             "deletedObjects": context.deletedObjects.map({ obj in
                 obj.entity.attributesByName
-            }),
+            })
         ]
 
         WCSession.default.sendMessage(messageSent!, replyHandler: nil, errorHandler: { error in
@@ -162,7 +160,7 @@ class WatchConnectivityController: NSObject, WCSessionDelegate, ObservableObject
                 self?.notificationMessageRecived = NotificationMessage(text: "Cannot send message: \(String(describing: error))")
             }
         })
-        
+
 //        do{
 //            try WCSession.default.updateApplicationContext(messageSent!)
 //        } catch {

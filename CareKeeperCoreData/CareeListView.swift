@@ -3,16 +3,14 @@ import CoreData
 
 struct CareeListView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    
-    @StateObject private var watchConnectivity = WatchConnectivityController.shared
-    
+
     @State private var isPresentingNewCareeView = false
-    
+
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Caree.name, ascending: false)],
         animation: .default)
     private var carees: FetchedResults<Caree>
-    
+
     var body: some View {
         NavigationView {
             List {
@@ -44,10 +42,6 @@ struct CareeListView: View {
                 }
             }
             .navigationTitle("In My Care")
-            .alert(item: $watchConnectivity.notificationMessageRecived) { message in
-                Alert(title: Text(message.text),
-                      dismissButton: .default(Text("Dismiss")))
-            }
             .sheet(isPresented: $isPresentingNewCareeView) {
                 //                TODO: fix height and focus
                 CareeAddView(isPresenting: $isPresentingNewCareeView)
@@ -57,12 +51,12 @@ struct CareeListView: View {
             }
         }
     }
-    
+
     private func deleteCarees(offsets: IndexSet) {
         withAnimation {
             //            TODO: cascade delete to behaviors and activities
             offsets.map { carees[$0] }.forEach(viewContext.delete)
-            
+
             do {
                 try viewContext.save()
             } catch {
@@ -77,7 +71,7 @@ struct CareeListView: View {
 
 struct CareeListItem: View {
     @ObservedObject var caree: Caree
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             Text(caree.name ?? "")
@@ -92,13 +86,13 @@ struct CareeAddView: View {
     @State private var name = ""
     @Binding var isPresenting: Bool
     @Environment(\.managedObjectContext) private var viewContext
-    
+
     private func addCaree() {
         withAnimation {
             let newCaree = Caree(context: viewContext)
             newCaree.dateCreated = Date()
             newCaree.name = name
-            
+
             do {
                 try viewContext.save()
                 name = ""
@@ -110,7 +104,7 @@ struct CareeAddView: View {
             }
         }
     }
-    
+
     var body: some View {
         NavigationView {
             Form {

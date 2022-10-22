@@ -1,4 +1,4 @@
-func ??<T>(lhs: Binding<Optional<T>>, rhs: T) -> Binding<T> {
+func ??<T>(lhs: Binding<T?>, rhs: T) -> Binding<T> {
     Binding(
         get: { lhs.wrappedValue ?? rhs },
         set: { lhs.wrappedValue = $0 }
@@ -8,6 +8,7 @@ func ??<T>(lhs: Binding<Optional<T>>, rhs: T) -> Binding<T> {
 import SwiftUI
 
 @main
+// swiftlint:disable:next type_name
 struct CareKeeperWatch_Watch_AppApp: App {
     let persistenceController = PersistenceController.shared
 
@@ -17,6 +18,5 @@ struct CareKeeperWatch_Watch_AppApp: App {
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
-    
-    
+
 }
