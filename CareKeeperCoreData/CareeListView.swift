@@ -14,6 +14,9 @@ struct CareeListView: View {
     var body: some View {
         NavigationView {
             List {
+                if carees.isEmpty {
+                    Text("Add persons, places, or things in your care")
+                }
                 ForEach(carees) { caree in
                     NavigationLink {
                         CareeDetailView(caree: caree)
