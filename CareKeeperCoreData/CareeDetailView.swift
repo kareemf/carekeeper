@@ -72,6 +72,11 @@ struct CareeDetailView: View {
         }
     }
 
+    private func saveEditForm() {
+            caree.name = name
+            saveAction()
+    }
+
     var body: some View {
         List {
             if isPresentingEditView == true {
@@ -81,8 +86,7 @@ struct CareeDetailView: View {
                             name = caree.name ?? ""
                         }
                         .onSubmit {
-                            caree.name = name
-                            saveAction()
+                            saveEditForm()
                         }
                 }
             }
@@ -166,7 +170,7 @@ struct CareeDetailView: View {
                 if isPresentingEditView == true {
                     Button("Done") {
                         isPresentingEditView = false
-                        //                        TODO: call save?
+                        saveEditForm()
                     }
                 } else {
                     Button("Edit") {
