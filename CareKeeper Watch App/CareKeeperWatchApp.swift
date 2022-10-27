@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 // swiftlint:disable:next type_name
-struct CareKeeperWatch_Watch_AppApp: App {
+struct CareKeeper_Watch_App: App {
     let persistenceController = PersistenceController.shared
 
     var body: some Scene {

@@ -40,9 +40,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		5101151928FF57A70009D7EC /* CareKeeperWatch Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeperWatch Watch App.entitlements"; sourceTree = "<group>"; };
+		5101151928FF57A70009D7EC /* CareKeeper Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeper Watch App.entitlements"; sourceTree = "<group>"; };
 		5101151A28FF5B2A0009D7EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		5101151B28FF5B390009D7EC /* CareKeeperWatch-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "CareKeeperWatch-Watch-App-Info.plist"; sourceTree = SOURCE_ROOT; };
+		5101151B28FF5B390009D7EC /* CareKeeper-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CareKeeper-Watch-App-Info.plist"; sourceTree = SOURCE_ROOT; };
 		5101151C2900D7E50009D7EC /* LocationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LocationController.swift; path = ../LocationController.swift; sourceTree = "<group>"; };
 		510115202900F64B0009D7EC /* UserLocationMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLocationMap.swift; sourceTree = "<group>"; };
 		514B883228E3873500B81198 /* CareKeeper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CareKeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -99,7 +99,7 @@
 			isa = PBXGroup;
 			children = (
 				514B883428E3873500B81198 /* CareKeeper */,
-				514B884E28E3875000B81198 /* CareKeeperWatch Watch App */,
+				514B884E28E3875000B81198 /* CareKeeper Watch App */,
 				514B883328E3873500B81198 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -145,16 +145,16 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		514B884E28E3875000B81198 /* CareKeeperWatch Watch App */ = {
+		514B884E28E3875000B81198 /* CareKeeper Watch App */ = {
 			isa = PBXGroup;
 			children = (
-				5101151B28FF5B390009D7EC /* CareKeeperWatch-Watch-App-Info.plist */,
-				5101151928FF57A70009D7EC /* CareKeeperWatch Watch App.entitlements */,
+				5101151B28FF5B390009D7EC /* CareKeeper-Watch-App-Info.plist */,
+				5101151928FF57A70009D7EC /* CareKeeper Watch App.entitlements */,
 				514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */,
 				514B885328E3875100B81198 /* Assets.xcassets */,
 				514B885528E3875100B81198 /* Preview Content */,
 			);
-			path = "CareKeeperWatch Watch App";
+			path = "CareKeeper Watch App";
 			sourceTree = "<group>";
 		};
 		514B885528E3875100B81198 /* Preview Content */ = {
@@ -530,14 +530,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "CareKeeperWatch Watch App/CareKeeperWatch Watch App.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "CareKeeper Watch App/CareKeeper Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperWatch Watch App/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper Watch App/Preview Content\"";
 				DEVELOPMENT_TEAM = 8C7EB23ZZP;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "CareKeeperWatch-Watch-App-Info.plist";
+				INFOPLIST_FILE = "CareKeeper-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = CareKeeperWatch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = kareemf.CareKeeper;
@@ -562,14 +562,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "CareKeeperWatch Watch App/CareKeeperWatch Watch App.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "CareKeeper Watch App/CareKeeper Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperWatch Watch App/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper Watch App/Preview Content\"";
 				DEVELOPMENT_TEAM = 8C7EB23ZZP;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "CareKeeperWatch-Watch-App-Info.plist";
+				INFOPLIST_FILE = "CareKeeper-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = CareKeeperWatch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = kareemf.CareKeeper;
