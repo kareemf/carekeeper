@@ -45,13 +45,13 @@
 		5101151B28FF5B390009D7EC /* CareKeeperWatch-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "CareKeeperWatch-Watch-App-Info.plist"; sourceTree = SOURCE_ROOT; };
 		5101151C2900D7E50009D7EC /* LocationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LocationController.swift; path = ../LocationController.swift; sourceTree = "<group>"; };
 		510115202900F64B0009D7EC /* UserLocationMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLocationMap.swift; sourceTree = "<group>"; };
-		514B883228E3873500B81198 /* CareKeeperCoreData.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CareKeeperCoreData.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		514B883228E3873500B81198 /* CareKeeper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CareKeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		514B883528E3873500B81198 /* CareKeeperCoreDataApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperCoreDataApp.swift; sourceTree = "<group>"; };
 		514B883728E3873500B81198 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		514B883A28E3873500B81198 /* CareKeeperCoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CareKeeperCoreData.xcdatamodel; sourceTree = "<group>"; };
 		514B883C28E3873500B81198 /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
 		514B883E28E3873700B81198 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		514B884028E3873700B81198 /* CareKeeperCoreData.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CareKeeperCoreData.entitlements; sourceTree = "<group>"; };
+		514B884028E3873700B81198 /* CareKeeper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CareKeeper.entitlements; sourceTree = "<group>"; };
 		514B884228E3873700B81198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		514B884D28E3875000B81198 /* CareKeeperWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CareKeeperWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWatchApp.swift; sourceTree = "<group>"; };
@@ -98,7 +98,7 @@
 		514B882928E3873500B81198 = {
 			isa = PBXGroup;
 			children = (
-				514B883428E3873500B81198 /* CareKeeperCoreData */,
+				514B883428E3873500B81198 /* CareKeeper */,
 				514B884E28E3875000B81198 /* CareKeeperWatch Watch App */,
 				514B883328E3873500B81198 /* Products */,
 			);
@@ -107,13 +107,13 @@
 		514B883328E3873500B81198 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				514B883228E3873500B81198 /* CareKeeperCoreData.app */,
+				514B883228E3873500B81198 /* CareKeeper.app */,
 				514B884D28E3875000B81198 /* CareKeeperWatch Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		514B883428E3873500B81198 /* CareKeeperCoreData */ = {
+		514B883428E3873500B81198 /* CareKeeper */ = {
 			isa = PBXGroup;
 			children = (
 				5101151F2900DB190009D7EC /* Controllers */,
@@ -126,7 +126,7 @@
 				514B883C28E3873500B81198 /* CareeListView.swift */,
 				514D926E28F7AED100CBF67E /* Scraps.md */,
 				514B883E28E3873700B81198 /* Assets.xcassets */,
-				514B884028E3873700B81198 /* CareKeeperCoreData.entitlements */,
+				514B884028E3873700B81198 /* CareKeeper.entitlements */,
 				514B883928E3873500B81198 /* CareKeeperCoreData.xcdatamodeld */,
 				514B884128E3873700B81198 /* Preview Content */,
 				514B885E28E3EEC800B81198 /* CareeDetailView.swift */,
@@ -134,7 +134,7 @@
 				51B42836290431A8007DF447 /* .swiftlint.yml */,
 				51B4283D2909B89B007DF447 /* ErrorHandling.swift */,
 			);
-			path = CareKeeperCoreData;
+			path = CareKeeper;
 			sourceTree = "<group>";
 		};
 		514B884128E3873700B81198 /* Preview Content */ = {
@@ -177,9 +177,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		514B883128E3873500B81198 /* CareKeeperCoreData */ = {
+		514B883128E3873500B81198 /* CareKeeper */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 514B884628E3873700B81198 /* Build configuration list for PBXNativeTarget "CareKeeperCoreData" */;
+			buildConfigurationList = 514B884628E3873700B81198 /* Build configuration list for PBXNativeTarget "CareKeeper" */;
 			buildPhases = (
 				514B882E28E3873500B81198 /* Sources */,
 				51B4283529033843007DF447 /* ShellScript */,
@@ -190,9 +190,9 @@
 			);
 			dependencies = (
 			);
-			name = CareKeeperCoreData;
+			name = CareKeeper;
 			productName = CareKeeperCoreData;
-			productReference = 514B883228E3873500B81198 /* CareKeeperCoreData.app */;
+			productReference = 514B883228E3873500B81198 /* CareKeeper.app */;
 			productType = "com.apple.product-type.application";
 		};
 		514B884C28E3875000B81198 /* CareKeeperWatch Watch App */ = {
@@ -230,7 +230,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 514B882D28E3873500B81198 /* Build configuration list for PBXProject "CareKeeperCoreData" */;
+			buildConfigurationList = 514B882D28E3873500B81198 /* Build configuration list for PBXProject "CareKeeper" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -243,7 +243,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				514B883128E3873500B81198 /* CareKeeperCoreData */,
+				514B883128E3873500B81198 /* CareKeeper */,
 				514B884C28E3875000B81198 /* CareKeeperWatch Watch App */,
 			);
 		};
@@ -448,16 +448,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = CareKeeperCoreData/CareKeeperCoreData.entitlements;
+				CODE_SIGN_ENTITLEMENTS = CareKeeper/CareKeeper.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperCoreData/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper/Preview Content\"";
 				DEVELOPMENT_TEAM = 8C7EB23ZZP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CareKeeperCoreData/Info.plist;
+				INFOPLIST_FILE = CareKeeper/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -489,16 +489,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = CareKeeperCoreData/CareKeeperCoreData.entitlements;
+				CODE_SIGN_ENTITLEMENTS = CareKeeper/CareKeeper.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperCoreData/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper/Preview Content\"";
 				DEVELOPMENT_TEAM = 8C7EB23ZZP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CareKeeperCoreData/Info.plist;
+				INFOPLIST_FILE = CareKeeper/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -593,7 +593,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		514B882D28E3873500B81198 /* Build configuration list for PBXProject "CareKeeperCoreData" */ = {
+		514B882D28E3873500B81198 /* Build configuration list for PBXProject "CareKeeper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				514B884428E3873700B81198 /* Debug */,
@@ -602,7 +602,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		514B884628E3873700B81198 /* Build configuration list for PBXNativeTarget "CareKeeperCoreData" */ = {
+		514B884628E3873700B81198 /* Build configuration list for PBXNativeTarget "CareKeeper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				514B884728E3873700B81198 /* Debug */,

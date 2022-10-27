@@ -8,7 +8,7 @@ func ??<T>(lhs: Binding<T?>, rhs: T) -> Binding<T> {
 }
 
 @main
-struct CareKeeperCoreDataApp: App {
+struct CareKeeperApp: App {
     let persistenceController = PersistenceController.shared
 
     var body: some Scene {
