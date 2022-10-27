@@ -3,6 +3,7 @@ import CoreData
 
 struct CareeDetailView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject private var errorHandling: ErrorHandling
 
     @ObservedObject private var caree: Caree
 
@@ -29,10 +30,7 @@ struct CareeDetailView: View {
             behaviors = CareeDetailView.fetchBehaviors(caree, viewContext)
 
         } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            self.errorHandling.handle(error: error)
         }
     }
 

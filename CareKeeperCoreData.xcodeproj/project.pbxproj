@@ -35,6 +35,8 @@
 		5189F10928F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10728F8CF880097E7E4 /* ActivityTrackingViewStep1.swift */; };
 		5189F10B28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */; };
 		5189F10C28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */; };
+		51B4283E2909B89B007DF447 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B4283D2909B89B007DF447 /* ErrorHandling.swift */; };
+		51B4283F2909B89B007DF447 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B4283D2909B89B007DF447 /* ErrorHandling.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,6 +65,7 @@
 		5189F10728F8CF880097E7E4 /* ActivityTrackingViewStep1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTrackingViewStep1.swift; sourceTree = "<group>"; };
 		5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTrackingViewStep2.swift; sourceTree = "<group>"; };
 		51B42836290431A8007DF447 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
+		51B4283D2909B89B007DF447 /* ErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +132,7 @@
 				514B885E28E3EEC800B81198 /* CareeDetailView.swift */,
 				510115202900F64B0009D7EC /* UserLocationMap.swift */,
 				51B42836290431A8007DF447 /* .swiftlint.yml */,
+				51B4283D2909B89B007DF447 /* ErrorHandling.swift */,
 			);
 			path = CareKeeperCoreData;
 			sourceTree = "<group>";
@@ -299,6 +303,7 @@
 				514B883D28E3873500B81198 /* CareeListView.swift in Sources */,
 				514B885F28E3EEC800B81198 /* CareeDetailView.swift in Sources */,
 				5189F0FE28F89FE70097E7E4 /* BehaviorEditView.swift in Sources */,
+				51B4283E2909B89B007DF447 /* ErrorHandling.swift in Sources */,
 				5189F10128F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */,
 				514B883B28E3873500B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,
 				5101151D2900D7E50009D7EC /* LocationController.swift in Sources */,
@@ -318,6 +323,7 @@
 				514B888828E50E8800B81198 /* Persistence.swift in Sources */,
 				514B886028E3EEC800B81198 /* CareeDetailView.swift in Sources */,
 				5189F0FF28F89FE70097E7E4 /* BehaviorEditView.swift in Sources */,
+				51B4283F2909B89B007DF447 /* ErrorHandling.swift in Sources */,
 				5189F10228F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */,
 				514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */,
 				5101151E2900D7E50009D7EC /* LocationController.swift in Sources */,

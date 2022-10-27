@@ -15,6 +15,7 @@ struct CareKeeperCoreDataApp: App {
         WindowGroup {
             CareeListView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .withErrorHandling()
         }
     }
 }

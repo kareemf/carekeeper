@@ -1,7 +1,19 @@
 import CoreData
 import Combine
+import OSLog
 
-class PersistenceController {
+enum PersistenceError: LocalizedError {
+    case misc(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .misc(let message):
+            return message
+        }
+    }
+}
+
+class PersistenceController: ObservableObject {
     static let shared = PersistenceController()
 
     static var preview: PersistenceController = {
@@ -36,14 +48,18 @@ class PersistenceController {
         do {
             try viewContext.save()
         } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let logger = Logger(subsystem: "com.kareemf.carekeeper", category: "persistence")
             let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+
+            logger.error("Unresolved error \(nsError), \(nsError.userInfo)")
         }
 
         return result
     }()
+
+    let logger = Logger(subsystem: "com.kareemf.carekeeper", category: "persistence")
+
+    @Published var latestError: LocalizedError?
 
 #if os(watchOS)
     private static let authorName = "CareKeeper watchOS"
@@ -58,6 +74,7 @@ class PersistenceController {
     private lazy var historyRequestQueue = DispatchQueue(label: "history")
 
     private var lastHistoryToken: NSPersistentHistoryToken?
+
     private lazy var tokenFileURL: URL = {
         let url = NSPersistentCloudKitContainer.defaultDirectoryURL()
             .appendingPathComponent("CareKeeper", isDirectory: true)
@@ -68,10 +85,15 @@ class PersistenceController {
                     withIntermediateDirectories: true,
                     attributes: nil)
         } catch {
-            // log any errors
+            logError("Error initializing history token", error: error)
         }
         return url.appendingPathComponent("token.data", isDirectory: false)
     }()
+
+    private func logError(_ message: String, error: Error) {
+        logger.error("\(message, privacy: .public): \(error)")
+        latestError = PersistenceError.misc(message)
+    }
 
     init(inMemory: Bool = false) {
         container = NSPersistentCloudKitContainer(name: "CareKeeperCoreData")
@@ -84,7 +106,7 @@ class PersistenceController {
             do {
                 try container.viewContext.setQueryGenerationFrom(.current)
             } catch {
-                // log any errors
+                logError("Error setting query generation", error: error)
             }
         }
 
@@ -101,18 +123,7 @@ class PersistenceController {
 
         container.loadPersistentStores(completionHandler: { (_, error) in
             if let error = error as NSError? {
-                // TODO: Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-
-                /*
-                 Typical reasons for an error here include:
-                 * The parent directory does not exist, cannot be created, or disallows writing.
-                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                 * The device is out of space.
-                 * The store could not be migrated to the current model version.
-                 Check the error message to determine what the actual problem was.
-                 */
-                fatalError("Unresolved error \(error), \(error.userInfo)")
+                self.logError("Error loading persistent stores", error: error)
             }
         })
 
@@ -158,11 +169,8 @@ class PersistenceController {
                     if let newToken = transactions.last?.token {
                         self.storeHistoryToken(newToken)
                     }
-
-//                    self.watchConnectivity.send(context: self.container.viewContext)
-
                 } catch {
-                    // log any errors
+                    self.logError("Error processing remote notifications", error: error)
                 }
             }
         }
@@ -175,7 +183,7 @@ class PersistenceController {
             try data.write(to: tokenFileURL)
             lastHistoryToken = token
         } catch {
-            // log any errors
+            logError("Error writing history token", error: error)
         }
     }
 
@@ -185,7 +193,7 @@ class PersistenceController {
             lastHistoryToken = try NSKeyedUnarchiver
                 .unarchivedObject(ofClass: NSPersistentHistoryToken.self, from: tokenData)
         } catch {
-            // log any errors
+            logError("Error retrieving history token", error: error)
         }
     }
 
