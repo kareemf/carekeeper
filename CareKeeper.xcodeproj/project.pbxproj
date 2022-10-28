@@ -11,7 +11,7 @@
 		5101151E2900D7E50009D7EC /* LocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5101151C2900D7E50009D7EC /* LocationController.swift */; };
 		510115212900F64B0009D7EC /* UserLocationMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510115202900F64B0009D7EC /* UserLocationMap.swift */; };
 		510115222900F64B0009D7EC /* UserLocationMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510115202900F64B0009D7EC /* UserLocationMap.swift */; };
-		514B883628E3873500B81198 /* CareKeeperCoreDataApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883528E3873500B81198 /* CareKeeperCoreDataApp.swift */; };
+		514B883628E3873500B81198 /* CareKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883528E3873500B81198 /* CareKeeperApp.swift */; };
 		514B883828E3873500B81198 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883728E3873500B81198 /* Persistence.swift */; };
 		514B883B28E3873500B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 514B883928E3873500B81198 /* CareKeeperCoreData.xcdatamodeld */; };
 		514B883D28E3873500B81198 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883C28E3873500B81198 /* CareeListView.swift */; };
@@ -37,6 +37,8 @@
 		5189F10C28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */; };
 		51B4283E2909B89B007DF447 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B4283D2909B89B007DF447 /* ErrorHandling.swift */; };
 		51B4283F2909B89B007DF447 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B4283D2909B89B007DF447 /* ErrorHandling.swift */; };
+		51C5B9A6290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */; };
+		51C5B9A7290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,7 +48,7 @@
 		5101151C2900D7E50009D7EC /* LocationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LocationController.swift; path = ../LocationController.swift; sourceTree = "<group>"; };
 		510115202900F64B0009D7EC /* UserLocationMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLocationMap.swift; sourceTree = "<group>"; };
 		514B883228E3873500B81198 /* CareKeeper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CareKeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		514B883528E3873500B81198 /* CareKeeperCoreDataApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperCoreDataApp.swift; sourceTree = "<group>"; };
+		514B883528E3873500B81198 /* CareKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperApp.swift; sourceTree = "<group>"; };
 		514B883728E3873500B81198 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		514B883A28E3873500B81198 /* CareKeeperCoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CareKeeperCoreData.xcdatamodel; sourceTree = "<group>"; };
 		514B883C28E3873500B81198 /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
@@ -66,6 +68,7 @@
 		5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTrackingViewStep2.swift; sourceTree = "<group>"; };
 		51B42836290431A8007DF447 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		51B4283D2909B89B007DF447 /* ErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
+		51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceErrorHandling.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +94,7 @@
 			children = (
 				514B883728E3873500B81198 /* Persistence.swift */,
 				5101151C2900D7E50009D7EC /* LocationController.swift */,
+				51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -122,7 +126,7 @@
 				5189F10328F8CEB10097E7E4 /* BehaviorListItemView.swift */,
 				5189F10028F8CC8C0097E7E4 /* ActivityDetailView.swift */,
 				5189F0FD28F89FE70097E7E4 /* BehaviorEditView.swift */,
-				514B883528E3873500B81198 /* CareKeeperCoreDataApp.swift */,
+				514B883528E3873500B81198 /* CareKeeperApp.swift */,
 				514B883C28E3873500B81198 /* CareeListView.swift */,
 				514D926E28F7AED100CBF67E /* Scraps.md */,
 				514B883E28E3873700B81198 /* Assets.xcassets */,
@@ -295,7 +299,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				514B883628E3873500B81198 /* CareKeeperCoreDataApp.swift in Sources */,
+				514B883628E3873500B81198 /* CareKeeperApp.swift in Sources */,
+				51C5B9A6290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */,
 				5189F10828F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
 				514B883828E3873500B81198 /* Persistence.swift in Sources */,
 				5189F10B28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */,
@@ -316,6 +321,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				514B888728E50E8800B81198 /* CareeListView.swift in Sources */,
+				51C5B9A7290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */,
 				5189F10928F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
 				514B888C28E50FCF00B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,
 				5189F10C28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */,

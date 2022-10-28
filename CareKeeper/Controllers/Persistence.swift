@@ -59,7 +59,7 @@ class PersistenceController: ObservableObject {
 
     let logger = Logger(subsystem: "com.kareemf.carekeeper", category: "persistence")
 
-    @Published var latestError: LocalizedError?
+    @Published var errorHandling = ErrorHandling()
 
 #if os(watchOS)
     private static let authorName = "CareKeeper watchOS"
@@ -92,7 +92,7 @@ class PersistenceController: ObservableObject {
 
     private func logError(_ message: String, error: Error) {
         logger.error("\(message, privacy: .public): \(error)")
-        latestError = PersistenceError.misc(message)
+        errorHandling.handle(error: error)
     }
 
     init(inMemory: Bool = false) {

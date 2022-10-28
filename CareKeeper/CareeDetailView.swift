@@ -49,6 +49,7 @@ struct CareeDetailView: View {
         do {
             return try viewContext.fetch(fetchRequest) as [Activity]
         } catch {
+//            TODO
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
@@ -65,6 +66,7 @@ struct CareeDetailView: View {
         do {
             return try viewContext.fetch(fetchRequest) as [Behavior]
         } catch {
+//            TODO
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
