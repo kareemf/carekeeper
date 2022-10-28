@@ -10,9 +10,6 @@ struct ActivityTrackingViewStep2: View {
 
     @State var notes = ""
     @State private var trackLocation = false
-    @State private var trackQuantity = true
-    @State private var quantity = 0
-    @State private var unit = "Oz"
 
     @Environment(\.managedObjectContext) private var viewContext
 

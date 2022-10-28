@@ -30,7 +30,7 @@ struct CareeDetailView: View {
             try behaviors = CareeDetailView.fetchBehaviors(caree, viewContext)
 
         } catch {
-            self.errorHandling.handle(error: error)
+            errorHandling.handle(error: error)
         }
     }
 
@@ -60,7 +60,7 @@ struct CareeDetailView: View {
 
         fetchRequest.predicate = predicate
         fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Behavior.dateCreated, ascending: false)]
-        
+
         do {
             return try viewContext.fetch(fetchRequest) as [Behavior]
         } catch {
@@ -229,10 +229,20 @@ struct CareeDetailView: View {
                                     isPresentingActivityTrackingView = false
                                 }
                             }
-                        }
+                    }
                 }
             }
         }
+        .onChange(of: isPresentingActivityTrackingView, perform: { newValue in
+            // Workaround to ensure that new activities are displayed after using main tracking button
+            if newValue == false {
+                do {
+                    try activities = CareeDetailView.fetchActivities(caree, viewContext)
+                } catch {
+                    errorHandling.handle(error: error)
+                }
+            }
+        })
     }
 
     private func deleteBehaviors(offsets: IndexSet) {
