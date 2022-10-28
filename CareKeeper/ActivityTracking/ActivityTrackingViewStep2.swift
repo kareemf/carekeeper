@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct ActivityTrackingViewStep2: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject private var errorHandling: ErrorHandling
+
     @StateObject private var locationController = LocationController.shared
 
     @ObservedObject var caree: Caree
@@ -11,16 +14,11 @@ struct ActivityTrackingViewStep2: View {
     @State var notes = ""
     @State private var trackLocation = false
 
-    @Environment(\.managedObjectContext) private var viewContext
-
     private func saveAction() {
         do {
             try viewContext.save()
         } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            errorHandling.handle(error: error, description: "Error saving activity")
         }
     }
 
