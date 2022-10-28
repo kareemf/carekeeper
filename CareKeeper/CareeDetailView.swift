@@ -26,8 +26,8 @@ struct CareeDetailView: View {
     private func saveAction() {
         do {
             try viewContext.save()
-            activities = CareeDetailView.fetchActivities(caree, viewContext)
-            behaviors = CareeDetailView.fetchBehaviors(caree, viewContext)
+            try activities = CareeDetailView.fetchActivities(caree, viewContext)
+            try behaviors = CareeDetailView.fetchBehaviors(caree, viewContext)
 
         } catch {
             self.errorHandling.handle(error: error)
@@ -38,7 +38,7 @@ struct CareeDetailView: View {
         self.caree = caree
     }
 
-    private static func fetchActivities(_ caree: Caree, _ viewContext: NSManagedObjectContext) -> [Activity] {
+    private static func fetchActivities(_ caree: Caree, _ viewContext: NSManagedObjectContext) throws -> [Activity] {
         let predicate = NSPredicate(format: "caree == %@", caree)
 
         let fetchRequest = Activity.fetchRequest()
@@ -49,26 +49,22 @@ struct CareeDetailView: View {
         do {
             return try viewContext.fetch(fetchRequest) as [Activity]
         } catch {
-//            TODO
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            throw error
         }
     }
 
-    private static func fetchBehaviors(_ caree: Caree, _ viewContext: NSManagedObjectContext) -> [Behavior] {
+    private static func fetchBehaviors(_ caree: Caree, _ viewContext: NSManagedObjectContext) throws -> [Behavior] {
         let predicate = NSPredicate(format: "caree == %@", caree)
 
         let fetchRequest = Behavior.fetchRequest()
 
         fetchRequest.predicate = predicate
         fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Behavior.dateCreated, ascending: false)]
-
+        
         do {
             return try viewContext.fetch(fetchRequest) as [Behavior]
         } catch {
-//            TODO
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            throw error
         }
     }
 
@@ -161,8 +157,12 @@ struct CareeDetailView: View {
             }
         }
         .onAppear(perform: {
-            activities = CareeDetailView.fetchActivities(caree, viewContext)
-            behaviors = CareeDetailView.fetchBehaviors(caree, viewContext)
+            do {
+                try activities = CareeDetailView.fetchActivities(caree, viewContext)
+                try behaviors = CareeDetailView.fetchBehaviors(caree, viewContext)
+            } catch {
+                errorHandling.handle(error: error)
+            }
         })
         .navigationTitle(caree.name ?? "")
         .toolbar {

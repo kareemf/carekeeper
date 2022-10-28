@@ -92,7 +92,7 @@ class PersistenceController: ObservableObject {
 
     private func logError(_ message: String, error: Error) {
         logger.error("\(message, privacy: .public): \(error)")
-        errorHandling.handle(error: error)
+        errorHandling.handle(error: error, description: message)
     }
 
     init(inMemory: Bool = false) {

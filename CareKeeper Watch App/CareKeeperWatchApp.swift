@@ -8,7 +8,6 @@ func ??<T>(lhs: Binding<T?>, rhs: T) -> Binding<T> {
 import SwiftUI
 
 @main
-// swiftlint:disable:next type_name
 struct CareKeeper_Watch_App: App {
     let persistenceController = PersistenceController.shared
 
@@ -17,6 +16,7 @@ struct CareKeeper_Watch_App: App {
             CareeListView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .withErrorHandling()
+                .withPersistenceErrorHandling()
         }
     }
 
