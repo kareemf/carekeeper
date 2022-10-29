@@ -182,7 +182,7 @@ class PersistenceController: ObservableObject {
             lastHistoryToken = try NSKeyedUnarchiver
                 .unarchivedObject(ofClass: NSPersistentHistoryToken.self, from: tokenData)
         } catch {
-            logError("Error retrieving history token", error: error)
+            logger.error("Error initializing history token. Probably benign: \(error)")
         }
     }
 
