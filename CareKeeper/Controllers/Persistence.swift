@@ -2,17 +2,6 @@ import CoreData
 import Combine
 import OSLog
 
-enum PersistenceError: LocalizedError {
-    case misc(String)
-
-    var errorDescription: String? {
-        switch self {
-        case .misc(let message):
-            return message
-        }
-    }
-}
-
 class PersistenceController: ObservableObject {
     static let shared = PersistenceController()
 
