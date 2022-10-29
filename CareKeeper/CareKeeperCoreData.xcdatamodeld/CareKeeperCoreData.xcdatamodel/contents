@@ -13,13 +13,13 @@
         <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="enableLocations" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="icon" optional="YES" attributeType="String" defaultValueString=""/>
-        <attribute name="name" optional="YES" attributeType="String" defaultValueString="" preserveAfterDeletion="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" defaultValueString="" allowsCloudEncryption="YES" preserveAfterDeletion="YES"/>
         <relationship name="activities" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Activity" inverseName="behavior" inverseEntity="Activity"/>
         <relationship name="caree" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Caree" inverseName="behaviors" inverseEntity="Caree"/>
     </entity>
     <entity name="Caree" representedClassName="Caree" syncable="YES" codeGenerationType="class">
         <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="name" optional="YES" attributeType="String" defaultValueString="" preserveAfterDeletion="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" defaultValueString="" allowsCloudEncryption="YES" preserveAfterDeletion="YES"/>
         <relationship name="activities" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Activity" inverseName="caree" inverseEntity="Activity"/>
         <relationship name="behaviors" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Behavior" inverseName="caree" inverseEntity="Behavior"/>
     </entity>
