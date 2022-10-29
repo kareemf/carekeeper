@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "514B884C28E3875000B81198"
-               BuildableName = "CareKeeperWatch Watch App.app"
-               BlueprintName = "CareKeeperWatch Watch App"
+               BuildableName = "CareKeeper Watch App.app"
+               BlueprintName = "CareKeeper Watch App"
                ReferencedContainer = "container:CareKeeper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,8 +45,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "514B884C28E3875000B81198"
-            BuildableName = "CareKeeperWatch Watch App.app"
-            BlueprintName = "CareKeeperWatch Watch App"
+            BuildableName = "CareKeeper Watch App.app"
+            BlueprintName = "CareKeeper Watch App"
             ReferencedContainer = "container:CareKeeper.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,8 +62,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "514B884C28E3875000B81198"
-            BuildableName = "CareKeeperWatch Watch App.app"
-            BlueprintName = "CareKeeperWatch Watch App"
+            BuildableName = "CareKeeper Watch App.app"
+            BlueprintName = "CareKeeper Watch App"
             ReferencedContainer = "container:CareKeeper.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

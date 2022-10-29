@@ -55,7 +55,7 @@
 		514B883E28E3873700B81198 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		514B884028E3873700B81198 /* CareKeeper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CareKeeper.entitlements; sourceTree = "<group>"; };
 		514B884228E3873700B81198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		514B884D28E3875000B81198 /* CareKeeperWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CareKeeperWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		514B884D28E3875000B81198 /* CareKeeper Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CareKeeper Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWatchApp.swift; sourceTree = "<group>"; };
 		514B885328E3875100B81198 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		514B885628E3875100B81198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -112,7 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				514B883228E3873500B81198 /* CareKeeper.app */,
-				514B884D28E3875000B81198 /* CareKeeperWatch Watch App.app */,
+				514B884D28E3875000B81198 /* CareKeeper Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -199,9 +199,9 @@
 			productReference = 514B883228E3873500B81198 /* CareKeeper.app */;
 			productType = "com.apple.product-type.application";
 		};
-		514B884C28E3875000B81198 /* CareKeeperWatch Watch App */ = {
+		514B884C28E3875000B81198 /* CareKeeper Watch App */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 514B885828E3875100B81198 /* Build configuration list for PBXNativeTarget "CareKeeperWatch Watch App" */;
+			buildConfigurationList = 514B885828E3875100B81198 /* Build configuration list for PBXNativeTarget "CareKeeper Watch App" */;
 			buildPhases = (
 				514B884928E3875000B81198 /* Sources */,
 				514B884A28E3875000B81198 /* Frameworks */,
@@ -211,9 +211,9 @@
 			);
 			dependencies = (
 			);
-			name = "CareKeeperWatch Watch App";
-			productName = "CareKeeperWatch Watch App";
-			productReference = 514B884D28E3875000B81198 /* CareKeeperWatch Watch App.app */;
+			name = "CareKeeper Watch App";
+			productName = "CareKeeper Watch App";
+			productReference = 514B884D28E3875000B81198 /* CareKeeper Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -248,7 +248,7 @@
 			projectRoot = "";
 			targets = (
 				514B883128E3873500B81198 /* CareKeeper */,
-				514B884C28E3875000B81198 /* CareKeeperWatch Watch App */,
+				514B884C28E3875000B81198 /* CareKeeper Watch App */,
 			);
 		};
 /* End PBXProject section */
@@ -625,7 +625,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		514B885828E3875100B81198 /* Build configuration list for PBXNativeTarget "CareKeeperWatch Watch App" */ = {
+		514B885828E3875100B81198 /* Build configuration list for PBXNativeTarget "CareKeeper Watch App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				514B885928E3875100B81198 /* Debug */,
