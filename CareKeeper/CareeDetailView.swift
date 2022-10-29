@@ -138,8 +138,10 @@ struct CareeDetailView: View {
                         self.isPresentingActivityDetailView = true
                     }) {
                         VStack(alignment: .leading) {
+                            if let behavior = activity.behavior {
+                                BehaviorListItemView(behavior: behavior)
+                            }
 
-                            BehaviorListItemView(behavior: activity.behavior!)
                             Text("🗓 \(activity.when?.formatted(date: .abbreviated, time: .shortened) ?? "")")
 
                             if !(activity.notes?.isEmpty ?? true) {
