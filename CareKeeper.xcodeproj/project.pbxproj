@@ -42,6 +42,16 @@
 		51C5B9A7290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		51AEC3512914A58200C1DD5E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 514B882A28E3873500B81198 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 514B884C28E3875000B81198;
+			remoteInfo = "CareKeeper Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		51AEC3532914A58200C1DD5E /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -217,6 +227,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				51AEC3522914A58200C1DD5E /* PBXTargetDependency */,
 			);
 			name = CareKeeper;
 			productName = CareKeeperCoreData;
@@ -362,6 +373,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		51AEC3522914A58200C1DD5E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 514B884C28E3875000B81198 /* CareKeeper Watch App */;
+			targetProxy = 51AEC3512914A58200C1DD5E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		514B884428E3873700B81198 /* Debug */ = {
