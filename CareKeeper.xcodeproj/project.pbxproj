@@ -35,11 +35,36 @@
 		5189F10928F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10728F8CF880097E7E4 /* ActivityTrackingViewStep1.swift */; };
 		5189F10B28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */; };
 		5189F10C28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */; };
+		51AEC3502914A58200C1DD5E /* CareKeeper Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 514B884D28E3875000B81198 /* CareKeeper Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		51B4283E2909B89B007DF447 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B4283D2909B89B007DF447 /* ErrorHandling.swift */; };
 		51B4283F2909B89B007DF447 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B4283D2909B89B007DF447 /* ErrorHandling.swift */; };
 		51C5B9A6290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */; };
 		51C5B9A7290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		51AEC3512914A58200C1DD5E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 514B882A28E3873500B81198 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 514B884C28E3875000B81198;
+			remoteInfo = "CareKeeper Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		51AEC3532914A58200C1DD5E /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				51AEC3502914A58200C1DD5E /* CareKeeper Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		5101151928FF57A70009D7EC /* CareKeeper Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeper Watch App.entitlements"; sourceTree = "<group>"; };
@@ -105,6 +130,7 @@
 				514B883428E3873500B81198 /* CareKeeper */,
 				514B884E28E3875000B81198 /* CareKeeper Watch App */,
 				514B883328E3873500B81198 /* Products */,
+				51AEC34F2914A58200C1DD5E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -178,6 +204,13 @@
 			path = ActivityTracking;
 			sourceTree = "<group>";
 		};
+		51AEC34F2914A58200C1DD5E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -189,10 +222,12 @@
 				51B4283529033843007DF447 /* ShellScript */,
 				514B882F28E3873500B81198 /* Frameworks */,
 				514B883028E3873500B81198 /* Resources */,
+				51AEC3532914A58200C1DD5E /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				51AEC3522914A58200C1DD5E /* PBXTargetDependency */,
 			);
 			name = CareKeeper;
 			productName = CareKeeperCoreData;
@@ -338,6 +373,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		51AEC3522914A58200C1DD5E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 514B884C28E3875000B81198 /* CareKeeper Watch App */;
+			targetProxy = 51AEC3512914A58200C1DD5E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		514B884428E3873700B81198 /* Debug */ = {
