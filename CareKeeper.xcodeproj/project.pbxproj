@@ -507,6 +507,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CareKeeper/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -552,6 +553,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CareKeeper/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -596,7 +598,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "CareKeeper-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = CareKeeperWatch;
+				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
@@ -631,7 +633,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "CareKeeper-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = CareKeeperWatch;
+				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
