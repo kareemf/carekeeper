@@ -11,6 +11,7 @@
 		5101151E2900D7E50009D7EC /* LocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5101151C2900D7E50009D7EC /* LocationController.swift */; };
 		510115212900F64B0009D7EC /* UserLocationMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510115202900F64B0009D7EC /* UserLocationMap.swift */; };
 		510115222900F64B0009D7EC /* UserLocationMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510115202900F64B0009D7EC /* UserLocationMap.swift */; };
+		5103A7A92918307B00F58FCE /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5103A7A82918307B00F58FCE /* ComplicationController.swift */; };
 		514B883628E3873500B81198 /* CareKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883528E3873500B81198 /* CareKeeperApp.swift */; };
 		514B883828E3873500B81198 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883728E3873500B81198 /* Persistence.swift */; };
 		514B883B28E3873500B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 514B883928E3873500B81198 /* CareKeeperCoreData.xcdatamodeld */; };
@@ -40,6 +41,7 @@
 		51B4283F2909B89B007DF447 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B4283D2909B89B007DF447 /* ErrorHandling.swift */; };
 		51C5B9A6290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */; };
 		51C5B9A7290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */; };
+		51F3EC552919EE39007F1F0F /* ImageFromText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F3EC542919EE39007F1F0F /* ImageFromText.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +74,7 @@
 		5101151B28FF5B390009D7EC /* CareKeeper-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CareKeeper-Watch-App-Info.plist"; sourceTree = SOURCE_ROOT; };
 		5101151C2900D7E50009D7EC /* LocationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LocationController.swift; path = ../LocationController.swift; sourceTree = "<group>"; };
 		510115202900F64B0009D7EC /* UserLocationMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLocationMap.swift; sourceTree = "<group>"; };
+		5103A7A82918307B00F58FCE /* ComplicationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicationController.swift; sourceTree = "<group>"; };
 		514B883228E3873500B81198 /* CareKeeper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CareKeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		514B883528E3873500B81198 /* CareKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperApp.swift; sourceTree = "<group>"; };
 		514B883728E3873500B81198 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
@@ -94,6 +97,7 @@
 		51B42836290431A8007DF447 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		51B4283D2909B89B007DF447 /* ErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
 		51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceErrorHandling.swift; sourceTree = "<group>"; };
+		51F3EC542919EE39007F1F0F /* ImageFromText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFromText.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,6 +187,8 @@
 				514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */,
 				514B885328E3875100B81198 /* Assets.xcassets */,
 				514B885528E3875100B81198 /* Preview Content */,
+				5103A7A82918307B00F58FCE /* ComplicationController.swift */,
+				51F3EC542919EE39007F1F0F /* ImageFromText.swift */,
 			);
 			path = "CareKeeper Watch App";
 			sourceTree = "<group>";
@@ -365,9 +371,11 @@
 				514B886028E3EEC800B81198 /* CareeDetailView.swift in Sources */,
 				5189F0FF28F89FE70097E7E4 /* BehaviorEditView.swift in Sources */,
 				51B4283F2909B89B007DF447 /* ErrorHandling.swift in Sources */,
+				51F3EC552919EE39007F1F0F /* ImageFromText.swift in Sources */,
 				5189F10228F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */,
 				514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */,
 				5101151E2900D7E50009D7EC /* LocationController.swift in Sources */,
+				5103A7A92918307B00F58FCE /* ComplicationController.swift in Sources */,
 				5189F10528F8CEB10097E7E4 /* BehaviorListItemView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -588,6 +596,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "CareKeeper Watch App/CareKeeper Watch App.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -599,6 +608,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "CareKeeper-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
+				INFOPLIST_KEY_CLKComplicationPrincipalClass = "$(PRODUCT_MODULE_NAME).ComplicationController";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
@@ -623,6 +633,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "CareKeeper Watch App/CareKeeper Watch App.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -634,6 +645,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "CareKeeper-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
+				INFOPLIST_KEY_CLKComplicationPrincipalClass = "$(PRODUCT_MODULE_NAME).ComplicationController";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
