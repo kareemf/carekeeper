@@ -18,6 +18,7 @@ struct CareeDetailView: View {
     @State private var behaviors: [Behavior] = []
     @State private var selectedBehavior: Behavior?
     @State private var isPresentingBehaviorEditView = false
+    @State private var isReorderingBehaviors = false
 
     private var isPresentingSheet: Bool {
         isPresentingBehaviorEditView || isPresentingActivityDetailView || isPresentingActivityTrackingView
@@ -124,7 +125,14 @@ struct CareeDetailView: View {
                     }
                     .foregroundColor(.mint)
 
-                }.onDelete(perform: deleteBehaviors)
+                }
+                .onDelete(perform: deleteBehaviors)
+                .onMove(perform: moveBehaviors)
+                .onLongPressGesture {
+                    withAnimation {
+                        self.isReorderingBehaviors = true
+                    }
+                }
             }
 
             Section(header: Text("Activities").foregroundColor(.red)) {
@@ -252,6 +260,25 @@ struct CareeDetailView: View {
             //            TODO: soft delete behaviors that still have activities
             offsets.map { behaviors[$0] }.forEach(viewContext.delete)
             saveAction()
+        }
+    }
+
+    private func moveBehaviors(from source: IndexSet, to destination: Int) {
+        var reorderedBehaviors: [Behavior] = behaviors.map { $0 }
+
+        reorderedBehaviors.move(fromOffsets: source, toOffset: destination )
+
+        // swiftlint:disable:next identifier_name
+        for i in stride( from: reorderedBehaviors.count - 1,
+                         through: 0,
+                         by: -1 ) {
+            reorderedBehaviors[i].listOrder = Int64(i)
+        }
+
+        saveAction()
+
+        withAnimation {
+            isReorderingBehaviors = false
         }
     }
 
