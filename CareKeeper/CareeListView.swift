@@ -6,9 +6,13 @@ struct CareeListView: View {
     @EnvironmentObject private var errorHandling: ErrorHandling
 
     @State private var isPresentingNewCareeView = false
+    @State private var isReordering = false
 
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Caree.name, ascending: false)],
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \Caree.listOrder, ascending: true),
+            NSSortDescriptor(keyPath: \Caree.name, ascending: false)
+        ],
         animation: .default)
     private var carees: FetchedResults<Caree>
 
@@ -27,6 +31,12 @@ struct CareeListView: View {
                     }
                 }
                 .onDelete(perform: deleteCarees)
+                .onMove(perform: moveCarees)
+                .onLongPressGesture {
+                    withAnimation {
+                        self.isReordering = true
+                    }
+                }
             }
 #if os(watchOS)
             .listStyle(CarouselListStyle())
@@ -58,7 +68,6 @@ struct CareeListView: View {
 
     private func deleteCarees(offsets: IndexSet) {
         withAnimation {
-            //            TODO: cascade delete to behaviors and activities
             offsets.map { carees[$0] }.forEach(viewContext.delete)
 
             do {
@@ -66,6 +75,29 @@ struct CareeListView: View {
             } catch {
                 self.errorHandling.handle(error: error)
             }
+        }
+    }
+
+    private func moveCarees(from source: IndexSet, to destination: Int) {
+        var reorderedCarees: [Caree] = carees.map { $0 }
+
+        reorderedCarees.move(fromOffsets: source, toOffset: destination )
+
+        // swiftlint:disable:next identifier_name
+        for i in stride( from: reorderedCarees.count - 1,
+                         through: 0,
+                         by: -1 ) {
+            reorderedCarees[i].listOrder = Int64(i)
+        }
+
+        do {
+            try viewContext.save()
+        } catch {
+            self.errorHandling.handle(error: error)
+        }
+
+        withAnimation {
+            isReordering = false
         }
     }
 }
