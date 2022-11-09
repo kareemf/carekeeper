@@ -6,6 +6,13 @@ struct ActivityDetailView: View {
     @StateObject private var locationController = LocationController.shared
     @ObservedObject var activity: Activity
 
+    @State private var latitude: String = ""
+    @State private var longitude: String = ""
+
+    var hasLocation: Bool {
+        activity.latitude != 0 || activity.longitude != 0
+    }
+
     var location: CLLocation {
         CLLocation(latitude: activity.latitude, longitude: activity.longitude)
     }
@@ -20,9 +27,33 @@ struct ActivityDetailView: View {
                 Section(header: Text("Behavior")) {
                     BehaviorListItemView(behavior: activity.behavior!)
                 }
+
+                if hasLocation {
+                    Section(header: Text("Location")) {
+                        TextField("Lat", text: $latitude)
+                            .onAppear(perform: {
+                                latitude = String(format: "%.02f", activity.latitude)
+                            })
+                            .onChange(of: latitude, perform: {
+                                if let value = NumberFormatter().number(from: $0) {
+                                    activity.latitude = value.doubleValue
+                                }
+                            })
+                        TextField("Lon", text: $longitude)
+                            .onAppear(perform: {
+                                longitude = String(format: "%.02f", activity.longitude)
+                            })
+                            .onChange(of: longitude, perform: {
+                                if let value = NumberFormatter().number(from: $0) {
+                                    activity.longitude = value.doubleValue
+                                }
+                            })
+                    }
+                }
             }
+
 #if !os(watchOS)
-            if activity.latitude != 0 || activity.longitude != 0 {
+            if hasLocation {
                 UserLocationMap(location: .constant(location), showsUserLocation: false, dropPinAtLocation: true)
             }
 #endif
