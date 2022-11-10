@@ -18,7 +18,6 @@ struct CareeDetailView: View {
     @State private var behaviors: [Behavior] = []
     @State private var selectedBehavior: Behavior?
     @State private var isPresentingBehaviorEditView = false
-    @State private var isReorderingBehaviors = false
 
     private var isPresentingSheet: Bool {
         isPresentingBehaviorEditView || isPresentingActivityDetailView || isPresentingActivityTrackingView
@@ -60,7 +59,10 @@ struct CareeDetailView: View {
         let fetchRequest = Behavior.fetchRequest()
 
         fetchRequest.predicate = predicate
-        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Behavior.dateCreated, ascending: false)]
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(keyPath: \Behavior.listOrder, ascending: true),
+            NSSortDescriptor(keyPath: \Behavior.dateCreated, ascending: false)
+        ]
 
         do {
             return try viewContext.fetch(fetchRequest) as [Behavior]
@@ -128,11 +130,6 @@ struct CareeDetailView: View {
                 }
                 .onDelete(perform: deleteBehaviors)
                 .onMove(perform: moveBehaviors)
-                .onLongPressGesture {
-                    withAnimation {
-                        self.isReorderingBehaviors = true
-                    }
-                }
             }
 
             Section(header: Text("Activities").foregroundColor(.red)) {
@@ -276,10 +273,6 @@ struct CareeDetailView: View {
         }
 
         saveAction()
-
-        withAnimation {
-            isReorderingBehaviors = false
-        }
     }
 
     private func deleteActivities(offsets: IndexSet) {

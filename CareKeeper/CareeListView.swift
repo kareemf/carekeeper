@@ -6,7 +6,6 @@ struct CareeListView: View {
     @EnvironmentObject private var errorHandling: ErrorHandling
 
     @State private var isPresentingNewCareeView = false
-    @State private var isReordering = false
 
     @FetchRequest(
         sortDescriptors: [
@@ -32,11 +31,6 @@ struct CareeListView: View {
                 }
                 .onDelete(perform: deleteCarees)
                 .onMove(perform: moveCarees)
-                .onLongPressGesture {
-                    withAnimation {
-                        self.isReordering = true
-                    }
-                }
             }
 #if os(watchOS)
             .listStyle(CarouselListStyle())
@@ -94,10 +88,6 @@ struct CareeListView: View {
             try viewContext.save()
         } catch {
             self.errorHandling.handle(error: error)
-        }
-
-        withAnimation {
-            isReordering = false
         }
     }
 }
