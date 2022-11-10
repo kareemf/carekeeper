@@ -38,8 +38,14 @@ struct ActivityDetailView: View {
                         "When",
                         selection: $when,
                         displayedComponents: [.date, .hourAndMinute]
-                    ).onChange(of: when, perform: { newValue in
+                    )
+                    .onChange(of: when, perform: { newValue in
                         activity.when = newValue
+                    })
+                    .onAppear(perform: {
+                        if let realWhen = activity.when {
+                            when = realWhen
+                        }
                     })
 #endif
                 }
