@@ -8,6 +8,7 @@ struct ActivityDetailView: View {
 
     @State private var latitude: String = ""
     @State private var longitude: String = ""
+    @State private var when: Date = Date()
 
     var hasLocation: Bool {
         activity.latitude != 0 || activity.longitude != 0
@@ -28,6 +29,20 @@ struct ActivityDetailView: View {
                     BehaviorListItemView(behavior: activity.behavior!)
                 }
 
+                Section(header: Text("When")) {
+#if os(watchOS)
+                    Text("\(activity.when?.formatted(date: .abbreviated, time: .shortened) ?? "")")
+#else
+
+                    DatePicker(
+                        "When",
+                        selection: $when,
+                        displayedComponents: [.date, .hourAndMinute]
+                    ).onChange(of: when, perform: { newValue in
+                        activity.when = newValue
+                    })
+#endif
+                }
                 if hasLocation {
                     Section(header: Text("Location")) {
                         TextField("Lat", text: $latitude)
