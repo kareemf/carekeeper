@@ -31,6 +31,9 @@ struct CareeListView: View {
                 }
                 .onDelete(perform: deleteCarees)
                 .onMove(perform: moveCarees)
+#if os(watchOS)
+                CareeAddButton(isPresentingNewCareeView: $isPresentingNewCareeView)
+#endif
             }
 #if os(watchOS)
             .listStyle(CarouselListStyle())
@@ -40,14 +43,11 @@ struct CareeListView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
                 }
-#endif
-                ToolbarItem {
-                    Button(action: {
-                        isPresentingNewCareeView = true
-                    }) {
-                        Label("Add Caree", systemImage: "plus")
-                    }
+
+                ToolbarItem(placement: .primaryAction) {
+                    CareeAddButton(isPresentingNewCareeView: $isPresentingNewCareeView)
                 }
+#endif
             }
             .navigationTitle("In My Care")
             .sheet(isPresented: $isPresentingNewCareeView) {
@@ -101,6 +101,18 @@ struct CareeListItem: View {
                 .font(.system(.headline, design: .rounded))
             Text("\(caree.behaviors?.count ?? 0) behaviors")
             Text("\(caree.activities?.count ?? 0) activities")
+        }
+    }
+}
+
+struct CareeAddButton: View {
+    @Binding var isPresentingNewCareeView: Bool
+    
+    var body: some View {
+        Button(action: {
+            isPresentingNewCareeView = true
+        }) {
+            Label("Add Caree", systemImage: "plus")
         }
     }
 }
