@@ -19,6 +19,9 @@ struct CareeDetailView: View {
     @State private var selectedBehavior: Behavior?
     @State private var isPresentingBehaviorEditView = false
 
+    // swiftlint:disable:next identifier_name
+    static let ACTIVITY_FETCH_LIMIT = 5
+
     private var isPresentingSheet: Bool {
         isPresentingBehaviorEditView || isPresentingActivityDetailView || isPresentingActivityTrackingView
     }
@@ -45,6 +48,7 @@ struct CareeDetailView: View {
 
         fetchRequest.predicate = predicate
         fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Activity.when, ascending: false)]
+        fetchRequest.fetchLimit = ACTIVITY_FETCH_LIMIT
 
         do {
             return try viewContext.fetch(fetchRequest) as [Activity]
@@ -132,7 +136,7 @@ struct CareeDetailView: View {
                 .onMove(perform: moveBehaviors)
             }
 
-            Section(header: Text("Activities").foregroundColor(.red)) {
+            Section(header: ActivitySectionHeader(caree: caree, activities: $activities).foregroundColor(.red)) {
                 if activities.isEmpty {
                     Text("No activities tracked yet")
                 }
@@ -273,11 +277,32 @@ struct CareeDetailView: View {
     }
 }
 
+struct ActivitySectionHeader: View {
+    @ObservedObject var caree: Caree
+    @Binding var activities: [Activity]
+
+    var body: some View {
+#if os(watchOS)
+        Text("Activities")
+#else
+        HStack {
+            Text("Activities")
+            if caree.activities?.count ?? 0 > CareeDetailView.ACTIVITY_FETCH_LIMIT {
+                NavigationLink(
+                    destination: ActivityListView(caree: caree),
+                    label: { Text("Show More") }
+                )
+            }
+        }
+#endif
+    }
+}
+
 struct CareeDetailView_Previews: PreviewProvider {
     static let viewContext = PersistenceController.preview.container.viewContext
-    static let fetchCareeRequest = Caree.fetchRequest()
+    static let fetchRequest = Caree.fetchRequest()
     // swiftlint:disable:next force_try
-    static let carees = try! viewContext.fetch(fetchCareeRequest)
+    static let carees = try! viewContext.fetch(fetchRequest)
 
     static var previews: some View {
         NavigationView {
