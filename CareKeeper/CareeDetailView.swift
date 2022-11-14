@@ -215,7 +215,11 @@ struct CareeDetailView: View {
                             }
                         }
                 } else if isPresentingActivityTrackingView {
-                    ActivityTrackingViewStep1(caree: caree, isPresentingView: $isPresentingActivityTrackingView, behaviors: behaviors)
+                    ActivityTrackingViewStep1(
+                        caree: caree,
+                        isPresentingView: $isPresentingActivityTrackingView,
+                        behaviors: behaviors
+                    )
                     .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
                                 Button("Cancel") {
