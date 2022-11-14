@@ -142,21 +142,7 @@ struct CareeDetailView: View {
                         self.selectedActivity = activity
                         self.isPresentingActivityDetailView = true
                     }) {
-                        VStack(alignment: .leading) {
-                            if let behavior = activity.behavior {
-                                BehaviorListItemView(behavior: behavior)
-                            }
-
-                            Text("🗓 \(activity.when?.formatted(date: .abbreviated, time: .shortened) ?? "")")
-
-                            if !(activity.notes?.isEmpty ?? true) {
-                                Text("🗒 \(activity.notes!)")
-                            }
-
-                            if activity.latitude != 0 || activity.longitude != 0 {
-                                Image(systemName: "location")
-                            }
-                        }
+                        ActivityListItem(activity: activity)
                     }
                     .foregroundColor(.red)
 
