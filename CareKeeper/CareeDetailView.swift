@@ -90,7 +90,7 @@ struct CareeDetailView: View {
                 }
             }
 
-            Section(header: Text("Activity").foregroundColor(.green)) {
+            Section {
                 Button(action: {
                         self.isPresentingActivityTrackingView = true
                     }) {
