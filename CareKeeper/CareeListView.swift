@@ -51,7 +51,6 @@ struct CareeListView: View {
             }
             .navigationTitle("In My Care")
             .sheet(isPresented: $isPresentingNewCareeView) {
-                //                TODO: fix height and focus
                 CareeAddView(isPresenting: $isPresentingNewCareeView)
             }
             .refreshable {
@@ -122,6 +121,7 @@ struct CareeAddView: View {
     @EnvironmentObject private var errorHandling: ErrorHandling
 
     @State private var name = ""
+    @FocusState private var isNameFocused: Bool
     @Binding var isPresenting: Bool
 
     private func addCaree() {
@@ -143,6 +143,10 @@ struct CareeAddView: View {
         NavigationView {
             Form {
                 TextField("Name", text: $name)
+                    .focused($isNameFocused)
+            }
+            .onAppear {
+                isNameFocused = true
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
