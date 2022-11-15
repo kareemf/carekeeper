@@ -3,12 +3,14 @@ import CoreData
 
 struct CareeDetailView: View {
     @Environment(\.managedObjectContext) private var viewContext
+#if os(iOS)
+    @Environment(\.editMode) private var editMode
+#endif
     @EnvironmentObject private var errorHandling: ErrorHandling
 
     @ObservedObject private var caree: Caree
 
     @State private var name: String = ""
-    @State private var isPresentingEditView = false
 
     @State private var activities: [Activity] = []
     @State private var selectedActivity: Activity?
@@ -82,7 +84,8 @@ struct CareeDetailView: View {
 
     var body: some View {
         List {
-            if isPresentingEditView == true {
+#if os(iOS)
+            if editMode?.wrappedValue.isEditing == true {
                 Section("Info") {
                     TextField("Name", text: $name)
                         .onAppear {
@@ -91,9 +94,11 @@ struct CareeDetailView: View {
                         .onSubmit {
                             saveEditForm()
                         }
-                }
-            }
 
+                }
+                .animation(nil, value: editMode?.wrappedValue)
+            }
+#endif
             Section {
                 Button(action: {
                         self.isPresentingActivityTrackingView = true
@@ -163,19 +168,18 @@ struct CareeDetailView: View {
         })
         .navigationTitle(caree.name ?? "")
         .toolbar {
-            ToolbarItem(placement: .automatic) {
-                if isPresentingEditView == true {
-                    Button("Done") {
-                        isPresentingEditView = false
-                        saveEditForm()
-                    }
-                } else {
-                    Button("Edit") {
-                        isPresentingEditView = true
-                    }
-                }
+#if os(iOS)
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    EditButton()
+                        .onChange(of: editMode?.wrappedValue, perform: { v in
+                            guard let isEditing = editMode?.wrappedValue.isEditing else { return }
 
-            }
+                            if isEditing == false {
+                                saveEditForm()
+                            }
+                        })
+                }
+#endif
         }
         .sheet(isPresented: .constant(isPresentingSheet)) {
             NavigationView {
