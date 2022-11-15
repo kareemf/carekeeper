@@ -49,10 +49,10 @@ struct BehaviorEditView: View {
 
 struct BehaviorEditView_Previews: PreviewProvider {
     static let viewContext = PersistenceController.preview.container.viewContext
-    static let fetchCareeRequest = Behavior.fetchRequest()
+    static let fetchRequest = Behavior.fetchRequest()
 
     // swiftlint:disable:next force_try
-    static let behaviors = try! viewContext.fetch(fetchCareeRequest)
+    static let behaviors = try! viewContext.fetch(fetchRequest)
 
     static var previews: some View {
         NavigationView {
