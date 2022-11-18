@@ -184,7 +184,7 @@ struct CareeDetailView: View {
         .sheet(isPresented: .constant(isPresentingSheet)) {
             NavigationView {
                 if isPresentingBehaviorEditView {
-                    BehaviorEditView(behavior: selectedBehavior!)
+                    BehavioDetailView(behavior: selectedBehavior!)
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
                                 Button("Cancel") {

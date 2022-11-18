@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct BehaviorEditView: View {
+struct BehavioDetailView: View {
     @ObservedObject var behavior: Behavior
     @State private var isPresentingActivityTrackingView = false
 
@@ -56,7 +56,7 @@ struct BehaviorEditView_Previews: PreviewProvider {
 
     static var previews: some View {
         NavigationView {
-            BehaviorEditView(behavior: behaviors[0])
+            BehavioDetailView(behavior: behaviors[0])
         }
     }
 }
