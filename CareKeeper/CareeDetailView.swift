@@ -78,8 +78,8 @@ struct CareeDetailView: View {
     }
 
     private func saveEditForm() {
-            caree.name = name
-            saveAction()
+        caree.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        saveAction()
     }
 
     var body: some View {
@@ -197,10 +197,22 @@ struct CareeDetailView: View {
                             }
                             ToolbarItem(placement: .confirmationAction) {
                                 Button("Done") {
-                                    let isNew = selectedBehavior?.objectID.isTemporaryID ?? false
-                                    if  isNew {
-                                        selectedBehavior?.dateCreated = Date()
+                                    guard let behavior = selectedBehavior else {
+                                        isPresentingBehaviorEditView = false
+                                        return
                                     }
+
+                                    let isNew = behavior.objectID.isTemporaryID
+
+                                    if  isNew {
+                                        behavior.dateCreated = Date()
+                                    }
+
+                                    if let name = behavior.name {
+                                        behavior.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+
+                                    }
+
                                     saveAction()
                                     isPresentingBehaviorEditView = false
                                 }

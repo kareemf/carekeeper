@@ -106,7 +106,7 @@ struct CareeListItem: View {
 
 struct CareeAddButton: View {
     @Binding var isPresentingNewCareeView: Bool
-    
+
     var body: some View {
         Button(action: {
             isPresentingNewCareeView = true
@@ -128,7 +128,7 @@ struct CareeAddView: View {
         withAnimation {
             let newCaree = Caree(context: viewContext)
             newCaree.dateCreated = Date()
-            newCaree.name = name
+            newCaree.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
 
             do {
                 try viewContext.save()
