@@ -171,7 +171,7 @@ struct CareeDetailView: View {
 #if os(iOS)
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
-                        .onChange(of: editMode?.wrappedValue, perform: { v in
+                        .onChange(of: editMode?.wrappedValue, perform: { _ in
                             guard let isEditing = editMode?.wrappedValue.isEditing else { return }
 
                             if isEditing == false {

@@ -6,6 +6,7 @@ struct ActivityDetailView: View {
     @StateObject private var locationController = LocationController.shared
     @ObservedObject var activity: Activity
 
+    @State private var notes: String = ""
     @State private var latitude: String = ""
     @State private var longitude: String = ""
     @State private var when: Date = Date()
@@ -22,7 +23,15 @@ struct ActivityDetailView: View {
         VStack {
             Form {
                 Section(header: Text("Notes")) {
-                    TextField("Notes", text: $activity.notes ?? "")
+                    TextField("Notes", text: $notes)
+                        .onAppear(perform: {
+                            if let realNotes = activity.notes {
+                                notes = realNotes
+                            }
+                        })
+                        .onChange(of: notes, perform: { _ in
+                            activity.notes = notes
+                        })
                 }
 
                 Section(header: Text("Behavior")) {
@@ -39,13 +48,13 @@ struct ActivityDetailView: View {
                         selection: $when,
                         displayedComponents: [.date, .hourAndMinute]
                     )
-                    .onChange(of: when, perform: { newValue in
-                        activity.when = newValue
-                    })
                     .onAppear(perform: {
                         if let realWhen = activity.when {
                             when = realWhen
                         }
+                    })
+                    .onChange(of: when, perform: { newValue in
+                        activity.when = newValue
                     })
 #endif
                 }

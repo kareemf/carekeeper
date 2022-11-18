@@ -3,6 +3,8 @@ import SwiftUI
 struct BehavioDetailView: View {
     @ObservedObject var behavior: Behavior
     @State private var isPresentingActivityTrackingView = false
+    @State private var name = ""
+    @State private var icon = ""
 
     private var isNew: Bool {
         behavior.objectID.isTemporaryID
@@ -15,10 +17,26 @@ struct BehavioDetailView: View {
     var body: some View {
             Form {
                 Section(header: Text("Info")) {
-                    TextField("Name", text: $behavior.name ?? "")
-                    //                TODO: limit to emojis?
-                    //                TODO: limit to single char
-                    TextField("Icon", text: $behavior.icon ?? "")
+                    TextField("Name", text: $name)
+                        .onAppear(perform: {
+                            if let realName = behavior.name {
+                                name = realName
+                            }
+                        })
+                        .onChange(of: name, perform: { _ in
+                            behavior.name = name
+                        })
+                    // TODO: limit to emojis?
+                    // TODO: limit to single char
+                    TextField("Icon", text: $icon)
+                        .onAppear(perform: {
+                            if let realIcon = behavior.icon {
+                                name = realIcon
+                            }
+                        })
+                        .onChange(of: icon, perform: { _ in
+                            behavior.icon = icon
+                        })
                 }
 
                 Section(header: Text("Properties")) {
