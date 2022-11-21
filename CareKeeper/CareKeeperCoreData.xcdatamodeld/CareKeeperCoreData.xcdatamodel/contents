@@ -27,7 +27,7 @@
         <relationship name="photo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Photo" inverseName="caree" inverseEntity="Photo"/>
     </entity>
     <entity name="Photo" representedClassName="Photo" syncable="YES" codeGenerationType="class">
-        <attribute name="data" optional="YES" attributeType="Binary"/>
+        <attribute name="data" optional="YES" attributeType="Binary" allowsCloudEncryption="YES"/>
         <relationship name="caree" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Caree" inverseName="photo" inverseEntity="Caree"/>
     </entity>
 </model>
