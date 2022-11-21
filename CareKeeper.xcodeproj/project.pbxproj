@@ -46,6 +46,16 @@
 		51F3EC552919EE39007F1F0F /* ImageFromText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F3EC542919EE39007F1F0F /* ImageFromText.swift */; };
 		51FB8E492922AFF9001BD62C /* ActivityListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E482922AFF9001BD62C /* ActivityListItem.swift */; };
 		51FB8E4A2922AFF9001BD62C /* ActivityListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E482922AFF9001BD62C /* ActivityListItem.swift */; };
+		51FB8E57292B0D55001BD62C /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 51FB8E52292B0D55001BD62C /* LICENSE.txt */; };
+		51FB8E58292B0D55001BD62C /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 51FB8E52292B0D55001BD62C /* LICENSE.txt */; };
+		51FB8E5D292B0D55001BD62C /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E55292B0D55001BD62C /* ProfileImage.swift */; };
+		51FB8E5E292B0D55001BD62C /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E55292B0D55001BD62C /* ProfileImage.swift */; };
+		51FB8E5F292B0D55001BD62C /* ProfileImageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */; };
+		51FB8E60292B0D55001BD62C /* ProfileImageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */; };
+		51FB8E62292B1EA0001BD62C /* Caree+Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E61292B1EA0001BD62C /* Caree+Photo.swift */; };
+		51FB8E63292B1EA0001BD62C /* Caree+Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E61292B1EA0001BD62C /* Caree+Photo.swift */; };
+		51FB8E66292B270E001BD62C /* PhotoPickerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E65292B270E001BD62C /* PhotoPickerCoordinator.swift */; };
+		51FB8E68292B2DA4001BD62C /* FullImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E67292B2DA4001BD62C /* FullImageView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -104,6 +114,13 @@
 		51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceErrorHandling.swift; sourceTree = "<group>"; };
 		51F3EC542919EE39007F1F0F /* ImageFromText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFromText.swift; sourceTree = "<group>"; };
 		51FB8E482922AFF9001BD62C /* ActivityListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListItem.swift; sourceTree = "<group>"; };
+		51FB8E52292B0D55001BD62C /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
+		51FB8E55292B0D55001BD62C /* ProfileImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileImage.swift; sourceTree = "<group>"; };
+		51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileImageModel.swift; sourceTree = "<group>"; };
+		51FB8E61292B1EA0001BD62C /* Caree+Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Caree+Photo.swift"; sourceTree = "<group>"; };
+		51FB8E64292B2128001BD62C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		51FB8E65292B270E001BD62C /* PhotoPickerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerCoordinator.swift; sourceTree = "<group>"; };
+		51FB8E67292B2DA4001BD62C /* FullImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullImageView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +173,7 @@
 		514B883428E3873500B81198 /* CareKeeper */ = {
 			isa = PBXGroup;
 			children = (
+				51FB8E50292B0D55001BD62C /* PhotosPicker */,
 				5101151F2900DB190009D7EC /* Controllers */,
 				5101151A28FF5B2A0009D7EC /* Info.plist */,
 				5189F10628F8CF700097E7E4 /* ActivityTracking */,
@@ -175,6 +193,7 @@
 				514B883928E3873500B81198 /* CareKeeperCoreData.xcdatamodeld */,
 				514B884128E3873700B81198 /* Preview Content */,
 				51B42836290431A8007DF447 /* .swiftlint.yml */,
+				51FB8E61292B1EA0001BD62C /* Caree+Photo.swift */,
 			);
 			path = CareKeeper;
 			sourceTree = "<group>";
@@ -223,6 +242,27 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		51FB8E50292B0D55001BD62C /* PhotosPicker */ = {
+			isa = PBXGroup;
+			children = (
+				51FB8E51292B0D55001BD62C /* LICENSE */,
+				51FB8E55292B0D55001BD62C /* ProfileImage.swift */,
+				51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */,
+				51FB8E65292B270E001BD62C /* PhotoPickerCoordinator.swift */,
+				51FB8E67292B2DA4001BD62C /* FullImageView.swift */,
+				51FB8E64292B2128001BD62C /* README.md */,
+			);
+			path = PhotosPicker;
+			sourceTree = "<group>";
+		};
+		51FB8E51292B0D55001BD62C /* LICENSE */ = {
+			isa = PBXGroup;
+			children = (
+				51FB8E52292B0D55001BD62C /* LICENSE.txt */,
+			);
+			path = LICENSE;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -307,6 +347,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				51FB8E57292B0D55001BD62C /* LICENSE.txt in Resources */,
 				514B884328E3873700B81198 /* Preview Assets.xcassets in Resources */,
 				514B883F28E3873700B81198 /* Assets.xcassets in Resources */,
 			);
@@ -316,6 +357,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				51FB8E58292B0D55001BD62C /* LICENSE.txt in Resources */,
 				514B885728E3875100B81198 /* Preview Assets.xcassets in Resources */,
 				514B885428E3875100B81198 /* Assets.xcassets in Resources */,
 			);
@@ -350,16 +392,21 @@
 			files = (
 				514B883628E3873500B81198 /* CareKeeperApp.swift in Sources */,
 				51C5B9A6290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */,
+				51FB8E62292B1EA0001BD62C /* Caree+Photo.swift in Sources */,
 				5189F10828F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
 				514B883828E3873500B81198 /* Persistence.swift in Sources */,
+				51FB8E68292B2DA4001BD62C /* FullImageView.swift in Sources */,
 				5189F10B28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */,
 				510115212900F64B0009D7EC /* UserLocationMap.swift in Sources */,
 				514B883D28E3873500B81198 /* CareeListView.swift in Sources */,
 				514B885F28E3EEC800B81198 /* CareeDetailView.swift in Sources */,
 				5189F0FE28F89FE70097E7E4 /* BehavioDetailView.swift in Sources */,
+				51FB8E5D292B0D55001BD62C /* ProfileImage.swift in Sources */,
+				51FB8E66292B270E001BD62C /* PhotoPickerCoordinator.swift in Sources */,
 				51FB8E492922AFF9001BD62C /* ActivityListItem.swift in Sources */,
 				51B4283E2909B89B007DF447 /* ErrorHandling.swift in Sources */,
 				5189F10128F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */,
+				51FB8E5F292B0D55001BD62C /* ProfileImageModel.swift in Sources */,
 				5125C7D3292146FD004D1EB7 /* ActivityListView.swift in Sources */,
 				514B883B28E3873500B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,
 				5101151D2900D7E50009D7EC /* LocationController.swift in Sources */,
@@ -373,8 +420,10 @@
 			files = (
 				5125C7D4292146FD004D1EB7 /* ActivityListView.swift in Sources */,
 				514B888728E50E8800B81198 /* CareeListView.swift in Sources */,
+				51FB8E60292B0D55001BD62C /* ProfileImageModel.swift in Sources */,
 				51C5B9A7290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */,
 				5189F10928F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
+				51FB8E63292B1EA0001BD62C /* Caree+Photo.swift in Sources */,
 				514B888C28E50FCF00B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,
 				51FB8E4A2922AFF9001BD62C /* ActivityListItem.swift in Sources */,
 				5189F10C28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */,
@@ -385,6 +434,7 @@
 				51B4283F2909B89B007DF447 /* ErrorHandling.swift in Sources */,
 				51F3EC552919EE39007F1F0F /* ImageFromText.swift in Sources */,
 				5189F10228F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */,
+				51FB8E5E292B0D55001BD62C /* ProfileImage.swift in Sources */,
 				514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */,
 				5101151E2900D7E50009D7EC /* LocationController.swift in Sources */,
 				5103A7A92918307B00F58FCE /* ComplicationController.swift in Sources */,

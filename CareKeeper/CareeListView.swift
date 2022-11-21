@@ -96,8 +96,14 @@ struct CareeListItem: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text(caree.name ?? "")
-                .font(.system(.headline, design: .rounded))
+            HStack {
+                Text(caree.name ?? "")
+                    .font(.system(.headline, design: .rounded))
+                
+                if let image = caree.image() {
+                    CircularProfileImage(imageState: .success(image))
+                }
+            }
             Text("\(caree.behaviors?.count ?? 0) behaviors")
             Text("\(caree.activities?.count ?? 0) activities")
         }
@@ -116,6 +122,7 @@ struct CareeAddButton: View {
     }
 }
 
+// TODO: extract + add image uploader for iOS
 struct CareeAddView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject private var errorHandling: ErrorHandling

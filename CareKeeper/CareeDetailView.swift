@@ -20,12 +20,13 @@ struct CareeDetailView: View {
     @State private var behaviors: [Behavior] = []
     @State private var selectedBehavior: Behavior?
     @State private var isPresentingBehaviorEditView = false
-
+    @State private var isShowingFullImage = false
+    
     // swiftlint:disable:next identifier_name
     static let ACTIVITY_FETCH_LIMIT = 5
 
     private var isPresentingSheet: Bool {
-        isPresentingBehaviorEditView || isPresentingActivityDetailView || isPresentingActivityTrackingView
+        isPresentingBehaviorEditView || isPresentingActivityDetailView || isPresentingActivityTrackingView || isShowingFullImage
     }
 
     private func saveAction() {
@@ -79,14 +80,49 @@ struct CareeDetailView: View {
 
     private func saveEditForm() {
         caree.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+#if os(iOS)
+        //        TODO: extract, maybe make a separate transation?
+        if imageChanged {
+            guard let imageData = profileImageModel.data else {
+//                TODO: error handling
+                print("\(#function): Failed to extract data from selected image")
+
+                return
+            }
+            
+            
+            guard let thumbnailData = PhotoPickerCoordinator.thumbnail(with: imageData)?.jpegData(compressionQuality: 1) else {
+                //                TODO: error handling
+                print("\(#function): Failed to create thumbnail for selected image.")
+                return
+            }
+            
+            let photo = Photo(context: viewContext)
+            
+            photo.data = thumbnailData
+            caree.photo = photo
+        }
+#endif
         saveAction()
     }
+    
+    @StateObject var profileImageModel = ProfileImageModel()
+    @State private var imageChanged = false
 
     var body: some View {
         List {
 #if os(iOS)
             if editMode?.wrappedValue.isEditing == true {
                 Section("Info") {
+                    EditableCircularProfileImage(model: profileImageModel)
+                        .onAppear {
+                            if let image = caree.image() {
+                                profileImageModel.imageState = .success(image)
+                            }
+                        }
+                        .onChange(of: profileImageModel.imageSelection, perform: { _ in
+                            imageChanged = true
+                        })
                     TextField("Name", text: $name)
                         .onAppear {
                             name = caree.name ?? ""
@@ -97,6 +133,17 @@ struct CareeDetailView: View {
 
                 }
                 .animation(nil, value: editMode?.wrappedValue)
+            } else {
+                if let image = caree.image() {
+                    CircularProfileImage(imageState: .success(image))
+                        .onTapGesture {
+                            isShowingFullImage = true
+                        }
+                }
+            }
+#else
+            if let image = caree.image() {
+                CircularProfileImage(imageState: .success(image))
             }
 #endif
             Section {
@@ -248,6 +295,18 @@ struct CareeDetailView: View {
                             }
                     }
                 }
+                
+#if os(iOS)
+                if isShowingFullImage {
+                    FullImageView(isShowingFullImage: $isShowingFullImage, photo: caree.photo)
+                        .onDisappear { isShowingFullImage = false }
+                        .toolbar {
+                            ToolbarItem(placement: .automatic) {
+                                Button("Dismiss") { isShowingFullImage = false }
+                            }
+                        }
+                }
+#endif
             }
         }
         .onChange(of: isPresentingActivityTrackingView, perform: { newValue in
