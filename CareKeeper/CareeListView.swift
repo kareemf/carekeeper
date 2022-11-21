@@ -91,25 +91,6 @@ struct CareeListView: View {
     }
 }
 
-struct CareeListItem: View {
-    @ObservedObject var caree: Caree
-
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text(caree.name ?? "")
-                    .font(.system(.headline, design: .rounded))
-                
-                if let image = caree.image() {
-                    CircularProfileImage(imageState: .success(image))
-                }
-            }
-            Text("\(caree.behaviors?.count ?? 0) behaviors")
-            Text("\(caree.activities?.count ?? 0) activities")
-        }
-    }
-}
-
 struct CareeAddButton: View {
     @Binding var isPresentingNewCareeView: Bool
 

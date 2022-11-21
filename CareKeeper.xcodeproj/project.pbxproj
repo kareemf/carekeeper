@@ -56,6 +56,8 @@
 		51FB8E63292B1EA0001BD62C /* Caree+Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E61292B1EA0001BD62C /* Caree+Photo.swift */; };
 		51FB8E66292B270E001BD62C /* PhotoPickerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E65292B270E001BD62C /* PhotoPickerCoordinator.swift */; };
 		51FB8E68292B2DA4001BD62C /* FullImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E67292B2DA4001BD62C /* FullImageView.swift */; };
+		51FB8E6D292BAFE0001BD62C /* CareeListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E6C292BAFE0001BD62C /* CareeListItemView.swift */; };
+		51FB8E6E292BAFE0001BD62C /* CareeListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E6C292BAFE0001BD62C /* CareeListItemView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -121,6 +123,7 @@
 		51FB8E64292B2128001BD62C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		51FB8E65292B270E001BD62C /* PhotoPickerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerCoordinator.swift; sourceTree = "<group>"; };
 		51FB8E67292B2DA4001BD62C /* FullImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullImageView.swift; sourceTree = "<group>"; };
+		51FB8E6C292BAFE0001BD62C /* CareeListItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListItemView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,6 +187,7 @@
 				5189F10328F8CEB10097E7E4 /* BehaviorListItemView.swift */,
 				514B883528E3873500B81198 /* CareKeeperApp.swift */,
 				514B883C28E3873500B81198 /* CareeListView.swift */,
+				51FB8E6C292BAFE0001BD62C /* CareeListItemView.swift */,
 				514B885E28E3EEC800B81198 /* CareeDetailView.swift */,
 				510115202900F64B0009D7EC /* UserLocationMap.swift */,
 				51B4283D2909B89B007DF447 /* ErrorHandling.swift */,
@@ -407,6 +411,7 @@
 				51B4283E2909B89B007DF447 /* ErrorHandling.swift in Sources */,
 				5189F10128F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */,
 				51FB8E5F292B0D55001BD62C /* ProfileImageModel.swift in Sources */,
+				51FB8E6D292BAFE0001BD62C /* CareeListItemView.swift in Sources */,
 				5125C7D3292146FD004D1EB7 /* ActivityListView.swift in Sources */,
 				514B883B28E3873500B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,
 				5101151D2900D7E50009D7EC /* LocationController.swift in Sources */,
@@ -435,6 +440,7 @@
 				51F3EC552919EE39007F1F0F /* ImageFromText.swift in Sources */,
 				5189F10228F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */,
 				51FB8E5E292B0D55001BD62C /* ProfileImage.swift in Sources */,
+				51FB8E6E292BAFE0001BD62C /* CareeListItemView.swift in Sources */,
 				514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */,
 				5101151E2900D7E50009D7EC /* LocationController.swift in Sources */,
 				5103A7A92918307B00F58FCE /* ComplicationController.swift in Sources */,
