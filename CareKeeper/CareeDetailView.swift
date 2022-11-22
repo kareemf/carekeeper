@@ -44,8 +44,8 @@ struct CareeDetailView: View {
     private func saveAction() {
         do {
             try viewContext.save()
-            try activities = CareeDetailView.fetchActivities(caree, viewContext)
-            try behaviors = CareeDetailView.fetchBehaviors(caree, viewContext)
+            try activities = caree.fetchActivities()
+            try behaviors = caree.fetchBehaviors()
 
         } catch {
             errorHandling.handle(error: error)
@@ -54,40 +54,6 @@ struct CareeDetailView: View {
 
     init(caree: Caree) {
         self.caree = caree
-    }
-
-    private static func fetchActivities(_ caree: Caree, _ viewContext: NSManagedObjectContext) throws -> [Activity] {
-        let predicate = NSPredicate(format: "caree == %@", caree)
-
-        let fetchRequest = Activity.fetchRequest()
-
-        fetchRequest.predicate = predicate
-        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Activity.when, ascending: false)]
-        fetchRequest.fetchLimit = ACTIVITY_FETCH_LIMIT
-
-        do {
-            return try viewContext.fetch(fetchRequest) as [Activity]
-        } catch {
-            throw error
-        }
-    }
-
-    private static func fetchBehaviors(_ caree: Caree, _ viewContext: NSManagedObjectContext) throws -> [Behavior] {
-        let predicate = NSPredicate(format: "caree == %@", caree)
-
-        let fetchRequest = Behavior.fetchRequest()
-
-        fetchRequest.predicate = predicate
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(keyPath: \Behavior.listOrder, ascending: true),
-            NSSortDescriptor(keyPath: \Behavior.dateCreated, ascending: false)
-        ]
-
-        do {
-            return try viewContext.fetch(fetchRequest) as [Behavior]
-        } catch {
-            throw error
-        }
     }
 
     private func saveEditForm() {
@@ -199,8 +165,8 @@ struct CareeDetailView: View {
         }
         .onAppear(perform: {
             do {
-                try activities = CareeDetailView.fetchActivities(caree, viewContext)
-                try behaviors = CareeDetailView.fetchBehaviors(caree, viewContext)
+                try activities = caree.fetchActivities()
+                try behaviors = caree.fetchBehaviors()
             } catch {
                 errorHandling.handle(error: error)
             }
@@ -227,7 +193,7 @@ struct CareeDetailView: View {
             // Workaround to ensure that new activities are displayed after using main tracking button
             if newValue == nil {
                 do {
-                    try activities = CareeDetailView.fetchActivities(caree, viewContext)
+                    try activities = caree.fetchActivities()
                 } catch {
                     errorHandling.handle(error: error)
                 }

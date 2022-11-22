@@ -61,6 +61,8 @@
 		51FB8E71292C55B1001BD62C /* ProfileImageModel+Photos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E70292C55B1001BD62C /* ProfileImageModel+Photos.swift */; };
 		51FB8E73292C5860001BD62C /* CareeAddView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E72292C5860001BD62C /* CareeAddView.swift */; };
 		51FB8E74292C5860001BD62C /* CareeAddView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E72292C5860001BD62C /* CareeAddView.swift */; };
+		51FB8E76292D9355001BD62C /* Caree+Relationships.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E75292D9355001BD62C /* Caree+Relationships.swift */; };
+		51FB8E77292D9355001BD62C /* Caree+Relationships.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E75292D9355001BD62C /* Caree+Relationships.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -129,6 +131,7 @@
 		51FB8E6C292BAFE0001BD62C /* CareeListItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListItemView.swift; sourceTree = "<group>"; };
 		51FB8E70292C55B1001BD62C /* ProfileImageModel+Photos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileImageModel+Photos.swift"; sourceTree = "<group>"; };
 		51FB8E72292C5860001BD62C /* CareeAddView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeAddView.swift; sourceTree = "<group>"; };
+		51FB8E75292D9355001BD62C /* Caree+Relationships.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Caree+Relationships.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,10 +203,11 @@
 				514D926E28F7AED100CBF67E /* Scraps.md */,
 				514B883E28E3873700B81198 /* Assets.xcassets */,
 				514B884028E3873700B81198 /* CareKeeper.entitlements */,
+				51FB8E61292B1EA0001BD62C /* Caree+Photo.swift */,
+				51FB8E75292D9355001BD62C /* Caree+Relationships.swift */,
 				514B883928E3873500B81198 /* CareKeeperCoreData.xcdatamodeld */,
 				514B884128E3873700B81198 /* Preview Content */,
 				51B42836290431A8007DF447 /* .swiftlint.yml */,
-				51FB8E61292B1EA0001BD62C /* Caree+Photo.swift */,
 			);
 			path = CareKeeper;
 			sourceTree = "<group>";
@@ -422,6 +426,7 @@
 				51FB8E5F292B0D55001BD62C /* ProfileImageModel.swift in Sources */,
 				51FB8E6D292BAFE0001BD62C /* CareeListItemView.swift in Sources */,
 				5125C7D3292146FD004D1EB7 /* ActivityListView.swift in Sources */,
+				51FB8E76292D9355001BD62C /* Caree+Relationships.swift in Sources */,
 				514B883B28E3873500B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,
 				5101151D2900D7E50009D7EC /* LocationController.swift in Sources */,
 				5189F10428F8CEB10097E7E4 /* BehaviorListItemView.swift in Sources */,
@@ -436,6 +441,7 @@
 				514B888728E50E8800B81198 /* CareeListView.swift in Sources */,
 				51FB8E60292B0D55001BD62C /* ProfileImageModel.swift in Sources */,
 				51C5B9A7290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */,
+				51FB8E77292D9355001BD62C /* Caree+Relationships.swift in Sources */,
 				5189F10928F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
 				51FB8E63292B1EA0001BD62C /* Caree+Photo.swift in Sources */,
 				514B888C28E50FCF00B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,
