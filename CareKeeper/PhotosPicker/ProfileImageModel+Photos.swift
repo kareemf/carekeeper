@@ -15,7 +15,6 @@ extension ProfileImageModel {
         }
 
         guard let thumbnailData = PhotoPickerCoordinator.thumbnail(with: imageData)?.jpegData(compressionQuality: 1) else {
-            //                TODO: error handling
             print("\(#function): Failed to create thumbnail for selected image")
 
             throw PhotoError.thumbnailCreatiomFailed("Failed to create thumbnail for selected image")

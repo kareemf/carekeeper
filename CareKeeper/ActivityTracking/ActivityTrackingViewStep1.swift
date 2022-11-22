@@ -57,7 +57,7 @@ struct BehaviorListItem: View {
 struct TrackActivityView_Previews: PreviewProvider {
     static let viewContext = PersistenceController.preview.container.viewContext
     static let fetchCareeRequest = Caree.fetchRequest()
-    
+
     // swiftlint:disable:next force_try
     static let carees = try! viewContext.fetch(fetchCareeRequest)
 

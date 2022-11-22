@@ -39,7 +39,7 @@ struct CareeAddView: View {
             Form {
                 TextField("Name", text: $name)
                     .focused($isNameFocused)
-                
+
 #if os(iOS)
                 EditableCircularProfileImage(model: profileImageModel)
 #endif
