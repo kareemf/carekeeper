@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ActivityTrackingViewStep1: View {
     @ObservedObject var caree: Caree
-    @Binding var isPresentingView: Bool
+    @Binding var activeSheet: ActiveSheet?
     var behaviors: [Behavior]
 
     var body: some View {
@@ -13,7 +13,7 @@ struct ActivityTrackingViewStep1: View {
                     }
 
                     ForEach(behaviors) { behavior in
-                        NavigationLink(destination: ActivityTrackingViewStep2(caree: caree, behavior: behavior, isPresentingView: $isPresentingView)) {
+                        NavigationLink(destination: ActivityTrackingViewStep2(caree: caree, behavior: behavior, activeSheet: $activeSheet)) {
                             BehaviorListItem(behavior: behavior)
                                 .frame(height: 100.0)
                                 .foregroundColor(.mint)
@@ -57,13 +57,14 @@ struct BehaviorListItem: View {
 struct TrackActivityView_Previews: PreviewProvider {
     static let viewContext = PersistenceController.preview.container.viewContext
     static let fetchCareeRequest = Caree.fetchRequest()
+    
     // swiftlint:disable:next force_try
     static let carees = try! viewContext.fetch(fetchCareeRequest)
 
     static var previews: some View {
         ActivityTrackingViewStep1(
             caree: carees[0],
-            isPresentingView: .constant(true),
+            activeSheet: .constant(.activityTracking),
             // swiftlint:disable:next force_cast
             behaviors: carees[0].behaviors!.allObjects as! [Behavior]
         )

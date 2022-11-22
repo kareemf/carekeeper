@@ -9,7 +9,7 @@ import SwiftUI
 import CoreData
 
 struct FullImageView: View {
-    @Binding var isShowingFullImage: Bool
+    @Binding var activeSheet: ActiveSheet?
     var photo: Photo?
 
     private var photoImage: UIImage? {

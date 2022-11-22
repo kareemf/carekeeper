@@ -9,7 +9,7 @@ struct ActivityTrackingViewStep2: View {
     @ObservedObject var caree: Caree
     var behavior: Behavior
 
-    @Binding var isPresentingView: Bool
+    @Binding var activeSheet: ActiveSheet?
 
     @State var notes = ""
     @State private var trackLocation = false
@@ -40,7 +40,7 @@ struct ActivityTrackingViewStep2: View {
             }
         }
 
-        isPresentingView = false
+        activeSheet = nil
         saveAction()
     }
 
@@ -105,7 +105,7 @@ struct ActivityTrackingViewStep2_Previews: PreviewProvider {
             caree: carees[0],
             // swiftlint:disable:next force_cast
             behavior: carees[0].behaviors!.allObjects.first(where: {($0 as! Behavior).enableLocations}) as! Behavior,
-            isPresentingView: .constant(true)
+            activeSheet: .constant(.activityTracking)
         )
         .environment(\.managedObjectContext, viewContext)
     }

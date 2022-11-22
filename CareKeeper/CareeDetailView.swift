@@ -1,6 +1,28 @@
 import SwiftUI
 import CoreData
 
+enum ActiveSheet: Identifiable, Equatable {
+    case activityTracking
+    case activityDetail(Activity)
+    case behaviorDetail(Behavior)
+#if os(iOS)
+    case fullImage
+#endif
+
+    /**
+     Use the enumeration member name string as the identifier for Identifiable.
+     In the case where an enumeration has an associated value, use the label, which is equal to the member name string.
+     */
+    var id: String {
+        let mirror = Mirror(reflecting: self)
+        if let label = mirror.children.first?.label {
+            return label
+        } else {
+            return "\(self)"
+        }
+    }
+}
+
 struct CareeDetailView: View {
     @Environment(\.managedObjectContext) private var viewContext
 #if os(iOS)
@@ -13,21 +35,11 @@ struct CareeDetailView: View {
     @State private var name: String = ""
 
     @State private var activities: [Activity] = []
-    @State private var selectedActivity: Activity?
-    @State private var isPresentingActivityTrackingView = false
-    @State private var isPresentingActivityDetailView = false
-
     @State private var behaviors: [Behavior] = []
-    @State private var selectedBehavior: Behavior?
-    @State private var isPresentingBehaviorEditView = false
-    @State private var isShowingFullImage = false
+    @State private var activeSheet: ActiveSheet?
 
     // swiftlint:disable:next identifier_name
     static let ACTIVITY_FETCH_LIMIT = 5
-
-    private var isPresentingSheet: Bool {
-        isPresentingBehaviorEditView || isPresentingActivityDetailView || isPresentingActivityTrackingView || isShowingFullImage
-    }
 
     private func saveAction() {
         do {
@@ -120,7 +132,7 @@ struct CareeDetailView: View {
                 if let image = caree.image() {
                     CircularProfileImage(imageState: .success(image))
                         .onTapGesture {
-                            isShowingFullImage = true
+                            activeSheet = .fullImage
                         }
                 }
             }
@@ -131,7 +143,7 @@ struct CareeDetailView: View {
 #endif
             Section {
                 Button(action: {
-                        self.isPresentingActivityTrackingView = true
+                    activeSheet = .activityTracking
                     }) {
                         Label("Track Activity", systemImage: "timer")
                             .font(.headline)
@@ -145,8 +157,7 @@ struct CareeDetailView: View {
                     let newBehavior = Behavior(context: viewContext)
                     newBehavior.caree = caree
 
-                    self.selectedBehavior = newBehavior
-                    self.isPresentingBehaviorEditView = true
+                    activeSheet = .behaviorDetail(newBehavior)
                 }) {
                     Label("Create Behavior", systemImage: "plus")
                         .font(.headline)
@@ -159,8 +170,7 @@ struct CareeDetailView: View {
 
                 ForEach(behaviors) { behavior in
                     Button(action: {
-                        self.selectedBehavior = behavior
-                        self.isPresentingBehaviorEditView = true
+                        activeSheet = .behaviorDetail(behavior)
                     }) {
                         BehaviorListItemView(behavior: behavior)
                     }
@@ -178,8 +188,7 @@ struct CareeDetailView: View {
 
                 ForEach(activities) { activity in
                     Button(action: {
-                        self.selectedActivity = activity
-                        self.isPresentingActivityDetailView = true
+                        activeSheet = .activityDetail(activity)
                     }) {
                         ActivityListItem(activity: activity)
                     }
@@ -211,90 +220,12 @@ struct CareeDetailView: View {
                 }
 #endif
         }
-        .sheet(isPresented: .constant(isPresentingSheet)) {
-            NavigationView {
-                if isPresentingBehaviorEditView {
-                    BehavioDetailView(behavior: selectedBehavior!)
-                        .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button("Cancel") {
-                                    let isNew = selectedBehavior?.objectID.isTemporaryID ?? false
-                                    if  isNew {
-                                        viewContext.delete(selectedBehavior!)
-                                    }
-                                    isPresentingBehaviorEditView = false
-                                }
-                            }
-                            ToolbarItem(placement: .confirmationAction) {
-                                Button("Done") {
-                                    guard let behavior = selectedBehavior else {
-                                        isPresentingBehaviorEditView = false
-                                        return
-                                    }
-
-                                    let isNew = behavior.objectID.isTemporaryID
-
-                                    if  isNew {
-                                        behavior.dateCreated = Date()
-                                    }
-
-                                    if let name = behavior.name {
-                                        behavior.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
-
-                                    }
-
-                                    saveAction()
-                                    isPresentingBehaviorEditView = false
-                                }
-                            }
-                        }
-
-                } else if isPresentingActivityDetailView {
-                    ActivityDetailView(activity: selectedActivity!)
-                        .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button("Cancel") {
-                                    isPresentingActivityDetailView = false
-                                }
-                            }
-                            ToolbarItem(placement: .confirmationAction) {
-                                Button("Done") {
-                                    saveAction()
-                                    isPresentingActivityDetailView = false
-                                }
-                            }
-                        }
-                } else if isPresentingActivityTrackingView {
-                    ActivityTrackingViewStep1(
-                        caree: caree,
-                        isPresentingView: $isPresentingActivityTrackingView,
-                        behaviors: behaviors
-                    )
-                    .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button("Cancel") {
-                                    isPresentingActivityTrackingView = false
-                                }
-                            }
-                    }
-                }
-
-#if os(iOS)
-                if isShowingFullImage {
-                    FullImageView(isShowingFullImage: $isShowingFullImage, photo: caree.photo)
-                        .onDisappear { isShowingFullImage = false }
-                        .toolbar {
-                            ToolbarItem(placement: .automatic) {
-                                Button("Dismiss") { isShowingFullImage = false }
-                            }
-                        }
-                }
-#endif
-            }
+        .sheet(item: $activeSheet) { item in
+            sheetView(with: item)
         }
-        .onChange(of: isPresentingActivityTrackingView, perform: { newValue in
+        .onChange(of: activeSheet, perform: { newValue in
             // Workaround to ensure that new activities are displayed after using main tracking button
-            if newValue == false {
+            if newValue == nil {
                 do {
                     try activities = CareeDetailView.fetchActivities(caree, viewContext)
                 } catch {
@@ -304,9 +235,93 @@ struct CareeDetailView: View {
         })
     }
 
+    @ViewBuilder
+    private func sheetView(with item: ActiveSheet) -> some View {
+        switch item {
+        case .behaviorDetail(let behavior):
+            NavigationView {
+                BehavioDetailView(behavior: behavior)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                let isNew = behavior.objectID.isTemporaryID
+                                if  isNew {
+                                    viewContext.delete(behavior)
+                                }
+                                activeSheet = nil
+                            }
+                        }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") {
+
+                                let isNew = behavior.objectID.isTemporaryID
+
+                                if  isNew {
+                                    behavior.dateCreated = Date()
+                                }
+
+                                if let name = behavior.name {
+                                    behavior.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+
+                                }
+
+                                saveAction()
+                                activeSheet = nil
+                            }
+                        }
+                    }
+            }
+
+        case .activityDetail(let activity):
+            NavigationView {
+                ActivityDetailView(activity: activity)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                activeSheet = nil
+                            }
+                        }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") {
+                                saveAction()
+                                activeSheet = nil
+                            }
+                        }
+                    }
+            }
+        case .activityTracking:
+            NavigationView {
+                ActivityTrackingViewStep1(
+                    caree: caree,
+                    activeSheet: $activeSheet,
+                    behaviors: behaviors
+                )
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            activeSheet = nil
+                        }
+                    }
+                }
+            }
+
+#if os(iOS)
+        case .fullImage:
+            NavigationView {
+                FullImageView(activeSheet: $activeSheet, photo: caree.photo)
+                    .onDisappear { activeSheet = nil }
+                    .toolbar {
+                        ToolbarItem(placement: .automatic) {
+                            Button("Dismiss") { activeSheet = nil }
+                        }
+                    }
+            }
+#endif
+        }
+    }
+
     private func deleteBehaviors(offsets: IndexSet) {
         withAnimation {
-            //            TODO: soft delete behaviors that still have activities
             offsets.map { behaviors[$0] }.forEach(viewContext.delete)
             saveAction()
         }

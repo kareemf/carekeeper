@@ -2,7 +2,7 @@ import SwiftUI
 
 struct BehavioDetailView: View {
     @ObservedObject var behavior: Behavior
-    @State private var isPresentingActivityTrackingView = false
+    @State private var activeSheet: ActiveSheet?
     @State private var name = ""
     @State private var icon = ""
 
@@ -47,21 +47,19 @@ struct BehavioDetailView: View {
 
                 if !isNew {
                     Section(header: Text("Activity").foregroundColor(.green)) {
-                        NavigationLink(
-                            destination: ActivityTrackingViewStep2(caree: behavior.caree!, behavior: behavior, isPresentingView: $isPresentingActivityTrackingView),
-                            isActive: $isPresentingActivityTrackingView) {
-                            Button(action: {
-                                self.isPresentingActivityTrackingView = true
-                            }) {
-                                Label("Track Activity", systemImage: "timer")
-                                    .font(.headline)
-                            }
-                            .foregroundColor(.green)
+                        Button(action: {
+                            activeSheet = .activityTracking
+                        }) {
+                            Label("Track Activity", systemImage: "timer")
+                                .font(.headline)
                         }
-                    }
+                        .foregroundColor(.green)                    }
                 }
             }
         .navigationTitle(.constant(navTitle))
+        .sheet(item: $activeSheet) { _ in
+            ActivityTrackingViewStep2(caree: behavior.caree!, behavior: behavior, activeSheet: $activeSheet)
+        }
     }
 }
 
