@@ -21,7 +21,7 @@ struct CareeDetailView: View {
     @State private var selectedBehavior: Behavior?
     @State private var isPresentingBehaviorEditView = false
     @State private var isShowingFullImage = false
-    
+
     // swiftlint:disable:next identifier_name
     static let ACTIVITY_FETCH_LIMIT = 5
 
@@ -88,7 +88,7 @@ struct CareeDetailView: View {
 #endif
         saveAction()
     }
-    
+
     @StateObject var profileImageModel = ProfileImageModel()
 
     var body: some View {
@@ -274,7 +274,7 @@ struct CareeDetailView: View {
                             }
                     }
                 }
-                
+
 #if os(iOS)
                 if isShowingFullImage {
                     FullImageView(isShowingFullImage: $isShowingFullImage, photo: caree.photo)

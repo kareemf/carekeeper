@@ -12,11 +12,11 @@ struct PhotoPickerCoordinator {
         let options = [kCGImageSourceCreateThumbnailWithTransform: true,
                      kCGImageSourceCreateThumbnailFromImageAlways: true,
                               kCGImageSourceThumbnailMaxPixelSize: pixelSize] as CFDictionary
-        
+
         guard let imageSource = CGImageSourceCreateWithData(imageData as CFData, nil) else {
             return nil
         }
-        
+
         let imageReference = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options)!
         return UIImage(cgImage: imageReference)
     }

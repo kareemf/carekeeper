@@ -3,7 +3,7 @@ import ClockKit
 
 class ComplicationController: NSObject, CLKComplicationDataSource {
     var cornerComplicationImage: UIImage? = imageFromText("❤️")
-    
+
     func getComplicationDescriptors(handler: @escaping ([CLKComplicationDescriptor]) -> Void) {
         let descriptors = [
             CLKComplicationDescriptor(identifier: "complication", displayName: "Care Keeper", supportedFamilies: CLKComplicationFamily.allCases)

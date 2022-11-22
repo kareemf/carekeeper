@@ -6,7 +6,7 @@ extension Caree {
               let uiImage = UIImage(data: photoData) else {
             return nil
         }
-        
+
         return Image(uiImage: uiImage)
     }
 }

@@ -3,17 +3,17 @@ import SwiftUI
 struct ActivityTrackingViewStep2: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject private var errorHandling: ErrorHandling
-    
+
     @StateObject private var locationController = LocationController.shared
-    
+
     @ObservedObject var caree: Caree
     var behavior: Behavior
-    
+
     @Binding var isPresentingView: Bool
-    
+
     @State var notes = ""
     @State private var trackLocation = false
-    
+
     private func saveAction() {
         do {
             try viewContext.save()
@@ -21,35 +21,35 @@ struct ActivityTrackingViewStep2: View {
             errorHandling.handle(error: error, description: "Error saving activity")
         }
     }
-    
+
     private func handleSavePress() {
         let newActivity = Activity(context: viewContext)
-        
+
         newActivity.caree = caree
         newActivity.behavior = behavior
         newActivity.notes = notes
         newActivity.when = Date()
-        
+
         if trackLocation {
             let location = locationController.location
-            
+
             if location != nil {
                 let coordinate = location!.coordinate
                 newActivity.latitude = coordinate.latitude
                 newActivity.longitude = coordinate.longitude
             }
         }
-        
+
         isPresentingView = false
         saveAction()
     }
-    
+
     var body: some View {
         VStack {
             Form {
                 Section {
                     TextField("Notes", text: $notes)
-                    
+
                     if behavior.enableLocations {
                         Toggle(isOn: $trackLocation) {
                             Text("Pin Location")
@@ -79,7 +79,7 @@ struct ActivityTrackingViewStep2: View {
                     }
                     .font(.system(.headline, design: .rounded))
                     .foregroundColor(.red)
-                    
+
                 }
             }
 #if !os(watchOS)
@@ -99,7 +99,7 @@ struct ActivityTrackingViewStep2_Previews: PreviewProvider {
     static let fetchCareeRequest = Caree.fetchRequest()
     // swiftlint:disable:next force_try
     static let carees = try! viewContext.fetch(fetchCareeRequest)
-    
+
     static var previews: some View {
         ActivityTrackingViewStep2(
             caree: carees[0],

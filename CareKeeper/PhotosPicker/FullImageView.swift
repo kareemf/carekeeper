@@ -11,7 +11,7 @@ import CoreData
 struct FullImageView: View {
     @Binding var isShowingFullImage: Bool
     var photo: Photo?
-    
+
     private var photoImage: UIImage? {
         guard let photoData = photo?.data else { return nil }
         return UIImage(data: photoData)
@@ -28,7 +28,7 @@ struct FullImageView: View {
                     Text("Something went wrong").padding()
                     Spacer()
                 }
-            }            
+            }
         }
     }
 }
