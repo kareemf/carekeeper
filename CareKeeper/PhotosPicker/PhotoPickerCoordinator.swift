@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PhotoPickerCoordinator {
-    public static func thumbnail(with imageData: Data, pixelSize: Int = 120) -> UIImage? {
+    public static func thumbnail(with imageData: Data, pixelSize: Int = 240) -> UIImage? {
         let options = [kCGImageSourceCreateThumbnailWithTransform: true,
                      kCGImageSourceCreateThumbnailFromImageAlways: true,
                               kCGImageSourceThumbnailMaxPixelSize: pixelSize] as CFDictionary
