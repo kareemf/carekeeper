@@ -81,25 +81,8 @@ struct CareeDetailView: View {
     private func saveEditForm() {
         caree.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
 #if os(iOS)
-        //        TODO: extract, maybe make a separate transation?
-        if imageChanged {
-            guard let imageData = profileImageModel.data else {
-//                TODO: error handling
-                print("\(#function): Failed to extract data from selected image")
-
-                return
-            }
-            
-            
-            guard let thumbnailData = PhotoPickerCoordinator.thumbnail(with: imageData)?.jpegData(compressionQuality: 1) else {
-                //                TODO: error handling
-                print("\(#function): Failed to create thumbnail for selected image.")
-                return
-            }
-            
-            let photo = Photo(context: viewContext)
-            
-            photo.data = thumbnailData
+        if profileImageModel.imageSelection != nil {
+            let photo = profileImageModel.createPhotoFromSelection(context: viewContext)
             caree.photo = photo
         }
 #endif
@@ -107,7 +90,6 @@ struct CareeDetailView: View {
     }
     
     @StateObject var profileImageModel = ProfileImageModel()
-    @State private var imageChanged = false
 
     var body: some View {
         List {
@@ -120,9 +102,6 @@ struct CareeDetailView: View {
                                 profileImageModel.imageState = .success(image)
                             }
                         }
-                        .onChange(of: profileImageModel.imageSelection, perform: { _ in
-                            imageChanged = true
-                        })
                     TextField("Name", text: $name)
                         .onAppear {
                             name = caree.name ?? ""
