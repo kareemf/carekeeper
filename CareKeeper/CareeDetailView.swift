@@ -82,8 +82,12 @@ struct CareeDetailView: View {
         caree.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
 #if os(iOS)
         if profileImageModel.imageSelection != nil {
-            let photo = profileImageModel.createPhotoFromSelection(context: viewContext)
-            caree.photo = photo
+            do {
+                let photo = try profileImageModel.createPhotoFromSelection(context: viewContext)
+                caree.photo = photo
+            } catch {
+                errorHandling.handle(error: error)
+            }
         }
 #endif
         saveAction()

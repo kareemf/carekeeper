@@ -17,8 +17,12 @@ struct CareeAddView: View {
 
 #if os(iOS)
             if profileImageModel.imageSelection != nil {
-                let photo = profileImageModel.createPhotoFromSelection(context: viewContext)
-                newCaree.photo = photo
+                do {
+                    let photo = try profileImageModel.createPhotoFromSelection(context: viewContext)
+                    newCaree.photo = photo
+                } catch {
+                    errorHandling.handle(error: error)
+                }
             }
 #endif
             do {

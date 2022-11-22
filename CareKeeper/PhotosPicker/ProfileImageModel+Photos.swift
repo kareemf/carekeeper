@@ -2,19 +2,23 @@ import SwiftUI
 import CoreData
 
 extension ProfileImageModel {
-    public func createPhotoFromSelection(context: NSManagedObjectContext) -> Photo? {
+    enum PhotoError: LocalizedError {
+        case dataExtractionFailed(String)
+        case thumbnailCreatiomFailed(String)
+    }
+
+    public func createPhotoFromSelection(context: NSManagedObjectContext) throws -> Photo? {
         guard let imageData = self.data else {
-            //     TODO: error handling
             print("\(#function): Failed to extract data from selected image")
 
-            return nil
+            throw PhotoError.dataExtractionFailed("Failed to extract data from selected image")
         }
 
         guard let thumbnailData = PhotoPickerCoordinator.thumbnail(with: imageData)?.jpegData(compressionQuality: 1) else {
             //                TODO: error handling
-            print("\(#function): Failed to create thumbnail for selected image.")
+            print("\(#function): Failed to create thumbnail for selected image")
 
-            return nil
+            throw PhotoError.thumbnailCreatiomFailed("Failed to create thumbnail for selected image")
         }
 
         let photo = Photo(context: context)
