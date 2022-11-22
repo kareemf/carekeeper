@@ -108,6 +108,7 @@ struct CareeAddView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject private var errorHandling: ErrorHandling
 
+    @StateObject var profileImageModel = ProfileImageModel()
     @State private var name = ""
     @FocusState private var isNameFocused: Bool
     @Binding var isPresenting: Bool
@@ -118,6 +119,12 @@ struct CareeAddView: View {
             newCaree.dateCreated = Date()
             newCaree.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
 
+#if os(iOS)
+            if profileImageModel.imageSelection != nil {
+                let photo = profileImageModel.createPhotoFromSelection(context: viewContext)
+                newCaree.photo = photo
+            }
+#endif
             do {
                 try viewContext.save()
                 name = ""
@@ -130,6 +137,7 @@ struct CareeAddView: View {
     var body: some View {
         NavigationView {
             Form {
+                EditableCircularProfileImage(model: profileImageModel)
                 TextField("Name", text: $name)
                     .focused($isNameFocused)
             }
