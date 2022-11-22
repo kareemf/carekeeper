@@ -37,9 +37,12 @@ struct CareeAddView: View {
     var body: some View {
         NavigationView {
             Form {
-                EditableCircularProfileImage(model: profileImageModel)
                 TextField("Name", text: $name)
                     .focused($isNameFocused)
+                
+#if os(iOS)
+                EditableCircularProfileImage(model: profileImageModel)
+#endif
             }
             .onAppear {
                 isNameFocused = true
