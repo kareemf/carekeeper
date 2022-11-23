@@ -184,6 +184,7 @@ struct CareeDetailView: View {
                                 saveEditForm()
                             }
                         })
+                        .disabled((editMode?.wrappedValue.isEditing ?? false) && name.isEmpty)
                 }
 #endif
         }
