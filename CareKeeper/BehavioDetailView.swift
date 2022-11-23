@@ -3,6 +3,7 @@ import SwiftUI
 struct BehavioDetailView: View {
     @ObservedObject var behavior: Behavior
     @Binding var activeSheet: ActiveSheet?
+    @FocusState private var isNameFocused: Bool
     @State private var name = ""
     @State private var icon = ""
     
@@ -25,10 +26,15 @@ struct BehavioDetailView: View {
                             if let realName = behavior.name {
                                 name = realName
                             }
+                            
+                            if isNew {
+                                isNameFocused = true
+                            }
                         })
                         .onChange(of: name, perform: { _ in
                             behavior.name = name
                         })
+                        .focused($isNameFocused)
                     
                     
                     iconTextUI()
