@@ -225,20 +225,11 @@ struct CareeDetailView: View {
                     }
             }
         case .activityTracking1:
-            NavigationView {
-                ActivityTrackingViewStep1(
-                    caree: caree,
-                    activeSheet: $activeSheet,
-                    behaviors: behaviors
-                )
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            activeSheet = nil
-                        }
-                    }
-                }
-            }
+            ActivityTrackingViewStep1(
+                caree: caree,
+                activeSheet: $activeSheet,
+                behaviors: behaviors
+            )
         case .activityTracking2(let behavior):
             NavigationView {
                 ActivityTrackingViewStep2(caree: behavior.caree!, behavior: behavior, activeSheet: $activeSheet)
@@ -253,15 +244,8 @@ struct CareeDetailView: View {
 
 #if os(iOS)
         case .fullImage:
-            NavigationView {
-                FullImageView(activeSheet: $activeSheet, photo: caree.photo)
-                    .onDisappear { activeSheet = nil }
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("Dismiss") { activeSheet = nil }
-                        }
-                    }
-            }
+            FullImageView(activeSheet: $activeSheet, photo: caree.photo)
+                .onDisappear { activeSheet = nil }
 #endif
         }
     }

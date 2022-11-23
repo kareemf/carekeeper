@@ -29,6 +29,11 @@ struct FullImageView: View {
                     Spacer()
                 }
             }
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Dismiss") { activeSheet = nil }
+                }
+            }
         }
     }
 }

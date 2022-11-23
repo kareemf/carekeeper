@@ -6,15 +6,16 @@ struct ActivityTrackingViewStep1: View {
     var behaviors: [Behavior]
 
     var body: some View {
+        NavigationView {
             VStack {
                 List {
                     if behaviors.count == 0 {
                         Text("Configure some behaviors to track for \(caree.name ?? "") first")
                     }
-
+                    
                     ForEach(behaviors) { behavior in
                         NavigationLink(destination: ActivityTrackingViewStep2(caree: caree, behavior: behavior, activeSheet: $activeSheet)) {
-                            BehaviorListItem(behavior: behavior)
+                            BehaviorListItem(behavior: behavior, activeSheet: $activeSheet)
                                 .frame(height: 100.0)
                                 .foregroundColor(.mint)
                         }
@@ -24,25 +25,35 @@ struct ActivityTrackingViewStep1: View {
                 .listStyle(CarouselListStyle())
 #endif
             }
-        .navigationTitle("\(caree.name ?? "") - Behavior To Track")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        activeSheet = nil
+                    }
+                }
+            }
+            .navigationTitle("\(caree.name ?? "") - Behavior To Track")
+        }
     }
 }
 
 struct BehaviorListItem: View {
     var behavior: Behavior
-
-    var body: some View {
+    
+    @Binding var activeSheet: ActiveSheet?
+    
+    var body: some View {        
         HStack {
             if behavior.icon != nil {
                 Text(behavior.icon ?? "")
                     .font(.title)
             }
-
+            
             VStack(alignment: .leading) {
                 Text(behavior.name ?? "")
                     .font(.system(.headline, design: .rounded))
                 Text("\(behavior.activities?.count ?? 0) activities")
-
+                
                 if behavior.enableLocations {
                     HStack {
                         Image(systemName: "location")
