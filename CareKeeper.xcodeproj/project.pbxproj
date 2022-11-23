@@ -63,6 +63,7 @@
 		51FB8E74292C5860001BD62C /* CareeAddView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E72292C5860001BD62C /* CareeAddView.swift */; };
 		51FB8E76292D9355001BD62C /* Caree+Relationships.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E75292D9355001BD62C /* Caree+Relationships.swift */; };
 		51FB8E77292D9355001BD62C /* Caree+Relationships.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E75292D9355001BD62C /* Caree+Relationships.swift */; };
+		51FB8E79292D9E87001BD62C /* EmojiTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E78292D9E87001BD62C /* EmojiTextField.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -132,6 +133,7 @@
 		51FB8E70292C55B1001BD62C /* ProfileImageModel+Photos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileImageModel+Photos.swift"; sourceTree = "<group>"; };
 		51FB8E72292C5860001BD62C /* CareeAddView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeAddView.swift; sourceTree = "<group>"; };
 		51FB8E75292D9355001BD62C /* Caree+Relationships.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Caree+Relationships.swift"; sourceTree = "<group>"; };
+		51FB8E78292D9E87001BD62C /* EmojiTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiTextField.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,8 +193,9 @@
 				5125C7D2292146FD004D1EB7 /* ActivityListView.swift */,
 				51FB8E482922AFF9001BD62C /* ActivityListItem.swift */,
 				5189F10028F8CC8C0097E7E4 /* ActivityDetailView.swift */,
-				5189F0FD28F89FE70097E7E4 /* BehavioDetailView.swift */,
 				5189F10328F8CEB10097E7E4 /* BehaviorListItemView.swift */,
+				5189F0FD28F89FE70097E7E4 /* BehavioDetailView.swift */,
+				51FB8E78292D9E87001BD62C /* EmojiTextField.swift */,
 				514B883528E3873500B81198 /* CareKeeperApp.swift */,
 				514B883C28E3873500B81198 /* CareeListView.swift */,
 				51FB8E6C292BAFE0001BD62C /* CareeListItemView.swift */,
@@ -288,7 +291,6 @@
 			buildConfigurationList = 514B884628E3873700B81198 /* Build configuration list for PBXNativeTarget "CareKeeper" */;
 			buildPhases = (
 				514B882E28E3873500B81198 /* Sources */,
-				51B4283529033843007DF447 /* ShellScript */,
 				514B882F28E3873500B81198 /* Frameworks */,
 				514B883028E3873500B81198 /* Resources */,
 				51AEC3532914A58200C1DD5E /* Embed Watch Content */,
@@ -380,26 +382,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		51B4283529033843007DF447 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint --fix && swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		514B882E28E3873500B81198 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -419,6 +401,7 @@
 				514B885F28E3EEC800B81198 /* CareeDetailView.swift in Sources */,
 				5189F0FE28F89FE70097E7E4 /* BehavioDetailView.swift in Sources */,
 				51FB8E5D292B0D55001BD62C /* ProfileImage.swift in Sources */,
+				51FB8E79292D9E87001BD62C /* EmojiTextField.swift in Sources */,
 				51FB8E66292B270E001BD62C /* PhotoPickerCoordinator.swift in Sources */,
 				51FB8E492922AFF9001BD62C /* ActivityListItem.swift in Sources */,
 				51B4283E2909B89B007DF447 /* ErrorHandling.swift in Sources */,
