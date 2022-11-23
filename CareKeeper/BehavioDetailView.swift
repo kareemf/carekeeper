@@ -90,6 +90,7 @@ struct BehavioDetailView: View {
                         onSave()
                         activeSheet = nil
                     }
+                    .disabled(name.isEmpty)
                 }
             }
         }
