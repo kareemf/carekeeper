@@ -64,7 +64,7 @@ struct TrackActivityView_Previews: PreviewProvider {
     static var previews: some View {
         ActivityTrackingViewStep1(
             caree: carees[0],
-            activeSheet: .constant(.activityTracking),
+            activeSheet: .constant(.activityTracking1),
             // swiftlint:disable:next force_cast
             behaviors: carees[0].behaviors!.allObjects as! [Behavior]
         )

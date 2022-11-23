@@ -105,7 +105,7 @@ struct ActivityTrackingViewStep2_Previews: PreviewProvider {
             caree: carees[0],
             // swiftlint:disable:next force_cast
             behavior: carees[0].behaviors!.allObjects.first(where: {($0 as! Behavior).enableLocations}) as! Behavior,
-            activeSheet: .constant(.activityTracking)
+            activeSheet: .constant(.activityTracking1)
         )
         .environment(\.managedObjectContext, viewContext)
     }

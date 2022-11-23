@@ -2,7 +2,8 @@ import SwiftUI
 import CoreData
 
 enum ActiveSheet: Identifiable, Equatable {
-    case activityTracking
+    case activityTracking1
+    case activityTracking2(Behavior)
     case activityDetail(Activity)
     case behaviorDetail(Behavior)
 #if os(iOS)
@@ -109,7 +110,7 @@ struct CareeDetailView: View {
 #endif
             Section {
                 Button(action: {
-                    activeSheet = .activityTracking
+                    activeSheet = .activityTracking1
                     }) {
                         Label("Track Activity", systemImage: "timer")
                             .font(.headline)
@@ -205,39 +206,7 @@ struct CareeDetailView: View {
     private func sheetView(with item: ActiveSheet) -> some View {
         switch item {
         case .behaviorDetail(let behavior):
-            NavigationView {
-                BehavioDetailView(behavior: behavior)
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("Cancel") {
-                                let isNew = behavior.objectID.isTemporaryID
-                                if  isNew {
-                                    viewContext.delete(behavior)
-                                }
-                                activeSheet = nil
-                            }
-                        }
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button("Done") {
-
-                                let isNew = behavior.objectID.isTemporaryID
-
-                                if  isNew {
-                                    behavior.dateCreated = Date()
-                                }
-
-                                if let name = behavior.name {
-                                    behavior.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
-
-                                }
-
-                                saveAction()
-                                activeSheet = nil
-                            }
-                        }
-                    }
-            }
-
+            BehavioDetailView(behavior: behavior, activeSheet: $activeSheet, onSave: saveAction)
         case .activityDetail(let activity):
             NavigationView {
                 ActivityDetailView(activity: activity)
@@ -255,7 +224,7 @@ struct CareeDetailView: View {
                         }
                     }
             }
-        case .activityTracking:
+        case .activityTracking1:
             NavigationView {
                 ActivityTrackingViewStep1(
                     caree: caree,
@@ -270,6 +239,17 @@ struct CareeDetailView: View {
                     }
                 }
             }
+        case .activityTracking2(let behavior):
+            NavigationView {
+                ActivityTrackingViewStep2(caree: behavior.caree!, behavior: behavior, activeSheet: $activeSheet)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                activeSheet = nil
+                            }
+                        }
+                    }
+            }
 
 #if os(iOS)
         case .fullImage:
@@ -277,7 +257,7 @@ struct CareeDetailView: View {
                 FullImageView(activeSheet: $activeSheet, photo: caree.photo)
                     .onDisappear { activeSheet = nil }
                     .toolbar {
-                        ToolbarItem(placement: .automatic) {
+                        ToolbarItem(placement: .cancellationAction) {
                             Button("Dismiss") { activeSheet = nil }
                         }
                     }
