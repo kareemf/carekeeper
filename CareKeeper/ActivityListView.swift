@@ -8,21 +8,6 @@ struct ActivityListView: View {
     @ObservedObject var caree: Caree
     @State private var activities: [Activity] = []
 
-    private static func fetchActivities(_ caree: Caree, _ viewContext: NSManagedObjectContext) throws -> [Activity] {
-        let predicate = NSPredicate(format: "caree == %@", caree)
-
-        let fetchRequest = Activity.fetchRequest()
-
-        fetchRequest.predicate = predicate
-        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Activity.when, ascending: false)]
-
-        do {
-            return try viewContext.fetch(fetchRequest) as [Activity]
-        } catch {
-            throw error
-        }
-    }
-
     init(caree: Caree) {
         self.caree = caree
     }
@@ -41,7 +26,7 @@ struct ActivityListView: View {
         }
         .onAppear(perform: {
             do {
-                try activities = ActivityListView.fetchActivities(caree, viewContext)
+                try activities = caree.fetchActivities(fetchLimit: .max)
             } catch {
                 errorHandling.handle(error: error)
             }
