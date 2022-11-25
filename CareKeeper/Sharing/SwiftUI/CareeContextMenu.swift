@@ -18,12 +18,14 @@ struct CareeContextMenu: View {
     @State private var hasAnyShare: Bool
     @State private var toggleProgress: Bool = false
     
+    let persistenceController = PersistenceController.shared
+    
     init(activeSheet: Binding<ActiveSheet?>, nextSheet: Binding<ActiveSheet?>, caree: Caree) {
         _activeSheet = activeSheet
         _nextSheet = nextSheet
         self.caree = caree
-        isCareeShared = (PersistenceController.shared.existingShare(caree: caree) != nil)
-        hasAnyShare = PersistenceController.shared.shareTitles().isEmpty ? false : true
+        isCareeShared = (persistenceController.existingShare(caree: caree) != nil)
+        hasAnyShare = persistenceController.shareTitles().isEmpty ? false : true
     }
 
     var body: some View {
@@ -47,7 +49,7 @@ struct CareeContextMenu: View {
          For carees in the private database, allow creating a new share or adding to an existing share.
          For carees in the shared database, allow managing participation.
          */
-        if PersistenceController.shared.privatePersistentStore.contains(manageObject: caree) {
+        if persistenceController.privatePersistentStore.contains(manageObject: caree) {
             Button("Create New Share") { createNewShare(caree: caree) }
             .disabled(isCareeShared)
             
@@ -55,19 +57,6 @@ struct CareeContextMenu: View {
             .disabled(isCareeShared || !hasAnyShare)
         } else {
             Button("Manage Participation") { manageParticipation(caree: caree) }
-        }
-
-        /**
-         Show the Delete button if the user is editing carees and has the permission to delete.
-         */
-//        TODO: migrate to existing delete button
-        if PersistenceController.shared.container.canDeleteRecord(forManagedObjectWith: caree.objectID) {
-            Divider()
-            Button("Delete", role: .destructive) {
-//                PersistenceController.shared.delete(caree: caree)
-//                caree
-                activeSheet = nil
-            }
         }
     }
 
@@ -77,11 +66,11 @@ struct CareeContextMenu: View {
      */
     #if os(iOS)
     private func createNewShare(caree: Caree) {
-         PersistenceController.shared.presentCloudSharingController(caree: caree)
+         persistenceController.presentCloudSharingController(caree: caree)
     }
     
     private func manageParticipation(caree: Caree) {
-        PersistenceController.shared.presentCloudSharingController(caree: caree)
+        persistenceController.presentCloudSharingController(caree: caree)
     }
     
     #elseif os(watchOS)
@@ -92,7 +81,7 @@ struct CareeContextMenu: View {
     private func createNewShare(caree: Caree) {
         toggleProgress.toggle()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            PersistenceController.shared.shareObject(caree, to: nil) { share, error in
+            persistenceController.shareObject(caree, to: nil) { share, error in
                 toggleProgress.toggle()
                 if let share = share {
                     nextSheet = .participantView(share)
