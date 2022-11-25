@@ -202,7 +202,7 @@ extension PersistenceController {
     }
     
     private func configure(share: CKShare, with caree: Caree? = nil) {
-        share[CKShare.SystemFieldKey.title] = "A cool caree"
+        share[CKShare.SystemFieldKey.title] = caree?.name
     }
 }
 
