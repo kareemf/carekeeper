@@ -15,11 +15,13 @@ struct ManagingSharesView: View {
 
     @State private var toggleProgress: Bool = false
     @State private var selection: String?
+    
+    let persistenceController = PersistenceController.shared
 
     var body: some View {
         ZStack {
             SharePickerView(activeSheet: $activeSheet, selection: $selection) {
-                if  let shareTitle = selection, let share = PersistenceController.shared.share(with: shareTitle) {
+                if  let shareTitle = selection, let share = persistenceController.share(with: shareTitle) {
                     actionButtons(for: share)
                 }
             }
@@ -32,10 +34,10 @@ struct ManagingSharesView: View {
     @ViewBuilder
     private func actionButtons(for share: CKShare) -> some View {
         let persistentStore = share.persistentStore
-        let isPrivateStore = (persistentStore == PersistenceController.shared.privatePersistentStore)
+        let isPrivateStore = (persistentStore == persistenceController.privatePersistentStore)
         
         Button(isPrivateStore ? "Manage Participants" : "View Participants") {
-            if let share = PersistenceController.shared.share(with: selection!) {
+            if let share = persistenceController.share(with: selection!) {
                 nextSheet = .participantView(share)
                 activeSheet = nil
             }
@@ -43,7 +45,7 @@ struct ManagingSharesView: View {
         .disabled(selection == nil)
         
         Button(isPrivateStore ? "Stop Sharing" : "Remove Me") {
-            if let share = PersistenceController.shared.share(with: selection!) {
+            if let share = persistenceController.share(with: selection!) {
                 purgeShare(share, in: persistentStore)
             }
         }
@@ -51,7 +53,7 @@ struct ManagingSharesView: View {
 
         #if os(iOS)
         Button("Manage With UICloudSharingController") {
-            if let share = PersistenceController.shared.share(with: selection!) {
+            if let share = persistenceController.share(with: selection!) {
                 nextSheet = .cloudSharingSheet(share)
                 activeSheet = nil
             }
@@ -63,7 +65,7 @@ struct ManagingSharesView: View {
     private func purgeShare(_ share: CKShare, in persistentStore: NSPersistentStore?) {
         toggleProgress.toggle()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            PersistenceController.shared.purgeObjectsAndRecords(with: share, in: persistentStore)
+            persistenceController.purgeObjectsAndRecords(with: share, in: persistentStore)
             toggleProgress.toggle()
             activeSheet = nil
         }
