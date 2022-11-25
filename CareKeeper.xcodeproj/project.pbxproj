@@ -38,6 +38,24 @@
 		5189F10928F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10728F8CF880097E7E4 /* ActivityTrackingViewStep1.swift */; };
 		5189F10B28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */; };
 		5189F10C28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */; };
+		518CB0D6292F219F00C60633 /* ManagingSharesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CB292F219F00C60633 /* ManagingSharesView.swift */; };
+		518CB0D7292F219F00C60633 /* ManagingSharesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CB292F219F00C60633 /* ManagingSharesView.swift */; };
+		518CB0D8292F219F00C60633 /* AddToExistingShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CC292F219F00C60633 /* AddToExistingShareView.swift */; };
+		518CB0D9292F219F00C60633 /* AddToExistingShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CC292F219F00C60633 /* AddToExistingShareView.swift */; };
+		518CB0DE292F219F00C60633 /* SharePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CF292F219F00C60633 /* SharePickerView.swift */; };
+		518CB0DF292F219F00C60633 /* SharePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CF292F219F00C60633 /* SharePickerView.swift */; };
+		518CB0E0292F219F00C60633 /* CareeContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0D0292F219F00C60633 /* CareeContextMenu.swift */; };
+		518CB0E1292F219F00C60633 /* CareeContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0D0292F219F00C60633 /* CareeContextMenu.swift */; };
+		518CB0E6292F219F00C60633 /* ParticipantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0D3292F219F00C60633 /* ParticipantView.swift */; };
+		518CB0E7292F219F00C60633 /* ParticipantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0D3292F219F00C60633 /* ParticipantView.swift */; };
+		518CB0E8292F219F00C60633 /* SwiftUIHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0D4292F219F00C60633 /* SwiftUIHelper.swift */; };
+		518CB0E9292F219F00C60633 /* SwiftUIHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0D4292F219F00C60633 /* SwiftUIHelper.swift */; };
+		518CB0F9292F21A900C60633 /* CoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0EE292F21A900C60633 /* CoreDataHelper.swift */; };
+		518CB0FA292F21A900C60633 /* CoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0EE292F21A900C60633 /* CoreDataHelper.swift */; };
+		518CB107292F21A900C60633 /* PersistenceController+Share.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0F6292F21A900C60633 /* PersistenceController+Share.swift */; };
+		518CB108292F21A900C60633 /* PersistenceController+Share.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0F6292F21A900C60633 /* PersistenceController+Share.swift */; };
+		518CB10B292F21BA00C60633 /* LICENSE1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 518CB10A292F21BA00C60633 /* LICENSE1.txt */; };
+		518CB10C292F21BA00C60633 /* LICENSE1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 518CB10A292F21BA00C60633 /* LICENSE1.txt */; };
 		51AEC3502914A58200C1DD5E /* CareKeeper Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 514B884D28E3875000B81198 /* CareKeeper Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		51B4283E2909B89B007DF447 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B4283D2909B89B007DF447 /* ErrorHandling.swift */; };
 		51B4283F2909B89B007DF447 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B4283D2909B89B007DF447 /* ErrorHandling.swift */; };
@@ -46,8 +64,8 @@
 		51F3EC552919EE39007F1F0F /* ImageFromText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F3EC542919EE39007F1F0F /* ImageFromText.swift */; };
 		51FB8E492922AFF9001BD62C /* ActivityListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E482922AFF9001BD62C /* ActivityListItem.swift */; };
 		51FB8E4A2922AFF9001BD62C /* ActivityListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E482922AFF9001BD62C /* ActivityListItem.swift */; };
-		51FB8E57292B0D55001BD62C /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 51FB8E52292B0D55001BD62C /* LICENSE.txt */; };
-		51FB8E58292B0D55001BD62C /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 51FB8E52292B0D55001BD62C /* LICENSE.txt */; };
+		51FB8E57292B0D55001BD62C /* LICENSE2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 51FB8E52292B0D55001BD62C /* LICENSE2.txt */; };
+		51FB8E58292B0D55001BD62C /* LICENSE2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 51FB8E52292B0D55001BD62C /* LICENSE2.txt */; };
 		51FB8E5D292B0D55001BD62C /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E55292B0D55001BD62C /* ProfileImage.swift */; };
 		51FB8E5E292B0D55001BD62C /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E55292B0D55001BD62C /* ProfileImage.swift */; };
 		51FB8E5F292B0D55001BD62C /* ProfileImageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */; };
@@ -117,12 +135,22 @@
 		5189F10328F8CEB10097E7E4 /* BehaviorListItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorListItemView.swift; sourceTree = "<group>"; };
 		5189F10728F8CF880097E7E4 /* ActivityTrackingViewStep1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTrackingViewStep1.swift; sourceTree = "<group>"; };
 		5189F10A28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTrackingViewStep2.swift; sourceTree = "<group>"; };
+		518CB0CB292F219F00C60633 /* ManagingSharesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManagingSharesView.swift; sourceTree = "<group>"; };
+		518CB0CC292F219F00C60633 /* AddToExistingShareView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddToExistingShareView.swift; sourceTree = "<group>"; };
+		518CB0CF292F219F00C60633 /* SharePickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharePickerView.swift; sourceTree = "<group>"; };
+		518CB0D0292F219F00C60633 /* CareeContextMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CareeContextMenu.swift; sourceTree = "<group>"; };
+		518CB0D3292F219F00C60633 /* ParticipantView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParticipantView.swift; sourceTree = "<group>"; };
+		518CB0D4292F219F00C60633 /* SwiftUIHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUIHelper.swift; sourceTree = "<group>"; };
+		518CB0EE292F21A900C60633 /* CoreDataHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataHelper.swift; sourceTree = "<group>"; };
+		518CB0F6292F21A900C60633 /* PersistenceController+Share.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PersistenceController+Share.swift"; sourceTree = "<group>"; };
+		518CB10A292F21BA00C60633 /* LICENSE1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE1.txt; sourceTree = "<group>"; };
+		518CB10D292F21ED00C60633 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		51B42836290431A8007DF447 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		51B4283D2909B89B007DF447 /* ErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
 		51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceErrorHandling.swift; sourceTree = "<group>"; };
 		51F3EC542919EE39007F1F0F /* ImageFromText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFromText.swift; sourceTree = "<group>"; };
 		51FB8E482922AFF9001BD62C /* ActivityListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListItem.swift; sourceTree = "<group>"; };
-		51FB8E52292B0D55001BD62C /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
+		51FB8E52292B0D55001BD62C /* LICENSE2.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE2.txt; sourceTree = "<group>"; };
 		51FB8E55292B0D55001BD62C /* ProfileImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileImage.swift; sourceTree = "<group>"; };
 		51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileImageModel.swift; sourceTree = "<group>"; };
 		51FB8E61292B1EA0001BD62C /* Caree+Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Caree+Photo.swift"; sourceTree = "<group>"; };
@@ -186,7 +214,8 @@
 		514B883428E3873500B81198 /* CareKeeper */ = {
 			isa = PBXGroup;
 			children = (
-				51FB8E50292B0D55001BD62C /* PhotosPicker */,
+				518CB10F292F277200C60633 /* Sharing */,
+				51FB8E50292B0D55001BD62C /* PhotoPicker */,
 				5101151F2900DB190009D7EC /* Controllers */,
 				5101151A28FF5B2A0009D7EC /* Info.plist */,
 				5189F10628F8CF700097E7E4 /* ActivityTracking */,
@@ -254,6 +283,47 @@
 			path = ActivityTracking;
 			sourceTree = "<group>";
 		};
+		518CB0CA292F219F00C60633 /* SwiftUI */ = {
+			isa = PBXGroup;
+			children = (
+				518CB0CB292F219F00C60633 /* ManagingSharesView.swift */,
+				518CB0CC292F219F00C60633 /* AddToExistingShareView.swift */,
+				518CB0CF292F219F00C60633 /* SharePickerView.swift */,
+				518CB0D0292F219F00C60633 /* CareeContextMenu.swift */,
+				518CB0D3292F219F00C60633 /* ParticipantView.swift */,
+				518CB0D4292F219F00C60633 /* SwiftUIHelper.swift */,
+			);
+			path = SwiftUI;
+			sourceTree = "<group>";
+		};
+		518CB0EC292F21A900C60633 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				518CB0EE292F21A900C60633 /* CoreDataHelper.swift */,
+				518CB0F6292F21A900C60633 /* PersistenceController+Share.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		518CB109292F21BA00C60633 /* LICENSE1 */ = {
+			isa = PBXGroup;
+			children = (
+				518CB10A292F21BA00C60633 /* LICENSE1.txt */,
+			);
+			path = LICENSE1;
+			sourceTree = "<group>";
+		};
+		518CB10F292F277200C60633 /* Sharing */ = {
+			isa = PBXGroup;
+			children = (
+				518CB109292F21BA00C60633 /* LICENSE1 */,
+				518CB0EC292F21A900C60633 /* Persistence */,
+				518CB0CA292F219F00C60633 /* SwiftUI */,
+				518CB10D292F21ED00C60633 /* README.md */,
+			);
+			path = Sharing;
+			sourceTree = "<group>";
+		};
 		51AEC34F2914A58200C1DD5E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -261,10 +331,10 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		51FB8E50292B0D55001BD62C /* PhotosPicker */ = {
+		51FB8E50292B0D55001BD62C /* PhotoPicker */ = {
 			isa = PBXGroup;
 			children = (
-				51FB8E51292B0D55001BD62C /* LICENSE */,
+				51FB8E51292B0D55001BD62C /* LICENSE2 */,
 				51FB8E55292B0D55001BD62C /* ProfileImage.swift */,
 				51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */,
 				51FB8E70292C55B1001BD62C /* ProfileImageModel+Photos.swift */,
@@ -272,15 +342,15 @@
 				51FB8E67292B2DA4001BD62C /* FullImageView.swift */,
 				51FB8E64292B2128001BD62C /* README.md */,
 			);
-			path = PhotosPicker;
+			path = PhotoPicker;
 			sourceTree = "<group>";
 		};
-		51FB8E51292B0D55001BD62C /* LICENSE */ = {
+		51FB8E51292B0D55001BD62C /* LICENSE2 */ = {
 			isa = PBXGroup;
 			children = (
-				51FB8E52292B0D55001BD62C /* LICENSE.txt */,
+				51FB8E52292B0D55001BD62C /* LICENSE2.txt */,
 			);
-			path = LICENSE;
+			path = LICENSE2;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -364,7 +434,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				51FB8E57292B0D55001BD62C /* LICENSE.txt in Resources */,
+				518CB10B292F21BA00C60633 /* LICENSE1.txt in Resources */,
+				51FB8E57292B0D55001BD62C /* LICENSE2.txt in Resources */,
 				514B884328E3873700B81198 /* Preview Assets.xcassets in Resources */,
 				514B883F28E3873700B81198 /* Assets.xcassets in Resources */,
 			);
@@ -374,7 +445,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				51FB8E58292B0D55001BD62C /* LICENSE.txt in Resources */,
+				518CB10C292F21BA00C60633 /* LICENSE1.txt in Resources */,
+				51FB8E58292B0D55001BD62C /* LICENSE2.txt in Resources */,
 				514B885728E3875100B81198 /* Preview Assets.xcassets in Resources */,
 				514B885428E3875100B81198 /* Assets.xcassets in Resources */,
 			);
@@ -390,7 +462,9 @@
 				514B883628E3873500B81198 /* CareKeeperApp.swift in Sources */,
 				51C5B9A6290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */,
 				51FB8E62292B1EA0001BD62C /* Caree+Photo.swift in Sources */,
+				518CB107292F21A900C60633 /* PersistenceController+Share.swift in Sources */,
 				5189F10828F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
+				518CB0D8292F219F00C60633 /* AddToExistingShareView.swift in Sources */,
 				514B883828E3873500B81198 /* Persistence.swift in Sources */,
 				51FB8E68292B2DA4001BD62C /* FullImageView.swift in Sources */,
 				51FB8E71292C55B1001BD62C /* ProfileImageModel+Photos.swift in Sources */,
@@ -402,16 +476,22 @@
 				5189F0FE28F89FE70097E7E4 /* BehavioDetailView.swift in Sources */,
 				51FB8E5D292B0D55001BD62C /* ProfileImage.swift in Sources */,
 				51FB8E79292D9E87001BD62C /* EmojiTextField.swift in Sources */,
+				518CB0F9292F21A900C60633 /* CoreDataHelper.swift in Sources */,
+				518CB0E6292F219F00C60633 /* ParticipantView.swift in Sources */,
 				51FB8E66292B270E001BD62C /* PhotoPickerCoordinator.swift in Sources */,
 				51FB8E492922AFF9001BD62C /* ActivityListItem.swift in Sources */,
 				51B4283E2909B89B007DF447 /* ErrorHandling.swift in Sources */,
+				518CB0E0292F219F00C60633 /* CareeContextMenu.swift in Sources */,
 				5189F10128F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */,
 				51FB8E5F292B0D55001BD62C /* ProfileImageModel.swift in Sources */,
 				51FB8E6D292BAFE0001BD62C /* CareeListItemView.swift in Sources */,
+				518CB0D6292F219F00C60633 /* ManagingSharesView.swift in Sources */,
+				518CB0E8292F219F00C60633 /* SwiftUIHelper.swift in Sources */,
 				5125C7D3292146FD004D1EB7 /* ActivityListView.swift in Sources */,
 				51FB8E76292D9355001BD62C /* Caree+Relationships.swift in Sources */,
 				514B883B28E3873500B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,
 				5101151D2900D7E50009D7EC /* LocationController.swift in Sources */,
+				518CB0DE292F219F00C60633 /* SharePickerView.swift in Sources */,
 				5189F10428F8CEB10097E7E4 /* BehaviorListItemView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -420,16 +500,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				518CB0D9292F219F00C60633 /* AddToExistingShareView.swift in Sources */,
 				5125C7D4292146FD004D1EB7 /* ActivityListView.swift in Sources */,
 				514B888728E50E8800B81198 /* CareeListView.swift in Sources */,
 				51FB8E60292B0D55001BD62C /* ProfileImageModel.swift in Sources */,
 				51C5B9A7290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */,
 				51FB8E77292D9355001BD62C /* Caree+Relationships.swift in Sources */,
 				5189F10928F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
+				518CB0FA292F21A900C60633 /* CoreDataHelper.swift in Sources */,
 				51FB8E63292B1EA0001BD62C /* Caree+Photo.swift in Sources */,
+				518CB108292F21A900C60633 /* PersistenceController+Share.swift in Sources */,
 				514B888C28E50FCF00B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */,
 				51FB8E4A2922AFF9001BD62C /* ActivityListItem.swift in Sources */,
 				5189F10C28F8CF940097E7E4 /* ActivityTrackingViewStep2.swift in Sources */,
+				518CB0D7292F219F00C60633 /* ManagingSharesView.swift in Sources */,
+				518CB0E9292F219F00C60633 /* SwiftUIHelper.swift in Sources */,
+				518CB0E7292F219F00C60633 /* ParticipantView.swift in Sources */,
 				510115222900F64B0009D7EC /* UserLocationMap.swift in Sources */,
 				514B888828E50E8800B81198 /* Persistence.swift in Sources */,
 				514B886028E3EEC800B81198 /* CareeDetailView.swift in Sources */,
@@ -441,6 +527,8 @@
 				51FB8E6E292BAFE0001BD62C /* CareeListItemView.swift in Sources */,
 				514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */,
 				5101151E2900D7E50009D7EC /* LocationController.swift in Sources */,
+				518CB0E1292F219F00C60633 /* CareeContextMenu.swift in Sources */,
+				518CB0DF292F219F00C60633 /* SharePickerView.swift in Sources */,
 				5103A7A92918307B00F58FCE /* ComplicationController.swift in Sources */,
 				51FB8E74292C5860001BD62C /* CareeAddView.swift in Sources */,
 				5189F10528F8CEB10097E7E4 /* BehaviorListItemView.swift in Sources */,

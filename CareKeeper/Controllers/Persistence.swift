@@ -1,8 +1,11 @@
 import CoreData
+import CloudKit
 import Combine
 import OSLog
 
-class PersistenceController: ObservableObject {
+class PersistenceController: NSObject, ObservableObject {
+    let gCloudKitContainerIdentifier = "iCloud.com.kareemf.CareKeeperCK"
+    
     static let shared = PersistenceController()
 
     static var preview: PersistenceController = {
@@ -58,13 +61,11 @@ class PersistenceController: ObservableObject {
     private static let remoteDataImportAuthorName = "CareKeeper Data Import"
 #endif
 
-    let container: NSPersistentCloudKitContainer
+    var container: NSPersistentCloudKitContainer
     private var subscriptions = [AnyCancellable]()
     private lazy var historyRequestQueue = DispatchQueue(label: "history")
-
-    private var lastHistoryToken: NSPersistentHistoryToken?
-
-    private lazy var tokenFileURL: URL = {
+    
+    private func baseUrl() throws -> URL {
         let url = NSPersistentCloudKitContainer.defaultDirectoryURL()
             .appendingPathComponent("CareKeeper", isDirectory: true)
         do {
@@ -73,10 +74,24 @@ class PersistenceController: ObservableObject {
                     at: url,
                     withIntermediateDirectories: true,
                     attributes: nil)
+            
+            return url
+        } catch {
+            throw error
+        }
+    }
+
+    private func tokenFileURL(_ storeUUID: String) -> URL? {
+        do {
+            return try baseUrl().appendingPathComponent("token-\(storeUUID).data", isDirectory: false)
         } catch {
             logError("Error initializing history token", error: error)
+            return nil
         }
-        return url.appendingPathComponent("token.data", isDirectory: false)
+    }
+    
+    lazy var cloudKitContainer: CKContainer = {
+        return CKContainer(identifier: gCloudKitContainerIdentifier)
     }()
 
     private func logError(_ message: String, error: Error) {
@@ -86,13 +101,36 @@ class PersistenceController: ObservableObject {
 
     init(inMemory: Bool = false) {
         container = NSPersistentCloudKitContainer(name: "CareKeeperCoreData")
-
-        let persistentStoreDescription = container.persistentStoreDescriptions.first!
+        
+        super.init()
+        
+        //         TODO: error handling
+        guard let storeFolderURL = try? baseUrl() else {
+//            logError("", error: error)
+            return
+        }
+        let privateStoreFolderURL = storeFolderURL.appendingPathComponent("Private")
+        let sharedStoreFolderURL = storeFolderURL.appendingPathComponent("Shared")
+        
+        let fileManager = FileManager.default
+        for folderURL in [privateStoreFolderURL, sharedStoreFolderURL] where !fileManager.fileExists(atPath: folderURL.path) {
+            do {
+                try fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                fatalError("#\(#function): Failed to create the store folder: \(error)")
+            }
+        }
+        
+        guard let privateStoreDescription = container.persistentStoreDescriptions.first else {
+            logger.error("Error retrieving a persistent store description")
+            return
+        }
 
         if inMemory {
-            persistentStoreDescription.url = URL(fileURLWithPath: "/dev/null")
+            privateStoreDescription.url = URL(fileURLWithPath: "/dev/null")
         } else {
             do {
+                privateStoreDescription.url = privateStoreFolderURL
                 try container.viewContext.setQueryGenerationFrom(.current)
             } catch {
                 logError("Error setting query generation", error: error)
@@ -100,46 +138,85 @@ class PersistenceController: ObservableObject {
         }
 
         // Generate notifications on change
-        persistentStoreDescription.setOption(
+        privateStoreDescription.setOption(
             true as NSNumber,
             forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey
         )
 
         // Persist change history
-        persistentStoreDescription.setOption(
+        privateStoreDescription.setOption(
             true as NSNumber,
             forKey: NSPersistentHistoryTrackingKey)
+        
+        // Start Shared DB setup
+        guard let sharedStoreDescription = privateStoreDescription.copy() as? NSPersistentStoreDescription else {
+//            TODO: error handling
+            fatalError("#\(#function): Copying the private store description returned an unexpected value.")
+        }
+                
+        sharedStoreDescription.url = inMemory ? URL(fileURLWithPath: "/dev/null") : sharedStoreFolderURL
+        
+        let sharedStoreOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: gCloudKitContainerIdentifier)
+        sharedStoreOptions.databaseScope = .shared
+        sharedStoreDescription.cloudKitContainerOptions = sharedStoreOptions
+        
+        container.persistentStoreDescriptions.append(sharedStoreDescription)
+        // End Shared DB setup
 
-        container.loadPersistentStores(completionHandler: { (_, error) in
+        container.loadPersistentStores(completionHandler: { [self] (loadedStoreDescription, error) in
             if let error = error as NSError? {
                 self.logError("Error loading persistent stores", error: error)
+                return
+            }
+            
+            guard let cloudKitContainerOptions = loadedStoreDescription.cloudKitContainerOptions else {
+                return
+            }
+            
+            if cloudKitContainerOptions.databaseScope == .private {
+                self._privatePersistentStore = container.persistentStoreCoordinator.persistentStore(for: loadedStoreDescription.url!)
+            } else if cloudKitContainerOptions.databaseScope  == .shared {
+                self._sharedPersistentStore = container.persistentStoreCoordinator.persistentStore(for: loadedStoreDescription.url!)
             }
         })
-
+        
+#if InitializeCloudKitSchema
+        do {
+            try container.initializeCloudKitSchema()
+        } catch {
+            fatalError("###\(#function) Error initialising CloudKit schema: \(String(describing: error))")
+        }
+#else
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.transactionAuthor = PersistenceController.authorName
 
         // Sub to notifications
-        loadHistoryToken()
-
         NotificationCenter.default
             .publisher(for: .NSPersistentStoreRemoteChange)
             .sink { [self] in
                 self.processRemoteStoreChange($0)
             }
             .store(in: &subscriptions)
-
+#endif
     }
 
     func processRemoteStoreChange(_ notification: Notification) {
         print("Store Notification", notification)
+        
+        guard let storeUUID = notification.userInfo?[NSStoreUUIDKey] as? String,
+              [privatePersistentStore.identifier, sharedPersistentStore.identifier].contains(storeUUID) else {
+            print("\(#function): Ignore a store remote Change notification because of no valid storeUUID.")
+            return
+        }
+        
+        let lastHistoryToken = loadHistoryToken(storeUUID: storeUUID)
 
         historyRequestQueue.async {
             let backgroundContext = self.container.newBackgroundContext()
 
             backgroundContext.performAndWait {
                 let request = NSPersistentHistoryChangeRequest
-                    .fetchHistory(after: self.lastHistoryToken)
+                    .fetchHistory(after: lastHistoryToken)
 
                 do {
                     let result = try backgroundContext.execute(request) as? NSPersistentHistoryResult
@@ -156,7 +233,7 @@ class PersistenceController: ObservableObject {
                     self.mergeChanges(from: transactions)
 
                     if let newToken = transactions.last?.token {
-                        self.storeHistoryToken(newToken)
+                        self.storeHistoryToken(token: newToken, storeUUID: storeUUID)
                     }
                 } catch {
                     self.logError("Error processing remote notifications", error: error)
@@ -165,24 +242,35 @@ class PersistenceController: ObservableObject {
         }
     }
 
-    private func storeHistoryToken(_ token: NSPersistentHistoryToken) {
+    private func storeHistoryToken(token: NSPersistentHistoryToken, storeUUID: String) {
         do {
             let data = try NSKeyedArchiver
                 .archivedData(withRootObject: token, requiringSecureCoding: true)
-            try data.write(to: tokenFileURL)
-            lastHistoryToken = token
+            
+            guard let url = tokenFileURL(storeUUID) else {
+//                TODO: error handling
+                return
+            }
+            
+            try data.write(to: url)
         } catch {
             logError("Error writing history token", error: error)
         }
     }
 
-    private func loadHistoryToken() {
+    private func loadHistoryToken(storeUUID: String) -> NSPersistentHistoryToken? {
         do {
-            let tokenData = try Data(contentsOf: tokenFileURL)
-            lastHistoryToken = try NSKeyedUnarchiver
+            guard let url = tokenFileURL(storeUUID) else {
+//                TODO: error handling
+                return nil
+            }
+            
+            let tokenData = try Data(contentsOf: url)
+            return try NSKeyedUnarchiver
                 .unarchivedObject(ofClass: NSPersistentHistoryToken.self, from: tokenData)
         } catch {
             logger.error("Error initializing history token. Probably benign: \(error)")
+            return nil
         }
     }
 
@@ -199,5 +287,15 @@ class PersistenceController: ObservableObject {
                     .mergeChanges(fromRemoteContextSave: userInfo, into: [context])
             }
         }
+    }
+    
+    private var _privatePersistentStore: NSPersistentStore?
+    var privatePersistentStore: NSPersistentStore {
+        return _privatePersistentStore!
+    }
+    
+    private var _sharedPersistentStore: NSPersistentStore?
+    var sharedPersistentStore: NSPersistentStore {
+        return _sharedPersistentStore!
     }
 }

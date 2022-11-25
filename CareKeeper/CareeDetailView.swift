@@ -1,11 +1,17 @@
 import SwiftUI
 import CoreData
+import CloudKit
 
 enum ActiveSheet: Identifiable, Equatable {
     case activityTracking1
     case activityTracking2(Behavior)
     case activityDetail(Activity)
     case behaviorDetail(Behavior)
+    case participantView(CKShare)
+    case cloudSharingSheet(CKShare)
+    case managingSharesView
+    case sharePicker(Caree)
+    case careeContextMenu(Caree) // .contextMenu is deprecated in watchOS, so use action list instead.
 #if os(iOS)
     case fullImage
 #endif
@@ -38,9 +44,12 @@ struct CareeDetailView: View {
     @State private var activities: [Activity] = []
     @State private var behaviors: [Behavior] = []
     @State private var activeSheet: ActiveSheet?
+    @State private var nextSheet: ActiveSheet?
 
     // swiftlint:disable:next identifier_name
     static let ACTIVITY_FETCH_LIMIT = 5
+    
+    let persistenceController = PersistenceController.shared
 
     private func saveAction() {
         do {
@@ -109,6 +118,10 @@ struct CareeDetailView: View {
             }
 #endif
             Section {
+                Text("menu")
+                    .contextMenu {
+                        CareeContextMenu(activeSheet: $activeSheet, nextSheet: $nextSheet, caree: caree)
+                    }
                 Button(action: {
                     activeSheet = .activityTracking1
                     }) {
@@ -186,9 +199,17 @@ struct CareeDetailView: View {
                         })
                         .disabled((editMode?.wrappedValue.isEditing ?? false) && name.isEmpty)
                 }
+            
+                ToolbarItem(placement: .bottomBar) {
+                    Button("Manage Shares") { activeSheet = .managingSharesView }
+                }
+#elseif os(watchOS)
+                ToolbarItem(placement: .automatic) {
+                    Button("Manage Shares") { activeSheet = .managingSharesView }
+                }
 #endif
         }
-        .sheet(item: $activeSheet) { item in
+        .sheet(item: $activeSheet, onDismiss: sheetOnDismiss) { item in
             sheetView(with: item)
         }
         .onChange(of: activeSheet, perform: { newValue in
@@ -242,13 +263,46 @@ struct CareeDetailView: View {
                         }
                     }
             }
-
 #if os(iOS)
         case .fullImage:
             FullImageView(activeSheet: $activeSheet, photo: caree.photo)
                 .onDisappear { activeSheet = nil }
 #endif
+        case .careeContextMenu(let caree):
+            CareeContextMenu(activeSheet: $activeSheet, nextSheet: $nextSheet, caree: caree)
+        case .cloudSharingSheet(_):
+            /**
+             Reserve this case for something like CloudSharingSheet(activeSheet: $activeSheet, share: share).
+             */
+            EmptyView()
+        case .managingSharesView:
+            ManagingSharesView(activeSheet: $activeSheet, nextSheet: $nextSheet)
+        case .sharePicker(let caree):
+            AddToExistingShareView(activeSheet: $activeSheet, caree: caree)
+        case .participantView(let share):
+            ParticipantView(activeSheet: $activeSheet, share: share)
         }
+    }
+    
+    /**
+     Present the next active sheet, if necessary.
+     Dispatch asynchronously to the next run loop so the presentation occurs after the current sheet's dismissal.
+     */
+    private func sheetOnDismiss() {
+        guard let nextActiveSheet = nextSheet else {
+            return
+        }
+        switch nextActiveSheet {
+        case .cloudSharingSheet(let share):
+            DispatchQueue.main.async {
+                persistenceController.presentCloudSharingController(share: share)
+            }
+        default:
+            DispatchQueue.main.async {
+                activeSheet = nextActiveSheet
+            }
+        }
+        nextSheet = nil
     }
 
     private func deleteBehaviors(offsets: IndexSet) {
