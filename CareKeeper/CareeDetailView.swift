@@ -117,10 +117,13 @@ struct CareeDetailView: View {
             // Design choice: don't show profile image on watch to cut down on visual clutter
 #endif
             Section {
-                Text("menu")
+#if os(iOS)
+                Label("Share", systemImage: "square.and.arrow.up")
                     .contextMenu {
                         CareeContextMenu(activeSheet: $activeSheet, nextSheet: $nextSheet, caree: caree)
                     }
+#endif
+                
                 Button(action: {
                     activeSheet = .activityTracking1
                     }) {
@@ -199,7 +202,7 @@ struct CareeDetailView: View {
                         .disabled((editMode?.wrappedValue.isEditing ?? false) && name.isEmpty)
                 }
             
-                ToolbarItem(placement: .bottomBar) {
+                ToolbarItem(placement: .secondaryAction) {
                     Button("Manage Shares") { activeSheet = .managingSharesView }
                 }
 #elseif os(watchOS)
