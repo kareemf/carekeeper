@@ -110,12 +110,11 @@ struct CareeDetailView: View {
                         .onTapGesture {
                             activeSheet = .fullImage
                         }
+                } else {
+                    CircularProfileImage(imageState: .empty)
                 }
             }
-#else
-            if let image = caree.image() {
-                CircularProfileImage(imageState: .success(image))
-            }
+            // Design choice: don't show profile image on watch to cut down on visual clutter
 #endif
             Section {
                 Text("menu")
