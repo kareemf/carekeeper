@@ -47,28 +47,7 @@ struct SharePickerView<ActionView: View>: View {
             .listStyle(.plain)
             .navigationTitle("Shares")
         }
-//        .onReceive(NotificationCenter.default.storeDidChangePublisher) { notification in
-//            processStoreChangeNotification(notification)
-//        }
     }
-    
-    /**
-     Update the share list, if necessary. Ignore the notification in the following cases:
-     - The notification isn't relevant to the private database.
-     - The notification transaction isn't empty. When a share changes, Core Data triggers a store remote change notification with no transaction.
-     */
-//    private func processStoreChangeNotification(_ notification: Notification) {
-//        guard let storeUUID = notification.userInfo?[UserInfoKey.storeUUID] as? String,
-//              storeUUID == PersistenceController.shared.privatePersistentStore.identifier else {
-//            return
-//        }
-//        guard let transactions = notification.userInfo?[UserInfoKey.transactions] as? [NSPersistentHistoryTransaction],
-//              transactions.isEmpty else {
-//            return
-//        }
-//        shareTitles = PersistenceController.shared.shareTitles()
-//    }
-
 }
 
 private struct ShareListView: View {

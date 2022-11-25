@@ -39,9 +39,6 @@ struct CareeContextMenu: View {
                 ProgressView()
             }
         }
-//        .onReceive(NotificationCenter.default.storeDidChangePublisher) { notification in
-//            processStoreChangeNotification(notification)
-//        }
     }
     
     @ViewBuilder
@@ -110,22 +107,4 @@ struct CareeContextMenu: View {
         activeSheet = nil
     }
     #endif
-    
-    /**
-     Ignore the notification in the following cases:
-     - It isn't relevant to the private database.
-     - It doesn't have a transaction. When a share changes, Core Data triggers a store remote change notification with no transaction.
-     */
-//    private func processStoreChangeNotification(_ notification: Notification) {
-//        guard let storeUUID = notification.userInfo?[UserInfoKey.storeUUID] as? String,
-//              storeUUID == PersistenceController.shared.privatePersistentStore.identifier else {
-//            return
-//        }
-//        guard let transactions = notification.userInfo?[UserInfoKey.transactions] as? [NSPersistentHistoryTransaction],
-//              transactions.isEmpty else {
-//            return
-//        }
-//        isCareeShared = (PersistenceController.shared.existingShare(caree: caree) != nil)
-//        hasAnyShare = PersistenceController.shared.shareTitles().isEmpty ? false : true
-//    }
 }

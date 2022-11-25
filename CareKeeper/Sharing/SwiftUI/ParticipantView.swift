@@ -48,9 +48,6 @@ struct ParticipantView: View {
             .listStyle(.plain)
             .navigationTitle("Participants")
         }
-//        .onReceive(NotificationCenter.default.storeDidChangePublisher) { notification in
-//            processStoreChangeNotification(notification)
-//        }
     }
     
     /**
@@ -123,29 +120,6 @@ struct ParticipantView: View {
             }
         }
     }
-    
-    /**
-     Ignore the notification in the following cases:
-     - The notification isn't relevant to the private database.
-     - The notification transaction isn't empty. When a share changes, Core Data triggers a store remote change notification with no transaction.
-     In that case, grab the share with the same title, and use it to update the UI.
-     */
-//    private func processStoreChangeNotification(_ notification: Notification) {
-//        guard let storeUUID = notification.userInfo?[UserInfoKey.storeUUID] as? String,
-//              storeUUID == PersistenceController.shared.privatePersistentStore.identifier else {
-//            return
-//        }
-//        guard let transactions = notification.userInfo?[UserInfoKey.transactions] as? [NSPersistentHistoryTransaction],
-//              transactions.isEmpty else {
-//            return
-//        }
-//        if let updatedShare = PersistenceController.shared.share(with: share.title) {
-//            participants = updatedShare.participants.filter { $0.role != .owner }.map { Participant($0) }
-//            
-//        } else {
-//            wasShareDeleted = true
-//        }
-//    }
 }
 
 private struct ParticipantListHeader: View {

@@ -54,10 +54,10 @@ class PersistenceController: NSObject, ObservableObject {
     @Published var errorHandling = ErrorHandling()
 
 #if os(watchOS)
-    private static let authorName = "CareKeeper watchOS"
+    static let authorName = "CareKeeper watchOS"
     private static let remoteDataImportAuthorName = "CareKeeper watchOS Data Import"
 #else
-    private static let authorName = "CareKeeper"
+    static let authorName = "CareKeeper"
     private static let remoteDataImportAuthorName = "CareKeeper Data Import"
 #endif
 
