@@ -172,13 +172,6 @@ class PersistenceController: NSObject, ObservableObject {
             }
         })
         
-#if InitializeCloudKitSchema
-        do {
-            try container.initializeCloudKitSchema()
-        } catch {
-            fatalError("###\(#function) Error initialising CloudKit schema: \(String(describing: error))")
-        }
-#else
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.transactionAuthor = PersistenceController.authorName
 
@@ -189,7 +182,6 @@ class PersistenceController: NSObject, ObservableObject {
                 self.processRemoteStoreChange($0)
             }
             .store(in: &subscriptions)
-#endif
     }
 
     func processRemoteStoreChange(_ notification: Notification) {
