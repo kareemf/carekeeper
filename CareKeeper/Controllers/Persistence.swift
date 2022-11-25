@@ -65,7 +65,7 @@ class PersistenceController: NSObject, ObservableObject {
     private var subscriptions = [AnyCancellable]()
     private lazy var historyRequestQueue = DispatchQueue(label: "history")
     
-    private func baseUrl() throws -> URL {
+    func baseUrl() throws -> URL {
         let url = NSPersistentCloudKitContainer.defaultDirectoryURL()
             .appendingPathComponent("CareKeeper", isDirectory: true)
         do {
@@ -81,20 +81,12 @@ class PersistenceController: NSObject, ObservableObject {
         }
     }
 
-    private func tokenFileURL(_ storeUUID: String) -> URL? {
-        do {
-            return try baseUrl().appendingPathComponent("token-\(storeUUID).data", isDirectory: false)
-        } catch {
-            logError("Error initializing history token", error: error)
-            return nil
-        }
-    }
     
     lazy var cloudKitContainer: CKContainer = {
         return CKContainer(identifier: gCloudKitContainerIdentifier)
     }()
 
-    private func logError(_ message: String, error: Error) {
+    func logError(_ message: String, error: Error) {
         logger.error("\(message, privacy: .public): \(error)")
         errorHandling.handle(error: error, description: message)
     }
@@ -239,38 +231,6 @@ class PersistenceController: NSObject, ObservableObject {
                     self.logError("Error processing remote notifications", error: error)
                 }
             }
-        }
-    }
-
-    private func storeHistoryToken(token: NSPersistentHistoryToken, storeUUID: String) {
-        do {
-            let data = try NSKeyedArchiver
-                .archivedData(withRootObject: token, requiringSecureCoding: true)
-            
-            guard let url = tokenFileURL(storeUUID) else {
-//                TODO: error handling
-                return
-            }
-            
-            try data.write(to: url)
-        } catch {
-            logError("Error writing history token", error: error)
-        }
-    }
-
-    private func loadHistoryToken(storeUUID: String) -> NSPersistentHistoryToken? {
-        do {
-            guard let url = tokenFileURL(storeUUID) else {
-//                TODO: error handling
-                return nil
-            }
-            
-            let tokenData = try Data(contentsOf: url)
-            return try NSKeyedUnarchiver
-                .unarchivedObject(ofClass: NSPersistentHistoryToken.self, from: tokenData)
-        } catch {
-            logger.error("Error initializing history token. Probably benign: \(error)")
-            return nil
         }
     }
 

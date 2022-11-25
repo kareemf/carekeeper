@@ -56,6 +56,8 @@
 		518CB108292F21A900C60633 /* PersistenceController+Share.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0F6292F21A900C60633 /* PersistenceController+Share.swift */; };
 		518CB10B292F21BA00C60633 /* LICENSE1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 518CB10A292F21BA00C60633 /* LICENSE1.txt */; };
 		518CB10C292F21BA00C60633 /* LICENSE1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 518CB10A292F21BA00C60633 /* LICENSE1.txt */; };
+		518CB114293049F800C60633 /* Persistence+History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB113293049F800C60633 /* Persistence+History.swift */; };
+		518CB115293049F800C60633 /* Persistence+History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB113293049F800C60633 /* Persistence+History.swift */; };
 		51AEC3502914A58200C1DD5E /* CareKeeper Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 514B884D28E3875000B81198 /* CareKeeper Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		51B4283E2909B89B007DF447 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B4283D2909B89B007DF447 /* ErrorHandling.swift */; };
 		51B4283F2909B89B007DF447 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B4283D2909B89B007DF447 /* ErrorHandling.swift */; };
@@ -145,6 +147,7 @@
 		518CB0F6292F21A900C60633 /* PersistenceController+Share.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PersistenceController+Share.swift"; sourceTree = "<group>"; };
 		518CB10A292F21BA00C60633 /* LICENSE1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE1.txt; sourceTree = "<group>"; };
 		518CB10D292F21ED00C60633 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		518CB113293049F800C60633 /* Persistence+History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Persistence+History.swift"; sourceTree = "<group>"; };
 		51B42836290431A8007DF447 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		51B4283D2909B89B007DF447 /* ErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
 		51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceErrorHandling.swift; sourceTree = "<group>"; };
@@ -186,6 +189,7 @@
 			isa = PBXGroup;
 			children = (
 				514B883728E3873500B81198 /* Persistence.swift */,
+				518CB113293049F800C60633 /* Persistence+History.swift */,
 				5101151C2900D7E50009D7EC /* LocationController.swift */,
 				51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */,
 			);
@@ -481,6 +485,7 @@
 				51FB8E66292B270E001BD62C /* PhotoPickerCoordinator.swift in Sources */,
 				51FB8E492922AFF9001BD62C /* ActivityListItem.swift in Sources */,
 				51B4283E2909B89B007DF447 /* ErrorHandling.swift in Sources */,
+				518CB114293049F800C60633 /* Persistence+History.swift in Sources */,
 				518CB0E0292F219F00C60633 /* CareeContextMenu.swift in Sources */,
 				5189F10128F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */,
 				51FB8E5F292B0D55001BD62C /* ProfileImageModel.swift in Sources */,
@@ -527,6 +532,7 @@
 				51FB8E6E292BAFE0001BD62C /* CareeListItemView.swift in Sources */,
 				514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */,
 				5101151E2900D7E50009D7EC /* LocationController.swift in Sources */,
+				518CB115293049F800C60633 /* Persistence+History.swift in Sources */,
 				518CB0E1292F219F00C60633 /* CareeContextMenu.swift in Sources */,
 				518CB0DF292F219F00C60633 /* SharePickerView.swift in Sources */,
 				5103A7A92918307B00F58FCE /* ComplicationController.swift in Sources */,
