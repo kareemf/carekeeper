@@ -55,6 +55,8 @@ struct CareeContextMenu: View {
             
             Button("Add to Existing Share") { activeSheet = .sharePicker(caree) }
             .disabled(isCareeShared || !hasAnyShare)
+            
+            Button("Manage Shares") { activeSheet = .managingSharesView }
         } else {
             Button("Manage Participation") { manageParticipation(caree: caree) }
         }
