@@ -26,7 +26,7 @@ struct SharePickerView<ActionView: View>: View {
         NavigationView {
             VStack {
                if shareTitles.isEmpty {
-                   Text("No share exists. Please create a new share for a photo, then try again.").padding()
+                   Text("No share exists. Please create a new share, then try again.").padding()
                    Spacer()
                } else {
                    Form {
