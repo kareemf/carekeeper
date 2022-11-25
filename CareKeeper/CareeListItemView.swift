@@ -2,7 +2,17 @@ import SwiftUI
 
 struct CareeListItem: View {
     @ObservedObject var caree: Caree
+    
+    let persistenceController = PersistenceController.shared
 
+    var isCareeShared: Bool {
+        persistenceController.existingShare(caree: caree) != nil
+    }
+    
+    var isCareeSharedWithYou: Bool {
+        !persistenceController.privatePersistentStore.contains(manageObject: caree)
+    }
+    
     var body: some View {
         if let image = caree.image() {
             VStack(alignment: .trailing) {
@@ -15,6 +25,14 @@ struct CareeListItem: View {
                 .font(.system(.headline, design: .rounded))
             Text("\(caree.behaviors?.count ?? 0) behaviors")
             Text("\(caree.activities?.count ?? 0) activities")
+            
+            if isCareeShared {
+                Label("Shared", systemImage: "person.line.dotted.person.fill")
+            }
+            
+            if isCareeSharedWithYou {
+                Label("Shared With You", systemImage: "person.line.dotted.person")
+            }
         }
     }
 }
