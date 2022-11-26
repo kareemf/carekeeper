@@ -188,17 +188,17 @@ extension PersistenceController {
         return nil
     }
     
-    func fetchShare(with title: String) -> CKShare? {
+    func fetchShare(with recordID: CKShare.ID) -> CKShare? {
         let stores = [privatePersistentStore, sharedPersistentStore]
         let shares = try? container.fetchShares(in: stores)
-        let share = shares?.first(where: { $0.title == title })
+        let share = shares?.first(where: { $0.recordID == recordID })
         return share
     }
     
-    func shareTitles() -> [String] {
+    func fetchAllShares() -> [CKShare] {
         let stores = [privatePersistentStore, sharedPersistentStore]
         let shares = try? container.fetchShares(in: stores)
-        return shares?.map { $0.title } ?? []
+        return shares ?? []
     }
     
     private func configure(share: CKShare, with caree: Caree? = nil) {
@@ -260,13 +260,7 @@ extension CKShare.ParticipantAcceptanceStatus {
 
 extension CKShare {
     var title: String {
-        guard let date = creationDate else {
-            return "Share-\(UUID().uuidString)"
-        }
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
-        return "Share-" + formatter.string(from: date)
+        return "Share-\(recordID.hash)"
     }
     
     var persistentStore: NSPersistentStore? {

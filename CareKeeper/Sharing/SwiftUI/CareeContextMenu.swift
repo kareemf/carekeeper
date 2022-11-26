@@ -25,7 +25,7 @@ struct CareeContextMenu: View {
         _nextSheet = nextSheet
         self.caree = caree
         isCareeShared = (persistenceController.existingShare(caree: caree) != nil)
-        hasAnyShare = persistenceController.shareTitles().isEmpty ? false : true
+        hasAnyShare = persistenceController.fetchAllShares().isEmpty ? false : true
     }
 
     var body: some View {
@@ -56,6 +56,9 @@ struct CareeContextMenu: View {
             Button("Add to Existing Share") { activeSheet = .sharePicker(caree) }
             .disabled(isCareeShared || !hasAnyShare)
             
+            Button("Manage Participation") { manageParticipation(caree: caree) }
+            
+//            TODO: should be a new, separate tab
             Button("Manage Shares") { activeSheet = .managingSharesView }
         } else {
             Button("Manage Participation") { manageParticipation(caree: caree) }

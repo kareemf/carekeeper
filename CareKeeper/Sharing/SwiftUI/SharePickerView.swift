@@ -11,12 +11,13 @@ import CloudKit
 
 struct SharePickerView<ActionView: View>: View {
     @Binding private var activeSheet: ActiveSheet?
-    @Binding private var selection: String?
+    @Binding private var selection: CKShare?
     
     private let actionView: ActionView
-    @State private var shareTitles = PersistenceController.shared.shareTitles()
+        
+    @State private var shares = PersistenceController.shared.fetchAllShares()
 
-    init(activeSheet: Binding<ActiveSheet?>, selection: Binding<String?>, @ViewBuilder actionView: () -> ActionView) {
+    init(activeSheet: Binding<ActiveSheet?>, selection: Binding<CKShare?>, @ViewBuilder actionView: () -> ActionView) {
         _activeSheet = activeSheet
         _selection = selection
         self.actionView = actionView()
@@ -25,13 +26,13 @@ struct SharePickerView<ActionView: View>: View {
     var body: some View {
         NavigationView {
             VStack {
-               if shareTitles.isEmpty {
+               if shares.isEmpty {
                    Text("No share exists. Please create a new share, then try again.").padding()
                    Spacer()
                } else {
                    Form {
                        Section(header: Text("Pick a share")) {
-                           ShareListView(selection: $selection, shareTitles: $shareTitles)
+                           ShareListView(selection: $selection, shares: $shares)
                        }
                        Section {
                            actionView
@@ -51,21 +52,24 @@ struct SharePickerView<ActionView: View>: View {
 }
 
 private struct ShareListView: View {
-    @Binding var selection: String?
-    @Binding var shareTitles: [String]
+    @Binding var selection: CKShare?
+    @Binding var shares: [CKShare]
 
     var body: some View {
-        List(shareTitles, id: \.self) { shareTitle in
+        List(shares, id: \.recordID) { share in
+            let title = share.title
+            let selectionTitle = selection?.title
+            
             HStack {
-                Text(shareTitle)
+                Text(title)
                 Spacer()
-                if selection == shareTitle {
+                if selectionTitle == title {
                     Image(systemName: "checkmark")
                 }
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                selection = (selection == shareTitle) ? nil : shareTitle
+                selection = (selectionTitle == title) ? nil : share
             }
         }
     }
