@@ -15,6 +15,8 @@ struct AddToExistingShareView: View {
     
     @State private var toggleProgress: Bool = false
     @State private var selection: String?
+    
+    let persistenceController = PersistenceController.shared
 
     var body: some View {
         ZStack {
@@ -30,9 +32,8 @@ struct AddToExistingShareView: View {
     
     private func shareCaree(_ unsharedCaree: Caree, shareTitle: String?) {
         toggleProgress.toggle()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let persistenceController = PersistenceController.shared
-            if let shareTitle = shareTitle, let share = persistenceController.share(with: shareTitle) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {            
+            if let shareTitle = shareTitle, let share = persistenceController.fetchShare(with: shareTitle) {
                 persistenceController.shareObject(unsharedCaree, to: share)
             }
             toggleProgress.toggle()

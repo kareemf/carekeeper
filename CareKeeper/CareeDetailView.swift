@@ -11,7 +11,7 @@ enum ActiveSheet: Identifiable, Equatable {
     case cloudSharingSheet(CKShare)
     case managingSharesView
     case sharePicker(Caree)
-    case careeContextMenu(Caree) // .contextMenu is deprecated in watchOS, so use action list instead.
+    case careeContextMenu(Caree)
 #if os(iOS)
     case fullImage
 #endif
