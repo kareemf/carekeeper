@@ -188,7 +188,7 @@ extension PersistenceController {
         return nil
     }
     
-    func share(with title: String) -> CKShare? {
+    func fetchShare(with title: String) -> CKShare? {
         let stores = [privatePersistentStore, sharedPersistentStore]
         let shares = try? container.fetchShares(in: stores)
         let share = shares?.first(where: { $0.title == title })

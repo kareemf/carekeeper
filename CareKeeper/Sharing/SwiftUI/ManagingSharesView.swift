@@ -21,7 +21,8 @@ struct ManagingSharesView: View {
     var body: some View {
         ZStack {
             SharePickerView(activeSheet: $activeSheet, selection: $selection) {
-                if  let shareTitle = selection, let share = persistenceController.share(with: shareTitle) {
+                if  let shareTitle = selection,
+                    let share = persistenceController.fetchShare(with: shareTitle) {
                     actionButtons(for: share)
                 }
             }
@@ -37,7 +38,7 @@ struct ManagingSharesView: View {
         let isPrivateStore = (persistentStore == persistenceController.privatePersistentStore)
         
         Button(isPrivateStore ? "Manage Participants" : "View Participants") {
-            if let share = persistenceController.share(with: selection!) {
+            if let share = persistenceController.fetchShare(with: selection!) {
                 nextSheet = .participantView(share)
                 activeSheet = nil
             }
@@ -45,7 +46,7 @@ struct ManagingSharesView: View {
         .disabled(selection == nil)
         
         Button(isPrivateStore ? "Stop Sharing" : "Remove Me") {
-            if let share = persistenceController.share(with: selection!) {
+            if let share = persistenceController.fetchShare(with: selection!) {
                 purgeShare(share, in: persistentStore)
             }
         }
@@ -53,7 +54,7 @@ struct ManagingSharesView: View {
 
         #if os(iOS)
         Button("Manage With UICloudSharingController") {
-            if let share = persistenceController.share(with: selection!) {
+            if let share = persistenceController.fetchShare(with: selection!) {
                 nextSheet = .cloudSharingSheet(share)
                 activeSheet = nil
             }
