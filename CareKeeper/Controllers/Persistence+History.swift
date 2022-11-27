@@ -2,15 +2,6 @@ import Foundation
 import CoreData
 
 extension PersistenceController {
-    private func tokenFileURL(_ storeUUID: String) -> URL? {
-        do {
-            return try baseUrl().appendingPathComponent("token-\(storeUUID).data", isDirectory: false)
-        } catch {
-            logError("Error initializing history token", error: error)
-            return nil
-        }
-    }
-    
     func storeHistoryToken(token: NSPersistentHistoryToken, storeUUID: String) {
         do {
             let data = try NSKeyedArchiver
@@ -39,6 +30,15 @@ extension PersistenceController {
                 .unarchivedObject(ofClass: NSPersistentHistoryToken.self, from: tokenData)
         } catch {
             logger.error("Error initializing history token. Probably benign: \(error)")
+            return nil
+        }
+    }
+    
+    private func tokenFileURL(_ storeUUID: String) -> URL? {
+        do {
+            return try baseUrl().appendingPathComponent("token-\(storeUUID).data", isDirectory: false)
+        } catch {
+            logError("Error initializing history token", error: error)
             return nil
         }
     }

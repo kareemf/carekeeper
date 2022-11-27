@@ -96,22 +96,7 @@ class PersistenceController: NSObject, ObservableObject {
         
         super.init()
         
-        //         TODO: error handling
-        guard let storeFolderURL = try? baseUrl() else {
-//            logError("", error: error)
-            return
-        }
-        let privateStoreFolderURL = storeFolderURL.appendingPathComponent("Private")
-        let sharedStoreFolderURL = storeFolderURL.appendingPathComponent("Shared")
-        
-        let fileManager = FileManager.default
-        for folderURL in [privateStoreFolderURL, sharedStoreFolderURL] where !fileManager.fileExists(atPath: folderURL.path) {
-            do {
-                try fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true, attributes: nil)
-            } catch {
-                fatalError("#\(#function): Failed to create the store folder: \(error)")
-            }
-        }
+        let (privateStoreFolderURL, sharedStoreFolderURL) = loadStoreURLs()
         
         guard let privateStoreDescription = container.persistentStoreDescriptions.first else {
             logger.error("Error retrieving a persistent store description")
@@ -142,7 +127,7 @@ class PersistenceController: NSObject, ObservableObject {
         
         // Start Shared DB setup
         guard let sharedStoreDescription = privateStoreDescription.copy() as? NSPersistentStoreDescription else {
-//            TODO: error handling
+            //TODO: error handling
             fatalError("#\(#function): Copying the private store description returned an unexpected value.")
         }
                 
@@ -183,6 +168,40 @@ class PersistenceController: NSObject, ObservableObject {
             }
             .store(in: &subscriptions)
     }
+    
+    private func loadStoreURLs() -> (URL?, URL?) {
+        do {
+            let storeFolderURL = try baseUrl().appendingPathComponent("CoreDataStores", isDirectory: true)
+            let privateStoreFolderURL = storeFolderURL.appendingPathComponent("Private", isDirectory: true)
+            let sharedStoreFolderURL = storeFolderURL.appendingPathComponent("Shared", isDirectory: true)
+            
+            let fileManager = FileManager.default
+            
+            for folderURL in [privateStoreFolderURL, sharedStoreFolderURL] where !fileManager.fileExists(atPath: folderURL.path) {
+                do {
+                    try fileManager
+                        .createDirectory(
+                            at: folderURL,
+                            withIntermediateDirectories: true,
+                            attributes: nil
+                        )
+                } catch {
+                    logError("Error initializing store folder ", error: error)
+                    return  (nil, nil)
+                }
+            }
+            
+            return (
+                privateStoreFolderURL.appendingPathComponent("private.sqlite"),
+                sharedStoreFolderURL.appendingPathComponent("shared.sqlite")
+            )
+
+        } catch {
+            logError("Error initializing base folder for stores", error: error)
+        }
+        return  (nil, nil)
+    }
+    
 
     func processRemoteStoreChange(_ notification: Notification) {
         print("Store Notification", notification)
