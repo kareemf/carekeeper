@@ -63,6 +63,8 @@
 		51B4283F2909B89B007DF447 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B4283D2909B89B007DF447 /* ErrorHandling.swift */; };
 		51C5B9A6290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */; };
 		51C5B9A7290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */; };
+		51ED92F22935F33400ED9526 /* ActiveSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51ED92F12935F33400ED9526 /* ActiveSheet.swift */; };
+		51ED92F32935F33400ED9526 /* ActiveSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51ED92F12935F33400ED9526 /* ActiveSheet.swift */; };
 		51F3EC552919EE39007F1F0F /* ImageFromText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F3EC542919EE39007F1F0F /* ImageFromText.swift */; };
 		51FB8E492922AFF9001BD62C /* ActivityListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E482922AFF9001BD62C /* ActivityListItem.swift */; };
 		51FB8E4A2922AFF9001BD62C /* ActivityListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E482922AFF9001BD62C /* ActivityListItem.swift */; };
@@ -151,6 +153,7 @@
 		51B42836290431A8007DF447 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		51B4283D2909B89B007DF447 /* ErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
 		51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceErrorHandling.swift; sourceTree = "<group>"; };
+		51ED92F12935F33400ED9526 /* ActiveSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSheet.swift; sourceTree = "<group>"; };
 		51F3EC542919EE39007F1F0F /* ImageFromText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFromText.swift; sourceTree = "<group>"; };
 		51FB8E482922AFF9001BD62C /* ActivityListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListItem.swift; sourceTree = "<group>"; };
 		51FB8E52292B0D55001BD62C /* LICENSE2.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE2.txt; sourceTree = "<group>"; };
@@ -233,6 +236,7 @@
 				514B883C28E3873500B81198 /* CareeListView.swift */,
 				51FB8E6C292BAFE0001BD62C /* CareeListItemView.swift */,
 				51FB8E72292C5860001BD62C /* CareeAddView.swift */,
+				51ED92F12935F33400ED9526 /* ActiveSheet.swift */,
 				514B885E28E3EEC800B81198 /* CareeDetailView.swift */,
 				510115202900F64B0009D7EC /* UserLocationMap.swift */,
 				51B4283D2909B89B007DF447 /* ErrorHandling.swift */,
@@ -468,6 +472,7 @@
 				51FB8E62292B1EA0001BD62C /* Caree+Photo.swift in Sources */,
 				518CB107292F21A900C60633 /* PersistenceController+Share.swift in Sources */,
 				5189F10828F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
+				51ED92F22935F33400ED9526 /* ActiveSheet.swift in Sources */,
 				518CB0D8292F219F00C60633 /* AddToExistingShareView.swift in Sources */,
 				514B883828E3873500B81198 /* Persistence.swift in Sources */,
 				51FB8E68292B2DA4001BD62C /* FullImageView.swift in Sources */,
@@ -510,6 +515,7 @@
 				514B888728E50E8800B81198 /* CareeListView.swift in Sources */,
 				51FB8E60292B0D55001BD62C /* ProfileImageModel.swift in Sources */,
 				51C5B9A7290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */,
+				51ED92F32935F33400ED9526 /* ActiveSheet.swift in Sources */,
 				51FB8E77292D9355001BD62C /* Caree+Relationships.swift in Sources */,
 				5189F10928F8CF880097E7E4 /* ActivityTrackingViewStep1.swift in Sources */,
 				518CB0FA292F21A900C60633 /* CoreDataHelper.swift in Sources */,

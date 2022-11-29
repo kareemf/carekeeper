@@ -57,9 +57,6 @@ struct CareeContextMenu: View {
             .disabled(isCareeShared || !hasAnyShare)
             
             Button("Manage Participation") { manageParticipation(caree: caree) }
-            
-//            TODO: should be a new, separate tab
-            Button("Manage Shares") { activeSheet = .managingSharesView }
         } else {
             Button("Manage Participation") { manageParticipation(caree: caree) }
         }

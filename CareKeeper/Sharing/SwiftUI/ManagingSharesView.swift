@@ -38,11 +38,19 @@ struct ManagingSharesView: View {
         
         Button(isPrivateStore ? "Manage Participants" : "View Participants") {
             if let share = persistenceController.fetchShare(with: selection!.recordID) {
-                nextSheet = .participantView(share)
-                activeSheet = nil
+                activeSheet = .participantView(share)
             }
         }
         .disabled(selection == nil)
+        
+        #if os(iOS)
+        Button("Manage With UICloudSharingController") {
+            if let share = persistenceController.fetchShare(with: selection!.recordID) {
+                activeSheet = .cloudSharingSheet(share)
+            }
+        }
+        .disabled(selection == nil)
+        #endif
         
         Button(isPrivateStore ? "Stop Sharing" : "Remove Me") {
             if let share = persistenceController.fetchShare(with: selection!.recordID) {
@@ -50,16 +58,8 @@ struct ManagingSharesView: View {
             }
         }
         .disabled(selection == nil)
-
-        #if os(iOS)
-        Button("Manage With UICloudSharingController") {
-            if let share = persistenceController.fetchShare(with: selection!.recordID) {
-                nextSheet = .cloudSharingSheet(share)
-                activeSheet = nil
-            }
-        }
-        .disabled(selection == nil)
-        #endif
+        
+//        TODO: REMOVE DISMISS BUTTON
     }
     
     private func purgeShare(_ share: CKShare, in persistentStore: NSPersistentStore?) {
