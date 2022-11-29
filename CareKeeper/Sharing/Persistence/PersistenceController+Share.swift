@@ -66,9 +66,14 @@ extension PersistenceController {
              The default value of publicPermission is CKShare.ParticipantPermission.none.
              */
             self.container.share([unsharedCaree], to: nil) { objectIDs, share, container, error in
+                if let error = error {
+                    self.logError("Error completing sharing", error: error)
+                }
+                
                 if let share = share {
                     self.configure(share: share, with: unsharedCaree)
                 }
+                                                
                 completion(share, container, error)
             }
         }
@@ -115,6 +120,7 @@ extension PersistenceController: UICloudSharingControllerDelegate {
         if let share = csc.share, let persistentStore = share.persistentStore {
             container.persistUpdatedShare(share, in: persistentStore) { (share, error) in
                 if let error = error {
+                    self.logError("Error persisting share update", error: error)
                     print("\(#function): Failed to persist updated share: \(error)")
                 }
             }
@@ -122,11 +128,12 @@ extension PersistenceController: UICloudSharingControllerDelegate {
     }
 
     func cloudSharingController(_ csc: UICloudSharingController, failedToSaveShareWithError error: Error) {
+        self.logError("Error saving share", error: error)
         print("\(#function): Failed to save a share: \(error)")
     }
     
     func itemTitle(for csc: UICloudSharingController) -> String? {
-        return csc.share?.title ?? "A cool caree"
+        return csc.share?.title ?? "Care for"
     }
 }
 #endif
@@ -146,6 +153,7 @@ extension PersistenceController {
     {
         container.share([unsharedObject], to: existingShare) { (objectIDs, share, container, error) in
             guard error == nil, let share = share else {
+                self.logError("Error sharing", error: error!)
                 print("\(#function): Failed to share an object: \(error!))")
                 completionHandler?(share, error)
                 return
@@ -159,6 +167,7 @@ extension PersistenceController {
              */
             self.container.persistUpdatedShare(share, in: self.privatePersistentStore) { (share, error) in
                 if let error = error {
+                    self.logError("Error persisting share update", error: error)
                     print("\(#function): Failed to persist updated share: \(error)")
                 }
                 completionHandler?(share, error)
@@ -176,6 +185,7 @@ extension PersistenceController {
         }
         container.purgeObjectsAndRecordsInZone(with: share.recordID.zoneID, in: store) { (zoneID, error) in
             if let error = error {
+                self.logError("Error purging share", error: error)
                 print("\(#function): Failed to purge objects and records: \(error)")
             }
         }
@@ -220,6 +230,9 @@ extension PersistenceController {
 
         container.fetchParticipants(matching: [lookupInfo], into: persistentStore) { (results, error) in
             guard let participants = results, let participant = participants.first, error == nil else {
+                if error != nil {
+                    self.logError("Error adding participants", error: error!)
+                }
                 completionHandler?(share, error)
                 return
             }
@@ -230,6 +243,7 @@ extension PersistenceController {
             
             self.container.persistUpdatedShare(share, in: persistentStore) { (share, error) in
                 if let error = error {
+                    self.logError("Error persisting share update", error: error)
                     print("\(#function): Failed to persist updated share: \(error)")
                 }
                 completionHandler?(share, error)
@@ -247,6 +261,7 @@ extension PersistenceController {
          */
         container.persistUpdatedShare(share, in: privatePersistentStore) { (share, error) in
             if let error = error {
+                self.logError("Error persisting share update", error: error)
                 print("\(#function): Failed to persist updated share: \(error)")
             }
             completionHandler?(share, error)
