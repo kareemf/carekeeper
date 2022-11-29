@@ -11,7 +11,6 @@ import CloudKit
 
 struct ManagingSharesView: View {
     @Binding var activeSheet: ActiveSheet?
-    @Binding var nextSheet: ActiveSheet?
 
     @State private var toggleProgress: Bool = false
     @State private var selection: CKShare?

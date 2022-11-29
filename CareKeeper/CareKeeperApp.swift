@@ -12,7 +12,6 @@ struct CareKeeperApp: App {
     let persistenceController = PersistenceController.shared
     
     @State private var activeSheet: ActiveSheet?
-    @State private var nextSheet: ActiveSheet?
     
     var body: some Scene {
         WindowGroup {
@@ -23,7 +22,7 @@ struct CareKeeperApp: App {
                     }
                 
                 NavigationView {
-                    ManagingSharesView(activeSheet: $activeSheet, nextSheet: $nextSheet)
+                    ManagingSharesView(activeSheet: $activeSheet)
                 }
                 .onChange(of: activeSheet, perform: {value in
                     switch activeSheet {
