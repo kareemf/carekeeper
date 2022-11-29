@@ -10,7 +10,6 @@ enum ActiveSheet: Identifiable, Equatable {
 //    TODO: remove
     case managingSharesView
     case sharePicker(Caree)
-    case careeContextMenu(Caree)
 #if os(iOS)
     case fullImage
 #endif

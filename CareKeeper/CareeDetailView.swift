@@ -88,7 +88,7 @@ struct CareeDetailView: View {
             }
             // Design choice: don't show profile image on watch to cut down on visual clutter
 #endif
-            Section {                
+            Section {
                 Button(action: {
                     activeSheet = .activityTracking1
                     }) {
@@ -229,8 +229,6 @@ struct CareeDetailView: View {
             FullImageView(activeSheet: $activeSheet, photo: caree.photo)
                 .onDisappear { activeSheet = nil }
 #endif
-        case .careeContextMenu(let caree):
-            CareeContextMenu(activeSheet: $activeSheet, nextSheet: $nextSheet, caree: caree)
         case .cloudSharingSheet(_):
             /**
              Reserve this case for something like CloudSharingSheet(activeSheet: $activeSheet, share: share).
