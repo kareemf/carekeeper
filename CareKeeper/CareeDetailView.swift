@@ -88,14 +88,7 @@ struct CareeDetailView: View {
             }
             // Design choice: don't show profile image on watch to cut down on visual clutter
 #endif
-            Section {
-#if os(iOS)
-                Label("Share", systemImage: "square.and.arrow.up")
-                    .contextMenu {
-                        CareeContextMenu(activeSheet: $activeSheet, nextSheet: $nextSheet, caree: caree)
-                    }
-#endif
-                
+            Section {                
                 Button(action: {
                     activeSheet = .activityTracking1
                     }) {
@@ -162,17 +155,19 @@ struct CareeDetailView: View {
         .navigationTitle(caree.name ?? "")
         .toolbar {
 #if os(iOS)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                        .onChange(of: editMode?.wrappedValue, perform: { _ in
-                            guard let isEditing = editMode?.wrappedValue.isEditing else { return }
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                EditButton()
+                    .onChange(of: editMode?.wrappedValue, perform: { _ in
+                        guard let isEditing = editMode?.wrappedValue.isEditing else { return }
 
-                            if isEditing == false {
-                                saveEditForm()
-                            }
-                        })
-                        .disabled((editMode?.wrappedValue.isEditing ?? false) && name.isEmpty)
-                }
+                        if isEditing == false {
+                            saveEditForm()
+                        }
+                    })
+                    .disabled((editMode?.wrappedValue.isEditing ?? false) && name.isEmpty)
+            
+                CareeShareButton(caree: caree, activeSheet: $activeSheet, nextSheet: $nextSheet)
+            }
 #endif
         }
         .sheet(item: $activeSheet, onDismiss: sheetOnDismiss) { item in
