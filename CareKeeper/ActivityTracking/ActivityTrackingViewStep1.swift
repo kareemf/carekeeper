@@ -32,7 +32,11 @@ struct ActivityTrackingViewStep1: View {
                     }
                 }
             }
-            .navigationTitle("\(caree.name ?? "") - Behavior To Track")
+#if os(watchOS)
+            .navigationTitle("Activity")
+#else
+            .navigationTitle("Activity for \(caree.name ?? "")")
+#endif
         }
     }
 }
