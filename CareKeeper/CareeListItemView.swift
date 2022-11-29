@@ -1,12 +1,13 @@
 import SwiftUI
+import CloudKit
 
 struct CareeListItem: View {
     @ObservedObject var caree: Caree
     
     let persistenceController = PersistenceController.shared
 
-    var isCareeShared: Bool {
-        persistenceController.existingShare(caree: caree) != nil
+    var existingShare: CKShare? {
+        persistenceController.existingShare(caree: caree)
     }
     
     var isCareeSharedWithYou: Bool {
@@ -23,11 +24,11 @@ struct CareeListItem: View {
         VStack(alignment: .leading) {
             Text(caree.name ?? "")
                 .font(.system(.headline, design: .rounded))
-            Text("\(caree.behaviors?.count ?? 0) behaviors")
-            Text("\(caree.activities?.count ?? 0) activities")
+            Text("Behaviors: \(caree.behaviors?.count ?? 0)")
+            Text("Activities: \(caree.activities?.count ?? 0)")
             
-            if isCareeShared {
-                Label("Shared", systemImage: "person.line.dotted.person.fill")
+            if let share = existingShare {
+                Text("Participants: \(share.participants.count)")
             }
             
             if isCareeSharedWithYou {
