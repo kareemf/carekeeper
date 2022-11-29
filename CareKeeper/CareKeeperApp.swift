@@ -49,11 +49,6 @@ struct CareKeeperApp: App {
     private func sheetView(with item: ActiveSheet) -> some View {
         
         switch item {
-        case .cloudSharingSheet(_):
-            /**
-             Reserve this case for something like CloudSharingSheet(activeSheet: $activeSheet, share: share).
-             */
-            EmptyView()
         case .participantView(let share):
             ParticipantView(activeSheet: $activeSheet, share: share)
         default:

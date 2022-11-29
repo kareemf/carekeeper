@@ -258,16 +258,11 @@ struct CareeDetailView: View {
         guard let nextActiveSheet = nextSheet else {
             return
         }
-        switch nextActiveSheet {
-        case .cloudSharingSheet(let share):
-            DispatchQueue.main.async {
-                persistenceController.presentCloudSharingController(share: share)
-            }
-        default:
-            DispatchQueue.main.async {
-                activeSheet = nextActiveSheet
-            }
+        
+        DispatchQueue.main.async {
+            activeSheet = nextActiveSheet
         }
+
         nextSheet = nil
     }
 
