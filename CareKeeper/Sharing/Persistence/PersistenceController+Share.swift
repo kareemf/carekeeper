@@ -31,6 +31,7 @@ extension PersistenceController {
             sharingController = UICloudSharingController(share: careeShare!, container: cloudKitContainer)
         }
         sharingController.delegate = self
+        
         /**
          Setting the presentation style to .formSheet so there's no need to specify sourceView, sourceItem, or sourceRect.
          */
@@ -66,7 +67,7 @@ extension PersistenceController {
              */
             self.container.share([unsharedCaree], to: nil) { objectIDs, share, container, error in
                 if let share = share {
-                    self.configure(share: share)
+                    self.configure(share: share, with: unsharedCaree)
                 }
                 completion(share, container, error)
             }
@@ -151,7 +152,7 @@ extension PersistenceController {
             }
             
             if existingShare == nil {
-                self.configure(share: share)
+                self.configure(share: share, with: unsharedObject as? Caree)
             }
             /**
              Synchronize the changes on the share to the private persistent store.
@@ -203,6 +204,7 @@ extension PersistenceController {
     
     private func configure(share: CKShare, with caree: Caree? = nil) {
         share[CKShare.SystemFieldKey.title] = caree?.name
+        share[CKShare.SystemFieldKey.thumbnailImageData] = caree?.photo?.data
     }
 }
 
