@@ -32,12 +32,12 @@ struct CareKeeperApp: App {
                         return
                     }
                 })
-                    .sheet(item: $activeSheet) { item in
-                        sheetView(with: item)
-                    }
-                    .tabItem {
-                        Label("Sharing", systemImage: "person.line.dotted.person.fill")
-                    }
+                .sheet(item: $activeSheet) { item in
+                    sheetView(with: item)
+                }
+                .tabItem {
+                    Label("Sharing", systemImage: "person.line.dotted.person.fill")
+                }
             }
             .environment(\.managedObjectContext, persistenceController.container.viewContext)
             .withErrorHandling()
@@ -47,7 +47,7 @@ struct CareKeeperApp: App {
     
     @ViewBuilder
     private func sheetView(with item: ActiveSheet) -> some View {
-                
+        
         switch item {
         case .cloudSharingSheet(_):
             /**
