@@ -214,7 +214,13 @@ extension PersistenceController {
     
     private func configure(share: CKShare, with caree: Caree? = nil) {
         share[CKShare.SystemFieldKey.title] = caree?.name
-        share[CKShare.SystemFieldKey.thumbnailImageData] = caree?.photo?.data
+        
+        if let photoData = caree?.photo?.data,
+           let uiImage = UIImage(data: photoData) {
+            share[CKShare.SystemFieldKey.thumbnailImageData] = uiImage.pngData()
+        }
+        
+        share[CKShare.SystemFieldKey.shareType] = "com.kareemf.carekeeper.caree"
     }
 }
 
