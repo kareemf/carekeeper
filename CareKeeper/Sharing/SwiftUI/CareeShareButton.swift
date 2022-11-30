@@ -63,16 +63,15 @@ struct CareeShareButton: View {
             persistenceController.shareObject(caree, to: nil) { share, error in
                 toggleProgress.toggle()
                 if let share = share {
-                    nextSheet = .participantView(share)
-                    activeSheet = nil
+                    activeSheet = .participantView(share)
                 }
             }
         }
     }
     
+//    TODO: this won't do anything
     private func manageParticipation(caree: Caree) {
-        nextSheet = .managingSharesView
-        activeSheet = nil
+        activeSheet = .managingSharesView
     }
     #endif
 }

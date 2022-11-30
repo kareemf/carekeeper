@@ -229,11 +229,6 @@ struct CareeDetailView: View {
             FullImageView(activeSheet: $activeSheet, photo: caree.photo)
                 .onDisappear { activeSheet = nil }
 #endif
-        case .cloudSharingSheet(_):
-            /**
-             Reserve this case for something like CloudSharingSheet(activeSheet: $activeSheet, share: share).
-             */
-            EmptyView()
         case .sharePicker(let caree):
             AddToExistingShareView(activeSheet: $activeSheet, caree: caree)
         case .participantView(let share):
