@@ -36,7 +36,7 @@ struct CareKeeperApp: App {
                     sheetView(with: item)
                 }
                 .tabItem {
-                    Label("Sharing", systemImage: "person.line.dotted.person.fill")
+                    Label("Sharing", systemImage: "person.2")
                 }
             }
             .environment(\.managedObjectContext, persistenceController.container.viewContext)
