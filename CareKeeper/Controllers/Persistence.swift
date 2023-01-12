@@ -96,18 +96,17 @@ class PersistenceController: NSObject, ObservableObject {
         
         super.init()
         
-        let (privateStoreFolderURL, sharedStoreFolderURL) = loadStoreURLs()
+        let (privateStoreFolderURL, sharedStoreFolderURL) = loadStoreURLs(inMemory: inMemory)
         
         guard let privateStoreDescription = container.persistentStoreDescriptions.first else {
             logger.error("Error retrieving a persistent store description")
             return
         }
 
-        if inMemory {
-            privateStoreDescription.url = URL(fileURLWithPath: "/dev/null")
-        } else {
+        privateStoreDescription.url = privateStoreFolderURL
+        
+        if !inMemory {
             do {
-                privateStoreDescription.url = privateStoreFolderURL
                 try container.viewContext.setQueryGenerationFrom(.current)
             } catch {
                 logError("Error setting query generation", error: error)
@@ -128,10 +127,10 @@ class PersistenceController: NSObject, ObservableObject {
         // Start Shared DB setup
         guard let sharedStoreDescription = privateStoreDescription.copy() as? NSPersistentStoreDescription else {
             //TODO: error handling
-            fatalError("#\(#function): Copying the private store description returned an unexpected value.")
+            fatalError("#\(#function): Copying the private store description /Users/kareemfrancis/Projects/CareKeeper/CareKeeper/Sharing/SwiftUI/ParticipantView.swiftreturned an unexpected value.")
         }
                 
-        sharedStoreDescription.url = inMemory ? URL(fileURLWithPath: "/dev/null") : sharedStoreFolderURL
+        sharedStoreDescription.url = sharedStoreFolderURL
         
         let sharedStoreOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: gCloudKitContainerIdentifier)
         sharedStoreOptions.databaseScope = .shared
@@ -169,7 +168,14 @@ class PersistenceController: NSObject, ObservableObject {
             .store(in: &subscriptions)
     }
     
-    private func loadStoreURLs() -> (URL?, URL?) {
+    private func loadStoreURLs(inMemory: Bool = false) -> (URL?, URL?) {
+        if inMemory {
+            return (
+                URL(fileURLWithPath: "/dev/null"),
+                URL(fileURLWithPath: "/dev/null")
+            )
+        }
+        
         do {
             let storeFolderURL = try baseUrl().appendingPathComponent("CoreDataStores", isDirectory: true)
             let privateStoreFolderURL = storeFolderURL.appendingPathComponent("Private", isDirectory: true)
