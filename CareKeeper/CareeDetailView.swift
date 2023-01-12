@@ -57,15 +57,10 @@ struct CareeDetailView: View {
 
     var body: some View {
         List {
+            profileImageView().frame(width: 1000, alignment: .center)
 #if os(iOS)
             if editMode?.wrappedValue.isEditing == true {
                 Section("Info") {
-                    EditableCircularProfileImage(model: profileImageModel)
-                        .onAppear {
-                            if let image = caree.image() {
-                                profileImageModel.imageState = .success(image)
-                            }
-                        }
                     TextField("Name", text: $name)
                         .onAppear {
                             name = caree.name ?? ""
@@ -73,20 +68,10 @@ struct CareeDetailView: View {
                         .onSubmit {
                             saveEditForm()
                         }
-
+                    
                 }
                 .animation(nil, value: editMode?.wrappedValue)
-            } else {
-                if let image = caree.image() {
-                    CircularProfileImage(imageState: .success(image))
-                        .onTapGesture {
-                            activeSheet = .fullImage
-                        }
-                } else {
-                    CircularProfileImage(imageState: .empty)
-                }
             }
-            // Design choice: don't show profile image on watch to cut down on visual clutter
 #endif
             Section {
                 Button(action: {
@@ -183,6 +168,33 @@ struct CareeDetailView: View {
                 }
             }
         })
+    }
+    
+    @ViewBuilder
+    private func profileImageView() -> some View {
+#if os(iOS)
+        // Design choice: don't show profile image on watch to cut down on visual clutter
+
+        if editMode?.wrappedValue.isEditing == true {
+            EditableCircularProfileImage(model: profileImageModel)
+                .onAppear {
+                    if let image = caree.image() {
+                        profileImageModel.imageState = .success(image)
+                    }
+                }
+        } else {
+            if let image = caree.image() {
+                CircularProfileImage(imageState: .success(image))
+                    .onTapGesture {
+                        activeSheet = .fullImage
+                    }
+            } else {
+                CircularProfileImage(imageState: .empty)
+            }
+        }
+#else
+        EmptyView()
+#endif
     }
 
     @ViewBuilder
