@@ -220,14 +220,24 @@ struct CareeDetailView: View {
                     }
             }
         case .activityTracking1:
-            ActivityTrackingViewStep1(
-                caree: caree,
-                activeSheet: $activeSheet,
-                behaviors: behaviors
-            )
+            NavigationView {
+                ActivityTrackingViewStep1(
+                    caree: caree,
+                    activeSheet: $activeSheet, onSave: {_ in},
+                    behaviors: behaviors
+                )
+            }
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        activeSheet = nil
+                    }
+                }
+            }
+            
         case .activityTracking2(let behavior):
             NavigationView {
-                ActivityTrackingViewStep2(caree: behavior.caree!, behavior: behavior, activeSheet: $activeSheet)
+                ActivityTrackingViewStep2(caree: behavior.caree!, behavior: behavior, activeSheet: $activeSheet, onSave: {_ in	})
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Cancel") {

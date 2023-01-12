@@ -24,12 +24,11 @@
 		514B885428E3875100B81198 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B885328E3875100B81198 /* Assets.xcassets */; };
 		514B885728E3875100B81198 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B885628E3875100B81198 /* Preview Assets.xcassets */; };
 		514B885F28E3EEC800B81198 /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B885E28E3EEC800B81198 /* CareeDetailView.swift */; };
-		514B886028E3EEC800B81198 /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B885E28E3EEC800B81198 /* CareeDetailView.swift */; };
 		514B888728E50E8800B81198 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883C28E3873500B81198 /* CareeListView.swift */; };
 		514B888828E50E8800B81198 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883728E3873500B81198 /* Persistence.swift */; };
 		514B888C28E50FCF00B81198 /* CareKeeperCoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 514B883928E3873500B81198 /* CareKeeperCoreData.xcdatamodeld */; };
-		5189F0FE28F89FE70097E7E4 /* BehavioDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F0FD28F89FE70097E7E4 /* BehavioDetailView.swift */; };
-		5189F0FF28F89FE70097E7E4 /* BehavioDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F0FD28F89FE70097E7E4 /* BehavioDetailView.swift */; };
+		5189F0FE28F89FE70097E7E4 /* BehaviorDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F0FD28F89FE70097E7E4 /* BehaviorDetailView.swift */; };
+		5189F0FF28F89FE70097E7E4 /* BehaviorDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F0FD28F89FE70097E7E4 /* BehaviorDetailView.swift */; };
 		5189F10128F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10028F8CC8C0097E7E4 /* ActivityDetailView.swift */; };
 		5189F10228F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10028F8CC8C0097E7E4 /* ActivityDetailView.swift */; };
 		5189F10428F8CEB10097E7E4 /* BehaviorListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5189F10328F8CEB10097E7E4 /* BehaviorListItemView.swift */; };
@@ -56,6 +55,7 @@
 		518CB10C292F21BA00C60633 /* LICENSE1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 518CB10A292F21BA00C60633 /* LICENSE1.txt */; };
 		518CB114293049F800C60633 /* Persistence+History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB113293049F800C60633 /* Persistence+History.swift */; };
 		518CB115293049F800C60633 /* Persistence+History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB113293049F800C60633 /* Persistence+History.swift */; };
+		51A3257D296FE0C300DBF4BC /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A3257C296FE0C300DBF4BC /* CareeDetailView.swift */; };
 		51AEC3502914A58200C1DD5E /* CareKeeper Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 514B884D28E3875000B81198 /* CareKeeper Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		51B4283E2909B89B007DF447 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B4283D2909B89B007DF447 /* ErrorHandling.swift */; };
 		51B4283F2909B89B007DF447 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B4283D2909B89B007DF447 /* ErrorHandling.swift */; };
@@ -134,7 +134,7 @@
 		514B885628E3875100B81198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		514B885E28E3EEC800B81198 /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
 		514D926E28F7AED100CBF67E /* Scraps.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Scraps.md; sourceTree = "<group>"; };
-		5189F0FD28F89FE70097E7E4 /* BehavioDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehavioDetailView.swift; sourceTree = "<group>"; };
+		5189F0FD28F89FE70097E7E4 /* BehaviorDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorDetailView.swift; sourceTree = "<group>"; };
 		5189F10028F8CC8C0097E7E4 /* ActivityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailView.swift; sourceTree = "<group>"; };
 		5189F10328F8CEB10097E7E4 /* BehaviorListItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorListItemView.swift; sourceTree = "<group>"; };
 		5189F10728F8CF880097E7E4 /* ActivityTrackingViewStep1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTrackingViewStep1.swift; sourceTree = "<group>"; };
@@ -149,6 +149,7 @@
 		518CB10A292F21BA00C60633 /* LICENSE1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE1.txt; sourceTree = "<group>"; };
 		518CB10D292F21ED00C60633 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		518CB113293049F800C60633 /* Persistence+History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Persistence+History.swift"; sourceTree = "<group>"; };
+		51A3257C296FE0C300DBF4BC /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
 		51B42836290431A8007DF447 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		51B4283D2909B89B007DF447 /* ErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
 		51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceErrorHandling.swift; sourceTree = "<group>"; };
@@ -230,7 +231,7 @@
 				51FB8E482922AFF9001BD62C /* ActivityListItem.swift */,
 				5189F10028F8CC8C0097E7E4 /* ActivityDetailView.swift */,
 				5189F10328F8CEB10097E7E4 /* BehaviorListItemView.swift */,
-				5189F0FD28F89FE70097E7E4 /* BehavioDetailView.swift */,
+				5189F0FD28F89FE70097E7E4 /* BehaviorDetailView.swift */,
 				51FB8E78292D9E87001BD62C /* EmojiTextField.swift */,
 				514B883528E3873500B81198 /* CareKeeperApp.swift */,
 				514B883C28E3873500B81198 /* CareeListView.swift */,
@@ -270,6 +271,7 @@
 				514B885528E3875100B81198 /* Preview Content */,
 				5103A7A82918307B00F58FCE /* ComplicationController.swift */,
 				51F3EC542919EE39007F1F0F /* ImageFromText.swift */,
+				51A3257C296FE0C300DBF4BC /* CareeDetailView.swift */,
 			);
 			path = "CareKeeper Watch App";
 			sourceTree = "<group>";
@@ -482,7 +484,7 @@
 				51FB8E73292C5860001BD62C /* CareeAddView.swift in Sources */,
 				514B883D28E3873500B81198 /* CareeListView.swift in Sources */,
 				514B885F28E3EEC800B81198 /* CareeDetailView.swift in Sources */,
-				5189F0FE28F89FE70097E7E4 /* BehavioDetailView.swift in Sources */,
+				5189F0FE28F89FE70097E7E4 /* BehaviorDetailView.swift in Sources */,
 				51FB8E5D292B0D55001BD62C /* ProfileImage.swift in Sources */,
 				51FB8E79292D9E87001BD62C /* EmojiTextField.swift in Sources */,
 				518CB0F9292F21A900C60633 /* CoreDataHelper.swift in Sources */,
@@ -530,12 +532,12 @@
 				518CB0E7292F219F00C60633 /* ParticipantView.swift in Sources */,
 				510115222900F64B0009D7EC /* UserLocationMap.swift in Sources */,
 				514B888828E50E8800B81198 /* Persistence.swift in Sources */,
-				514B886028E3EEC800B81198 /* CareeDetailView.swift in Sources */,
-				5189F0FF28F89FE70097E7E4 /* BehavioDetailView.swift in Sources */,
+				5189F0FF28F89FE70097E7E4 /* BehaviorDetailView.swift in Sources */,
 				51B4283F2909B89B007DF447 /* ErrorHandling.swift in Sources */,
 				51F3EC552919EE39007F1F0F /* ImageFromText.swift in Sources */,
 				5189F10228F8CC8C0097E7E4 /* ActivityDetailView.swift in Sources */,
 				51FB8E5E292B0D55001BD62C /* ProfileImage.swift in Sources */,
+				51A3257D296FE0C300DBF4BC /* CareeDetailView.swift in Sources */,
 				51FB8E6E292BAFE0001BD62C /* CareeListItemView.swift in Sources */,
 				514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */,
 				5101151E2900D7E50009D7EC /* LocationController.swift in Sources */,

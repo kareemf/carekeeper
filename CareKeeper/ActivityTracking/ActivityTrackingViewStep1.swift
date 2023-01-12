@@ -3,10 +3,10 @@ import SwiftUI
 struct ActivityTrackingViewStep1: View {
     @ObservedObject var caree: Caree
     @Binding var activeSheet: ActiveSheet?
+    var onSave: (Activity) -> Void
     var behaviors: [Behavior]
 
     var body: some View {
-        NavigationView {
             VStack {
                 List {
                     if behaviors.count == 0 {
@@ -14,38 +14,38 @@ struct ActivityTrackingViewStep1: View {
                     }
                     
                     ForEach(behaviors) { behavior in
-                        NavigationLink(destination: ActivityTrackingViewStep2(caree: caree, behavior: behavior, activeSheet: $activeSheet)) {
-                            BehaviorListItem(behavior: behavior, activeSheet: $activeSheet)
-                                .frame(height: 100.0)
-                                .foregroundColor(.mint)
+                        let itemView = BehaviorListItem(behavior: behavior)
+                            .frame(height: 100.0)
+                            .foregroundColor(.mint)
+#if os(watchOS)
+                        Button(action: {
+                            activeSheet = .activityTracking2(behavior)
+                        }, label: {
+                            itemView
+                        })
+#else
+                        NavigationLink(destination: ActivityTrackingViewStep2(caree: caree, behavior: behavior, activeSheet: $activeSheet, onSave: onSave)) {
+                            itemView
                         }
+#endif
                     }
                 }
 #if os(watchOS)
                 .listStyle(CarouselListStyle())
 #endif
             }
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        activeSheet = nil
-                    }
-                }
-            }
+
 #if os(watchOS)
             .navigationTitle("Activity")
 #else
             .navigationTitle("Activity for \(caree.name ?? "")")
 #endif
-        }
     }
 }
 
 struct BehaviorListItem: View {
     var behavior: Behavior
-    
-    @Binding var activeSheet: ActiveSheet?
-    
+        
     var body: some View {        
         HStack {
             if behavior.icon != nil {
@@ -80,6 +80,7 @@ struct TrackActivityView_Previews: PreviewProvider {
         ActivityTrackingViewStep1(
             caree: carees[0],
             activeSheet: .constant(.activityTracking1),
+            onSave: {_ in },
             // swiftlint:disable:next force_cast
             behaviors: carees[0].behaviors!.allObjects as! [Behavior]
         )

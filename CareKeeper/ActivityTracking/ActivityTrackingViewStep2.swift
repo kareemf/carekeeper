@@ -10,6 +10,7 @@ struct ActivityTrackingViewStep2: View {
     var behavior: Behavior
     
     @Binding var activeSheet: ActiveSheet?
+    var onSave: (Activity) -> Void
     
     @State private var notes = ""
     @State private var trackLocation = false
@@ -44,6 +45,7 @@ struct ActivityTrackingViewStep2: View {
         
         activeSheet = nil
         saveAction()
+        onSave(newActivity)
     }
     
     var body: some View {
@@ -107,7 +109,11 @@ struct ActivityTrackingViewStep2: View {
             }
 #endif
         }
+#if os(watchOS)
+        .navigationTitle("\(behavior.icon ?? "")\(behavior.name ?? "")")
+#else
         .navigationTitle("\(caree.name ?? "") - \(behavior.icon ?? "")\(behavior.name ?? "")")
+#endif
     }
 }
 
@@ -122,7 +128,8 @@ struct ActivityTrackingViewStep2_Previews: PreviewProvider {
             caree: carees[0],
             // swiftlint:disable:next force_cast
             behavior: carees[0].behaviors!.allObjects.first(where: {($0 as! Behavior).enableLocations}) as! Behavior,
-            activeSheet: .constant(.activityTracking1)
+            activeSheet: .constant(.activityTracking1),
+            onSave: {_ in }
         )
         .environment(\.managedObjectContext, viewContext)
     }
