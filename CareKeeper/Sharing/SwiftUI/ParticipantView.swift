@@ -86,8 +86,11 @@ struct ParticipantView: View {
     @ViewBuilder
     private func sectionContent() -> some View {
         ForEach(participants, id: \.self) { participant in
+            let lookupInfo = participant.ckShareParticipant.userIdentity.lookupInfo
+            let contact = lookupInfo?.phoneNumber ?? lookupInfo?.emailAddress
+            
             HStack {
-                Text(participant.ckShareParticipant.userIdentity.lookupInfo?.emailAddress ?? "")
+                Text(contact ?? "")
                 Spacer()
                 Text(participant.ckShareParticipant.acceptanceStatus.stringValue)
             }
