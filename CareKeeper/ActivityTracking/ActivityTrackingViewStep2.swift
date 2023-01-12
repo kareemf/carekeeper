@@ -11,8 +11,10 @@ struct ActivityTrackingViewStep2: View {
     
     @Binding var activeSheet: ActiveSheet?
     
-    @State var notes = ""
+    @State private var notes = ""
     @State private var trackLocation = false
+    @State private var useCustomDate = false
+    @State private var when: Date = Date()
     
     private func saveAction() {
         do {
@@ -28,7 +30,7 @@ struct ActivityTrackingViewStep2: View {
         newActivity.caree = caree
         newActivity.behavior = behavior
         newActivity.notes = notes
-        newActivity.when = Date()
+        newActivity.when = useCustomDate ? when : Date()
         
         if trackLocation {
             let location = locationController.location
@@ -72,6 +74,21 @@ struct ActivityTrackingViewStep2: View {
                             }
                         }
                     }}
+#if !os(watchOS)
+                Section {
+                    Toggle(isOn: $useCustomDate) {
+                        Text("Set Time")
+                    }
+                    
+                    if useCustomDate {
+                        DatePicker(
+                            "When",
+                            selection: $when,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+                    }
+                }
+#endif
                 Section {
                     Button("Done") {
                         handleSavePress()
