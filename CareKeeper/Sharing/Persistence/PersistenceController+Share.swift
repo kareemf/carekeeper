@@ -283,7 +283,7 @@ extension CKShare.ParticipantAcceptanceStatus {
 
 extension CKShare {
     var title: String {
-        return "Share-\(recordID.hash)"
+        return self[CKShare.SystemFieldKey.title] ?? "Share-\(recordID.hash)"
     }
     
     var persistentStore: NSPersistentStore? {
