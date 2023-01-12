@@ -54,14 +54,45 @@ struct SharePickerView<ActionView: View>: View {
 private struct ShareListView: View {
     @Binding var selection: CKShare?
     @Binding var shares: [CKShare]
+    
+//    var carees: [Caree]
+    var sharesToCarees: [CKRecord.ID: Caree]
+    
+    static func fetchCarees() throws -> [Caree] {
+        let fetchRequest = Caree.fetchRequest()
+
+        do {
+            return try PersistenceController.shared.container.viewContext.fetch(fetchRequest)
+        } catch {
+            throw error
+        }
+    }
+    
+    init(selection: Binding<CKShare?>, shares: Binding<[CKShare]>) {
+        _selection = selection
+        _shares = shares
+        
+//        TODO: error handling
+        let carees = try! ShareListView.fetchCarees()
+        
+        self.sharesToCarees = carees.reduce(into: [:], {mapper, caree in
+            if let share = PersistenceController.shared.existingShare(caree: caree) {
+                mapper[share.recordID] = caree
+            }
+        })
+    }
 
     var body: some View {
         List(shares, id: \.recordID) { share in
             let title = share.title
             let selectionTitle = selection?.title
+            let caree = sharesToCarees[share.recordID]
             
             HStack {
                 Text(title)
+                if let name = caree?.name {
+                    Text(name)
+                }
                 Spacer()
                 if selectionTitle == title {
                     Image(systemName: "checkmark")
