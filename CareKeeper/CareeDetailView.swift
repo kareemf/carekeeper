@@ -237,7 +237,9 @@ struct CareeDetailView: View {
             
         case .activityTracking2(let behavior):
             NavigationView {
-                ActivityTrackingViewStep2(caree: behavior.caree!, behavior: behavior, activeSheet: $activeSheet, onSave: {_ in	})
+                ActivityTrackingViewStep2(caree: behavior.caree!, behavior: behavior, activeSheet: $activeSheet, onSave: {activity in
+                        activeSheet = .activityDetail(activity)                    
+                })
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Cancel") {

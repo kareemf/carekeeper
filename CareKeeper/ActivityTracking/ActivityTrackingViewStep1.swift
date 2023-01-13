@@ -14,20 +14,13 @@ struct ActivityTrackingViewStep1: View {
                     }
                     
                     ForEach(behaviors) { behavior in
-                        let itemView = BehaviorListItem(behavior: behavior)
-                            .frame(height: 100.0)
-                            .foregroundColor(.mint)
-#if os(watchOS)
                         Button(action: {
                             activeSheet = .activityTracking2(behavior)
                         }, label: {
-                            itemView
+                            BehaviorListItem(behavior: behavior)
+                                .frame(height: 100.0)
+                                .foregroundColor(.mint)
                         })
-#else
-                        NavigationLink(destination: ActivityTrackingViewStep2(caree: caree, behavior: behavior, activeSheet: $activeSheet, onSave: onSave)) {
-                            itemView
-                        }
-#endif
                     }
                 }
 #if os(watchOS)
