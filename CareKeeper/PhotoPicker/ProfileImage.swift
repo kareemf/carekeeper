@@ -31,12 +31,13 @@ struct ProfileImage: View {
 
 struct CircularProfileImage: View {
 	let imageState: ProfileImageModel.ImageState
+    var size: CGFloat = 60
 
 	var body: some View {
 		ProfileImage(imageState: imageState)
             .scaledToFill()
 			.clipShape(Circle())
-			.frame(width: 60, height: 60)
+			.frame(width: size, height: size)
 			.background {
 				Circle().fill(
 					LinearGradient(
@@ -51,6 +52,7 @@ struct CircularProfileImage: View {
 
 struct EditableCircularProfileImage: View {
 	@ObservedObject var model: ProfileImageModel
+    var size: CGFloat = 30
 
 	var body: some View {
 		CircularProfileImage(imageState: model.imageState)
@@ -60,7 +62,7 @@ struct EditableCircularProfileImage: View {
                 ) {
 					Image(systemName: "pencil.circle.fill")
 						.symbolRenderingMode(.multicolor)
-						.font(.system(size: 30))
+						.font(.system(size: size))
 						.foregroundColor(.accentColor)
 				}
 				.buttonStyle(.borderless)

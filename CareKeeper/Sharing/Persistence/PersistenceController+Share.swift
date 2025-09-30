@@ -28,6 +28,7 @@ extension PersistenceController {
         if careeShare == nil {
             sharingController = newSharingController(unsharedCaree: caree, persistenceController: self)
         } else {
+            configure(share: careeShare!)
             sharingController = UICloudSharingController(share: careeShare!, container: cloudKitContainer)
         }
         sharingController.delegate = self

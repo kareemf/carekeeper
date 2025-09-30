@@ -57,9 +57,10 @@ struct CareeDetailView: View {
 
     var body: some View {
         List {
-            profileImageView().frame(width: 1000, alignment: .center)
 #if os(iOS)
             if editMode?.wrappedValue.isEditing == true {
+//                profileImageView()
+
                 Section("Info") {
                     TextField("Name", text: $name)
                         .onAppear {
@@ -141,6 +142,11 @@ struct CareeDetailView: View {
         .toolbar {
 #if os(iOS)
             ToolbarItemGroup(placement: .navigationBarTrailing) {
+                profileImageView()
+                        .scaledToFit()
+                        .clipShape(Circle())
+                        .frame(width: 25, height: 12, alignment: .trailing)
+                
                 EditButton()
                     .onChange(of: editMode?.wrappedValue, perform: { _ in
                         guard let isEditing = editMode?.wrappedValue.isEditing else { return }
@@ -176,7 +182,7 @@ struct CareeDetailView: View {
         // Design choice: don't show profile image on watch to cut down on visual clutter
 
         if editMode?.wrappedValue.isEditing == true {
-            EditableCircularProfileImage(model: profileImageModel)
+            EditableCircularProfileImage(model: profileImageModel, size: 20)
                 .onAppear {
                     if let image = caree.image() {
                         profileImageModel.imageState = .success(image)
@@ -184,12 +190,12 @@ struct CareeDetailView: View {
                 }
         } else {
             if let image = caree.image() {
-                CircularProfileImage(imageState: .success(image))
+                CircularProfileImage(imageState: .success(image), size: 40)
                     .onTapGesture {
                         activeSheet = .fullImage
                     }
             } else {
-                CircularProfileImage(imageState: .empty)
+                CircularProfileImage(imageState: .empty, size: 40)
             }
         }
 #else
