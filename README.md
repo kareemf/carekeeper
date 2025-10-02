@@ -218,13 +218,29 @@ For end-to-end testing on simulators, use the provided sync script to copy data 
 
 ### Running Tests
 
+**From Xcode:**
 ```bash
-# Unit tests
-⌘+U in Xcode
-
-# UI tests (when implemented)
-⌘+U with UI test target selected
+⌘+U  # Run all tests in CareKeeperV2Tests target
 ```
+
+**From Command Line:**
+```bash
+# Run all unit tests
+xcodebuild test -project CareKeeper.xcodeproj -scheme CareKeeperV2 \
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
+
+# Run specific test class
+xcodebuild test -project CareKeeper.xcodeproj -scheme CareKeeperV2 \
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
+  -only-testing:CareKeeperV2Tests/CareeTests
+
+# Run specific test method
+xcodebuild test -project CareKeeper.xcodeproj -scheme CareKeeperV2 \
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
+  -only-testing:CareKeeperV2Tests/CareeTests/testCreateCaree
+```
+
+All tests use in-memory SwiftData containers for fast, isolated execution.
 
 ### Code Style
 

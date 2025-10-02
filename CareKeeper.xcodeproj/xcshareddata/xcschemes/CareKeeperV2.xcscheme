@@ -53,6 +53,17 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "9C71D5E24D0279A78CE4A870"
+               BuildableName = "CareKeeperV2Tests.xctest"
+               BlueprintName = "CareKeeperV2Tests"
+               ReferencedContainer = "container:CareKeeper.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <CommandLineArguments>
       </CommandLineArguments>

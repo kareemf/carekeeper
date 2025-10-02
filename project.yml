@@ -90,6 +90,22 @@ targets:
         WKApplication: true
         NSLocationWhenInUseUsageDescription: "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types."
 
+  CareKeeperV2Tests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: CareKeeperV2Tests
+      - path: CareKeeperV2/Models
+    dependencies:
+      - target: CareKeeperV2
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeperV2Tests
+        SWIFT_VERSION: "5.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_STYLE: Automatic
+
   CareKeeper:
     type: application
     platform: iOS
@@ -159,6 +175,8 @@ schemes:
       config: Debug
     test:
       config: Debug
+      targets:
+        - CareKeeperV2Tests
     profile:
       config: Release
     analyze:
