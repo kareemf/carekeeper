@@ -116,8 +116,16 @@ xcrun simctl launch booted com.kareemf.CareKeeperV2.watchkitapp
 
 #### Quick Development Workflow
 
+**Recommended: Use the build-install-launch script** (builds, installs, and launches both iOS and watchOS apps):
+
 ```bash
-# Build, uninstall, install, and launch iOS app in one command
+./scripts/build-install-launch.sh
+```
+
+**Manual approach** (iOS app only):
+
+```bash
+# Build, install, and launch iOS app in one command
 xcodebuild -project CareKeeper.xcodeproj -scheme CareKeeperV2 \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build && \
 xcrun simctl uninstall booted com.kareemf.CareKeeperV2 && \
