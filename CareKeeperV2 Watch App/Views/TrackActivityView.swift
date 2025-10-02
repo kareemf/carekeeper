@@ -57,55 +57,84 @@ struct TrackActivityView: View {
     }
 
     private func activityDetailsForm(for activityType: ActivityType) -> some View {
-        Form {
-            Section(header: Text(NSLocalizedString("Notes", comment: "Notes section"))) {
-                TextField(NSLocalizedString("Optional", comment: "Notes placeholder"), text: $notes)
-            }
+        ScrollView {
+            VStack(spacing: 16) {
+                // Large Save button at top
+                Button(action: { saveActivity(for: activityType) }) {
+                    Text(NSLocalizedString("Save", comment: "Save button"))
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .foregroundColor(.white)
+                        .background(Color.green.opacity(0.8))
+                        .cornerRadius(12)
+                }
+                .padding(.horizontal)
 
-            if activityType.hasQuantity {
-                Section(header: Text(activityType.quantityUnit ?? NSLocalizedString("Quantity", comment: "Quantity section"))) {
-                    HStack {
-                        Text(String(format: "%.1f", quantity))
-                            .font(.title2)
-                            .fontWeight(.semibold)
-
-                        if let unit = activityType.quantityUnit {
-                            Text(unit)
-                                .font(.body)
+                // Form fields
+                VStack(spacing: 12) {
+                    // Quantity section
+                    if activityType.hasQuantity {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(activityType.quantityUnit ?? NSLocalizedString("Quantity", comment: "Quantity section"))
+                                .font(.caption)
                                 .foregroundColor(.secondary)
+                            HStack {
+                                Text(String(format: "%.1f", quantity))
+                                    .font(.title2)
+                                    .fontWeight(.semibold)
+
+                                if let unit = activityType.quantityUnit {
+                                    Text(unit)
+                                        .font(.body)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                            .focusable()
+                            .digitalCrownRotation($quantity, from: 0, through: 999, by: 0.5, sensitivity: .medium)
                         }
                     }
-                    .frame(maxWidth: .infinity)
-                    .focusable()
-                    .digitalCrownRotation($quantity, from: 0, through: 999, by: 0.5, sensitivity: .medium)
-                }
-            }
 
-            if activityType.hasLocation {
-                Section {
-                    Toggle(NSLocalizedString("Include Location", comment: "Location toggle"), isOn: $includeLocation)
-                        .onChange(of: includeLocation) { _, newValue in
-                            if newValue {
-                                locationManager.requestLocation()
-                            } else {
-                                locationManager.stopUpdating()
+                    // Location section
+                    if activityType.hasLocation {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Toggle(NSLocalizedString("Include Location", comment: "Location toggle"), isOn: $includeLocation)
+                                .onChange(of: includeLocation) { _, newValue in
+                                    if newValue {
+                                        locationManager.requestLocation()
+                                    } else {
+                                        locationManager.stopUpdating()
+                                    }
+                                }
+
+                            if includeLocation, let location = locationManager.location {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(NSLocalizedString("Location", comment: "Location label"))
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                    Text(String(format: "%.6f, %.6f",
+                                               location.coordinate.latitude,
+                                               location.coordinate.longitude))
+                                        .font(.caption)
+                                        .fontDesign(.monospaced)
+                                }
                             }
                         }
+                    }
 
-                    if includeLocation, let location = locationManager.location {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(NSLocalizedString("Location", comment: "Location label"))
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                            Text(String(format: "%.6f, %.6f",
-                                       location.coordinate.latitude,
-                                       location.coordinate.longitude))
-                                .font(.caption)
-                                .fontDesign(.monospaced)
-                        }
+                    // Notes section (last to prevent accidental crown scrolling on quantity)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(NSLocalizedString("Notes", comment: "Notes section"))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        TextField(NSLocalizedString("Optional", comment: "Notes placeholder"), text: $notes)
                     }
                 }
+                .padding(.horizontal)
             }
+            .padding(.vertical)
         }
         .navigationTitle(activityType.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -116,12 +145,6 @@ struct TrackActivityView: View {
                     selectedActivityType = nil
                     includeLocation = false
                     locationManager.stopUpdating()
-                }
-            }
-
-            ToolbarItem(placement: .confirmationAction) {
-                Button(NSLocalizedString("Save", comment: "Save button")) {
-                    saveActivity(for: activityType)
                 }
             }
         }
