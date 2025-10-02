@@ -9,16 +9,31 @@ struct CareKeeperV2App: App {
             ActivityType.self,
             Activity.self
         ])
+
+        // Start with local storage only - CloudKit sync will be added in Phase 2
         let modelConfiguration = ModelConfiguration(
             schema: schema,
-            isStoredInMemoryOnly: false,
-            cloudKitDatabase: .automatic
+            isStoredInMemoryOnly: false
         )
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            // Log the error for debugging
+            print("⚠️ Failed to create ModelContainer: \(error)")
+            print("⚠️ Error details: \(error.localizedDescription)")
+
+            // Fallback to in-memory store for development
+            let fallbackConfig = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: true
+            )
+
+            do {
+                return try ModelContainer(for: schema, configurations: [fallbackConfig])
+            } catch {
+                fatalError("Could not create fallback ModelContainer: \(error)")
+            }
         }
     }()
 

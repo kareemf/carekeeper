@@ -1,0 +1,888 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5101151D2900D7E50009D7EC /* LocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5101151C2900D7E50009D7EC /* LocationController.swift */; };
+		5101151E2900D7E50009D7EC /* LocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5101151C2900D7E50009D7EC /* LocationController.swift */; };
+		5103A7A92918307B00F58FCE /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5103A7A82918307B00F58FCE /* ComplicationController.swift */; };
+		514B883828E3873500B81198 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883728E3873500B81198 /* Persistence.swift */; };
+		514B883F28E3873700B81198 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B883E28E3873700B81198 /* Assets.xcassets */; };
+		514B884328E3873700B81198 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B884228E3873700B81198 /* Preview Assets.xcassets */; };
+		514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */; };
+		514B885428E3875100B81198 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B885328E3875100B81198 /* Assets.xcassets */; };
+		514B885728E3875100B81198 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B885628E3875100B81198 /* Preview Assets.xcassets */; };
+		514B888828E50E8800B81198 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883728E3873500B81198 /* Persistence.swift */; };
+		518CB0D6292F219F00C60633 /* ManagingSharesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CB292F219F00C60633 /* ManagingSharesView.swift */; };
+		518CB0D7292F219F00C60633 /* ManagingSharesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CB292F219F00C60633 /* ManagingSharesView.swift */; };
+		518CB0D8292F219F00C60633 /* AddToExistingShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CC292F219F00C60633 /* AddToExistingShareView.swift */; };
+		518CB0D9292F219F00C60633 /* AddToExistingShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CC292F219F00C60633 /* AddToExistingShareView.swift */; };
+		518CB0DE292F219F00C60633 /* SharePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CF292F219F00C60633 /* SharePickerView.swift */; };
+		518CB0DF292F219F00C60633 /* SharePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CF292F219F00C60633 /* SharePickerView.swift */; };
+		518CB0E6292F219F00C60633 /* ParticipantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0D3292F219F00C60633 /* ParticipantView.swift */; };
+		518CB0E7292F219F00C60633 /* ParticipantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0D3292F219F00C60633 /* ParticipantView.swift */; };
+		518CB0E8292F219F00C60633 /* SwiftUIHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0D4292F219F00C60633 /* SwiftUIHelper.swift */; };
+		518CB0E9292F219F00C60633 /* SwiftUIHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0D4292F219F00C60633 /* SwiftUIHelper.swift */; };
+		518CB0F9292F21A900C60633 /* CoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0EE292F21A900C60633 /* CoreDataHelper.swift */; };
+		518CB0FA292F21A900C60633 /* CoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0EE292F21A900C60633 /* CoreDataHelper.swift */; };
+		518CB107292F21A900C60633 /* PersistenceController+Share.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0F6292F21A900C60633 /* PersistenceController+Share.swift */; };
+		518CB108292F21A900C60633 /* PersistenceController+Share.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0F6292F21A900C60633 /* PersistenceController+Share.swift */; };
+		518CB10B292F21BA00C60633 /* LICENSE1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 518CB10A292F21BA00C60633 /* LICENSE1.txt */; };
+		518CB10C292F21BA00C60633 /* LICENSE1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 518CB10A292F21BA00C60633 /* LICENSE1.txt */; };
+		518CB114293049F800C60633 /* Persistence+History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB113293049F800C60633 /* Persistence+History.swift */; };
+		518CB115293049F800C60633 /* Persistence+History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB113293049F800C60633 /* Persistence+History.swift */; };
+		51A3257D296FE0C300DBF4BC /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A3257C296FE0C300DBF4BC /* CareeDetailView.swift */; };
+		51AEC3502914A58200C1DD5E /* CareKeeper Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 514B884D28E3875000B81198 /* CareKeeper Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		51C5B9A6290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */; };
+		51C5B9A7290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */; };
+		51ED92F82936B50400ED9526 /* CareeShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51ED92F72936B50400ED9526 /* CareeShareButton.swift */; };
+		51ED92F92936B50400ED9526 /* CareeShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51ED92F72936B50400ED9526 /* CareeShareButton.swift */; };
+		51F3EC552919EE39007F1F0F /* ImageFromText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F3EC542919EE39007F1F0F /* ImageFromText.swift */; };
+		51FB8E57292B0D55001BD62C /* LICENSE2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 51FB8E52292B0D55001BD62C /* LICENSE2.txt */; };
+		51FB8E58292B0D55001BD62C /* LICENSE2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 51FB8E52292B0D55001BD62C /* LICENSE2.txt */; };
+		51FB8E5D292B0D55001BD62C /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E55292B0D55001BD62C /* ProfileImage.swift */; };
+		51FB8E5E292B0D55001BD62C /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E55292B0D55001BD62C /* ProfileImage.swift */; };
+		51FB8E5F292B0D55001BD62C /* ProfileImageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */; };
+		51FB8E60292B0D55001BD62C /* ProfileImageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */; };
+		51FB8E66292B270E001BD62C /* PhotoPickerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E65292B270E001BD62C /* PhotoPickerCoordinator.swift */; };
+		51FB8E68292B2DA4001BD62C /* FullImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E67292B2DA4001BD62C /* FullImageView.swift */; };
+		51FB8E71292C55B1001BD62C /* ProfileImageModel+Photos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E70292C55B1001BD62C /* ProfileImageModel+Photos.swift */; };
+		A1B2C3D4E5F6789012345678 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23E36B64DFEC8C3B913A3629 /* ErrorHandling.swift */; };
+		B2C3D4E5F67890123456789A /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23E36B64DFEC8C3B913A3629 /* ErrorHandling.swift */; };
+		C3D4E5F67890123456789AB2 /* ActiveSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4F43CFD78FE7739895820C /* ActiveSheet.swift */; };
+		D4E5F67890123456789AB2C3 /* ActiveSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4F43CFD78FE7739895820C /* ActiveSheet.swift */; };
+		E5F67890123456789AB2C3D4 /* CoreDataEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82ECEF84D16EA6F211E60647 /* CoreDataEntities.swift */; };
+		F67890123456789AB2C3D4E5 /* CoreDataEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82ECEF84D16EA6F211E60647 /* CoreDataEntities.swift */; };
+		67890123456789AB2C3D4E5F /* CareKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0FB2E21F61CBF7A9D4F82F /* CareKeeperApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		51AEC3512914A58200C1DD5E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 514B882A28E3873500B81198 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 514B884C28E3875000B81198;
+			remoteInfo = "CareKeeper Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		51AEC3532914A58200C1DD5E /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				51AEC3502914A58200C1DD5E /* CareKeeper Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		5101151928FF57A70009D7EC /* CareKeeper Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeper Watch App.entitlements"; sourceTree = "<group>"; };
+		5101151A28FF5B2A0009D7EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		5101151B28FF5B390009D7EC /* CareKeeper-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CareKeeper-Watch-App-Info.plist"; sourceTree = SOURCE_ROOT; };
+		5101151C2900D7E50009D7EC /* LocationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LocationController.swift; path = ../LocationController.swift; sourceTree = "<group>"; };
+		5103A7A82918307B00F58FCE /* ComplicationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicationController.swift; sourceTree = "<group>"; };
+		514B883228E3873500B81198 /* CareKeeper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CareKeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		514B883728E3873500B81198 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		514B883E28E3873700B81198 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		514B884028E3873700B81198 /* CareKeeper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CareKeeper.entitlements; sourceTree = "<group>"; };
+		514B884228E3873700B81198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		514B884D28E3875000B81198 /* CareKeeper Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CareKeeper Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWatchApp.swift; sourceTree = "<group>"; };
+		514B885328E3875100B81198 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		514B885628E3875100B81198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		514D926E28F7AED100CBF67E /* Scraps.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Scraps.md; sourceTree = "<group>"; };
+		518CB0CB292F219F00C60633 /* ManagingSharesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManagingSharesView.swift; sourceTree = "<group>"; };
+		518CB0CC292F219F00C60633 /* AddToExistingShareView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddToExistingShareView.swift; sourceTree = "<group>"; };
+		518CB0CF292F219F00C60633 /* SharePickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharePickerView.swift; sourceTree = "<group>"; };
+		518CB0D3292F219F00C60633 /* ParticipantView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParticipantView.swift; sourceTree = "<group>"; };
+		518CB0D4292F219F00C60633 /* SwiftUIHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUIHelper.swift; sourceTree = "<group>"; };
+		518CB0EE292F21A900C60633 /* CoreDataHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataHelper.swift; sourceTree = "<group>"; };
+		518CB0F6292F21A900C60633 /* PersistenceController+Share.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PersistenceController+Share.swift"; sourceTree = "<group>"; };
+		518CB10A292F21BA00C60633 /* LICENSE1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE1.txt; sourceTree = "<group>"; };
+		518CB10D292F21ED00C60633 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		518CB113293049F800C60633 /* Persistence+History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Persistence+History.swift"; sourceTree = "<group>"; };
+		51A3257C296FE0C300DBF4BC /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
+		51B42836290431A8007DF447 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
+		51B9A0722E8E428200EFEA78 /* CareKeeperV2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperV2App.swift; sourceTree = "<group>"; };
+		51B9A0742E8E428200EFEA78 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
+		51B9A0752E8E428200EFEA78 /* ActivityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityType.swift; sourceTree = "<group>"; };
+		51B9A0762E8E428200EFEA78 /* Caree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Caree.swift; sourceTree = "<group>"; };
+		51B9A0782E8E428200EFEA78 /* PreviewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewContainer.swift; sourceTree = "<group>"; };
+		51B9A0792E8E428200EFEA78 /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
+		51B9A07B2E8E428200EFEA78 /* ActivityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailView.swift; sourceTree = "<group>"; };
+		51B9A07C2E8E428200EFEA78 /* ActivityRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRowView.swift; sourceTree = "<group>"; };
+		51B9A07D2E8E428200EFEA78 /* TrackActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackActivityView.swift; sourceTree = "<group>"; };
+		51B9A07F2E8E428200EFEA78 /* ActivityTypeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeEditView.swift; sourceTree = "<group>"; };
+		51B9A0802E8E428200EFEA78 /* ActivityTypeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeRowView.swift; sourceTree = "<group>"; };
+		51B9A0822E8E428200EFEA78 /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
+		51B9A0832E8E428200EFEA78 /* CareeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeEditView.swift; sourceTree = "<group>"; };
+		51B9A0842E8E428200EFEA78 /* CareeListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListRowView.swift; sourceTree = "<group>"; };
+		51B9A0852E8E428200EFEA78 /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
+		51B9A0872E8E428200EFEA78 /* SharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingView.swift; sourceTree = "<group>"; };
+		51B9A0892E8E428200EFEA78 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		51B9A08C2E8E428200EFEA78 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceErrorHandling.swift; sourceTree = "<group>"; };
+		51ED92F72936B50400ED9526 /* CareeShareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeShareButton.swift; sourceTree = "<group>"; };
+		51F3EC542919EE39007F1F0F /* ImageFromText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFromText.swift; sourceTree = "<group>"; };
+		51FB8E52292B0D55001BD62C /* LICENSE2.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE2.txt; sourceTree = "<group>"; };
+		51FB8E55292B0D55001BD62C /* ProfileImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileImage.swift; sourceTree = "<group>"; };
+		51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileImageModel.swift; sourceTree = "<group>"; };
+		51FB8E64292B2128001BD62C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		51FB8E65292B270E001BD62C /* PhotoPickerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerCoordinator.swift; sourceTree = "<group>"; };
+		51FB8E67292B2DA4001BD62C /* FullImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullImageView.swift; sourceTree = "<group>"; };
+		51FB8E70292C55B1001BD62C /* ProfileImageModel+Photos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileImageModel+Photos.swift"; sourceTree = "<group>"; };
+		23E36B64DFEC8C3B913A3629 /* ErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
+		3A4F43CFD78FE7739895820C /* ActiveSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSheet.swift; sourceTree = "<group>"; };
+		82ECEF84D16EA6F211E60647 /* CoreDataEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEntities.swift; sourceTree = "<group>"; };
+		4E0FB2E21F61CBF7A9D4F82F /* CareKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperApp.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		514B882F28E3873500B81198 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		514B884A28E3875000B81198 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5101151F2900DB190009D7EC /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				514B883728E3873500B81198 /* Persistence.swift */,
+				518CB113293049F800C60633 /* Persistence+History.swift */,
+				5101151C2900D7E50009D7EC /* LocationController.swift */,
+				51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		514B882928E3873500B81198 = {
+			isa = PBXGroup;
+			children = (
+				514B883428E3873500B81198 /* CareKeeper */,
+				514B884E28E3875000B81198 /* CareKeeper Watch App */,
+				514B883328E3873500B81198 /* Products */,
+				51AEC34F2914A58200C1DD5E /* Frameworks */,
+				51B9A08B2E8E428200EFEA78 /* CareKeeperV2 */,
+				51B9A08C2E8E428200EFEA78 /* README.md */,
+			);
+			sourceTree = "<group>";
+		};
+		514B883328E3873500B81198 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				514B883228E3873500B81198 /* CareKeeper.app */,
+				514B884D28E3875000B81198 /* CareKeeper Watch App.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		514B883428E3873500B81198 /* CareKeeper */ = {
+			isa = PBXGroup;
+			children = (
+				518CB10F292F277200C60633 /* Sharing */,
+				51FB8E50292B0D55001BD62C /* PhotoPicker */,
+				5101151F2900DB190009D7EC /* Controllers */,
+				5101151A28FF5B2A0009D7EC /* Info.plist */,
+				514D926E28F7AED100CBF67E /* Scraps.md */,
+				23E36B64DFEC8C3B913A3629 /* ErrorHandling.swift */,
+				3A4F43CFD78FE7739895820C /* ActiveSheet.swift */,
+				82ECEF84D16EA6F211E60647 /* CoreDataEntities.swift */,
+				4E0FB2E21F61CBF7A9D4F82F /* CareKeeperApp.swift */,
+				514B883E28E3873700B81198 /* Assets.xcassets */,
+				514B884028E3873700B81198 /* CareKeeper.entitlements */,
+				514B884128E3873700B81198 /* Preview Content */,
+				51B42836290431A8007DF447 /* .swiftlint.yml */,
+			);
+			path = CareKeeper;
+			sourceTree = "<group>";
+		};
+		514B884128E3873700B81198 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				514B884228E3873700B81198 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		514B884E28E3875000B81198 /* CareKeeper Watch App */ = {
+			isa = PBXGroup;
+			children = (
+				5101151B28FF5B390009D7EC /* CareKeeper-Watch-App-Info.plist */,
+				5101151928FF57A70009D7EC /* CareKeeper Watch App.entitlements */,
+				514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */,
+				514B885328E3875100B81198 /* Assets.xcassets */,
+				514B885528E3875100B81198 /* Preview Content */,
+				5103A7A82918307B00F58FCE /* ComplicationController.swift */,
+				51F3EC542919EE39007F1F0F /* ImageFromText.swift */,
+				51A3257C296FE0C300DBF4BC /* CareeDetailView.swift */,
+			);
+			path = "CareKeeper Watch App";
+			sourceTree = "<group>";
+		};
+		514B885528E3875100B81198 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				514B885628E3875100B81198 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		518CB0CA292F219F00C60633 /* SwiftUI */ = {
+			isa = PBXGroup;
+			children = (
+				518CB0CB292F219F00C60633 /* ManagingSharesView.swift */,
+				518CB0CC292F219F00C60633 /* AddToExistingShareView.swift */,
+				518CB0CF292F219F00C60633 /* SharePickerView.swift */,
+				51ED92F72936B50400ED9526 /* CareeShareButton.swift */,
+				518CB0D3292F219F00C60633 /* ParticipantView.swift */,
+				518CB0D4292F219F00C60633 /* SwiftUIHelper.swift */,
+			);
+			path = SwiftUI;
+			sourceTree = "<group>";
+		};
+		518CB0EC292F21A900C60633 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				518CB0EE292F21A900C60633 /* CoreDataHelper.swift */,
+				518CB0F6292F21A900C60633 /* PersistenceController+Share.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		518CB109292F21BA00C60633 /* LICENSE1 */ = {
+			isa = PBXGroup;
+			children = (
+				518CB10A292F21BA00C60633 /* LICENSE1.txt */,
+			);
+			path = LICENSE1;
+			sourceTree = "<group>";
+		};
+		518CB10F292F277200C60633 /* Sharing */ = {
+			isa = PBXGroup;
+			children = (
+				518CB109292F21BA00C60633 /* LICENSE1 */,
+				518CB0EC292F21A900C60633 /* Persistence */,
+				518CB0CA292F219F00C60633 /* SwiftUI */,
+				518CB10D292F21ED00C60633 /* README.md */,
+			);
+			path = Sharing;
+			sourceTree = "<group>";
+		};
+		51AEC34F2914A58200C1DD5E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		51B9A0732E8E428200EFEA78 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				51B9A0722E8E428200EFEA78 /* CareKeeperV2App.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		51B9A0772E8E428200EFEA78 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				51B9A0742E8E428200EFEA78 /* Activity.swift */,
+				51B9A0752E8E428200EFEA78 /* ActivityType.swift */,
+				51B9A0762E8E428200EFEA78 /* Caree.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		51B9A07A2E8E428200EFEA78 /* Preview */ = {
+			isa = PBXGroup;
+			children = (
+				51B9A0782E8E428200EFEA78 /* PreviewContainer.swift */,
+				51B9A0792E8E428200EFEA78 /* PreviewData.swift */,
+			);
+			path = Preview;
+			sourceTree = "<group>";
+		};
+		51B9A07E2E8E428200EFEA78 /* Activity */ = {
+			isa = PBXGroup;
+			children = (
+				51B9A07B2E8E428200EFEA78 /* ActivityDetailView.swift */,
+				51B9A07C2E8E428200EFEA78 /* ActivityRowView.swift */,
+				51B9A07D2E8E428200EFEA78 /* TrackActivityView.swift */,
+			);
+			path = Activity;
+			sourceTree = "<group>";
+		};
+		51B9A0812E8E428200EFEA78 /* ActivityType */ = {
+			isa = PBXGroup;
+			children = (
+				51B9A07F2E8E428200EFEA78 /* ActivityTypeEditView.swift */,
+				51B9A0802E8E428200EFEA78 /* ActivityTypeRowView.swift */,
+			);
+			path = ActivityType;
+			sourceTree = "<group>";
+		};
+		51B9A0862E8E428200EFEA78 /* Caree */ = {
+			isa = PBXGroup;
+			children = (
+				51B9A0822E8E428200EFEA78 /* CareeDetailView.swift */,
+				51B9A0832E8E428200EFEA78 /* CareeEditView.swift */,
+				51B9A0842E8E428200EFEA78 /* CareeListRowView.swift */,
+				51B9A0852E8E428200EFEA78 /* CareeListView.swift */,
+			);
+			path = Caree;
+			sourceTree = "<group>";
+		};
+		51B9A0882E8E428200EFEA78 /* Sharing */ = {
+			isa = PBXGroup;
+			children = (
+				51B9A0872E8E428200EFEA78 /* SharingView.swift */,
+			);
+			path = Sharing;
+			sourceTree = "<group>";
+		};
+		51B9A08A2E8E428200EFEA78 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				51B9A07E2E8E428200EFEA78 /* Activity */,
+				51B9A0812E8E428200EFEA78 /* ActivityType */,
+				51B9A0862E8E428200EFEA78 /* Caree */,
+				51B9A0882E8E428200EFEA78 /* Sharing */,
+				51B9A0892E8E428200EFEA78 /* ContentView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		51B9A08B2E8E428200EFEA78 /* CareKeeperV2 */ = {
+			isa = PBXGroup;
+			children = (
+				51B9A0732E8E428200EFEA78 /* App */,
+				51B9A0772E8E428200EFEA78 /* Models */,
+				51B9A07A2E8E428200EFEA78 /* Preview */,
+				51B9A08A2E8E428200EFEA78 /* Views */,
+			);
+			path = CareKeeperV2;
+			sourceTree = "<group>";
+		};
+		51FB8E50292B0D55001BD62C /* PhotoPicker */ = {
+			isa = PBXGroup;
+			children = (
+				51FB8E51292B0D55001BD62C /* LICENSE2 */,
+				51FB8E55292B0D55001BD62C /* ProfileImage.swift */,
+				51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */,
+				51FB8E70292C55B1001BD62C /* ProfileImageModel+Photos.swift */,
+				51FB8E65292B270E001BD62C /* PhotoPickerCoordinator.swift */,
+				51FB8E67292B2DA4001BD62C /* FullImageView.swift */,
+				51FB8E64292B2128001BD62C /* README.md */,
+			);
+			path = PhotoPicker;
+			sourceTree = "<group>";
+		};
+		51FB8E51292B0D55001BD62C /* LICENSE2 */ = {
+			isa = PBXGroup;
+			children = (
+				51FB8E52292B0D55001BD62C /* LICENSE2.txt */,
+			);
+			path = LICENSE2;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		514B883128E3873500B81198 /* CareKeeper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 514B884628E3873700B81198 /* Build configuration list for PBXNativeTarget "CareKeeper" */;
+			buildPhases = (
+				514B882E28E3873500B81198 /* Sources */,
+				514B882F28E3873500B81198 /* Frameworks */,
+				514B883028E3873500B81198 /* Resources */,
+				51AEC3532914A58200C1DD5E /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				51AEC3522914A58200C1DD5E /* PBXTargetDependency */,
+			);
+			name = CareKeeper;
+			productName = CareKeeperCoreData;
+			productReference = 514B883228E3873500B81198 /* CareKeeper.app */;
+			productType = "com.apple.product-type.application";
+		};
+		514B884C28E3875000B81198 /* CareKeeper Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 514B885828E3875100B81198 /* Build configuration list for PBXNativeTarget "CareKeeper Watch App" */;
+			buildPhases = (
+				514B884928E3875000B81198 /* Sources */,
+				514B884A28E3875000B81198 /* Frameworks */,
+				514B884B28E3875000B81198 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CareKeeper Watch App";
+			productName = "CareKeeper Watch App";
+			productReference = 514B884D28E3875000B81198 /* CareKeeper Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		514B882A28E3873500B81198 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1400;
+				LastUpgradeCheck = 1410;
+				TargetAttributes = {
+					514B883128E3873500B81198 = {
+						CreatedOnToolsVersion = 14.0.1;
+					};
+					514B884C28E3875000B81198 = {
+						CreatedOnToolsVersion = 14.0.1;
+					};
+				};
+			};
+			buildConfigurationList = 514B882D28E3873500B81198 /* Build configuration list for PBXProject "CareKeeper" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 514B882928E3873500B81198;
+			productRefGroup = 514B883328E3873500B81198 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				514B883128E3873500B81198 /* CareKeeper */,
+				514B884C28E3875000B81198 /* CareKeeper Watch App */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		514B883028E3873500B81198 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				518CB10B292F21BA00C60633 /* LICENSE1.txt in Resources */,
+				51FB8E57292B0D55001BD62C /* LICENSE2.txt in Resources */,
+				514B884328E3873700B81198 /* Preview Assets.xcassets in Resources */,
+				514B883F28E3873700B81198 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		514B884B28E3875000B81198 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				518CB10C292F21BA00C60633 /* LICENSE1.txt in Resources */,
+				51FB8E58292B0D55001BD62C /* LICENSE2.txt in Resources */,
+				514B885728E3875100B81198 /* Preview Assets.xcassets in Resources */,
+				514B885428E3875100B81198 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		514B882E28E3873500B81198 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				51C5B9A6290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */,
+				518CB107292F21A900C60633 /* PersistenceController+Share.swift in Sources */,
+				518CB0D8292F219F00C60633 /* AddToExistingShareView.swift in Sources */,
+				514B883828E3873500B81198 /* Persistence.swift in Sources */,
+				51FB8E68292B2DA4001BD62C /* FullImageView.swift in Sources */,
+				51FB8E71292C55B1001BD62C /* ProfileImageModel+Photos.swift in Sources */,
+				51FB8E5D292B0D55001BD62C /* ProfileImage.swift in Sources */,
+				518CB0F9292F21A900C60633 /* CoreDataHelper.swift in Sources */,
+				518CB0E6292F219F00C60633 /* ParticipantView.swift in Sources */,
+				51ED92F82936B50400ED9526 /* CareeShareButton.swift in Sources */,
+				51FB8E66292B270E001BD62C /* PhotoPickerCoordinator.swift in Sources */,
+				518CB114293049F800C60633 /* Persistence+History.swift in Sources */,
+				51FB8E5F292B0D55001BD62C /* ProfileImageModel.swift in Sources */,
+				518CB0D6292F219F00C60633 /* ManagingSharesView.swift in Sources */,
+				518CB0E8292F219F00C60633 /* SwiftUIHelper.swift in Sources */,
+				5101151D2900D7E50009D7EC /* LocationController.swift in Sources */,
+				518CB0DE292F219F00C60633 /* SharePickerView.swift in Sources */,
+				A1B2C3D4E5F6789012345678 /* ErrorHandling.swift in Sources */,
+				C3D4E5F67890123456789AB2 /* ActiveSheet.swift in Sources */,
+				E5F67890123456789AB2C3D4 /* CoreDataEntities.swift in Sources */,
+				67890123456789AB2C3D4E5F /* CareKeeperApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		514B884928E3875000B81198 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				518CB0D9292F219F00C60633 /* AddToExistingShareView.swift in Sources */,
+				51FB8E60292B0D55001BD62C /* ProfileImageModel.swift in Sources */,
+				51C5B9A7290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */,
+				518CB0FA292F21A900C60633 /* CoreDataHelper.swift in Sources */,
+				518CB108292F21A900C60633 /* PersistenceController+Share.swift in Sources */,
+				51ED92F92936B50400ED9526 /* CareeShareButton.swift in Sources */,
+				518CB0D7292F219F00C60633 /* ManagingSharesView.swift in Sources */,
+				518CB0E9292F219F00C60633 /* SwiftUIHelper.swift in Sources */,
+				518CB0E7292F219F00C60633 /* ParticipantView.swift in Sources */,
+				514B888828E50E8800B81198 /* Persistence.swift in Sources */,
+				51F3EC552919EE39007F1F0F /* ImageFromText.swift in Sources */,
+				51FB8E5E292B0D55001BD62C /* ProfileImage.swift in Sources */,
+				51A3257D296FE0C300DBF4BC /* CareeDetailView.swift in Sources */,
+				514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */,
+				5101151E2900D7E50009D7EC /* LocationController.swift in Sources */,
+				518CB115293049F800C60633 /* Persistence+History.swift in Sources */,
+				518CB0DF292F219F00C60633 /* SharePickerView.swift in Sources */,
+				5103A7A92918307B00F58FCE /* ComplicationController.swift in Sources */,
+				B2C3D4E5F67890123456789A /* ErrorHandling.swift in Sources */,
+				D4E5F67890123456789AB2C3 /* ActiveSheet.swift in Sources */,
+				F67890123456789AB2C3D4E5 /* CoreDataEntities.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		51AEC3522914A58200C1DD5E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 514B884C28E3875000B81198 /* CareKeeper Watch App */;
+			targetProxy = 51AEC3512914A58200C1DD5E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		514B884428E3873700B81198 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		514B884528E3873700B81198 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		514B884728E3873700B81198 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CareKeeper/CareKeeper.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper/Preview Content\"";
+				DEVELOPMENT_TEAM = 8C7EB23ZZP;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CareKeeper/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		514B884828E3873700B81198 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CareKeeper/CareKeeper.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper/Preview Content\"";
+				DEVELOPMENT_TEAM = 8C7EB23ZZP;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CareKeeper/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		514B885928E3875100B81198 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "CareKeeper Watch App/CareKeeper Watch App.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = 8C7EB23ZZP;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "CareKeeper-Watch-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
+				INFOPLIST_KEY_CLKComplicationPrincipalClass = "$(PRODUCT_MODULE_NAME).ComplicationController";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Debug;
+		};
+		514B885A28E3875100B81198 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "CareKeeper Watch App/CareKeeper Watch App.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = 8C7EB23ZZP;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "CareKeeper-Watch-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
+				INFOPLIST_KEY_CLKComplicationPrincipalClass = "$(PRODUCT_MODULE_NAME).ComplicationController";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		514B882D28E3873500B81198 /* Build configuration list for PBXProject "CareKeeper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				514B884428E3873700B81198 /* Debug */,
+				514B884528E3873700B81198 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		514B884628E3873700B81198 /* Build configuration list for PBXNativeTarget "CareKeeper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				514B884728E3873700B81198 /* Debug */,
+				514B884828E3873700B81198 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		514B885828E3875100B81198 /* Build configuration list for PBXNativeTarget "CareKeeper Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				514B885928E3875100B81198 /* Debug */,
+				514B885A28E3875100B81198 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 514B882A28E3873500B81198 /* Project object */;
+}
