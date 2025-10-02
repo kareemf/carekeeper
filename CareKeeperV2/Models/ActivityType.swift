@@ -43,7 +43,10 @@ final class ActivityType {
 // MARK: - Computed Properties
 extension ActivityType {
     var displayIcon: String {
-        icon ?? "circle"
+        if let icon = icon, !icon.isEmpty {
+            return icon
+        }
+        return "" // Empty string instead of showing "circle" SF Symbol name
     }
     
     var recentActivities: [Activity] {

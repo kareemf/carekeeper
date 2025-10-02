@@ -1,67 +1,87 @@
 import SwiftUI
+import SwiftData
 
 struct ActivityDetailView: View {
     @Environment(\.dismiss) private var dismiss
-    let activity: Activity
-    
+    @Environment(\.modelContext) private var modelContext
+
+    let activityID: UUID
+    @Query private var allActivities: [Activity]
+
+    // Computed property to get the specific activity
+    private var activity: Activity? {
+        allActivities.first { $0.id == activityID }
+    }
+
     @State private var isEditing = false
     @State private var editingNotes: String = ""
     @State private var editingQuantity: String = ""
     @State private var editingDateTime: Date = Date()
+
+    init(activityID: UUID) {
+        self.activityID = activityID
+    }
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    headerSection
-                    detailsSection
-                    
-                    if activity.hasLocation {
-                        locationSection
-                    }
-                }
-                .padding()
-            }
-            .navigationTitle(activity.activityType?.name ?? NSLocalizedString("Activity", comment: "Activity title"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(NSLocalizedString("Done", comment: "Done button")) {
-                        dismiss()
-                    }
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if isEditing {
-                        Button(NSLocalizedString("Save", comment: "Save button")) {
-                            saveChanges()
+        Group {
+            if let activity = activity {
+                NavigationView {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 20) {
+                            headerSection(for: activity)
+                            detailsSection(for: activity)
+
+                            if activity.hasLocation {
+                                locationSection(for: activity)
+                            }
                         }
-                    } else {
-                        Button(NSLocalizedString("Edit", comment: "Edit button")) {
-                            startEditing()
+                        .padding()
+                    }
+                    .navigationTitle(activity.activityType?.name ?? NSLocalizedString("Activity", comment: "Activity title"))
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button(NSLocalizedString("Done", comment: "Done button")) {
+                                dismiss()
+                            }
+                        }
+
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            if isEditing {
+                                Button(NSLocalizedString("Save", comment: "Save button")) {
+                                    saveChanges(for: activity)
+                                }
+                            } else {
+                                Button(NSLocalizedString("Edit", comment: "Edit button")) {
+                                    startEditing(for: activity)
+                                }
+                            }
                         }
                     }
                 }
+                .onAppear {
+                    setupEditingValues(for: activity)
+                }
+            } else {
+                Text(NSLocalizedString("Activity not found", comment: "Activity not found message"))
+                    .foregroundColor(.secondary)
             }
-        }
-        .onAppear {
-            setupEditingValues()
         }
     }
     
-    private var headerSection: some View {
+    private func headerSection(for activity: Activity) -> some View {
         HStack {
             Text(activity.activityType?.displayIcon ?? "⭐")
                 .font(.system(size: 50))
-            
+
             VStack(alignment: .leading, spacing: 8) {
                 Text(activity.activityType?.name ?? NSLocalizedString("Unknown Activity", comment: "Unknown activity"))
                     .font(.title2)
                     .fontWeight(.medium)
-                
+
                 if isEditing {
-                    DatePicker(NSLocalizedString("When", comment: "Date picker label"), 
-                              selection: $editingDateTime, 
+                    DatePicker(NSLocalizedString("When", comment: "Date picker label"),
+                              selection: $editingDateTime,
                               displayedComponents: [.date, .hourAndMinute])
                 } else {
                     Text(activity.formattedDateTime)
@@ -69,20 +89,20 @@ struct ActivityDetailView: View {
                         .foregroundColor(.secondary)
                 }
             }
-            
+
             Spacer()
         }
     }
     
-    private var detailsSection: some View {
+    private func detailsSection(for activity: Activity) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             // Notes section
             VStack(alignment: .leading, spacing: 8) {
                 Text(NSLocalizedString("Notes", comment: "Notes section title"))
                     .font(.headline)
-                
+
                 if isEditing {
-                    TextField(NSLocalizedString("Add notes...", comment: "Notes placeholder"), 
+                    TextField(NSLocalizedString("Add notes...", comment: "Notes placeholder"),
                              text: $editingNotes, axis: .vertical)
                         .textFieldStyle(.roundedBorder)
                         .lineLimit(3...6)
@@ -98,20 +118,20 @@ struct ActivityDetailView: View {
                     }
                 }
             }
-            
+
             // Quantity section
             if activity.activityType?.hasQuantity == true {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(NSLocalizedString("Quantity", comment: "Quantity section title"))
                         .font(.headline)
-                    
+
                     if isEditing {
                         HStack {
-                            TextField(NSLocalizedString("Amount", comment: "Quantity placeholder"), 
+                            TextField(NSLocalizedString("Amount", comment: "Quantity placeholder"),
                                      text: $editingQuantity)
                                 .keyboardType(.decimalPad)
                                 .textFieldStyle(.roundedBorder)
-                            
+
                             if let unit = activity.activityType?.quantityUnit {
                                 Text(unit)
                                     .foregroundColor(.secondary)
@@ -134,52 +154,52 @@ struct ActivityDetailView: View {
     }
     
     @ViewBuilder
-    private var locationSection: some View {
+    private func locationSection(for activity: Activity) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(NSLocalizedString("Location", comment: "Location section title"))
                 .font(.headline)
-            
+
             if let location = activity.location {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(String(format: "%.6f, %.6f", 
-                               location.coordinate.latitude, 
+                    Text(String(format: "%.6f, %.6f",
+                               location.coordinate.latitude,
                                location.coordinate.longitude))
                         .font(.body)
                         .fontDesign(.monospaced)
-                    
+
                     Text(NSLocalizedString("Tap to view in Maps", comment: "Maps CTA"))
                         .font(.caption)
                         .foregroundColor(.accentColor)
                 }
                 .onTapGesture {
-                    openInMaps()
+                    openInMaps(for: activity)
                 }
             }
         }
     }
     
-    private func setupEditingValues() {
+    private func setupEditingValues(for activity: Activity) {
         editingNotes = activity.notes ?? ""
         editingQuantity = activity.quantity?.description ?? ""
         editingDateTime = activity.dateTime
     }
-    
-    private func startEditing() {
+
+    private func startEditing(for activity: Activity) {
         isEditing = true
-        setupEditingValues()
+        setupEditingValues(for: activity)
     }
-    
-    private func saveChanges() {
+
+    private func saveChanges(for activity: Activity) {
         activity.notes = editingNotes.isEmpty ? nil : editingNotes
         activity.quantity = Double(editingQuantity)
         activity.dateTime = editingDateTime
-        
+
         isEditing = false
     }
-    
-    private func openInMaps() {
+
+    private func openInMaps(for activity: Activity) {
         guard let location = activity.location else { return }
-        
+
         let url = URL(string: "http://maps.apple.com/?ll=\(location.coordinate.latitude),\(location.coordinate.longitude)")
         if let url = url {
             UIApplication.shared.open(url)
@@ -188,6 +208,6 @@ struct ActivityDetailView: View {
 }
 
 #Preview {
-    ActivityDetailView(activity: PreviewData.sampleActivity)
+    ActivityDetailView(activityID: PreviewData.sampleActivity.id)
         .modelContainer(PreviewContainer.shared)
 }

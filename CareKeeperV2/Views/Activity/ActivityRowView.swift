@@ -53,7 +53,7 @@ struct ActivityRowView: View {
             showingDetail = true
         }
         .sheet(isPresented: $showingDetail) {
-            ActivityDetailView(activity: activity)
+            ActivityDetailView(activityID: activity.id)
         }
     }
 }
