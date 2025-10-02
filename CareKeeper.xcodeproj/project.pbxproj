@@ -49,6 +49,7 @@
 		820E4069BB93603590C14498 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0E024D0D96F2261DFEDB12 /* Caree.swift */; };
 		868F2E55E09757F642875784 /* ParticipantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7265D0CA032A26F123C51F15 /* ParticipantView.swift */; };
 		87C2738F0624C7BAFEF7BB2F /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40792041A2DC1BDA880278A8 /* PreviewData.swift */; };
+		899DACF0637249F2AFC2F43D /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7B99A534A6E1F1B10F21E7 /* AppError.swift */; };
 		8F3C861246A79EB64BBF0DEF /* ProfileImageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF732E629FEA74BD457BFBB8 /* ProfileImageModel.swift */; };
 		90E2DD04B3EC997C91C95CE1 /* AddToExistingShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29DD278F648AC6ECC36DB9F3 /* AddToExistingShareView.swift */; };
 		93F76C9E85CEEFFF5DA3A4BA /* SharePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22238868F63435B855D04FA8 /* SharePickerView.swift */; };
@@ -76,6 +77,8 @@
 		E77FEDB47486C7901244812E /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B891A79098EB2F885B7EE8C3 /* ActivityType.swift */; };
 		EA33E703003CFE89F512D9FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D341BBBC8A307763AE849260 /* Assets.xcassets */; };
 		ECA3B98C70D9456D33FBE1CC /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0079CA022C03600548BC3C79 /* ErrorHandling.swift */; };
+		EDD259508C70C163E93CFBCD /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7B99A534A6E1F1B10F21E7 /* AppError.swift */; };
+		EFB1307079F88ABF2A64293D /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F76D243061A40A8C87C86C5 /* ErrorAlert.swift */; };
 		F03D95A5CC1DC29FFEEC1BDF /* TrackActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8112617D9FA97E8E677035 /* TrackActivityView.swift */; };
 		F0703D9851B796CC4296791D /* ManagingSharesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D54F26D0B59C422EB19A19 /* ManagingSharesView.swift */; };
 		F2DF86428CBEB7EFA932ABEE /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8187C52A135E5A9456DAF /* CareeDetailView.swift */; };
@@ -174,9 +177,11 @@
 		8687F3F7995864074BA7FC62 /* PreviewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewContainer.swift; sourceTree = "<group>"; };
 		88D9EC2B1F9A2FB0F13364A2 /* CareKeeper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CareKeeper.entitlements; sourceTree = "<group>"; };
 		8929A24685E0D06AF3CCA78C /* ActivityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTests.swift; sourceTree = "<group>"; };
+		8B7B99A534A6E1F1B10F21E7 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		8DD708C0FABD1B3D66E8E9A9 /* ActiveSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSheet.swift; sourceTree = "<group>"; };
 		964019F6C108B3350E5D98A6 /* ProfileImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImage.swift; sourceTree = "<group>"; };
 		9BDD832C3A966D99072E15C8 /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
+		9F76D243061A40A8C87C86C5 /* ErrorAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorAlert.swift; sourceTree = "<group>"; };
 		A0D54F26D0B59C422EB19A19 /* ManagingSharesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagingSharesView.swift; sourceTree = "<group>"; };
 		A69987D453D2359155BFFFEE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A81DFDF2739935BF8FAA685F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -305,6 +310,14 @@
 			path = "CareKeeper Watch App";
 			sourceTree = "<group>";
 		};
+		41B924BF4890EFA1CF40A113 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				9F76D243061A40A8C87C86C5 /* ErrorAlert.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
 		4825DDA580BC3F4A142314C3 /* LICENSE2 */ = {
 			isa = PBXGroup;
 			children = (
@@ -340,6 +353,7 @@
 				C9322D90ADFDD08382676A25 /* Activity */,
 				2D0BD90839CB2F8F2A4A2340 /* ActivityType */,
 				746F5E18FE4455DE2068C0D0 /* Caree */,
+				41B924BF4890EFA1CF40A113 /* Components */,
 				FAD2DDF8F4A2B698D8DEDF10 /* Sharing */,
 			);
 			path = Views;
@@ -467,6 +481,7 @@
 		F48C9222BE4BF9F9C1E6FC84 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				8B7B99A534A6E1F1B10F21E7 /* AppError.swift */,
 				E9E5F89CB58DAA1911ACE334 /* LocationManager.swift */,
 			);
 			path = Services;
@@ -752,6 +767,7 @@
 				9D3271D9F2AA1666EF52B2C0 /* Activity.swift in Sources */,
 				1E3CF0C5E578D3A385F58BEC /* ActivityDetailView.swift in Sources */,
 				E77FEDB47486C7901244812E /* ActivityType.swift in Sources */,
+				899DACF0637249F2AFC2F43D /* AppError.swift in Sources */,
 				2AE30C11E64B40CE43C397EC /* CareKeeperV2WatchApp.swift in Sources */,
 				820E4069BB93603590C14498 /* Caree.swift in Sources */,
 				F2DF86428CBEB7EFA932ABEE /* CareeDetailView.swift in Sources */,
@@ -774,6 +790,7 @@
 				0581540E5C21709255EC0B4C /* ActivityType.swift in Sources */,
 				F4BB352FA5DDC45AA1324D51 /* ActivityTypeEditView.swift in Sources */,
 				AE2D0DC285908FAA9D1D1F89 /* ActivityTypeRowView.swift in Sources */,
+				EDD259508C70C163E93CFBCD /* AppError.swift in Sources */,
 				F9D1603943AAC5BC7FF298D3 /* CareKeeperV2App.swift in Sources */,
 				CE611BA043D64709EAC21138 /* Caree.swift in Sources */,
 				D7A6752318BB0C8EFF5EEF0D /* CareeDetailView.swift in Sources */,
@@ -781,6 +798,7 @@
 				19F506A7D3A3551BDC63A94B /* CareeListRowView.swift in Sources */,
 				401B3BAF4C0A5BE53876C494 /* CareeListView.swift in Sources */,
 				048ADB4D38C8A311F7089D0A /* ContentView.swift in Sources */,
+				EFB1307079F88ABF2A64293D /* ErrorAlert.swift in Sources */,
 				390EBE4554F93E93EB6668EE /* LocationManager.swift in Sources */,
 				95EA4C6E3C1B7F304EAED088 /* PreviewContainer.swift in Sources */,
 				87C2738F0624C7BAFEF7BB2F /* PreviewData.swift in Sources */,

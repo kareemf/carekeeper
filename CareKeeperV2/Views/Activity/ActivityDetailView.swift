@@ -18,6 +18,7 @@ struct ActivityDetailView: View {
     @State private var editingQuantity: String = ""
     @State private var editingDateTime: Date = Date()
     @State private var showingDeleteConfirmation = false
+    @State private var error: Error?
 
     init(activityID: UUID) {
         self.activityID = activityID
@@ -95,6 +96,7 @@ struct ActivityDetailView: View {
                     .foregroundColor(.secondary)
             }
         }
+        .errorAlert($error)
     }
     
     private func headerSection(for activity: Activity) -> some View {
@@ -241,7 +243,7 @@ struct ActivityDetailView: View {
             try modelContext.save()
             dismiss()
         } catch {
-            print("⚠️ Failed to delete activity: \(error)")
+            self.error = AppError.deleteFailed(error.localizedDescription)
         }
     }
 }

@@ -14,6 +14,7 @@ struct ActivityListView: View {
 
     @State private var selectedActivityType: ActivityType?
     @State private var showingFilterMenu = false
+    @State private var error: Error?
 
     init(careeID: UUID) {
         self.careeID = careeID
@@ -76,6 +77,7 @@ struct ActivityListView: View {
                     .foregroundColor(.secondary)
             }
         }
+        .errorAlert($error)
     }
 
     private var emptyStateView: some View {
@@ -124,7 +126,7 @@ struct ActivityListView: View {
         do {
             try modelContext.save()
         } catch {
-            print("⚠️ Failed to delete activity: \(error)")
+            self.error = AppError.deleteFailed(error.localizedDescription)
         }
     }
 }
