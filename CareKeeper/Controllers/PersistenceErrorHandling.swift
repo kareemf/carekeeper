@@ -10,7 +10,7 @@ struct PersistenceErrorHandlingAlertViewModifier: ViewModifier {
             // other .alert modifiers inside of content would not work anymore
             .background(
                 EmptyView()
-                    .alert(item: .constant(persistenceController.errorHandling.currentAlert)) { currentAlert in
+                    .alert(item: .constant(persistenceController.errorHandling.currentAlert)) { (currentAlert: ErrorAlert) in
                         Alert(
                             title: Text("Error"),
                             message: Text(currentAlert.message),
