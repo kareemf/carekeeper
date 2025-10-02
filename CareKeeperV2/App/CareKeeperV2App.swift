@@ -11,9 +11,11 @@ struct CareKeeperV2App: App {
         ])
 
         // Start with local storage only - CloudKit sync will be added in Phase 2
+        // Use app group to share data with watchOS
         let modelConfiguration = ModelConfiguration(
             schema: schema,
-            isStoredInMemoryOnly: false
+            isStoredInMemoryOnly: false,
+            groupContainer: .identifier("group.com.kareemf.CareKeeper")
         )
 
         do {

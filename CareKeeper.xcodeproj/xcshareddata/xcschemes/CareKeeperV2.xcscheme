@@ -21,6 +21,20 @@
                ReferencedContainer = "container:CareKeeper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "CDBD9A71E6A9D897B8CF6186"
+               BuildableName = "CareKeeperV2 Watch App.app"
+               BlueprintName = "CareKeeperV2 Watch App"
+               ReferencedContainer = "container:CareKeeper.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

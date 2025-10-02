@@ -14,12 +14,16 @@
 		0B7E78423B30517254F92DC9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D56064A0416085AD5C7749D0 /* Preview Assets.xcassets */; };
 		19F506A7D3A3551BDC63A94B /* CareeListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705AB44FD17075847F5967A1 /* CareeListRowView.swift */; };
 		2044087946A057C720062B59 /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31948962CFC6379850CD7DFF /* ComplicationController.swift */; };
+		27FA247EAD48C2EBF0A87C80 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B1CD125EDB7D626B6E51DC9 /* Assets.xcassets */; };
+		2A8B596F5D72FC49CD074884 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A69987D453D2359155BFFFEE /* Preview Assets.xcassets */; };
 		2AD302DA8DF4E5325B987212 /* CareKeeper Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2AE30C11E64B40CE43C397EC /* CareKeeperV2WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5394A28349D2536DACEC55AD /* CareKeeperV2WatchApp.swift */; };
 		2AE6F0B5667E58000BF31695 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A8D35563F0827622269172EA /* Assets.xcassets */; };
 		2C12A06E594777FE5198E802 /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0FF56E7DC356EFD46084A8 /* CareeDetailView.swift */; };
 		2C767CF4BAC4785ED75ACB8B /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A7DC7DAE5761427EEDECF7 /* ActivityDetailView.swift */; };
 		3033A5968D83187001982DEE /* LICENSE1.txt in Resources */ = {isa = PBXBuildFile; fileRef = BEC44D40EB9CC1E64C437FCD /* LICENSE1.txt */; };
 		3177C9877FB9B354EB2CA846 /* ActivityRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48E2E1E92765420A15B8C96E /* ActivityRowView.swift */; };
+		390EBE4554F93E93EB6668EE /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E5F89CB58DAA1911ACE334 /* LocationManager.swift */; };
 		3DD65D8FA8C262DE08388010 /* CareKeeperWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EEB68E99A36144D80736247 /* CareKeeperWatchApp.swift */; };
 		401B3BAF4C0A5BE53876C494 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D570E01BB9E019E67E3A94C9 /* CareeListView.swift */; };
 		4112460D2B9B18A4E476CE86 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DEDD278DF064D85B39264A /* Persistence.swift */; };
@@ -27,12 +31,16 @@
 		434622AA3466F621B68791A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E16FBE8C16D3C0D2B5A0DD7F /* Assets.xcassets */; };
 		49FF82EC93435404D90A81AB /* CareKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 255BBC825C014353B28F7535 /* CareKeeperApp.swift */; };
 		4A1A325580413B98328D89A5 /* ActiveSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD708C0FABD1B3D66E8E9A9 /* ActiveSheet.swift */; };
+		4A6F4BC427D6A44E957EF9CE /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264CD9E2FB06C5E7AA16A887 /* CareeListView.swift */; };
 		5119FE50D16B690D2C25DC2B /* SharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4BC9A5CC8DF0E6A53D7373C /* SharingView.swift */; };
 		5B17A7DF45E7C2230F878709 /* ImageFromText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B270AE3B9967B028C752A756 /* ImageFromText.swift */; };
 		6128E06996359F16384D0142 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 22B9297F373BA7714C369647 /* README.md */; };
 		62F14F0758A0E89A9157B09A /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6976693A5E69E76A8B8618C8 /* PersistenceErrorHandling.swift */; };
+		6DE89BDF18F7D4A5901C2350 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E5F89CB58DAA1911ACE334 /* LocationManager.swift */; };
+		71A1F9F6F2A93552AF2973BF /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40792041A2DC1BDA880278A8 /* PreviewData.swift */; };
 		7EFA480D633F676FB7425E56 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 16D4F822B7FDC13F5F0C9C00 /* README.md */; };
 		805AB8CA18C75280907BB24A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FD4EE14A1A83C8E2F7FC6687 /* Preview Assets.xcassets */; };
+		820E4069BB93603590C14498 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0E024D0D96F2261DFEDB12 /* Caree.swift */; };
 		868F2E55E09757F642875784 /* ParticipantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7265D0CA032A26F123C51F15 /* ParticipantView.swift */; };
 		87C2738F0624C7BAFEF7BB2F /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40792041A2DC1BDA880278A8 /* PreviewData.swift */; };
 		8F3C861246A79EB64BBF0DEF /* ProfileImageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF732E629FEA74BD457BFBB8 /* ProfileImageModel.swift */; };
@@ -40,6 +48,7 @@
 		93F76C9E85CEEFFF5DA3A4BA /* SharePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22238868F63435B855D04FA8 /* SharePickerView.swift */; };
 		95EA4C6E3C1B7F304EAED088 /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8687F3F7995864074BA7FC62 /* PreviewContainer.swift */; };
 		9B8389689C3D15979366B955 /* PersistenceController+Share.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FBE4BD356F9BFE3D7C5C260 /* PersistenceController+Share.swift */; };
+		9D3271D9F2AA1666EF52B2C0 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B379F85DC676CFD654FBE7 /* Activity.swift */; };
 		9DD1F4DF60DBDDB6166E2DC7 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B379F85DC676CFD654FBE7 /* Activity.swift */; };
 		A4D1FC41604F205388B16F28 /* CareeEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D92530A8EA9D7FED7C0414EA /* CareeEditView.swift */; };
 		AB9C036BE3DCD0669C4EAEAF /* LocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7E31CCDFC087A12FD190ED0 /* LocationController.swift */; };
@@ -53,10 +62,16 @@
 		D6B1A4440C79CE30B09336DC /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964019F6C108B3350E5D98A6 /* ProfileImage.swift */; };
 		D7A6752318BB0C8EFF5EEF0D /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BDD832C3A966D99072E15C8 /* CareeDetailView.swift */; };
 		D98374EF6E3277E116588C09 /* Persistence+History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2071D27F8F2ACE827F0AB0B8 /* Persistence+History.swift */; };
+		DC3D255CFB44AD9F3C39DB76 /* CareKeeperV2 Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 85161FD61189C644DC863547 /* CareKeeperV2 Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E06B226350D1699A29BB67F7 /* LICENSE2.txt in Resources */ = {isa = PBXBuildFile; fileRef = DDE013807F370265BF04A643 /* LICENSE2.txt */; };
+		E4CD10AECA514C023A31B0B6 /* TrackActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B090F6CCCD5E8D95521DCD /* TrackActivityView.swift */; };
+		E77FEDB47486C7901244812E /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B891A79098EB2F885B7EE8C3 /* ActivityType.swift */; };
+		EA33E703003CFE89F512D9FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D341BBBC8A307763AE849260 /* Assets.xcassets */; };
 		ECA3B98C70D9456D33FBE1CC /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0079CA022C03600548BC3C79 /* ErrorHandling.swift */; };
 		F03D95A5CC1DC29FFEEC1BDF /* TrackActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8112617D9FA97E8E677035 /* TrackActivityView.swift */; };
 		F0703D9851B796CC4296791D /* ManagingSharesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D54F26D0B59C422EB19A19 /* ManagingSharesView.swift */; };
+		F2DF86428CBEB7EFA932ABEE /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8187C52A135E5A9456DAF /* CareeDetailView.swift */; };
+		F3BAF1DDC8B16FC2A9FD150D /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8687F3F7995864074BA7FC62 /* PreviewContainer.swift */; };
 		F4BB352FA5DDC45AA1324D51 /* ActivityTypeEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A6D88ECF96D344D93D6FBBF /* ActivityTypeEditView.swift */; };
 		F9D1603943AAC5BC7FF298D3 /* CareKeeperV2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F7245C4875E7F8AF42ADA25 /* CareKeeperV2App.swift */; };
 /* End PBXBuildFile section */
@@ -69,6 +84,13 @@
 			remoteGlobalIDString = D33AEF414D4813AD6FD4E498;
 			remoteInfo = "CareKeeper Watch App";
 		};
+		EA57768CF393C4EE708D8305 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D73F9B8A4F010D7EC1AB2F1E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CDBD9A71E6A9D897B8CF6186;
+			remoteInfo = "CareKeeperV2 Watch App";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -79,6 +101,17 @@
 			dstSubfolderSpec = 16;
 			files = (
 				2AD302DA8DF4E5325B987212 /* CareKeeper Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8822F6FCF45F9E879740653 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				DC3D255CFB44AD9F3C39DB76 /* CareKeeperV2 Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -97,6 +130,7 @@
 		22238868F63435B855D04FA8 /* SharePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharePickerView.swift; sourceTree = "<group>"; };
 		22B9297F373BA7714C369647 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		255BBC825C014353B28F7535 /* CareKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperApp.swift; sourceTree = "<group>"; };
+		264CD9E2FB06C5E7AA16A887 /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
 		29DD278F648AC6ECC36DB9F3 /* AddToExistingShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToExistingShareView.swift; sourceTree = "<group>"; };
 		2A6D88ECF96D344D93D6FBBF /* ActivityTypeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeEditView.swift; sourceTree = "<group>"; };
 		2EEB68E99A36144D80736247 /* CareKeeperWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWatchApp.swift; sourceTree = "<group>"; };
@@ -107,12 +141,16 @@
 		40792041A2DC1BDA880278A8 /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
 		44DEDD278DF064D85B39264A /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		48E2E1E92765420A15B8C96E /* ActivityRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRowView.swift; sourceTree = "<group>"; };
+		5394A28349D2536DACEC55AD /* CareKeeperV2WatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperV2WatchApp.swift; sourceTree = "<group>"; };
 		55B817EC7B2594E7047F4B99 /* ActivityTypeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeRowView.swift; sourceTree = "<group>"; };
 		68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CareKeeper Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6976693A5E69E76A8B8618C8 /* PersistenceErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceErrorHandling.swift; sourceTree = "<group>"; };
+		6B1CD125EDB7D626B6E51DC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		705AB44FD17075847F5967A1 /* CareeListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListRowView.swift; sourceTree = "<group>"; };
 		7265D0CA032A26F123C51F15 /* ParticipantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantView.swift; sourceTree = "<group>"; };
 		75FD9086FF163E6E1AECC486 /* CoreDataCloudKitShare.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataCloudKitShare.xcdatamodel; sourceTree = "<group>"; };
+		80C8187C52A135E5A9456DAF /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
+		85161FD61189C644DC863547 /* CareKeeperV2 Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CareKeeperV2 Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8536D04113B55B9A3A78A61A /* CoreDataHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataHelper.swift; sourceTree = "<group>"; };
 		85E9FE0D93FA7DAC0747FF2C /* CareKeeper.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CareKeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8687F3F7995864074BA7FC62 /* PreviewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewContainer.swift; sourceTree = "<group>"; };
@@ -121,7 +159,9 @@
 		964019F6C108B3350E5D98A6 /* ProfileImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImage.swift; sourceTree = "<group>"; };
 		9BDD832C3A966D99072E15C8 /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
 		A0D54F26D0B59C422EB19A19 /* ManagingSharesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagingSharesView.swift; sourceTree = "<group>"; };
+		A69987D453D2359155BFFFEE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A81DFDF2739935BF8FAA685F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		A8B090F6CCCD5E8D95521DCD /* TrackActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackActivityView.swift; sourceTree = "<group>"; };
 		A8D35563F0827622269172EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A9A7DC7DAE5761427EEDECF7 /* ActivityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailView.swift; sourceTree = "<group>"; };
 		AA0FF56E7DC356EFD46084A8 /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
@@ -131,7 +171,9 @@
 		B891A79098EB2F885B7EE8C3 /* ActivityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityType.swift; sourceTree = "<group>"; };
 		BEC44D40EB9CC1E64C437FCD /* LICENSE1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE1.txt; sourceTree = "<group>"; };
 		C4BC9A5CC8DF0E6A53D7373C /* SharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingView.swift; sourceTree = "<group>"; };
+		C9E016748886279F33CFECD3 /* CareKeeperV2 Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeperV2 Watch App.entitlements"; sourceTree = "<group>"; };
 		CF732E629FEA74BD457BFBB8 /* ProfileImageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImageModel.swift; sourceTree = "<group>"; };
+		D341BBBC8A307763AE849260 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D56064A0416085AD5C7749D0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		D570E01BB9E019E67E3A94C9 /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
 		D665D6FCFCDD05576A713B0A /* CoreDataEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEntities.swift; sourceTree = "<group>"; };
@@ -140,6 +182,7 @@
 		DDE013807F370265BF04A643 /* LICENSE2.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE2.txt; sourceTree = "<group>"; };
 		E16FBE8C16D3C0D2B5A0DD7F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E83FE980E7622F5F01EFA1CC /* PhotoPickerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerCoordinator.swift; sourceTree = "<group>"; };
+		E9E5F89CB58DAA1911ACE334 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		F12E00F40EFFE5A1C8CCC245 /* FullImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullImageView.swift; sourceTree = "<group>"; };
 		F7E31CCDFC087A12FD190ED0 /* LocationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationController.swift; sourceTree = "<group>"; };
 		F9B379F85DC676CFD654FBE7 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
@@ -148,6 +191,24 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		03E57D925EAA465A1F27B15C /* App */ = {
+			isa = PBXGroup;
+			children = (
+				5394A28349D2536DACEC55AD /* CareKeeperV2WatchApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		14DA52296EF70487C40E5C0C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				80C8187C52A135E5A9456DAF /* CareeDetailView.swift */,
+				264CD9E2FB06C5E7AA16A887 /* CareeListView.swift */,
+				A8B090F6CCCD5E8D95521DCD /* TrackActivityView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		1CFAEB2EAC2EC9C2337A7ADD /* PhotoPicker */ = {
 			isa = PBXGroup;
 			children = (
@@ -225,9 +286,18 @@
 			children = (
 				68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */,
 				85E9FE0D93FA7DAC0747FF2C /* CareKeeper.app */,
+				85161FD61189C644DC863547 /* CareKeeperV2 Watch App.app */,
 				05FE31454AB58301B0B745F0 /* CareKeeperV2.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		54E9EF6476C95ECDEE618EB7 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				A69987D453D2359155BFFFEE /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 		5AE0926FBD848299AE2E20FF /* Views */ = {
@@ -248,6 +318,7 @@
 				364945D556AA0A317E9737E9 /* CareKeeper */,
 				3FE913D039CAB64DB537CB03 /* CareKeeper Watch App */,
 				E7BA0075BE818C29A778C260 /* CareKeeperV2 */,
+				8D80FA2755D541A3D9379FFC /* CareKeeperV2 Watch App */,
 				4F693B2665B385AFBE2F92C7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -271,6 +342,17 @@
 				6976693A5E69E76A8B8618C8 /* PersistenceErrorHandling.swift */,
 			);
 			path = Controllers;
+			sourceTree = "<group>";
+		};
+		8D80FA2755D541A3D9379FFC /* CareKeeperV2 Watch App */ = {
+			isa = PBXGroup;
+			children = (
+				6B1CD125EDB7D626B6E51DC9 /* Assets.xcassets */,
+				C9E016748886279F33CFECD3 /* CareKeeperV2 Watch App.entitlements */,
+				03E57D925EAA465A1F27B15C /* App */,
+				14DA52296EF70487C40E5C0C /* Views */,
+			);
+			path = "CareKeeperV2 Watch App";
 			sourceTree = "<group>";
 		};
 		AB6EEAEDDFA4446044B5CC5E /* Preview */ = {
@@ -334,14 +416,25 @@
 		E7BA0075BE818C29A778C260 /* CareKeeperV2 */ = {
 			isa = PBXGroup;
 			children = (
+				D341BBBC8A307763AE849260 /* Assets.xcassets */,
 				AFA0B244053244763E644EDB /* CareKeeperV2.entitlements */,
 				3658F15B57408C93FEFBDD57 /* Info.plist */,
 				F94ECE7EA8EC4B5CA4B73443 /* App */,
 				F7B1635295465A23398351D8 /* Models */,
 				AB6EEAEDDFA4446044B5CC5E /* Preview */,
+				54E9EF6476C95ECDEE618EB7 /* Preview Content */,
+				F48C9222BE4BF9F9C1E6FC84 /* Services */,
 				5AE0926FBD848299AE2E20FF /* Views */,
 			);
 			path = CareKeeperV2;
+			sourceTree = "<group>";
+		};
+		F48C9222BE4BF9F9C1E6FC84 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				E9E5F89CB58DAA1911ACE334 /* LocationManager.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		F7B1635295465A23398351D8 /* Models */ = {
@@ -389,10 +482,13 @@
 			buildConfigurationList = D4D8DA5FEFFEB4FED359BA0D /* Build configuration list for PBXNativeTarget "CareKeeperV2" */;
 			buildPhases = (
 				D86BC807B8BE8260B402EABB /* Sources */,
+				9266356F82D02DD8C0182568 /* Resources */,
+				E8822F6FCF45F9E879740653 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				406EC9BD8E0AE7AF4824FFE8 /* PBXTargetDependency */,
 			);
 			name = CareKeeperV2;
 			packageProductDependencies = (
@@ -419,6 +515,24 @@
 			);
 			productName = CareKeeper;
 			productReference = 85E9FE0D93FA7DAC0747FF2C /* CareKeeper.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CDBD9A71E6A9D897B8CF6186 /* CareKeeperV2 Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F1DFA9366F7FF2D842568CCF /* Build configuration list for PBXNativeTarget "CareKeeperV2 Watch App" */;
+			buildPhases = (
+				76716F9A703B84D313132845 /* Sources */,
+				7FD22D38A641A10EFCA14CF4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CareKeeperV2 Watch App";
+			packageProductDependencies = (
+			);
+			productName = "CareKeeperV2 Watch App";
+			productReference = 85161FD61189C644DC863547 /* CareKeeperV2 Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 		D33AEF414D4813AD6FD4E498 /* CareKeeper Watch App */ = {
@@ -456,6 +570,10 @@
 						DevelopmentTeam = 8C7EB23ZZP;
 						ProvisioningStyle = Automatic;
 					};
+					CDBD9A71E6A9D897B8CF6186 = {
+						DevelopmentTeam = 8C7EB23ZZP;
+						ProvisioningStyle = Automatic;
+					};
 					D33AEF414D4813AD6FD4E498 = {
 						DevelopmentTeam = 8C7EB23ZZP;
 						ProvisioningStyle = Automatic;
@@ -479,6 +597,7 @@
 				731CFBEA9FF41BE516075846 /* CareKeeper */,
 				D33AEF414D4813AD6FD4E498 /* CareKeeper Watch App */,
 				5864BADE6AABF03AA09BCA6D /* CareKeeperV2 */,
+				CDBD9A71E6A9D897B8CF6186 /* CareKeeperV2 Watch App */,
 			);
 		};
 /* End PBXProject section */
@@ -503,6 +622,23 @@
 			files = (
 				2AE6F0B5667E58000BF31695 /* Assets.xcassets in Resources */,
 				805AB8CA18C75280907BB24A /* Preview Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7FD22D38A641A10EFCA14CF4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				27FA247EAD48C2EBF0A87C80 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9266356F82D02DD8C0182568 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA33E703003CFE89F512D9FB /* Assets.xcassets in Resources */,
+				2A8B596F5D72FC49CD074884 /* Preview Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -538,6 +674,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		76716F9A703B84D313132845 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9D3271D9F2AA1666EF52B2C0 /* Activity.swift in Sources */,
+				E77FEDB47486C7901244812E /* ActivityType.swift in Sources */,
+				2AE30C11E64B40CE43C397EC /* CareKeeperV2WatchApp.swift in Sources */,
+				820E4069BB93603590C14498 /* Caree.swift in Sources */,
+				F2DF86428CBEB7EFA932ABEE /* CareeDetailView.swift in Sources */,
+				4A6F4BC427D6A44E957EF9CE /* CareeListView.swift in Sources */,
+				6DE89BDF18F7D4A5901C2350 /* LocationManager.swift in Sources */,
+				F3BAF1DDC8B16FC2A9FD150D /* PreviewContainer.swift in Sources */,
+				71A1F9F6F2A93552AF2973BF /* PreviewData.swift in Sources */,
+				E4CD10AECA514C023A31B0B6 /* TrackActivityView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D86BC807B8BE8260B402EABB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -555,6 +708,7 @@
 				19F506A7D3A3551BDC63A94B /* CareeListRowView.swift in Sources */,
 				401B3BAF4C0A5BE53876C494 /* CareeListView.swift in Sources */,
 				048ADB4D38C8A311F7089D0A /* ContentView.swift in Sources */,
+				390EBE4554F93E93EB6668EE /* LocationManager.swift in Sources */,
 				95EA4C6E3C1B7F304EAED088 /* PreviewContainer.swift in Sources */,
 				87C2738F0624C7BAFEF7BB2F /* PreviewData.swift in Sources */,
 				5119FE50D16B690D2C25DC2B /* SharingView.swift in Sources */,
@@ -576,6 +730,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		406EC9BD8E0AE7AF4824FFE8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CDBD9A71E6A9D897B8CF6186 /* CareKeeperV2 Watch App */;
+			targetProxy = EA57768CF393C4EE708D8305 /* PBXContainerItemProxy */;
+		};
 		43D1278FF4944D57EE14C36E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = D33AEF414D4813AD6FD4E498 /* CareKeeper Watch App */;
@@ -674,6 +833,28 @@
 			};
 			name = Release;
 		};
+		2A342F44C7819B681018AE58 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "CareKeeperV2 Watch App/CareKeeperV2 Watch App.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperV2 Watch App/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "CareKeeperV2-Watch-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "CareKeeper v2";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types.";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeperV2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperV2.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
 		70585D3C1F7B71E83D62AE29 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -722,6 +903,28 @@
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		8C9282DF06479343A17B9AAF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "CareKeeperV2 Watch App/CareKeeperV2 Watch App.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperV2 Watch App/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "CareKeeperV2-Watch-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "CareKeeper v2";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types.";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeperV2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperV2.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
 		};
@@ -894,6 +1097,15 @@
 			buildConfigurations = (
 				D4E999FFE68FD754BBDF64FB /* Debug */,
 				2804E2B10087B0D1E693F6AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F1DFA9366F7FF2D842568CCF /* Build configuration list for PBXNativeTarget "CareKeeperV2 Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2A342F44C7819B681018AE58 /* Debug */,
+				8C9282DF06479343A17B9AAF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

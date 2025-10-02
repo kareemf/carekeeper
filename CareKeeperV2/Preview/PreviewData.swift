@@ -173,15 +173,20 @@ struct PreviewData {
     }()
     
     private static func createSampleImageData() -> Data? {
+        #if os(iOS)
         // Create a simple colored circle as sample image data
         let size = CGSize(width: 100, height: 100)
         let renderer = UIGraphicsImageRenderer(size: size)
-        
+
         let image = renderer.image { context in
             context.cgContext.setFillColor(UIColor.systemBlue.cgColor)
             context.cgContext.fillEllipse(in: CGRect(origin: .zero, size: size))
         }
-        
+
         return image.pngData()
+        #else
+        // watchOS doesn't support UIGraphicsImageRenderer
+        return nil
+        #endif
     }
 }

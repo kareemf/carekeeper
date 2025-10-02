@@ -4,15 +4,16 @@ import CoreLocation
 struct TrackActivityView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    
+
     let caree: Caree
-    
+
     @State private var selectedActivityType: ActivityType?
     @State private var notes: String = ""
     @State private var quantity: String = ""
     @State private var customDateTime: Date = Date()
     @State private var useCustomTime: Bool = false
-    @State private var currentLocation: CLLocation?
+    @State private var includeLocation: Bool = false
+    @StateObject private var locationManager = LocationManager()
     
     private var sortedActivityTypes: [ActivityType] {
         caree.sortedActivityTypes
@@ -117,39 +118,52 @@ struct TrackActivityView: View {
     private var locationSection: some View {
         if selectedActivityType?.hasLocation == true {
             Section(NSLocalizedString("Location", comment: "Location section title")) {
-                if let location = currentLocation {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(NSLocalizedString("Current location", comment: "Current location label"))
-                            .font(.subheadline)
-                        
-                        Text(String(format: "%.6f, %.6f", location.coordinate.latitude, location.coordinate.longitude))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                Toggle(NSLocalizedString("Include Location", comment: "Location toggle"), isOn: $includeLocation)
+                    .onChange(of: includeLocation) { _, newValue in
+                        if newValue {
+                            locationManager.requestLocation()
+                        } else {
+                            locationManager.stopUpdating()
+                        }
                     }
-                } else {
-                    Text(NSLocalizedString("Getting location...", comment: "Getting location message"))
-                        .foregroundColor(.secondary)
+
+                if includeLocation {
+                    if let location = locationManager.location {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(NSLocalizedString("Current location", comment: "Current location label"))
+                                .font(.subheadline)
+
+                            Text(String(format: "%.6f, %.6f", location.coordinate.latitude, location.coordinate.longitude))
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .fontDesign(.monospaced)
+                        }
+                    } else {
+                        HStack {
+                            ProgressView()
+                                .controlSize(.small)
+                            Text(NSLocalizedString("Getting location...", comment: "Getting location message"))
+                                .foregroundColor(.secondary)
+                        }
+                    }
                 }
             }
         }
     }
-    
+
     private func requestLocationIfNeeded() {
-        guard selectedActivityType?.hasLocation == true else { return }
-        
-        // In a real implementation, you'd use CLLocationManager here
-        // For now, we'll use a mock location
-        currentLocation = CLLocation(latitude: 37.7749, longitude: -122.4194)
+        // Location is now requested on-demand via toggle
     }
     
     private func saveActivity() {
         guard let activityType = selectedActivityType else { return }
-        
+
         let activityDateTime = useCustomTime ? customDateTime : Date()
         let quantityValue = activityType.hasQuantity ? Double(quantity) : nil
-        let latitude = activityType.hasLocation ? currentLocation?.coordinate.latitude : nil
-        let longitude = activityType.hasLocation ? currentLocation?.coordinate.longitude : nil
-        
+        let location = includeLocation ? locationManager.location : nil
+        let latitude = location?.coordinate.latitude
+        let longitude = location?.coordinate.longitude
+
         let newActivity = Activity(
             dateTime: activityDateTime,
             notes: notes.isEmpty ? nil : notes,
@@ -159,8 +173,9 @@ struct TrackActivityView: View {
             activityType: activityType,
             caree: caree
         )
-        
+
         modelContext.insert(newActivity)
+        locationManager.stopUpdating()
         dismiss()
     }
 }

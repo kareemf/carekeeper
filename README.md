@@ -60,9 +60,78 @@ open CareKeeper.xcodeproj
 
 ### 5. Build and Run
 
-1. Select your target device or simulator
-2. Choose either "CareKeeper" (v1) or "CareKeeperV2" (v2) scheme
-3. Build and run the project (⌘+R)
+#### Build from Command Line
+
+**iOS App:**
+```bash
+# Build CareKeeperV2 for iOS Simulator
+xcodebuild -project CareKeeper.xcodeproj \
+  -scheme CareKeeperV2 \
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
+  build
+```
+
+**watchOS App:**
+```bash
+# Build CareKeeperV2 Watch App for Apple Watch Simulator
+xcodebuild -project CareKeeper.xcodeproj \
+  -scheme "CareKeeperV2 Watch App" \
+  -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 2 (49mm)' \
+  build
+```
+
+#### Install and Launch on Simulator
+
+**iOS App:**
+```bash
+# Find the booted simulator
+xcrun simctl list devices | grep Booted
+
+# Uninstall existing app (if needed)
+xcrun simctl uninstall booted com.kareemf.CareKeeperV2
+
+# Install the app
+xcrun simctl install booted \
+  ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-iphonesimulator/CareKeeperV2.app
+
+# Launch the app
+xcrun simctl launch booted com.kareemf.CareKeeperV2
+```
+
+**watchOS App:**
+```bash
+# Boot a paired Apple Watch simulator (if not already booted)
+xcrun simctl boot "Apple Watch Ultra 2 (49mm)"
+
+# Uninstall existing app (if needed)
+xcrun simctl uninstall booted com.kareemf.CareKeeperV2.watchkitapp
+
+# Install the app
+xcrun simctl install booted \
+  ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-watchsimulator/CareKeeperV2\ Watch\ App.app
+
+# Launch the app
+xcrun simctl launch booted com.kareemf.CareKeeperV2.watchkitapp
+```
+
+#### Quick Development Workflow
+
+```bash
+# Build, uninstall, install, and launch iOS app in one command
+xcodebuild -project CareKeeper.xcodeproj -scheme CareKeeperV2 \
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build && \
+xcrun simctl uninstall booted com.kareemf.CareKeeperV2 && \
+xcrun simctl install booted \
+  ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-iphonesimulator/CareKeeperV2.app && \
+xcrun simctl launch booted com.kareemf.CareKeeperV2
+```
+
+#### Build from Xcode
+
+1. Open `CareKeeper.xcodeproj` in Xcode
+2. Select your target device or simulator
+3. Choose either "CareKeeper" (v1) or "CareKeeperV2" (v2) scheme
+4. Build and run the project (⌘+R)
 
 The app will automatically create sample data on first launch for development purposes.
 
