@@ -26,10 +26,11 @@ struct CareeDetailView: View {
                         // Track activity button (only if activity types exist)
                         if !caree.sortedActivityTypes.isEmpty {
                             trackActivityButton(for: caree)
+                            // Recent activities section
+                            recentActivitiesSection(for: caree)
+                        } else {
+                            gettingStartedView
                         }
-
-                        // Recent activities section
-                        recentActivitiesSection(for: caree)
                     }
                     .padding()
                 }
@@ -46,17 +47,37 @@ struct CareeDetailView: View {
 
     private func trackActivityButton(for caree: Caree) -> some View {
         Button(action: { showingTrackActivity = true }) {
-            HStack {
+            VStack(spacing: 8) {
                 Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 40))
                 Text(NSLocalizedString("Track", comment: "Track activity button"))
+                    .font(.title3)
+                    .fontWeight(.semibold)
             }
             .frame(maxWidth: .infinity)
+            .frame(height: 100)
             .foregroundColor(.white)
-            .padding(.vertical, 12)
             .background(Color.green.opacity(0.8))
-            .cornerRadius(8)
+            .cornerRadius(12)
         }
         .disabled(caree.activityTypes.isEmpty)
+    }
+
+    private var gettingStartedView: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "lightbulb.circle")
+                .font(.system(size: 50))
+                .foregroundColor(.accentColor)
+
+            Text(NSLocalizedString("Getting Started", comment: "Getting started title"))
+                .font(.headline)
+
+            Text(NSLocalizedString("Activity types must be created on iPhone before you can track activities on Apple Watch.", comment: "Getting started message"))
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding()
     }
 
     private func recentActivitiesSection(for caree: Caree) -> some View {
@@ -70,29 +91,32 @@ struct CareeDetailView: View {
                     .foregroundColor(.secondary)
             } else {
                 ForEach(Array(caree.recentActivities.prefix(3))) { activity in
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack {
-                            Text(activity.activityType?.displayIcon ?? "⭐")
-                                .font(.caption)
+                    NavigationLink(destination: ActivityDetailView(activityID: activity.id)) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack {
+                                Text(activity.activityType?.displayIcon ?? "⭐")
+                                    .font(.caption)
 
-                            Text(activity.activityType?.name ?? NSLocalizedString("Unknown", comment: "Unknown activity type"))
-                                .font(.caption)
+                                Text(activity.activityType?.name ?? NSLocalizedString("Unknown", comment: "Unknown activity type"))
+                                    .font(.caption)
 
-                            Spacer()
+                                Spacer()
 
-                            Text(activity.formattedDateTime)
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
+                                Text(activity.formattedDateTime)
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+
+                            if let notes = activity.notes, !notes.isEmpty {
+                                Text(notes)
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                            }
                         }
-
-                        if let notes = activity.notes, !notes.isEmpty {
-                            Text(notes)
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                        }
+                        .padding(.vertical, 2)
                     }
-                    .padding(.vertical, 2)
+                    .buttonStyle(.plain)
                 }
             }
         }

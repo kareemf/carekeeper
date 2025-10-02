@@ -10,7 +10,7 @@ struct TrackActivityView: View {
 
     @State private var selectedActivityType: ActivityType?
     @State private var notes: String = ""
-    @State private var quantity: String = ""
+    @State private var quantity: Double = 0
     @State private var showingStep2 = false
     @State private var includeLocation: Bool = false
     @StateObject private var locationManager = LocationManager()
@@ -64,7 +64,20 @@ struct TrackActivityView: View {
 
             if activityType.hasQuantity {
                 Section(header: Text(activityType.quantityUnit ?? NSLocalizedString("Quantity", comment: "Quantity section"))) {
-                    TextField(NSLocalizedString("Amount", comment: "Quantity placeholder"), text: $quantity)
+                    HStack {
+                        Text(String(format: "%.1f", quantity))
+                            .font(.title2)
+                            .fontWeight(.semibold)
+
+                        if let unit = activityType.quantityUnit {
+                            Text(unit)
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .focusable()
+                    .digitalCrownRotation($quantity, from: 0, through: 999, by: 0.5, sensitivity: .medium)
                 }
             }
 
@@ -122,7 +135,7 @@ struct TrackActivityView: View {
 
         let activity = Activity(
             notes: notes.isEmpty ? nil : notes,
-            quantity: Double(quantity),
+            quantity: activityType.hasQuantity ? quantity : nil,
             latitude: location?.coordinate.latitude,
             longitude: location?.coordinate.longitude,
             activityType: activityType,
