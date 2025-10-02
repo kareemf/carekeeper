@@ -39,6 +39,7 @@
 		62F14F0758A0E89A9157B09A /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6976693A5E69E76A8B8618C8 /* PersistenceErrorHandling.swift */; };
 		6DE89BDF18F7D4A5901C2350 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E5F89CB58DAA1911ACE334 /* LocationManager.swift */; };
 		71A1F9F6F2A93552AF2973BF /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40792041A2DC1BDA880278A8 /* PreviewData.swift */; };
+		7831AE78D0B9B4FBC9E47852 /* ActivityListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA915A8B9B58471A28E73195 /* ActivityListView.swift */; };
 		7EFA480D633F676FB7425E56 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 16D4F822B7FDC13F5F0C9C00 /* README.md */; };
 		805AB8CA18C75280907BB24A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FD4EE14A1A83C8E2F7FC6687 /* Preview Assets.xcassets */; };
 		820E4069BB93603590C14498 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0E024D0D96F2261DFEDB12 /* Caree.swift */; };
@@ -188,6 +189,7 @@
 		F12E00F40EFFE5A1C8CCC245 /* FullImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullImageView.swift; sourceTree = "<group>"; };
 		F7E31CCDFC087A12FD190ED0 /* LocationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationController.swift; sourceTree = "<group>"; };
 		F9B379F85DC676CFD654FBE7 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
+		FA915A8B9B58471A28E73195 /* ActivityListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListView.swift; sourceTree = "<group>"; };
 		FD4EE14A1A83C8E2F7FC6687 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		FF35B00333E669D852B2B9BF /* CareKeeper Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeper Watch App.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -389,6 +391,7 @@
 			isa = PBXGroup;
 			children = (
 				A9A7DC7DAE5761427EEDECF7 /* ActivityDetailView.swift */,
+				FA915A8B9B58471A28E73195 /* ActivityListView.swift */,
 				48E2E1E92765420A15B8C96E /* ActivityRowView.swift */,
 				DB8112617D9FA97E8E677035 /* TrackActivityView.swift */,
 			);
@@ -701,6 +704,7 @@
 			files = (
 				9DD1F4DF60DBDDB6166E2DC7 /* Activity.swift in Sources */,
 				2C767CF4BAC4785ED75ACB8B /* ActivityDetailView.swift in Sources */,
+				7831AE78D0B9B4FBC9E47852 /* ActivityListView.swift in Sources */,
 				3177C9877FB9B354EB2CA846 /* ActivityRowView.swift in Sources */,
 				0581540E5C21709255EC0B4C /* ActivityType.swift in Sources */,
 				F4BB352FA5DDC45AA1324D51 /* ActivityTypeEditView.swift in Sources */,

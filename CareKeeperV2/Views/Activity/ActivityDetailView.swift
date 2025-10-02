@@ -17,6 +17,7 @@ struct ActivityDetailView: View {
     @State private var editingNotes: String = ""
     @State private var editingQuantity: String = ""
     @State private var editingDateTime: Date = Date()
+    @State private var showingDeleteConfirmation = false
 
     init(activityID: UUID) {
         self.activityID = activityID
@@ -47,16 +48,43 @@ struct ActivityDetailView: View {
                         }
 
                         ToolbarItem(placement: .navigationBarTrailing) {
-                            if isEditing {
-                                Button(NSLocalizedString("Save", comment: "Save button")) {
-                                    saveChanges(for: activity)
-                                }
-                            } else {
-                                Button(NSLocalizedString("Edit", comment: "Edit button")) {
-                                    startEditing(for: activity)
+                            HStack {
+                                if isEditing {
+                                    Button(NSLocalizedString("Save", comment: "Save button")) {
+                                        saveChanges(for: activity)
+                                    }
+                                } else {
+                                    Menu {
+                                        Button(NSLocalizedString("Edit", comment: "Edit button")) {
+                                            startEditing(for: activity)
+                                        }
+
+                                        Divider()
+
+                                        Button(role: .destructive) {
+                                            showingDeleteConfirmation = true
+                                        } label: {
+                                            Label(NSLocalizedString("Delete Activity", comment: "Delete activity button"),
+                                                  systemImage: "trash")
+                                        }
+                                    } label: {
+                                        Image(systemName: "ellipsis.circle")
+                                    }
                                 }
                             }
                         }
+                    }
+                    .confirmationDialog(
+                        NSLocalizedString("Delete this activity?", comment: "Delete confirmation title"),
+                        isPresented: $showingDeleteConfirmation,
+                        titleVisibility: .visible
+                    ) {
+                        Button(NSLocalizedString("Delete Activity", comment: "Delete confirmation button"), role: .destructive) {
+                            deleteActivity(activity)
+                        }
+                        Button(NSLocalizedString("Cancel", comment: "Cancel button"), role: .cancel) {}
+                    } message: {
+                        Text(NSLocalizedString("This action cannot be undone.", comment: "Delete confirmation message"))
                     }
                 }
                 .onAppear {
@@ -203,6 +231,17 @@ struct ActivityDetailView: View {
         let url = URL(string: "http://maps.apple.com/?ll=\(location.coordinate.latitude),\(location.coordinate.longitude)")
         if let url = url {
             UIApplication.shared.open(url)
+        }
+    }
+
+    private func deleteActivity(_ activity: Activity) {
+        modelContext.delete(activity)
+
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            print("⚠️ Failed to delete activity: \(error)")
         }
     }
 }

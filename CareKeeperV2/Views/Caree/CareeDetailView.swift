@@ -192,11 +192,11 @@ struct CareeDetailView: View {
             }
 
             if caree.recentActivities.count > 5 {
-                Button(NSLocalizedString("View All Activities", comment: "View all activities button")) {
-                    // Navigate to full activities list
+                NavigationLink(destination: ActivityListView(careeID: caree.id)) {
+                    Text(NSLocalizedString("View All Activities", comment: "View all activities button"))
+                        .font(.caption)
+                        .foregroundColor(.accentColor)
                 }
-                .font(.caption)
-                .foregroundColor(.accentColor)
             }
         }
     }
