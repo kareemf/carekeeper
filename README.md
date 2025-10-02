@@ -185,6 +185,29 @@ CareKeeperV2/
 
 ## Development Workflow
 
+### Syncing Data Between iOS and watchOS Simulators
+
+**Important**: iOS and watchOS simulators run in separate containers and cannot share app group data automatically. This is a simulator limitation - on physical devices, app groups work correctly.
+
+For end-to-end testing on simulators, use the provided sync script to copy data from iOS to watchOS:
+
+```bash
+# 1. Run the iOS app and create some data (carees, activity types, etc.)
+# 2. Run the watchOS app at least once to create its app group
+# 3. Sync the database
+./scripts/sync-ios-to-watch-sim.sh
+
+# The script will:
+# - Find booted iOS and watchOS simulators
+# - Stop both apps
+# - Copy the SwiftData database from iOS to watchOS
+# - Provide launch commands for both apps
+```
+
+**Why this is needed**: The watchOS app is read-only for carees and activity types (these can only be created/edited on iOS). To test activity tracking on the watch, you need to first create carees and activity types on iOS, then sync the data to watchOS.
+
+**Note**: Once CloudKit sync is enabled in Phase 2, simulators will sync automatically via iCloud and this script won't be necessary.
+
 ### Running Tests
 
 ```bash
