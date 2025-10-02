@@ -153,8 +153,20 @@ struct CareeDetailView: View {
 
     private func recentActivitiesSection(for caree: Caree) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(NSLocalizedString("Recent Activities", comment: "Recent activities section title"))
-                .font(.headline)
+            HStack {
+                Text(NSLocalizedString("Recent Activities", comment: "Recent activities section title"))
+                    .font(.headline)
+
+                Spacer()
+
+                if !caree.recentActivities.isEmpty {
+                    NavigationLink(destination: ActivityListView(careeID: caree.id)) {
+                        Text(NSLocalizedString("View All", comment: "View all activities button"))
+                            .font(.subheadline)
+                            .foregroundColor(.accentColor)
+                    }
+                }
+            }
 
             if caree.recentActivities.isEmpty {
                 emptyActivitiesView
@@ -189,14 +201,6 @@ struct CareeDetailView: View {
         LazyVStack(spacing: 8) {
             ForEach(Array(caree.recentActivities.prefix(5))) { activity in
                 ActivityRowView(activity: activity)
-            }
-
-            if caree.recentActivities.count > 5 {
-                NavigationLink(destination: ActivityListView(careeID: caree.id)) {
-                    Text(NSLocalizedString("View All Activities", comment: "View all activities button"))
-                        .font(.caption)
-                        .foregroundColor(.accentColor)
-                }
             }
         }
     }
