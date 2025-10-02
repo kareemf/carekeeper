@@ -112,42 +112,19 @@ struct CareeDetailView: View {
             HStack {
                 Text(NSLocalizedString("Activity Types", comment: "Activity types section title"))
                     .font(.headline)
-                
+
                 Spacer()
-                
+
                 Button(NSLocalizedString("Add", comment: "Add activity type button")) {
                     showingAddActivityType = true
                 }
                 .font(.subheadline)
             }
-            
-            if caree.sortedActivityTypes.isEmpty {
-                emptyActivityTypesView
-            } else {
+
+            if !caree.sortedActivityTypes.isEmpty {
                 activityTypesList
             }
         }
-    }
-    
-    private var emptyActivityTypesView: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "list.bullet.circle")
-                .font(.system(size: 40))
-                .foregroundColor(.secondary)
-            
-            Text(NSLocalizedString("No activity types yet", comment: "Empty activity types message"))
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            
-            Button(NSLocalizedString("Add your first activity type", comment: "Add first activity type CTA")) {
-                showingAddActivityType = true
-            }
-            .font(.caption)
-            .buttonStyle(.bordered)
-        }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
     }
     
     private var activityTypesList: some View {
