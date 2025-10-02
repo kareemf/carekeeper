@@ -27,13 +27,29 @@ git clone https://github.com/your-username/carekeeper.git
 cd carekeeper
 ```
 
-### 2. Open in Xcode
+### 2. Install XcodeGen (Optional but Recommended)
+
+This project uses XcodeGen to manage the Xcode project file, making it easier to handle merge conflicts and project configuration.
+
+```bash
+brew install xcodegen
+```
+
+After making changes to `project.yml`, regenerate the Xcode project:
+
+```bash
+xcodegen generate
+```
+
+> **Note**: If you don't use XcodeGen, you can still use the pre-generated `.xcodeproj` file directly.
+
+### 3. Open in Xcode
 
 ```bash
 open CareKeeper.xcodeproj
 ```
 
-### 3. Configure CloudKit
+### 4. Configure CloudKit
 
 1. In Xcode, select your project in the navigator
 2. Select the CareKeeper target
@@ -42,12 +58,15 @@ open CareKeeper.xcodeproj
 5. Enable "CloudKit" capability
 6. Select or create a CloudKit container
 
-### 4. Build and Run
+### 5. Build and Run
 
 1. Select your target device or simulator
-2. Build and run the project (⌘+R)
+2. Choose either "CareKeeper" (v1) or "CareKeeperV2" (v2) scheme
+3. Build and run the project (⌘+R)
 
 The app will automatically create sample data on first launch for development purposes.
+
+> **Tip**: Use the CareKeeperV2 scheme for the latest version with SwiftData.
 
 ## Project Structure
 

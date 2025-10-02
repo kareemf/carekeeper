@@ -3,81 +3,82 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5101151D2900D7E50009D7EC /* LocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5101151C2900D7E50009D7EC /* LocationController.swift */; };
-		5101151E2900D7E50009D7EC /* LocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5101151C2900D7E50009D7EC /* LocationController.swift */; };
-		5103A7A92918307B00F58FCE /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5103A7A82918307B00F58FCE /* ComplicationController.swift */; };
-		514B883828E3873500B81198 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883728E3873500B81198 /* Persistence.swift */; };
-		514B883F28E3873700B81198 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B883E28E3873700B81198 /* Assets.xcassets */; };
-		514B884328E3873700B81198 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B884228E3873700B81198 /* Preview Assets.xcassets */; };
-		514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */; };
-		514B885428E3875100B81198 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B885328E3875100B81198 /* Assets.xcassets */; };
-		514B885728E3875100B81198 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514B885628E3875100B81198 /* Preview Assets.xcassets */; };
-		514B888828E50E8800B81198 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514B883728E3873500B81198 /* Persistence.swift */; };
-		518CB0D6292F219F00C60633 /* ManagingSharesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CB292F219F00C60633 /* ManagingSharesView.swift */; };
-		518CB0D7292F219F00C60633 /* ManagingSharesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CB292F219F00C60633 /* ManagingSharesView.swift */; };
-		518CB0D8292F219F00C60633 /* AddToExistingShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CC292F219F00C60633 /* AddToExistingShareView.swift */; };
-		518CB0D9292F219F00C60633 /* AddToExistingShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CC292F219F00C60633 /* AddToExistingShareView.swift */; };
-		518CB0DE292F219F00C60633 /* SharePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CF292F219F00C60633 /* SharePickerView.swift */; };
-		518CB0DF292F219F00C60633 /* SharePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0CF292F219F00C60633 /* SharePickerView.swift */; };
-		518CB0E6292F219F00C60633 /* ParticipantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0D3292F219F00C60633 /* ParticipantView.swift */; };
-		518CB0E7292F219F00C60633 /* ParticipantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0D3292F219F00C60633 /* ParticipantView.swift */; };
-		518CB0E8292F219F00C60633 /* SwiftUIHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0D4292F219F00C60633 /* SwiftUIHelper.swift */; };
-		518CB0E9292F219F00C60633 /* SwiftUIHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0D4292F219F00C60633 /* SwiftUIHelper.swift */; };
-		518CB0F9292F21A900C60633 /* CoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0EE292F21A900C60633 /* CoreDataHelper.swift */; };
-		518CB0FA292F21A900C60633 /* CoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0EE292F21A900C60633 /* CoreDataHelper.swift */; };
-		518CB107292F21A900C60633 /* PersistenceController+Share.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0F6292F21A900C60633 /* PersistenceController+Share.swift */; };
-		518CB108292F21A900C60633 /* PersistenceController+Share.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB0F6292F21A900C60633 /* PersistenceController+Share.swift */; };
-		518CB10B292F21BA00C60633 /* LICENSE1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 518CB10A292F21BA00C60633 /* LICENSE1.txt */; };
-		518CB10C292F21BA00C60633 /* LICENSE1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 518CB10A292F21BA00C60633 /* LICENSE1.txt */; };
-		518CB114293049F800C60633 /* Persistence+History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB113293049F800C60633 /* Persistence+History.swift */; };
-		518CB115293049F800C60633 /* Persistence+History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518CB113293049F800C60633 /* Persistence+History.swift */; };
-		51A3257D296FE0C300DBF4BC /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A3257C296FE0C300DBF4BC /* CareeDetailView.swift */; };
-		51AEC3502914A58200C1DD5E /* CareKeeper Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 514B884D28E3875000B81198 /* CareKeeper Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		51C5B9A6290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */; };
-		51C5B9A7290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */; };
-		51ED92F82936B50400ED9526 /* CareeShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51ED92F72936B50400ED9526 /* CareeShareButton.swift */; };
-		51ED92F92936B50400ED9526 /* CareeShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51ED92F72936B50400ED9526 /* CareeShareButton.swift */; };
-		51F3EC552919EE39007F1F0F /* ImageFromText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F3EC542919EE39007F1F0F /* ImageFromText.swift */; };
-		51FB8E57292B0D55001BD62C /* LICENSE2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 51FB8E52292B0D55001BD62C /* LICENSE2.txt */; };
-		51FB8E58292B0D55001BD62C /* LICENSE2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 51FB8E52292B0D55001BD62C /* LICENSE2.txt */; };
-		51FB8E5D292B0D55001BD62C /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E55292B0D55001BD62C /* ProfileImage.swift */; };
-		51FB8E5E292B0D55001BD62C /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E55292B0D55001BD62C /* ProfileImage.swift */; };
-		51FB8E5F292B0D55001BD62C /* ProfileImageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */; };
-		51FB8E60292B0D55001BD62C /* ProfileImageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */; };
-		51FB8E66292B270E001BD62C /* PhotoPickerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E65292B270E001BD62C /* PhotoPickerCoordinator.swift */; };
-		51FB8E68292B2DA4001BD62C /* FullImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E67292B2DA4001BD62C /* FullImageView.swift */; };
-		51FB8E71292C55B1001BD62C /* ProfileImageModel+Photos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FB8E70292C55B1001BD62C /* ProfileImageModel+Photos.swift */; };
-		A1B2C3D4E5F6789012345678 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23E36B64DFEC8C3B913A3629 /* ErrorHandling.swift */; };
-		B2C3D4E5F67890123456789A /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23E36B64DFEC8C3B913A3629 /* ErrorHandling.swift */; };
-		C3D4E5F67890123456789AB2 /* ActiveSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4F43CFD78FE7739895820C /* ActiveSheet.swift */; };
-		D4E5F67890123456789AB2C3 /* ActiveSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4F43CFD78FE7739895820C /* ActiveSheet.swift */; };
-		E5F67890123456789AB2C3D4 /* CoreDataEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82ECEF84D16EA6F211E60647 /* CoreDataEntities.swift */; };
-		F67890123456789AB2C3D4E5 /* CoreDataEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82ECEF84D16EA6F211E60647 /* CoreDataEntities.swift */; };
-		67890123456789AB2C3D4E5F /* CareKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0FB2E21F61CBF7A9D4F82F /* CareKeeperApp.swift */; };
+		048ADB4D38C8A311F7089D0A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C956433CB3EF2251FA35385 /* ContentView.swift */; };
+		05554E558F2C0A3D875CCBF8 /* PhotoPickerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E83FE980E7622F5F01EFA1CC /* PhotoPickerCoordinator.swift */; };
+		0581540E5C21709255EC0B4C /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B891A79098EB2F885B7EE8C3 /* ActivityType.swift */; };
+		05B404ED220CC1647EDFD0A0 /* CoreDataEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D665D6FCFCDD05576A713B0A /* CoreDataEntities.swift */; };
+		0B7E78423B30517254F92DC9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D56064A0416085AD5C7749D0 /* Preview Assets.xcassets */; };
+		19F506A7D3A3551BDC63A94B /* CareeListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705AB44FD17075847F5967A1 /* CareeListRowView.swift */; };
+		2044087946A057C720062B59 /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31948962CFC6379850CD7DFF /* ComplicationController.swift */; };
+		2AD302DA8DF4E5325B987212 /* CareKeeper Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2AE6F0B5667E58000BF31695 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A8D35563F0827622269172EA /* Assets.xcassets */; };
+		2C12A06E594777FE5198E802 /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0FF56E7DC356EFD46084A8 /* CareeDetailView.swift */; };
+		2C767CF4BAC4785ED75ACB8B /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A7DC7DAE5761427EEDECF7 /* ActivityDetailView.swift */; };
+		3033A5968D83187001982DEE /* LICENSE1.txt in Resources */ = {isa = PBXBuildFile; fileRef = BEC44D40EB9CC1E64C437FCD /* LICENSE1.txt */; };
+		3177C9877FB9B354EB2CA846 /* ActivityRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48E2E1E92765420A15B8C96E /* ActivityRowView.swift */; };
+		3DD65D8FA8C262DE08388010 /* CareKeeperWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EEB68E99A36144D80736247 /* CareKeeperWatchApp.swift */; };
+		401B3BAF4C0A5BE53876C494 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D570E01BB9E019E67E3A94C9 /* CareeListView.swift */; };
+		4112460D2B9B18A4E476CE86 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DEDD278DF064D85B39264A /* Persistence.swift */; };
+		430C9B65DD9DCE78115D853F /* ProfileImageModel+Photos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007ED22D2F77B76FE75C6F55 /* ProfileImageModel+Photos.swift */; };
+		434622AA3466F621B68791A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E16FBE8C16D3C0D2B5A0DD7F /* Assets.xcassets */; };
+		49FF82EC93435404D90A81AB /* CareKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 255BBC825C014353B28F7535 /* CareKeeperApp.swift */; };
+		4A1A325580413B98328D89A5 /* ActiveSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD708C0FABD1B3D66E8E9A9 /* ActiveSheet.swift */; };
+		5119FE50D16B690D2C25DC2B /* SharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4BC9A5CC8DF0E6A53D7373C /* SharingView.swift */; };
+		5B17A7DF45E7C2230F878709 /* ImageFromText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B270AE3B9967B028C752A756 /* ImageFromText.swift */; };
+		6128E06996359F16384D0142 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 22B9297F373BA7714C369647 /* README.md */; };
+		62F14F0758A0E89A9157B09A /* PersistenceErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6976693A5E69E76A8B8618C8 /* PersistenceErrorHandling.swift */; };
+		7EFA480D633F676FB7425E56 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 16D4F822B7FDC13F5F0C9C00 /* README.md */; };
+		805AB8CA18C75280907BB24A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FD4EE14A1A83C8E2F7FC6687 /* Preview Assets.xcassets */; };
+		868F2E55E09757F642875784 /* ParticipantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7265D0CA032A26F123C51F15 /* ParticipantView.swift */; };
+		87C2738F0624C7BAFEF7BB2F /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40792041A2DC1BDA880278A8 /* PreviewData.swift */; };
+		8F3C861246A79EB64BBF0DEF /* ProfileImageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF732E629FEA74BD457BFBB8 /* ProfileImageModel.swift */; };
+		90E2DD04B3EC997C91C95CE1 /* AddToExistingShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29DD278F648AC6ECC36DB9F3 /* AddToExistingShareView.swift */; };
+		93F76C9E85CEEFFF5DA3A4BA /* SharePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22238868F63435B855D04FA8 /* SharePickerView.swift */; };
+		95EA4C6E3C1B7F304EAED088 /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8687F3F7995864074BA7FC62 /* PreviewContainer.swift */; };
+		9B8389689C3D15979366B955 /* PersistenceController+Share.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FBE4BD356F9BFE3D7C5C260 /* PersistenceController+Share.swift */; };
+		9DD1F4DF60DBDDB6166E2DC7 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B379F85DC676CFD654FBE7 /* Activity.swift */; };
+		A4D1FC41604F205388B16F28 /* CareeEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D92530A8EA9D7FED7C0414EA /* CareeEditView.swift */; };
+		AB9C036BE3DCD0669C4EAEAF /* LocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7E31CCDFC087A12FD190ED0 /* LocationController.swift */; };
+		AE2D0DC285908FAA9D1D1F89 /* ActivityTypeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B817EC7B2594E7047F4B99 /* ActivityTypeRowView.swift */; };
+		B42EE23EBB2DE840E381F132 /* SwiftUIHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A7D2996299552009231AFC /* SwiftUIHelper.swift */; };
+		B7A355F031DD32946A9867C3 /* CareeShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B8ADC93934A503139847545 /* CareeShareButton.swift */; };
+		BB2806AB9D4957AE5EB4F882 /* FullImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F12E00F40EFFE5A1C8CCC245 /* FullImageView.swift */; };
+		BDD8E320600B33A79DBE91D6 /* CoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8536D04113B55B9A3A78A61A /* CoreDataHelper.swift */; };
+		C0C3EDFA3282EE2FDF44B38D /* CoreDataCloudKitShare.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 182FA45482AF8D9F2D342493 /* CoreDataCloudKitShare.xcdatamodeld */; };
+		CE611BA043D64709EAC21138 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0E024D0D96F2261DFEDB12 /* Caree.swift */; };
+		D6B1A4440C79CE30B09336DC /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964019F6C108B3350E5D98A6 /* ProfileImage.swift */; };
+		D7A6752318BB0C8EFF5EEF0D /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BDD832C3A966D99072E15C8 /* CareeDetailView.swift */; };
+		D98374EF6E3277E116588C09 /* Persistence+History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2071D27F8F2ACE827F0AB0B8 /* Persistence+History.swift */; };
+		E06B226350D1699A29BB67F7 /* LICENSE2.txt in Resources */ = {isa = PBXBuildFile; fileRef = DDE013807F370265BF04A643 /* LICENSE2.txt */; };
+		ECA3B98C70D9456D33FBE1CC /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0079CA022C03600548BC3C79 /* ErrorHandling.swift */; };
+		F03D95A5CC1DC29FFEEC1BDF /* TrackActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8112617D9FA97E8E677035 /* TrackActivityView.swift */; };
+		F0703D9851B796CC4296791D /* ManagingSharesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D54F26D0B59C422EB19A19 /* ManagingSharesView.swift */; };
+		F4BB352FA5DDC45AA1324D51 /* ActivityTypeEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A6D88ECF96D344D93D6FBBF /* ActivityTypeEditView.swift */; };
+		F9D1603943AAC5BC7FF298D3 /* CareKeeperV2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F7245C4875E7F8AF42ADA25 /* CareKeeperV2App.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		51AEC3512914A58200C1DD5E /* PBXContainerItemProxy */ = {
+		ABA7405D567582DC32E7EBAD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 514B882A28E3873500B81198 /* Project object */;
+			containerPortal = D73F9B8A4F010D7EC1AB2F1E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 514B884C28E3875000B81198;
+			remoteGlobalIDString = D33AEF414D4813AD6FD4E498;
 			remoteInfo = "CareKeeper Watch App";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		51AEC3532914A58200C1DD5E /* Embed Watch Content */ = {
+		1FC6D8B5E11349B962E7C63F /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				51AEC3502914A58200C1DD5E /* CareKeeper Watch App.app in Embed Watch Content */,
+				2AD302DA8DF4E5325B987212 /* CareKeeper Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -85,502 +86,512 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		5101151928FF57A70009D7EC /* CareKeeper Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeper Watch App.entitlements"; sourceTree = "<group>"; };
-		5101151A28FF5B2A0009D7EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		5101151B28FF5B390009D7EC /* CareKeeper-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CareKeeper-Watch-App-Info.plist"; sourceTree = SOURCE_ROOT; };
-		5101151C2900D7E50009D7EC /* LocationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LocationController.swift; path = ../LocationController.swift; sourceTree = "<group>"; };
-		5103A7A82918307B00F58FCE /* ComplicationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicationController.swift; sourceTree = "<group>"; };
-		514B883228E3873500B81198 /* CareKeeper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CareKeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		514B883728E3873500B81198 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
-		514B883E28E3873700B81198 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		514B884028E3873700B81198 /* CareKeeper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CareKeeper.entitlements; sourceTree = "<group>"; };
-		514B884228E3873700B81198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		514B884D28E3875000B81198 /* CareKeeper Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CareKeeper Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWatchApp.swift; sourceTree = "<group>"; };
-		514B885328E3875100B81198 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		514B885628E3875100B81198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		514D926E28F7AED100CBF67E /* Scraps.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Scraps.md; sourceTree = "<group>"; };
-		518CB0CB292F219F00C60633 /* ManagingSharesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManagingSharesView.swift; sourceTree = "<group>"; };
-		518CB0CC292F219F00C60633 /* AddToExistingShareView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddToExistingShareView.swift; sourceTree = "<group>"; };
-		518CB0CF292F219F00C60633 /* SharePickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharePickerView.swift; sourceTree = "<group>"; };
-		518CB0D3292F219F00C60633 /* ParticipantView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParticipantView.swift; sourceTree = "<group>"; };
-		518CB0D4292F219F00C60633 /* SwiftUIHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUIHelper.swift; sourceTree = "<group>"; };
-		518CB0EE292F21A900C60633 /* CoreDataHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataHelper.swift; sourceTree = "<group>"; };
-		518CB0F6292F21A900C60633 /* PersistenceController+Share.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PersistenceController+Share.swift"; sourceTree = "<group>"; };
-		518CB10A292F21BA00C60633 /* LICENSE1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE1.txt; sourceTree = "<group>"; };
-		518CB10D292F21ED00C60633 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		518CB113293049F800C60633 /* Persistence+History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Persistence+History.swift"; sourceTree = "<group>"; };
-		51A3257C296FE0C300DBF4BC /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
-		51B42836290431A8007DF447 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
-		51B9A0722E8E428200EFEA78 /* CareKeeperV2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperV2App.swift; sourceTree = "<group>"; };
-		51B9A0742E8E428200EFEA78 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
-		51B9A0752E8E428200EFEA78 /* ActivityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityType.swift; sourceTree = "<group>"; };
-		51B9A0762E8E428200EFEA78 /* Caree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Caree.swift; sourceTree = "<group>"; };
-		51B9A0782E8E428200EFEA78 /* PreviewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewContainer.swift; sourceTree = "<group>"; };
-		51B9A0792E8E428200EFEA78 /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
-		51B9A07B2E8E428200EFEA78 /* ActivityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailView.swift; sourceTree = "<group>"; };
-		51B9A07C2E8E428200EFEA78 /* ActivityRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRowView.swift; sourceTree = "<group>"; };
-		51B9A07D2E8E428200EFEA78 /* TrackActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackActivityView.swift; sourceTree = "<group>"; };
-		51B9A07F2E8E428200EFEA78 /* ActivityTypeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeEditView.swift; sourceTree = "<group>"; };
-		51B9A0802E8E428200EFEA78 /* ActivityTypeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeRowView.swift; sourceTree = "<group>"; };
-		51B9A0822E8E428200EFEA78 /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
-		51B9A0832E8E428200EFEA78 /* CareeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeEditView.swift; sourceTree = "<group>"; };
-		51B9A0842E8E428200EFEA78 /* CareeListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListRowView.swift; sourceTree = "<group>"; };
-		51B9A0852E8E428200EFEA78 /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
-		51B9A0872E8E428200EFEA78 /* SharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingView.swift; sourceTree = "<group>"; };
-		51B9A0892E8E428200EFEA78 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		51B9A08C2E8E428200EFEA78 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceErrorHandling.swift; sourceTree = "<group>"; };
-		51ED92F72936B50400ED9526 /* CareeShareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeShareButton.swift; sourceTree = "<group>"; };
-		51F3EC542919EE39007F1F0F /* ImageFromText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFromText.swift; sourceTree = "<group>"; };
-		51FB8E52292B0D55001BD62C /* LICENSE2.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE2.txt; sourceTree = "<group>"; };
-		51FB8E55292B0D55001BD62C /* ProfileImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileImage.swift; sourceTree = "<group>"; };
-		51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileImageModel.swift; sourceTree = "<group>"; };
-		51FB8E64292B2128001BD62C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		51FB8E65292B270E001BD62C /* PhotoPickerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerCoordinator.swift; sourceTree = "<group>"; };
-		51FB8E67292B2DA4001BD62C /* FullImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullImageView.swift; sourceTree = "<group>"; };
-		51FB8E70292C55B1001BD62C /* ProfileImageModel+Photos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileImageModel+Photos.swift"; sourceTree = "<group>"; };
-		23E36B64DFEC8C3B913A3629 /* ErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
-		3A4F43CFD78FE7739895820C /* ActiveSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSheet.swift; sourceTree = "<group>"; };
-		82ECEF84D16EA6F211E60647 /* CoreDataEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEntities.swift; sourceTree = "<group>"; };
-		4E0FB2E21F61CBF7A9D4F82F /* CareKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperApp.swift; sourceTree = "<group>"; };
+		0079CA022C03600548BC3C79 /* ErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
+		007ED22D2F77B76FE75C6F55 /* ProfileImageModel+Photos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileImageModel+Photos.swift"; sourceTree = "<group>"; };
+		05FE31454AB58301B0B745F0 /* CareKeeperV2.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CareKeeperV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0E0E024D0D96F2261DFEDB12 /* Caree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Caree.swift; sourceTree = "<group>"; };
+		16D4F822B7FDC13F5F0C9C00 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		1B8ADC93934A503139847545 /* CareeShareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeShareButton.swift; sourceTree = "<group>"; };
+		1C956433CB3EF2251FA35385 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		2071D27F8F2ACE827F0AB0B8 /* Persistence+History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Persistence+History.swift"; sourceTree = "<group>"; };
+		22238868F63435B855D04FA8 /* SharePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharePickerView.swift; sourceTree = "<group>"; };
+		22B9297F373BA7714C369647 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		255BBC825C014353B28F7535 /* CareKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperApp.swift; sourceTree = "<group>"; };
+		29DD278F648AC6ECC36DB9F3 /* AddToExistingShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToExistingShareView.swift; sourceTree = "<group>"; };
+		2A6D88ECF96D344D93D6FBBF /* ActivityTypeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeEditView.swift; sourceTree = "<group>"; };
+		2EEB68E99A36144D80736247 /* CareKeeperWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWatchApp.swift; sourceTree = "<group>"; };
+		2F7245C4875E7F8AF42ADA25 /* CareKeeperV2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperV2App.swift; sourceTree = "<group>"; };
+		2FBE4BD356F9BFE3D7C5C260 /* PersistenceController+Share.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersistenceController+Share.swift"; sourceTree = "<group>"; };
+		31948962CFC6379850CD7DFF /* ComplicationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicationController.swift; sourceTree = "<group>"; };
+		3658F15B57408C93FEFBDD57 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		40792041A2DC1BDA880278A8 /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
+		44DEDD278DF064D85B39264A /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		48E2E1E92765420A15B8C96E /* ActivityRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRowView.swift; sourceTree = "<group>"; };
+		55B817EC7B2594E7047F4B99 /* ActivityTypeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeRowView.swift; sourceTree = "<group>"; };
+		68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CareKeeper Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6976693A5E69E76A8B8618C8 /* PersistenceErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceErrorHandling.swift; sourceTree = "<group>"; };
+		705AB44FD17075847F5967A1 /* CareeListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListRowView.swift; sourceTree = "<group>"; };
+		7265D0CA032A26F123C51F15 /* ParticipantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantView.swift; sourceTree = "<group>"; };
+		75FD9086FF163E6E1AECC486 /* CoreDataCloudKitShare.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataCloudKitShare.xcdatamodel; sourceTree = "<group>"; };
+		8536D04113B55B9A3A78A61A /* CoreDataHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataHelper.swift; sourceTree = "<group>"; };
+		85E9FE0D93FA7DAC0747FF2C /* CareKeeper.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CareKeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8687F3F7995864074BA7FC62 /* PreviewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewContainer.swift; sourceTree = "<group>"; };
+		88D9EC2B1F9A2FB0F13364A2 /* CareKeeper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CareKeeper.entitlements; sourceTree = "<group>"; };
+		8DD708C0FABD1B3D66E8E9A9 /* ActiveSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSheet.swift; sourceTree = "<group>"; };
+		964019F6C108B3350E5D98A6 /* ProfileImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImage.swift; sourceTree = "<group>"; };
+		9BDD832C3A966D99072E15C8 /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
+		A0D54F26D0B59C422EB19A19 /* ManagingSharesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagingSharesView.swift; sourceTree = "<group>"; };
+		A81DFDF2739935BF8FAA685F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		A8D35563F0827622269172EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A9A7DC7DAE5761427EEDECF7 /* ActivityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailView.swift; sourceTree = "<group>"; };
+		AA0FF56E7DC356EFD46084A8 /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
+		AFA0B244053244763E644EDB /* CareKeeperV2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CareKeeperV2.entitlements; sourceTree = "<group>"; };
+		B270AE3B9967B028C752A756 /* ImageFromText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFromText.swift; sourceTree = "<group>"; };
+		B2A7D2996299552009231AFC /* SwiftUIHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIHelper.swift; sourceTree = "<group>"; };
+		B891A79098EB2F885B7EE8C3 /* ActivityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityType.swift; sourceTree = "<group>"; };
+		BEC44D40EB9CC1E64C437FCD /* LICENSE1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE1.txt; sourceTree = "<group>"; };
+		C4BC9A5CC8DF0E6A53D7373C /* SharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingView.swift; sourceTree = "<group>"; };
+		CF732E629FEA74BD457BFBB8 /* ProfileImageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImageModel.swift; sourceTree = "<group>"; };
+		D56064A0416085AD5C7749D0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		D570E01BB9E019E67E3A94C9 /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
+		D665D6FCFCDD05576A713B0A /* CoreDataEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEntities.swift; sourceTree = "<group>"; };
+		D92530A8EA9D7FED7C0414EA /* CareeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeEditView.swift; sourceTree = "<group>"; };
+		DB8112617D9FA97E8E677035 /* TrackActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackActivityView.swift; sourceTree = "<group>"; };
+		DDE013807F370265BF04A643 /* LICENSE2.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE2.txt; sourceTree = "<group>"; };
+		E16FBE8C16D3C0D2B5A0DD7F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E83FE980E7622F5F01EFA1CC /* PhotoPickerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerCoordinator.swift; sourceTree = "<group>"; };
+		F12E00F40EFFE5A1C8CCC245 /* FullImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullImageView.swift; sourceTree = "<group>"; };
+		F7E31CCDFC087A12FD190ED0 /* LocationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationController.swift; sourceTree = "<group>"; };
+		F9B379F85DC676CFD654FBE7 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
+		FD4EE14A1A83C8E2F7FC6687 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		FF35B00333E669D852B2B9BF /* CareKeeper Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeper Watch App.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFrameworksBuildPhase section */
-		514B882F28E3873500B81198 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		514B884A28E3875000B81198 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
-
 /* Begin PBXGroup section */
-		5101151F2900DB190009D7EC /* Controllers */ = {
+		1CFAEB2EAC2EC9C2337A7ADD /* PhotoPicker */ = {
 			isa = PBXGroup;
 			children = (
-				514B883728E3873500B81198 /* Persistence.swift */,
-				518CB113293049F800C60633 /* Persistence+History.swift */,
-				5101151C2900D7E50009D7EC /* LocationController.swift */,
-				51C5B9A5290C252D007B0C7C /* PersistenceErrorHandling.swift */,
-			);
-			path = Controllers;
-			sourceTree = "<group>";
-		};
-		514B882928E3873500B81198 = {
-			isa = PBXGroup;
-			children = (
-				514B883428E3873500B81198 /* CareKeeper */,
-				514B884E28E3875000B81198 /* CareKeeper Watch App */,
-				514B883328E3873500B81198 /* Products */,
-				51AEC34F2914A58200C1DD5E /* Frameworks */,
-				51B9A08B2E8E428200EFEA78 /* CareKeeperV2 */,
-				51B9A08C2E8E428200EFEA78 /* README.md */,
-			);
-			sourceTree = "<group>";
-		};
-		514B883328E3873500B81198 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				514B883228E3873500B81198 /* CareKeeper.app */,
-				514B884D28E3875000B81198 /* CareKeeper Watch App.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		514B883428E3873500B81198 /* CareKeeper */ = {
-			isa = PBXGroup;
-			children = (
-				518CB10F292F277200C60633 /* Sharing */,
-				51FB8E50292B0D55001BD62C /* PhotoPicker */,
-				5101151F2900DB190009D7EC /* Controllers */,
-				5101151A28FF5B2A0009D7EC /* Info.plist */,
-				514D926E28F7AED100CBF67E /* Scraps.md */,
-				23E36B64DFEC8C3B913A3629 /* ErrorHandling.swift */,
-				3A4F43CFD78FE7739895820C /* ActiveSheet.swift */,
-				82ECEF84D16EA6F211E60647 /* CoreDataEntities.swift */,
-				4E0FB2E21F61CBF7A9D4F82F /* CareKeeperApp.swift */,
-				514B883E28E3873700B81198 /* Assets.xcassets */,
-				514B884028E3873700B81198 /* CareKeeper.entitlements */,
-				514B884128E3873700B81198 /* Preview Content */,
-				51B42836290431A8007DF447 /* .swiftlint.yml */,
-			);
-			path = CareKeeper;
-			sourceTree = "<group>";
-		};
-		514B884128E3873700B81198 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				514B884228E3873700B81198 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		514B884E28E3875000B81198 /* CareKeeper Watch App */ = {
-			isa = PBXGroup;
-			children = (
-				5101151B28FF5B390009D7EC /* CareKeeper-Watch-App-Info.plist */,
-				5101151928FF57A70009D7EC /* CareKeeper Watch App.entitlements */,
-				514B884F28E3875000B81198 /* CareKeeperWatchApp.swift */,
-				514B885328E3875100B81198 /* Assets.xcassets */,
-				514B885528E3875100B81198 /* Preview Content */,
-				5103A7A82918307B00F58FCE /* ComplicationController.swift */,
-				51F3EC542919EE39007F1F0F /* ImageFromText.swift */,
-				51A3257C296FE0C300DBF4BC /* CareeDetailView.swift */,
-			);
-			path = "CareKeeper Watch App";
-			sourceTree = "<group>";
-		};
-		514B885528E3875100B81198 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				514B885628E3875100B81198 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		518CB0CA292F219F00C60633 /* SwiftUI */ = {
-			isa = PBXGroup;
-			children = (
-				518CB0CB292F219F00C60633 /* ManagingSharesView.swift */,
-				518CB0CC292F219F00C60633 /* AddToExistingShareView.swift */,
-				518CB0CF292F219F00C60633 /* SharePickerView.swift */,
-				51ED92F72936B50400ED9526 /* CareeShareButton.swift */,
-				518CB0D3292F219F00C60633 /* ParticipantView.swift */,
-				518CB0D4292F219F00C60633 /* SwiftUIHelper.swift */,
-			);
-			path = SwiftUI;
-			sourceTree = "<group>";
-		};
-		518CB0EC292F21A900C60633 /* Persistence */ = {
-			isa = PBXGroup;
-			children = (
-				518CB0EE292F21A900C60633 /* CoreDataHelper.swift */,
-				518CB0F6292F21A900C60633 /* PersistenceController+Share.swift */,
-			);
-			path = Persistence;
-			sourceTree = "<group>";
-		};
-		518CB109292F21BA00C60633 /* LICENSE1 */ = {
-			isa = PBXGroup;
-			children = (
-				518CB10A292F21BA00C60633 /* LICENSE1.txt */,
-			);
-			path = LICENSE1;
-			sourceTree = "<group>";
-		};
-		518CB10F292F277200C60633 /* Sharing */ = {
-			isa = PBXGroup;
-			children = (
-				518CB109292F21BA00C60633 /* LICENSE1 */,
-				518CB0EC292F21A900C60633 /* Persistence */,
-				518CB0CA292F219F00C60633 /* SwiftUI */,
-				518CB10D292F21ED00C60633 /* README.md */,
-			);
-			path = Sharing;
-			sourceTree = "<group>";
-		};
-		51AEC34F2914A58200C1DD5E /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		51B9A0732E8E428200EFEA78 /* App */ = {
-			isa = PBXGroup;
-			children = (
-				51B9A0722E8E428200EFEA78 /* CareKeeperV2App.swift */,
-			);
-			path = App;
-			sourceTree = "<group>";
-		};
-		51B9A0772E8E428200EFEA78 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				51B9A0742E8E428200EFEA78 /* Activity.swift */,
-				51B9A0752E8E428200EFEA78 /* ActivityType.swift */,
-				51B9A0762E8E428200EFEA78 /* Caree.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		51B9A07A2E8E428200EFEA78 /* Preview */ = {
-			isa = PBXGroup;
-			children = (
-				51B9A0782E8E428200EFEA78 /* PreviewContainer.swift */,
-				51B9A0792E8E428200EFEA78 /* PreviewData.swift */,
-			);
-			path = Preview;
-			sourceTree = "<group>";
-		};
-		51B9A07E2E8E428200EFEA78 /* Activity */ = {
-			isa = PBXGroup;
-			children = (
-				51B9A07B2E8E428200EFEA78 /* ActivityDetailView.swift */,
-				51B9A07C2E8E428200EFEA78 /* ActivityRowView.swift */,
-				51B9A07D2E8E428200EFEA78 /* TrackActivityView.swift */,
-			);
-			path = Activity;
-			sourceTree = "<group>";
-		};
-		51B9A0812E8E428200EFEA78 /* ActivityType */ = {
-			isa = PBXGroup;
-			children = (
-				51B9A07F2E8E428200EFEA78 /* ActivityTypeEditView.swift */,
-				51B9A0802E8E428200EFEA78 /* ActivityTypeRowView.swift */,
-			);
-			path = ActivityType;
-			sourceTree = "<group>";
-		};
-		51B9A0862E8E428200EFEA78 /* Caree */ = {
-			isa = PBXGroup;
-			children = (
-				51B9A0822E8E428200EFEA78 /* CareeDetailView.swift */,
-				51B9A0832E8E428200EFEA78 /* CareeEditView.swift */,
-				51B9A0842E8E428200EFEA78 /* CareeListRowView.swift */,
-				51B9A0852E8E428200EFEA78 /* CareeListView.swift */,
-			);
-			path = Caree;
-			sourceTree = "<group>";
-		};
-		51B9A0882E8E428200EFEA78 /* Sharing */ = {
-			isa = PBXGroup;
-			children = (
-				51B9A0872E8E428200EFEA78 /* SharingView.swift */,
-			);
-			path = Sharing;
-			sourceTree = "<group>";
-		};
-		51B9A08A2E8E428200EFEA78 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				51B9A07E2E8E428200EFEA78 /* Activity */,
-				51B9A0812E8E428200EFEA78 /* ActivityType */,
-				51B9A0862E8E428200EFEA78 /* Caree */,
-				51B9A0882E8E428200EFEA78 /* Sharing */,
-				51B9A0892E8E428200EFEA78 /* ContentView.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		51B9A08B2E8E428200EFEA78 /* CareKeeperV2 */ = {
-			isa = PBXGroup;
-			children = (
-				51B9A0732E8E428200EFEA78 /* App */,
-				51B9A0772E8E428200EFEA78 /* Models */,
-				51B9A07A2E8E428200EFEA78 /* Preview */,
-				51B9A08A2E8E428200EFEA78 /* Views */,
-			);
-			path = CareKeeperV2;
-			sourceTree = "<group>";
-		};
-		51FB8E50292B0D55001BD62C /* PhotoPicker */ = {
-			isa = PBXGroup;
-			children = (
-				51FB8E51292B0D55001BD62C /* LICENSE2 */,
-				51FB8E55292B0D55001BD62C /* ProfileImage.swift */,
-				51FB8E56292B0D55001BD62C /* ProfileImageModel.swift */,
-				51FB8E70292C55B1001BD62C /* ProfileImageModel+Photos.swift */,
-				51FB8E65292B270E001BD62C /* PhotoPickerCoordinator.swift */,
-				51FB8E67292B2DA4001BD62C /* FullImageView.swift */,
-				51FB8E64292B2128001BD62C /* README.md */,
+				F12E00F40EFFE5A1C8CCC245 /* FullImageView.swift */,
+				E83FE980E7622F5F01EFA1CC /* PhotoPickerCoordinator.swift */,
+				964019F6C108B3350E5D98A6 /* ProfileImage.swift */,
+				CF732E629FEA74BD457BFBB8 /* ProfileImageModel.swift */,
+				007ED22D2F77B76FE75C6F55 /* ProfileImageModel+Photos.swift */,
+				16D4F822B7FDC13F5F0C9C00 /* README.md */,
+				4825DDA580BC3F4A142314C3 /* LICENSE2 */,
 			);
 			path = PhotoPicker;
 			sourceTree = "<group>";
 		};
-		51FB8E51292B0D55001BD62C /* LICENSE2 */ = {
+		29ECDC02903BE34BDA4E1B1E /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				51FB8E52292B0D55001BD62C /* LICENSE2.txt */,
+				D56064A0416085AD5C7749D0 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		2D0BD90839CB2F8F2A4A2340 /* ActivityType */ = {
+			isa = PBXGroup;
+			children = (
+				2A6D88ECF96D344D93D6FBBF /* ActivityTypeEditView.swift */,
+				55B817EC7B2594E7047F4B99 /* ActivityTypeRowView.swift */,
+			);
+			path = ActivityType;
+			sourceTree = "<group>";
+		};
+		364945D556AA0A317E9737E9 /* CareKeeper */ = {
+			isa = PBXGroup;
+			children = (
+				8DD708C0FABD1B3D66E8E9A9 /* ActiveSheet.swift */,
+				E16FBE8C16D3C0D2B5A0DD7F /* Assets.xcassets */,
+				88D9EC2B1F9A2FB0F13364A2 /* CareKeeper.entitlements */,
+				255BBC825C014353B28F7535 /* CareKeeperApp.swift */,
+				D665D6FCFCDD05576A713B0A /* CoreDataEntities.swift */,
+				0079CA022C03600548BC3C79 /* ErrorHandling.swift */,
+				A81DFDF2739935BF8FAA685F /* Info.plist */,
+				F7E31CCDFC087A12FD190ED0 /* LocationController.swift */,
+				77C235AF25BC595EC8838DF3 /* Controllers */,
+				1CFAEB2EAC2EC9C2337A7ADD /* PhotoPicker */,
+				29ECDC02903BE34BDA4E1B1E /* Preview Content */,
+				FBD2FD610ABB85406231BE9D /* Sharing */,
+			);
+			path = CareKeeper;
+			sourceTree = "<group>";
+		};
+		3FE913D039CAB64DB537CB03 /* CareKeeper Watch App */ = {
+			isa = PBXGroup;
+			children = (
+				A8D35563F0827622269172EA /* Assets.xcassets */,
+				AA0FF56E7DC356EFD46084A8 /* CareeDetailView.swift */,
+				FF35B00333E669D852B2B9BF /* CareKeeper Watch App.entitlements */,
+				2EEB68E99A36144D80736247 /* CareKeeperWatchApp.swift */,
+				31948962CFC6379850CD7DFF /* ComplicationController.swift */,
+				B270AE3B9967B028C752A756 /* ImageFromText.swift */,
+				CE6047F9E684668365191BDF /* Preview Content */,
+			);
+			path = "CareKeeper Watch App";
+			sourceTree = "<group>";
+		};
+		4825DDA580BC3F4A142314C3 /* LICENSE2 */ = {
+			isa = PBXGroup;
+			children = (
+				DDE013807F370265BF04A643 /* LICENSE2.txt */,
 			);
 			path = LICENSE2;
+			sourceTree = "<group>";
+		};
+		4F693B2665B385AFBE2F92C7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */,
+				85E9FE0D93FA7DAC0747FF2C /* CareKeeper.app */,
+				05FE31454AB58301B0B745F0 /* CareKeeperV2.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5AE0926FBD848299AE2E20FF /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				1C956433CB3EF2251FA35385 /* ContentView.swift */,
+				C9322D90ADFDD08382676A25 /* Activity */,
+				2D0BD90839CB2F8F2A4A2340 /* ActivityType */,
+				746F5E18FE4455DE2068C0D0 /* Caree */,
+				FAD2DDF8F4A2B698D8DEDF10 /* Sharing */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		6082FA992EBB1FA2D05C686F = {
+			isa = PBXGroup;
+			children = (
+				364945D556AA0A317E9737E9 /* CareKeeper */,
+				3FE913D039CAB64DB537CB03 /* CareKeeper Watch App */,
+				E7BA0075BE818C29A778C260 /* CareKeeperV2 */,
+				4F693B2665B385AFBE2F92C7 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		746F5E18FE4455DE2068C0D0 /* Caree */ = {
+			isa = PBXGroup;
+			children = (
+				9BDD832C3A966D99072E15C8 /* CareeDetailView.swift */,
+				D92530A8EA9D7FED7C0414EA /* CareeEditView.swift */,
+				705AB44FD17075847F5967A1 /* CareeListRowView.swift */,
+				D570E01BB9E019E67E3A94C9 /* CareeListView.swift */,
+			);
+			path = Caree;
+			sourceTree = "<group>";
+		};
+		77C235AF25BC595EC8838DF3 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				44DEDD278DF064D85B39264A /* Persistence.swift */,
+				2071D27F8F2ACE827F0AB0B8 /* Persistence+History.swift */,
+				6976693A5E69E76A8B8618C8 /* PersistenceErrorHandling.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		AB6EEAEDDFA4446044B5CC5E /* Preview */ = {
+			isa = PBXGroup;
+			children = (
+				8687F3F7995864074BA7FC62 /* PreviewContainer.swift */,
+				40792041A2DC1BDA880278A8 /* PreviewData.swift */,
+			);
+			path = Preview;
+			sourceTree = "<group>";
+		};
+		AF52D2B54218386F3D8843A3 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				182FA45482AF8D9F2D342493 /* CoreDataCloudKitShare.xcdatamodeld */,
+				8536D04113B55B9A3A78A61A /* CoreDataHelper.swift */,
+				2FBE4BD356F9BFE3D7C5C260 /* PersistenceController+Share.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		C1FCE5B0C584E924F99AEDDA /* LICENSE1 */ = {
+			isa = PBXGroup;
+			children = (
+				BEC44D40EB9CC1E64C437FCD /* LICENSE1.txt */,
+			);
+			path = LICENSE1;
+			sourceTree = "<group>";
+		};
+		C9322D90ADFDD08382676A25 /* Activity */ = {
+			isa = PBXGroup;
+			children = (
+				A9A7DC7DAE5761427EEDECF7 /* ActivityDetailView.swift */,
+				48E2E1E92765420A15B8C96E /* ActivityRowView.swift */,
+				DB8112617D9FA97E8E677035 /* TrackActivityView.swift */,
+			);
+			path = Activity;
+			sourceTree = "<group>";
+		};
+		CE6047F9E684668365191BDF /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				FD4EE14A1A83C8E2F7FC6687 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		E008E6B3722DD183E012B044 /* SwiftUI */ = {
+			isa = PBXGroup;
+			children = (
+				29DD278F648AC6ECC36DB9F3 /* AddToExistingShareView.swift */,
+				1B8ADC93934A503139847545 /* CareeShareButton.swift */,
+				A0D54F26D0B59C422EB19A19 /* ManagingSharesView.swift */,
+				7265D0CA032A26F123C51F15 /* ParticipantView.swift */,
+				22238868F63435B855D04FA8 /* SharePickerView.swift */,
+				B2A7D2996299552009231AFC /* SwiftUIHelper.swift */,
+			);
+			path = SwiftUI;
+			sourceTree = "<group>";
+		};
+		E7BA0075BE818C29A778C260 /* CareKeeperV2 */ = {
+			isa = PBXGroup;
+			children = (
+				AFA0B244053244763E644EDB /* CareKeeperV2.entitlements */,
+				3658F15B57408C93FEFBDD57 /* Info.plist */,
+				F94ECE7EA8EC4B5CA4B73443 /* App */,
+				F7B1635295465A23398351D8 /* Models */,
+				AB6EEAEDDFA4446044B5CC5E /* Preview */,
+				5AE0926FBD848299AE2E20FF /* Views */,
+			);
+			path = CareKeeperV2;
+			sourceTree = "<group>";
+		};
+		F7B1635295465A23398351D8 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F9B379F85DC676CFD654FBE7 /* Activity.swift */,
+				B891A79098EB2F885B7EE8C3 /* ActivityType.swift */,
+				0E0E024D0D96F2261DFEDB12 /* Caree.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		F94ECE7EA8EC4B5CA4B73443 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				2F7245C4875E7F8AF42ADA25 /* CareKeeperV2App.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		FAD2DDF8F4A2B698D8DEDF10 /* Sharing */ = {
+			isa = PBXGroup;
+			children = (
+				C4BC9A5CC8DF0E6A53D7373C /* SharingView.swift */,
+			);
+			path = Sharing;
+			sourceTree = "<group>";
+		};
+		FBD2FD610ABB85406231BE9D /* Sharing */ = {
+			isa = PBXGroup;
+			children = (
+				22B9297F373BA7714C369647 /* README.md */,
+				C1FCE5B0C584E924F99AEDDA /* LICENSE1 */,
+				AF52D2B54218386F3D8843A3 /* Persistence */,
+				E008E6B3722DD183E012B044 /* SwiftUI */,
+			);
+			path = Sharing;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		514B883128E3873500B81198 /* CareKeeper */ = {
+		5864BADE6AABF03AA09BCA6D /* CareKeeperV2 */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 514B884628E3873700B81198 /* Build configuration list for PBXNativeTarget "CareKeeper" */;
+			buildConfigurationList = D4D8DA5FEFFEB4FED359BA0D /* Build configuration list for PBXNativeTarget "CareKeeperV2" */;
 			buildPhases = (
-				514B882E28E3873500B81198 /* Sources */,
-				514B882F28E3873500B81198 /* Frameworks */,
-				514B883028E3873500B81198 /* Resources */,
-				51AEC3532914A58200C1DD5E /* Embed Watch Content */,
+				D86BC807B8BE8260B402EABB /* Sources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				51AEC3522914A58200C1DD5E /* PBXTargetDependency */,
 			);
-			name = CareKeeper;
-			productName = CareKeeperCoreData;
-			productReference = 514B883228E3873500B81198 /* CareKeeper.app */;
+			name = CareKeeperV2;
+			packageProductDependencies = (
+			);
+			productName = CareKeeperV2;
+			productReference = 05FE31454AB58301B0B745F0 /* CareKeeperV2.app */;
 			productType = "com.apple.product-type.application";
 		};
-		514B884C28E3875000B81198 /* CareKeeper Watch App */ = {
+		731CFBEA9FF41BE516075846 /* CareKeeper */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 514B885828E3875100B81198 /* Build configuration list for PBXNativeTarget "CareKeeper Watch App" */;
+			buildConfigurationList = 0DBDA7D4345A5BA8BE6EA0D1 /* Build configuration list for PBXNativeTarget "CareKeeper" */;
 			buildPhases = (
-				514B884928E3875000B81198 /* Sources */,
-				514B884A28E3875000B81198 /* Frameworks */,
-				514B884B28E3875000B81198 /* Resources */,
+				63BB5A117566FECA4275EB73 /* Sources */,
+				74170DF08E295392FEF2909C /* Resources */,
+				1FC6D8B5E11349B962E7C63F /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				43D1278FF4944D57EE14C36E /* PBXTargetDependency */,
+			);
+			name = CareKeeper;
+			packageProductDependencies = (
+			);
+			productName = CareKeeper;
+			productReference = 85E9FE0D93FA7DAC0747FF2C /* CareKeeper.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D33AEF414D4813AD6FD4E498 /* CareKeeper Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BBC90296502FD4A99E93605C /* Build configuration list for PBXNativeTarget "CareKeeper Watch App" */;
+			buildPhases = (
+				E9894483CC5FAB5AB02545EF /* Sources */,
+				7F4B0BC84CAAA87119CA1D84 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = "CareKeeper Watch App";
+			packageProductDependencies = (
+			);
 			productName = "CareKeeper Watch App";
-			productReference = 514B884D28E3875000B81198 /* CareKeeper Watch App.app */;
+			productReference = 68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		514B882A28E3873500B81198 /* Project object */ = {
+		D73F9B8A4F010D7EC1AB2F1E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1400;
-				LastUpgradeCheck = 1410;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
-					514B883128E3873500B81198 = {
-						CreatedOnToolsVersion = 14.0.1;
+					5864BADE6AABF03AA09BCA6D = {
+						DevelopmentTeam = 8C7EB23ZZP;
+						ProvisioningStyle = Automatic;
 					};
-					514B884C28E3875000B81198 = {
-						CreatedOnToolsVersion = 14.0.1;
+					731CFBEA9FF41BE516075846 = {
+						DevelopmentTeam = 8C7EB23ZZP;
+						ProvisioningStyle = Automatic;
+					};
+					D33AEF414D4813AD6FD4E498 = {
+						DevelopmentTeam = 8C7EB23ZZP;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
-			buildConfigurationList = 514B882D28E3873500B81198 /* Build configuration list for PBXProject "CareKeeper" */;
+			buildConfigurationList = 2BDA0F23576EC8A7540D098B /* Build configuration list for PBXProject "CareKeeper" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				Base,
+				en,
 			);
-			mainGroup = 514B882928E3873500B81198;
-			productRefGroup = 514B883328E3873500B81198 /* Products */;
+			mainGroup = 6082FA992EBB1FA2D05C686F;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				514B883128E3873500B81198 /* CareKeeper */,
-				514B884C28E3875000B81198 /* CareKeeper Watch App */,
+				731CFBEA9FF41BE516075846 /* CareKeeper */,
+				D33AEF414D4813AD6FD4E498 /* CareKeeper Watch App */,
+				5864BADE6AABF03AA09BCA6D /* CareKeeperV2 */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		514B883028E3873500B81198 /* Resources */ = {
+		74170DF08E295392FEF2909C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				518CB10B292F21BA00C60633 /* LICENSE1.txt in Resources */,
-				51FB8E57292B0D55001BD62C /* LICENSE2.txt in Resources */,
-				514B884328E3873700B81198 /* Preview Assets.xcassets in Resources */,
-				514B883F28E3873700B81198 /* Assets.xcassets in Resources */,
+				434622AA3466F621B68791A0 /* Assets.xcassets in Resources */,
+				3033A5968D83187001982DEE /* LICENSE1.txt in Resources */,
+				E06B226350D1699A29BB67F7 /* LICENSE2.txt in Resources */,
+				0B7E78423B30517254F92DC9 /* Preview Assets.xcassets in Resources */,
+				7EFA480D633F676FB7425E56 /* README.md in Resources */,
+				6128E06996359F16384D0142 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		514B884B28E3875000B81198 /* Resources */ = {
+		7F4B0BC84CAAA87119CA1D84 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				518CB10C292F21BA00C60633 /* LICENSE1.txt in Resources */,
-				51FB8E58292B0D55001BD62C /* LICENSE2.txt in Resources */,
-				514B885728E3875100B81198 /* Preview Assets.xcassets in Resources */,
-				514B885428E3875100B81198 /* Assets.xcassets in Resources */,
+				2AE6F0B5667E58000BF31695 /* Assets.xcassets in Resources */,
+				805AB8CA18C75280907BB24A /* Preview Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		514B882E28E3873500B81198 /* Sources */ = {
+		63BB5A117566FECA4275EB73 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				51C5B9A6290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */,
-				518CB107292F21A900C60633 /* PersistenceController+Share.swift in Sources */,
-				518CB0D8292F219F00C60633 /* AddToExistingShareView.swift in Sources */,
-				514B883828E3873500B81198 /* Persistence.swift in Sources */,
-				51FB8E68292B2DA4001BD62C /* FullImageView.swift in Sources */,
-				51FB8E71292C55B1001BD62C /* ProfileImageModel+Photos.swift in Sources */,
-				51FB8E5D292B0D55001BD62C /* ProfileImage.swift in Sources */,
-				518CB0F9292F21A900C60633 /* CoreDataHelper.swift in Sources */,
-				518CB0E6292F219F00C60633 /* ParticipantView.swift in Sources */,
-				51ED92F82936B50400ED9526 /* CareeShareButton.swift in Sources */,
-				51FB8E66292B270E001BD62C /* PhotoPickerCoordinator.swift in Sources */,
-				518CB114293049F800C60633 /* Persistence+History.swift in Sources */,
-				51FB8E5F292B0D55001BD62C /* ProfileImageModel.swift in Sources */,
-				518CB0D6292F219F00C60633 /* ManagingSharesView.swift in Sources */,
-				518CB0E8292F219F00C60633 /* SwiftUIHelper.swift in Sources */,
-				5101151D2900D7E50009D7EC /* LocationController.swift in Sources */,
-				518CB0DE292F219F00C60633 /* SharePickerView.swift in Sources */,
-				A1B2C3D4E5F6789012345678 /* ErrorHandling.swift in Sources */,
-				C3D4E5F67890123456789AB2 /* ActiveSheet.swift in Sources */,
-				E5F67890123456789AB2C3D4 /* CoreDataEntities.swift in Sources */,
-				67890123456789AB2C3D4E5F /* CareKeeperApp.swift in Sources */,
+				4A1A325580413B98328D89A5 /* ActiveSheet.swift in Sources */,
+				90E2DD04B3EC997C91C95CE1 /* AddToExistingShareView.swift in Sources */,
+				49FF82EC93435404D90A81AB /* CareKeeperApp.swift in Sources */,
+				B7A355F031DD32946A9867C3 /* CareeShareButton.swift in Sources */,
+				C0C3EDFA3282EE2FDF44B38D /* CoreDataCloudKitShare.xcdatamodeld in Sources */,
+				05B404ED220CC1647EDFD0A0 /* CoreDataEntities.swift in Sources */,
+				BDD8E320600B33A79DBE91D6 /* CoreDataHelper.swift in Sources */,
+				ECA3B98C70D9456D33FBE1CC /* ErrorHandling.swift in Sources */,
+				BB2806AB9D4957AE5EB4F882 /* FullImageView.swift in Sources */,
+				AB9C036BE3DCD0669C4EAEAF /* LocationController.swift in Sources */,
+				F0703D9851B796CC4296791D /* ManagingSharesView.swift in Sources */,
+				868F2E55E09757F642875784 /* ParticipantView.swift in Sources */,
+				D98374EF6E3277E116588C09 /* Persistence+History.swift in Sources */,
+				4112460D2B9B18A4E476CE86 /* Persistence.swift in Sources */,
+				9B8389689C3D15979366B955 /* PersistenceController+Share.swift in Sources */,
+				62F14F0758A0E89A9157B09A /* PersistenceErrorHandling.swift in Sources */,
+				05554E558F2C0A3D875CCBF8 /* PhotoPickerCoordinator.swift in Sources */,
+				D6B1A4440C79CE30B09336DC /* ProfileImage.swift in Sources */,
+				430C9B65DD9DCE78115D853F /* ProfileImageModel+Photos.swift in Sources */,
+				8F3C861246A79EB64BBF0DEF /* ProfileImageModel.swift in Sources */,
+				93F76C9E85CEEFFF5DA3A4BA /* SharePickerView.swift in Sources */,
+				B42EE23EBB2DE840E381F132 /* SwiftUIHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		514B884928E3875000B81198 /* Sources */ = {
+		D86BC807B8BE8260B402EABB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				518CB0D9292F219F00C60633 /* AddToExistingShareView.swift in Sources */,
-				51FB8E60292B0D55001BD62C /* ProfileImageModel.swift in Sources */,
-				51C5B9A7290C252D007B0C7C /* PersistenceErrorHandling.swift in Sources */,
-				518CB0FA292F21A900C60633 /* CoreDataHelper.swift in Sources */,
-				518CB108292F21A900C60633 /* PersistenceController+Share.swift in Sources */,
-				51ED92F92936B50400ED9526 /* CareeShareButton.swift in Sources */,
-				518CB0D7292F219F00C60633 /* ManagingSharesView.swift in Sources */,
-				518CB0E9292F219F00C60633 /* SwiftUIHelper.swift in Sources */,
-				518CB0E7292F219F00C60633 /* ParticipantView.swift in Sources */,
-				514B888828E50E8800B81198 /* Persistence.swift in Sources */,
-				51F3EC552919EE39007F1F0F /* ImageFromText.swift in Sources */,
-				51FB8E5E292B0D55001BD62C /* ProfileImage.swift in Sources */,
-				51A3257D296FE0C300DBF4BC /* CareeDetailView.swift in Sources */,
-				514B885028E3875000B81198 /* CareKeeperWatchApp.swift in Sources */,
-				5101151E2900D7E50009D7EC /* LocationController.swift in Sources */,
-				518CB115293049F800C60633 /* Persistence+History.swift in Sources */,
-				518CB0DF292F219F00C60633 /* SharePickerView.swift in Sources */,
-				5103A7A92918307B00F58FCE /* ComplicationController.swift in Sources */,
-				B2C3D4E5F67890123456789A /* ErrorHandling.swift in Sources */,
-				D4E5F67890123456789AB2C3 /* ActiveSheet.swift in Sources */,
-				F67890123456789AB2C3D4E5 /* CoreDataEntities.swift in Sources */,
+				9DD1F4DF60DBDDB6166E2DC7 /* Activity.swift in Sources */,
+				2C767CF4BAC4785ED75ACB8B /* ActivityDetailView.swift in Sources */,
+				3177C9877FB9B354EB2CA846 /* ActivityRowView.swift in Sources */,
+				0581540E5C21709255EC0B4C /* ActivityType.swift in Sources */,
+				F4BB352FA5DDC45AA1324D51 /* ActivityTypeEditView.swift in Sources */,
+				AE2D0DC285908FAA9D1D1F89 /* ActivityTypeRowView.swift in Sources */,
+				F9D1603943AAC5BC7FF298D3 /* CareKeeperV2App.swift in Sources */,
+				CE611BA043D64709EAC21138 /* Caree.swift in Sources */,
+				D7A6752318BB0C8EFF5EEF0D /* CareeDetailView.swift in Sources */,
+				A4D1FC41604F205388B16F28 /* CareeEditView.swift in Sources */,
+				19F506A7D3A3551BDC63A94B /* CareeListRowView.swift in Sources */,
+				401B3BAF4C0A5BE53876C494 /* CareeListView.swift in Sources */,
+				048ADB4D38C8A311F7089D0A /* ContentView.swift in Sources */,
+				95EA4C6E3C1B7F304EAED088 /* PreviewContainer.swift in Sources */,
+				87C2738F0624C7BAFEF7BB2F /* PreviewData.swift in Sources */,
+				5119FE50D16B690D2C25DC2B /* SharingView.swift in Sources */,
+				F03D95A5CC1DC29FFEEC1BDF /* TrackActivityView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E9894483CC5FAB5AB02545EF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3DD65D8FA8C262DE08388010 /* CareKeeperWatchApp.swift in Sources */,
+				2C12A06E594777FE5198E802 /* CareeDetailView.swift in Sources */,
+				2044087946A057C720062B59 /* ComplicationController.swift in Sources */,
+				5B17A7DF45E7C2230F878709 /* ImageFromText.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		51AEC3522914A58200C1DD5E /* PBXTargetDependency */ = {
+		43D1278FF4944D57EE14C36E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 514B884C28E3875000B81198 /* CareKeeper Watch App */;
-			targetProxy = 51AEC3512914A58200C1DD5E /* PBXContainerItemProxy */;
+			target = D33AEF414D4813AD6FD4E498 /* CareKeeper Watch App */;
+			targetProxy = ABA7405D567582DC32E7EBAD /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		514B884428E3873700B81198 /* Debug */ = {
+		12E5FD1AAD4FBFC97EE1381F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -607,8 +618,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 8C7EB23ZZP;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -616,8 +628,8 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
 					"$(inherited)",
+					"DEBUG=1",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -625,21 +637,102 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 2.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
 		};
-		514B884528E3873700B81198 /* Release */ = {
+		2804E2B10087B0D1E693F6AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CareKeeperV2/CareKeeperV2.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperV2/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = CareKeeperV2/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperV2;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		70585D3C1F7B71E83D62AE29 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "CareKeeper Watch App/CareKeeper Watch App.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper Watch App/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "CareKeeper-Watch-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
+				INFOPLIST_KEY_CLKComplicationPrincipalClass = "$(PRODUCT_MODULE_NAME).ComplicationController";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Debug;
+		};
+		7E4C752AA2924FD2E53623E1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CareKeeper/CareKeeper.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper/Preview Content\"";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = CareKeeper/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		98A48EBFB5F79FAA45AE3688 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -666,8 +759,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 8C7EB23ZZP;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -678,211 +772,146 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 2.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
 		};
-		514B884728E3873700B81198 /* Debug */ = {
+		D3E1AF13477A7154AE445C80 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CareKeeper/CareKeeper.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper/Preview Content\"";
-				DEVELOPMENT_TEAM = 8C7EB23ZZP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CareKeeper/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
-				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				MARKETING_VERSION = 1.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
-				SKIP_INSTALL = NO;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		514B884828E3873700B81198 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = CareKeeper/CareKeeper.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper/Preview Content\"";
-				DEVELOPMENT_TEAM = 8C7EB23ZZP;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CareKeeper/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
-				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
-				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = NO;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		514B885928E3875100B81198 /* Debug */ = {
+		D41CB91D679AC1BBC377141E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "CareKeeper Watch App/CareKeeper Watch App.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = 8C7EB23ZZP;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "CareKeeper-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
 				INFOPLIST_KEY_CLKComplicationPrincipalClass = "$(PRODUCT_MODULE_NAME).ComplicationController";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 9.0;
-			};
-			name = Debug;
-		};
-		514B885A28E3875100B81198 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "CareKeeper Watch App/CareKeeper Watch App.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = 8C7EB23ZZP;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "CareKeeper-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
-				INFOPLIST_KEY_CLKComplicationPrincipalClass = "$(PRODUCT_MODULE_NAME).ComplicationController";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Associate location with a single activity only after explicit opt-in";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				VALIDATE_PRODUCT = YES;
 				WATCHOS_DEPLOYMENT_TARGET = 9.0;
 			};
 			name = Release;
+		};
+		D4E999FFE68FD754BBDF64FB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CareKeeperV2/CareKeeperV2.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperV2/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = CareKeeperV2/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperV2;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		514B882D28E3873500B81198 /* Build configuration list for PBXProject "CareKeeper" */ = {
+		0DBDA7D4345A5BA8BE6EA0D1 /* Build configuration list for PBXNativeTarget "CareKeeper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				514B884428E3873700B81198 /* Debug */,
-				514B884528E3873700B81198 /* Release */,
+				D3E1AF13477A7154AE445C80 /* Debug */,
+				7E4C752AA2924FD2E53623E1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
-		514B884628E3873700B81198 /* Build configuration list for PBXNativeTarget "CareKeeper" */ = {
+		2BDA0F23576EC8A7540D098B /* Build configuration list for PBXProject "CareKeeper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				514B884728E3873700B81198 /* Debug */,
-				514B884828E3873700B81198 /* Release */,
+				12E5FD1AAD4FBFC97EE1381F /* Debug */,
+				98A48EBFB5F79FAA45AE3688 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
-		514B885828E3875100B81198 /* Build configuration list for PBXNativeTarget "CareKeeper Watch App" */ = {
+		BBC90296502FD4A99E93605C /* Build configuration list for PBXNativeTarget "CareKeeper Watch App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				514B885928E3875100B81198 /* Debug */,
-				514B885A28E3875100B81198 /* Release */,
+				70585D3C1F7B71E83D62AE29 /* Debug */,
+				D41CB91D679AC1BBC377141E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
+		};
+		D4D8DA5FEFFEB4FED359BA0D /* Build configuration list for PBXNativeTarget "CareKeeperV2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D4E999FFE68FD754BBDF64FB /* Debug */,
+				2804E2B10087B0D1E693F6AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		182FA45482AF8D9F2D342493 /* CoreDataCloudKitShare.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				75FD9086FF163E6E1AECC486 /* CoreDataCloudKitShare.xcdatamodel */,
+			);
+			currentVersion = 75FD9086FF163E6E1AECC486 /* CoreDataCloudKitShare.xcdatamodel */;
+			path = CoreDataCloudKitShare.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
-	rootObject = 514B882A28E3873500B81198 /* Project object */;
+	rootObject = D73F9B8A4F010D7EC1AB2F1E /* Project object */;
 }
