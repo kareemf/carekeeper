@@ -12,9 +12,20 @@ struct CareeDetailView: View {
         ScrollView {
             VStack(spacing: 20) {
                 headerSection
-                trackActivityButton
+
+                // Only show track activity button if activity types exist
+                if !caree.sortedActivityTypes.isEmpty {
+                    trackActivityButton
+                }
+
                 activityTypesSection
-                recentActivitiesSection
+
+                // Only show recent activities section if activity types exist
+                if !caree.sortedActivityTypes.isEmpty {
+                    recentActivitiesSection
+                } else {
+                    noActivityTypesGuidance
+                }
             }
             .padding()
         }
@@ -186,7 +197,7 @@ struct CareeDetailView: View {
             ForEach(Array(caree.recentActivities.prefix(5))) { activity in
                 ActivityRowView(activity: activity)
             }
-            
+
             if caree.recentActivities.count > 5 {
                 Button(NSLocalizedString("View All Activities", comment: "View all activities button")) {
                     // Navigate to full activities list
@@ -195,6 +206,31 @@ struct CareeDetailView: View {
                 .foregroundColor(.accentColor)
             }
         }
+    }
+
+    private var noActivityTypesGuidance: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "lightbulb.circle")
+                .font(.system(size: 50))
+                .foregroundColor(.accentColor)
+
+            Text(NSLocalizedString("Getting Started", comment: "Getting started title"))
+                .font(.headline)
+
+            Text(NSLocalizedString("Once you've configured your first activity type, you'll be able to track new activities and view recent ones here.",
+                                 comment: "No activity types guidance"))
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+
+            Button(NSLocalizedString("Add Activity Type", comment: "Add activity type CTA")) {
+                showingAddActivityType = true
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
     }
 }
 
