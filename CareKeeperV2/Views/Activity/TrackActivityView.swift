@@ -14,6 +14,7 @@ struct TrackActivityView: View {
     @State private var useCustomTime: Bool = false
     @State private var includeLocation: Bool = false
     @StateObject private var locationManager = LocationManager()
+    @State private var error: Error?
     
     private var sortedActivityTypes: [ActivityType] {
         caree.sortedActivityTypes
@@ -50,6 +51,12 @@ struct TrackActivityView: View {
         .onAppear {
             requestLocationIfNeeded()
         }
+        .onChange(of: locationManager.error != nil) { _, hasError in
+            if hasError {
+                error = locationManager.error
+            }
+        }
+        .errorAlert($error)
     }
     
     private var activityTypeSection: some View {

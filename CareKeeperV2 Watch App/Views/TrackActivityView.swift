@@ -14,6 +14,7 @@ struct TrackActivityView: View {
     @State private var showingStep2 = false
     @State private var includeLocation: Bool = false
     @StateObject private var locationManager = LocationManager()
+    @State private var error: Error?
 
     var body: some View {
         NavigationStack {
@@ -23,6 +24,12 @@ struct TrackActivityView: View {
                 activityDetailsForm(for: activityType)
             }
         }
+        .onChange(of: locationManager.error != nil) { _, hasError in
+            if hasError {
+                error = locationManager.error
+            }
+        }
+        .errorAlert($error)
     }
 
     private var activityTypeSelection: some View {
@@ -172,7 +179,7 @@ struct TrackActivityView: View {
             locationManager.stopUpdating()
             dismiss()
         } catch {
-            print("⚠️ Failed to save activity: \(error)")
+            self.error = AppError.saveFailed(error.localizedDescription)
         }
     }
 }

@@ -65,6 +65,7 @@ targets:
       - path: CareKeeperV2/Models
       - path: CareKeeperV2/Preview
       - path: CareKeeperV2/Services
+      - path: CareKeeperV2/Views/Components
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeperV2.watchkitapp

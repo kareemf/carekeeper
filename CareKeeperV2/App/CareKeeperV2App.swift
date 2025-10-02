@@ -21,9 +21,9 @@ struct CareKeeperV2App: App {
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
-            // Log the error for debugging
-            print("⚠️ Failed to create ModelContainer: \(error)")
-            print("⚠️ Error details: \(error.localizedDescription)")
+            // Log the error and fall back to in-memory storage
+            print("⚠️ Failed to create persistent ModelContainer: \(error.localizedDescription)")
+            print("   Falling back to in-memory storage (data will not persist)")
 
             // Fallback to in-memory store for development
             let fallbackConfig = ModelConfiguration(
@@ -34,7 +34,7 @@ struct CareKeeperV2App: App {
             do {
                 return try ModelContainer(for: schema, configurations: [fallbackConfig])
             } catch {
-                fatalError("Could not create fallback ModelContainer: \(error)")
+                fatalError("Could not create ModelContainer: \(error)")
             }
         }
     }()

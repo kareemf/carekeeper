@@ -7,6 +7,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var location: CLLocation?
     @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
     @Published var isUpdating: Bool = false
+    @Published var error: Error?
 
     private let locationManager = CLLocationManager()
 
@@ -20,7 +21,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     /// Request location permission and start updating location
     func startUpdating() {
         guard authorizationStatus != .denied && authorizationStatus != .restricted else {
-            print("⚠️ Location access denied or restricted")
+            self.error = AppError.locationPermissionDenied
             return
         }
 
@@ -41,7 +42,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     /// Get current location once (useful for activity tracking)
     func requestLocation() {
         guard authorizationStatus != .denied && authorizationStatus != .restricted else {
-            print("⚠️ Location access denied or restricted")
+            self.error = AppError.locationPermissionDenied
             return
         }
 
@@ -63,7 +64,9 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("⚠️ Location manager failed: \(error.localizedDescription)")
+        Task { @MainActor in
+            self.error = AppError.locationUnavailable
+        }
     }
 
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {

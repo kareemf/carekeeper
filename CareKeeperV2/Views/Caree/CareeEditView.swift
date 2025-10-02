@@ -10,7 +10,8 @@ struct CareeEditView: View {
     @State private var name: String = ""
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var imageData: Data?
-    
+    @State private var error: Error?
+
     private var isEditing: Bool { caree != nil }
     
     init(caree: Caree? = nil) {
@@ -61,6 +62,7 @@ struct CareeEditView: View {
         .onChange(of: selectedPhotoItem) { _, newItem in
             loadSelectedPhoto(from: newItem)
         }
+        .errorAlert($error)
     }
     
     private var profileImageSection: some View {
@@ -112,7 +114,9 @@ struct CareeEditView: View {
                     self.imageData = data
                 }
             case .failure(let error):
-                print("Error loading photo: \(error)")
+                DispatchQueue.main.async {
+                    self.error = error
+                }
             }
         }
     }
