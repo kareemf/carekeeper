@@ -30,6 +30,8 @@ struct CareeListRowView: View {
                     .aspectRatio(contentMode: .fill)
             } else {
                 Image(systemName: "person.crop.circle.fill")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
                     .foregroundColor(.secondary)
             }
         }

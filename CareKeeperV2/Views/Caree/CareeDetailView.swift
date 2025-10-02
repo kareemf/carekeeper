@@ -100,7 +100,8 @@ struct CareeDetailView: View {
                     .aspectRatio(contentMode: .fill)
             } else {
                 Image(systemName: "person.crop.circle.fill")
-                    .font(.system(size: 50))
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
                     .foregroundColor(.secondary)
             }
         }
