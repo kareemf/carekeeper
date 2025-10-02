@@ -13,6 +13,13 @@ public class Caree: NSManagedObject {
     @NSManaged public var name: String?
     @NSManaged public var activities: NSSet?
     @NSManaged public var behaviors: NSSet?
+    @NSManaged public var photo: Photo?
+}
+
+@objc(Photo)
+public class Photo: NSManagedObject {
+    @NSManaged public var data: Data?
+    @NSManaged public var caree: Caree?
 }
 
 @objc(Behavior)

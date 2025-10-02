@@ -7,6 +7,7 @@ import CloudKit
 enum ActiveSheet: Identifiable {
     case cloudSharingSheet(CKShare)
     case participantView(CKShare)
+    case managingSharesView
     
     var id: String {
         switch self {
@@ -14,6 +15,8 @@ enum ActiveSheet: Identifiable {
             return "cloudSharing-\(share.recordID.recordName)"
         case .participantView(let share):
             return "participant-\(share.recordID.recordName)"
+        case .managingSharesView:
+            return "managingSharesView"
         }
     }
 }

@@ -62,7 +62,7 @@ private struct ShareListView: View {
         let fetchRequest = Caree.fetchRequest()
 
         do {
-            return try PersistenceController.shared.container.viewContext.fetch(fetchRequest)
+            return try PersistenceController.shared.container.viewContext.fetch(fetchRequest) as! [Caree]
         } catch {
             throw error
         }
