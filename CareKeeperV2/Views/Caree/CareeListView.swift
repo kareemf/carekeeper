@@ -55,7 +55,7 @@ struct CareeListView: View {
     private var careeListView: some View {
         List {
             ForEach(carees) { caree in
-                NavigationLink(destination: CareeDetailView(caree: caree)) {
+                NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
                     CareeListRowView(caree: caree)
                 }
             }

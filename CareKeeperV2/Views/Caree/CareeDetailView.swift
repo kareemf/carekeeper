@@ -1,79 +1,98 @@
 import SwiftUI
+import SwiftData
 
 struct CareeDetailView: View {
     @Environment(\.modelContext) private var modelContext
-    let caree: Caree
-    
+
+    let careeID: UUID
+    @Query private var allCarees: [Caree]
+
+    // Computed property to get the specific caree
+    private var caree: Caree? {
+        allCarees.first { $0.id == careeID }
+    }
+
     @State private var showingEditCaree = false
     @State private var showingAddActivityType = false
     @State private var showingTrackActivity = false
+
+    init(careeID: UUID) {
+        self.careeID = careeID
+    }
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                headerSection
+        Group {
+            if let caree = caree {
+                ScrollView {
+                    VStack(spacing: 20) {
+                        headerSection(for: caree)
 
-                // Only show track activity button if activity types exist
-                if !caree.sortedActivityTypes.isEmpty {
-                    trackActivityButton
+                        // Only show track activity button if activity types exist
+                        if !caree.sortedActivityTypes.isEmpty {
+                            trackActivityButton(for: caree)
+                        }
+
+                        activityTypesSection(for: caree)
+
+                        // Only show recent activities section if activity types exist
+                        if !caree.sortedActivityTypes.isEmpty {
+                            recentActivitiesSection(for: caree)
+                        } else {
+                            noActivityTypesGuidance
+                        }
+                    }
+                    .padding()
                 }
-
-                activityTypesSection
-
-                // Only show recent activities section if activity types exist
-                if !caree.sortedActivityTypes.isEmpty {
-                    recentActivitiesSection
-                } else {
-                    noActivityTypesGuidance
+                .navigationTitle(caree.name)
+                .navigationBarTitleDisplayMode(.large)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(NSLocalizedString("Edit", comment: "Edit button")) {
+                            showingEditCaree = true
+                        }
+                    }
                 }
+                .sheet(isPresented: $showingEditCaree) {
+                    CareeEditView(caree: caree)
+                }
+                .sheet(isPresented: $showingAddActivityType) {
+                    ActivityTypeEditView(caree: caree)
+                }
+                .sheet(isPresented: $showingTrackActivity) {
+                    TrackActivityView(caree: caree)
+                }
+            } else {
+                Text(NSLocalizedString("Caree not found", comment: "Caree not found message"))
+                    .foregroundColor(.secondary)
             }
-            .padding()
-        }
-        .navigationTitle(caree.name)
-        .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(NSLocalizedString("Edit", comment: "Edit button")) {
-                    showingEditCaree = true
-                }
-            }
-        }
-        .sheet(isPresented: $showingEditCaree) {
-            CareeEditView(caree: caree)
-        }
-        .sheet(isPresented: $showingAddActivityType) {
-            ActivityTypeEditView(caree: caree)
-        }
-        .sheet(isPresented: $showingTrackActivity) {
-            TrackActivityView(caree: caree)
         }
     }
     
-    private var headerSection: some View {
+    private func headerSection(for caree: Caree) -> some View {
         HStack {
-            profileImageView
-            
+            profileImageView(for: caree)
+
             VStack(alignment: .leading, spacing: 8) {
                 Text(caree.name)
                     .font(.title2)
                     .fontWeight(.medium)
-                
-                Text(NSLocalizedString("\(caree.activityTypes.count) activity types", 
+
+                Text(NSLocalizedString("\(caree.activityTypes.count) activity types",
                                      comment: "Activity types count"))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                
-                Text(NSLocalizedString("\(caree.activities.count) total activities", 
+
+                Text(NSLocalizedString("\(caree.activities.count) total activities",
                                      comment: "Total activities count"))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
-            
+
             Spacer()
         }
     }
-    
-    private var profileImageView: some View {
+
+    private func profileImageView(for caree: Caree) -> some View {
         Group {
             if let imageData = caree.image, let uiImage = UIImage(data: imageData) {
                 Image(uiImage: uiImage)
@@ -88,13 +107,13 @@ struct CareeDetailView: View {
         .frame(width: 80, height: 80)
         .clipShape(Circle())
     }
-    
-    private var trackActivityButton: some View {
+
+    private func trackActivityButton(for caree: Caree) -> some View {
         Button(action: { showingTrackActivity = true }) {
             HStack {
                 Image(systemName: "plus.circle.fill")
                     .font(.title2)
-                
+
                 Text(NSLocalizedString("Track Activity", comment: "Track activity button"))
                     .font(.headline)
             }
@@ -106,8 +125,8 @@ struct CareeDetailView: View {
         }
         .disabled(caree.activityTypes.isEmpty)
     }
-    
-    private var activityTypesSection: some View {
+
+    private func activityTypesSection(for caree: Caree) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(NSLocalizedString("Activity Types", comment: "Activity types section title"))
@@ -122,43 +141,43 @@ struct CareeDetailView: View {
             }
 
             if !caree.sortedActivityTypes.isEmpty {
-                activityTypesList
+                activityTypesList(for: caree)
             }
         }
     }
-    
-    private var activityTypesList: some View {
+
+    private func activityTypesList(for caree: Caree) -> some View {
         LazyVStack(spacing: 8) {
             ForEach(caree.sortedActivityTypes) { activityType in
                 ActivityTypeRowView(activityType: activityType)
             }
         }
     }
-    
-    private var recentActivitiesSection: some View {
+
+    private func recentActivitiesSection(for caree: Caree) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(NSLocalizedString("Recent Activities", comment: "Recent activities section title"))
                 .font(.headline)
-            
+
             if caree.recentActivities.isEmpty {
                 emptyActivitiesView
             } else {
-                recentActivitiesList
+                recentActivitiesList(for: caree)
             }
         }
     }
-    
+
     private var emptyActivitiesView: some View {
         VStack(spacing: 12) {
             Image(systemName: "clock.circle")
                 .font(.system(size: 40))
                 .foregroundColor(.secondary)
-            
+
             Text(NSLocalizedString("No activities yet", comment: "Empty activities message"))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            
-            Text(NSLocalizedString("This list will be populated once you start tracking activities.", 
+
+            Text(NSLocalizedString("This list will be populated once you start tracking activities.",
                                  comment: "Empty activities description"))
                 .font(.caption)
                 .foregroundColor(.secondary)
@@ -168,8 +187,8 @@ struct CareeDetailView: View {
         .background(Color(.systemGray6))
         .cornerRadius(12)
     }
-    
-    private var recentActivitiesList: some View {
+
+    private func recentActivitiesList(for caree: Caree) -> some View {
         LazyVStack(spacing: 8) {
             ForEach(Array(caree.recentActivities.prefix(5))) { activity in
                 ActivityRowView(activity: activity)
@@ -213,7 +232,7 @@ struct CareeDetailView: View {
 
 #Preview {
     NavigationView {
-        CareeDetailView(caree: PreviewData.sampleCareeWithActivities)
+        CareeDetailView(careeID: PreviewData.sampleCareeWithActivities.id)
     }
     .modelContainer(PreviewContainer.shared)
 }
