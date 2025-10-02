@@ -73,10 +73,6 @@ struct CareeDetailView: View {
             profileImageView(for: caree)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text(caree.name)
-                    .font(.title2)
-                    .fontWeight(.medium)
-
                 Text(NSLocalizedString("\(caree.activityTypes.count) activity types",
                                      comment: "Activity types count"))
                     .font(.subheadline)
@@ -121,7 +117,7 @@ struct CareeDetailView: View {
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .padding()
-            .background(Color.accentColor)
+            .background(Color.green.opacity(0.8))
             .cornerRadius(12)
         }
         .disabled(caree.activityTypes.isEmpty)

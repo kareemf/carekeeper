@@ -28,9 +28,6 @@ struct CareeDetailView: View {
                             trackActivityButton(for: caree)
                         }
 
-                        // Activity types section
-                        activityTypesSection(for: caree)
-
                         // Recent activities section
                         recentActivitiesSection(for: caree)
                     }
@@ -56,45 +53,15 @@ struct CareeDetailView: View {
             .frame(maxWidth: .infinity)
             .foregroundColor(.white)
             .padding(.vertical, 12)
-            .background(Color.accentColor)
+            .background(Color.green.opacity(0.8))
             .cornerRadius(8)
         }
         .disabled(caree.activityTypes.isEmpty)
     }
 
-    private func activityTypesSection(for caree: Caree) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(NSLocalizedString("Activity Types", comment: "Activity types section title"))
-                .font(.headline)
-
-            if caree.sortedActivityTypes.isEmpty {
-                Text(NSLocalizedString("Add on iPhone", comment: "Empty activity types"))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            } else {
-                ForEach(caree.sortedActivityTypes) { activityType in
-                    HStack {
-                        Text(activityType.displayIcon)
-                            .font(.title3)
-
-                        Text(activityType.name)
-                            .font(.subheadline)
-
-                        Spacer()
-
-                        Text("\(activityType.totalActivitiesCount)")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.vertical, 4)
-                }
-            }
-        }
-    }
-
     private func recentActivitiesSection(for caree: Caree) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(NSLocalizedString("Recent", comment: "Recent activities section title"))
+            Text(NSLocalizedString("Recent Activities", comment: "Recent activities section title"))
                 .font(.headline)
 
             if caree.recentActivities.isEmpty {
