@@ -15,6 +15,8 @@ struct ActivityListView: View {
     @State private var selectedActivityType: ActivityType?
     @State private var showingFilterMenu = false
     @State private var error: Error?
+    @State private var activityToDelete: IndexSet?
+    @State private var showingDeleteConfirmation = false
 
     init(careeID: UUID) {
         self.careeID = careeID
@@ -34,7 +36,8 @@ struct ActivityListView: View {
                                 .listRowBackground(Color.clear)
                         }
                         .onDelete { offsets in
-                            deleteActivities(at: offsets, from: caree)
+                            activityToDelete = offsets
+                            showingDeleteConfirmation = true
                         }
                     }
                 }
@@ -78,6 +81,22 @@ struct ActivityListView: View {
             }
         }
         .errorAlert($error)
+        .confirmationDialog(
+            NSLocalizedString("Delete Activity?", comment: "Delete activity confirmation title"),
+            isPresented: $showingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(NSLocalizedString("Delete", comment: "Delete button"), role: .destructive) {
+                if let offsets = activityToDelete, let caree = caree {
+                    deleteActivities(at: offsets, from: caree)
+                }
+            }
+            Button(NSLocalizedString("Cancel", comment: "Cancel button"), role: .cancel) {
+                activityToDelete = nil
+            }
+        } message: {
+            Text(NSLocalizedString("This cannot be undone.", comment: "Delete confirmation message"))
+        }
     }
 
     private var emptyStateView: some View {

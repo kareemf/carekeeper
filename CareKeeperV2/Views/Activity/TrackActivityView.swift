@@ -35,7 +35,6 @@ struct TrackActivityView: View {
                         .transition(.move(edge: .leading).combined(with: .opacity))
                 }
             }
-            .animation(.easeInOut(duration: 0.3), value: selectedActivityType?.id)
             .navigationTitle(NSLocalizedString("Track Activity", comment: "Track activity navigation title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -186,16 +185,12 @@ struct TrackActivityView: View {
     private func saveActivity() {
         guard let activityType = selectedActivityType else { return }
 
-        // Validate quantity if required
+        // Parse quantity if provided
         var quantityValue: Double? = nil
-        if activityType.hasQuantity {
-            guard let parsedQuantity = Double(quantity), parsedQuantity >= 0 else {
-                error = AppError.invalidInput(
-                    NSLocalizedString("Please enter a valid quantity (0 or greater)", comment: "Invalid quantity error")
-                )
-                return
+        if activityType.hasQuantity && !quantity.isEmpty {
+            if let parsedQuantity = Double(quantity), parsedQuantity >= 0 {
+                quantityValue = parsedQuantity
             }
-            quantityValue = parsedQuantity
         }
 
         isSaving = true

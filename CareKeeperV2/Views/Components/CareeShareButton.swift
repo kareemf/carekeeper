@@ -21,16 +21,13 @@ struct CareeShareButton: View {
                 await prepareShare()
             }
         } label: {
-            HStack {
-                if isLoading {
-                    ProgressView()
-                        .scaleEffect(0.8)
-                } else {
-                    Image(systemName: sharingService.isShared(caree, in: modelContext) ? "person.2.fill" : "person.2")
-                    Text(sharingService.isShared(caree, in: modelContext)
-                         ? NSLocalizedString("Manage Sharing", comment: "Manage sharing button")
-                         : NSLocalizedString("Share", comment: "Share button"))
-                }
+            if isLoading {
+                ProgressView()
+                    .scaleEffect(0.8)
+            } else {
+                Image(systemName: sharingService.isShared(caree, in: modelContext)
+                      ? "person.crop.circle.badge.checkmark"
+                      : "square.and.arrow.up")
             }
         }
         .disabled(isLoading)

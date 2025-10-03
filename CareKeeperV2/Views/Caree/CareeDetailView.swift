@@ -15,6 +15,8 @@ struct CareeDetailView: View {
     @State private var showingEditCaree = false
     @State private var showingAddActivityType = false
     @State private var showingTrackActivity = false
+    @State private var activityTypeToDelete: ActivityType?
+    @State private var showingDeleteActivityTypeConfirmation = false
 
     init(careeID: UUID) {
         self.careeID = careeID
@@ -67,11 +69,32 @@ struct CareeDetailView: View {
                 .sheet(isPresented: $showingTrackActivity) {
                     TrackActivityView(caree: caree)
                 }
+                .confirmationDialog(
+                    NSLocalizedString("Delete Activity Type?", comment: "Delete activity type confirmation title"),
+                    isPresented: $showingDeleteActivityTypeConfirmation,
+                    titleVisibility: .visible
+                ) {
+                    Button(NSLocalizedString("Delete", comment: "Delete button"), role: .destructive) {
+                        if let activityType = activityTypeToDelete {
+                            deleteActivityType(activityType)
+                        }
+                    }
+                    Button(NSLocalizedString("Cancel", comment: "Cancel button"), role: .cancel) {
+                        activityTypeToDelete = nil
+                    }
+                } message: {
+                    Text(NSLocalizedString("This will also delete all associated activities. This cannot be undone.", comment: "Delete activity type confirmation message"))
+                }
             } else {
                 Text(NSLocalizedString("Caree not found", comment: "Caree not found message"))
                     .foregroundColor(.secondary)
             }
         }
+    }
+
+    private func deleteActivityType(_ activityType: ActivityType) {
+        modelContext.delete(activityType)
+        activityTypeToDelete = nil
     }
     
     private func headerSection(for caree: Caree) -> some View {
@@ -153,6 +176,14 @@ struct CareeDetailView: View {
         LazyVStack(spacing: 8) {
             ForEach(caree.sortedActivityTypes) { activityType in
                 ActivityTypeRowView(activityType: activityType)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button(role: .destructive) {
+                            activityTypeToDelete = activityType
+                            showingDeleteActivityTypeConfirmation = true
+                        } label: {
+                            Label(NSLocalizedString("Delete", comment: "Delete button"), systemImage: "trash")
+                        }
+                    }
             }
         }
     }

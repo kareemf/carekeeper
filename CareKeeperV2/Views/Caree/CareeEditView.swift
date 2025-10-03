@@ -47,16 +47,8 @@ struct CareeEditView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    HStack(spacing: 16) {
-                        #if os(iOS)
-                        if isEditing, let caree = caree {
-                            CareeShareButton(caree: caree)
-                        }
-                        #endif
-
-                        Button(NSLocalizedString("Cancel", comment: "Cancel button")) {
-                            dismiss()
-                        }
+                    Button(NSLocalizedString("Cancel", comment: "Cancel button")) {
+                        dismiss()
                     }
                 }
 

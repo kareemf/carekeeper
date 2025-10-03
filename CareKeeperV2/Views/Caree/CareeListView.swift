@@ -5,6 +5,8 @@ struct CareeListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Caree.listOrder) private var carees: [Caree]
     @State private var showingAddCaree = false
+    @State private var careeToDelete: IndexSet?
+    @State private var showingDeleteConfirmation = false
     
     var body: some View {
         NavigationView {
@@ -38,6 +40,23 @@ struct CareeListView: View {
             .sheet(isPresented: $showingAddCaree) {
                 CareeEditView()
                     .presentationDragIndicator(.visible)
+            }
+            .confirmationDialog(
+                NSLocalizedString("Delete Caree?", comment: "Delete caree confirmation title"),
+                isPresented: $showingDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button(NSLocalizedString("Delete", comment: "Delete button"), role: .destructive) {
+                    if let offsets = careeToDelete {
+                        deleteCarees(offsets: offsets)
+                        careeToDelete = nil
+                    }
+                }
+                Button(NSLocalizedString("Cancel", comment: "Cancel button"), role: .cancel) {
+                    careeToDelete = nil
+                }
+            } message: {
+                Text(NSLocalizedString("This will delete all activity types and activities. This cannot be undone.", comment: "Delete caree confirmation message"))
             }
         }
     }
@@ -80,7 +99,10 @@ struct CareeListView: View {
                     removal: .move(edge: .trailing).combined(with: .opacity)
                 ))
             }
-            .onDelete(perform: deleteCarees)
+            .onDelete { offsets in
+                careeToDelete = offsets
+                showingDeleteConfirmation = true
+            }
             .onMove(perform: moveCarees)
         }
         .animation(.easeInOut(duration: 0.3), value: carees.map { $0.id })
