@@ -13,6 +13,7 @@ struct ActivityTypeEditView: View {
     @State private var quantityUnit: String = ""
     @State private var hasLocation: Bool = false
     @State private var error: Error?
+    @FocusState private var isNameFieldFocused: Bool
 
     private var isEditing: Bool { activityType != nil }
     
@@ -35,7 +36,8 @@ struct ActivityTypeEditView: View {
                 Section {
                     TextField(NSLocalizedString("Name", comment: "Activity type name field"), text: $name)
                         .textInputAutocapitalization(.words)
-                    
+                        .focused($isNameFieldFocused)
+
                     TextField(NSLocalizedString("Icon (emoji)", comment: "Activity type icon field"), text: $icon)
                         .textInputAutocapitalization(.never)
                 }
@@ -68,6 +70,14 @@ struct ActivityTypeEditView: View {
                         saveActivityType()
                     }
                     .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+        }
+        .onAppear {
+            // Auto-focus on name field for new activity types
+            if !isEditing {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    isNameFieldFocused = true
                 }
             }
         }
