@@ -173,7 +173,7 @@ struct TrackActivityView: View {
 
         let activity = Activity(
             notes: notes.isEmpty ? nil : notes,
-            quantity: activityType.hasQuantity ? quantity : nil,
+            quantity: activityType.hasQuantity && quantity > 0 ? quantity : nil,
             latitude: location?.coordinate.latitude,
             longitude: location?.coordinate.longitude,
             activityType: activityType,
