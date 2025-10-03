@@ -12,7 +12,8 @@ struct ActivityTypeEditView: View {
     @State private var hasQuantity: Bool = false
     @State private var quantityUnit: String = ""
     @State private var hasLocation: Bool = false
-    
+    @State private var error: Error?
+
     private var isEditing: Bool { activityType != nil }
     
     init(caree: Caree, activityType: ActivityType? = nil) {
@@ -70,12 +71,18 @@ struct ActivityTypeEditView: View {
                 }
             }
         }
+        .errorAlert($error)
     }
     
     private func saveActivityType() {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedName.isEmpty else { return }
-        
+        guard !trimmedName.isEmpty else {
+            error = AppError.invalidInput(
+                NSLocalizedString("Please enter a name for the activity type", comment: "Empty activity type name error")
+            )
+            return
+        }
+
         if let existingActivityType = activityType {
             // Update existing activity type
             existingActivityType.name = trimmedName
@@ -96,8 +103,13 @@ struct ActivityTypeEditView: View {
             )
             modelContext.insert(newActivityType)
         }
-        
-        dismiss()
+
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            self.error = AppError.saveFailed(error.localizedDescription)
+        }
     }
 }
 

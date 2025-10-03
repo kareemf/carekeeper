@@ -10,18 +10,20 @@ struct CareKeeperV2WatchApp: App {
             Activity.self
         ])
 
+        // Configure CloudKit sync with private database
         // Use app group for shared data with iOS app
         let modelConfiguration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
-            groupContainer: .identifier("group.com.kareemf.CareKeeper")
+            groupContainer: .identifier("group.com.kareemf.CareKeeper"),
+            cloudKitDatabase: .private("iCloud.com.kareemf.CareKeeperCK")
         )
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
             // Log the error and fall back to in-memory storage
-            print("⚠️ Failed to create persistent ModelContainer: \(error.localizedDescription)")
+            print("⚠️ Failed to create CloudKit-enabled ModelContainer: \(error.localizedDescription)")
             print("   Falling back to in-memory storage (data will not persist)")
 
             // Fallback to in-memory store for development

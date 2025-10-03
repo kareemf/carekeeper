@@ -17,6 +17,10 @@ struct CareeListView: View {
             }
             .navigationTitle(NSLocalizedString("Carees", comment: "Navigation title for carees list"))
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    SyncStatusIndicator()
+                }
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingAddCaree = true }) {
                         Image(systemName: "plus")

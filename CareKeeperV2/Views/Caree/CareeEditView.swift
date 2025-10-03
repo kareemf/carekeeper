@@ -123,8 +123,13 @@ struct CareeEditView: View {
     
     private func saveCaree() {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedName.isEmpty else { return }
-        
+        guard !trimmedName.isEmpty else {
+            error = AppError.invalidInput(
+                NSLocalizedString("Please enter a name for the caree", comment: "Empty caree name error")
+            )
+            return
+        }
+
         if let existingCaree = caree {
             // Update existing caree
             existingCaree.name = trimmedName
@@ -138,8 +143,13 @@ struct CareeEditView: View {
             )
             modelContext.insert(newCaree)
         }
-        
-        dismiss()
+
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            self.error = AppError.saveFailed(error.localizedDescription)
+        }
     }
 }
 

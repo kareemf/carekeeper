@@ -17,58 +17,76 @@ CareKeeper is an iOS/watchOS app for tracking care activities using SwiftUI and 
 - Run tests through Xcode Test Navigator or Cmd+U
 - No specific test scripts configured - uses standard Xcode testing
 
-## Code Architecture
+## Code Architecture (v2)
 
-### Core Data Model
-The app uses a Core Data model (`CareKeeperCoreData.xcdatamodeld`) with four main entities:
-- **Caree**: Care recipients with name, list order, and optional photo
-- **Behavior**: Activities that can be tracked (with emoji icons, location enablement)
-- **Activity**: Individual instances of behaviors with timestamps and optional location data
-- **Photo**: Binary photo data linked to Carees
+### SwiftData Model
+The app uses SwiftData with three main model entities:
+- **Caree**: Care recipients with name, list order, and optional photo (Data)
+- **ActivityType**: Trackable activities with icons, quantity/location configuration
+- **Activity**: Individual activity instances with timestamps, optional location/quantity
 
 ### Key Components
 
 #### Persistence Layer
-- `PersistenceController`: Main Core Data controller with CloudKit integration
-- Supports both private and shared CloudKit databases for data sharing
-- History tracking enabled for remote change synchronization
-- Custom error handling through `ErrorHandling` and `PersistenceErrorHandling`
+- `ModelContainer`: SwiftData container with app group sharing
+- Configured in app initialization with fallback to in-memory storage on error
+- Supports CloudKit sync via ModelConfiguration (Phase 2)
+- App group: `group.com.kareemf.CareKeeper` for iOS/watchOS data sharing
 
-#### SwiftUI Views
-- **Main App**: `CareKeeperApp.swift` - TabView with Carees and Sharing tabs
-- **Caree Management**: `CareeListView`, `CareeDetailView`, `CareeAddView`
-- **Activity Tracking**: `ActivityTrackingViewStep1/2`, `ActivityDetailView`, `ActivityListView`
-- **Behavior Management**: `BehaviorDetailView`, `BehaviorListItemView`
-- **Sharing**: Complete sharing system in `/Sharing/SwiftUI/` for CloudKit collaboration
+#### Error Handling
+- **AppError**: Centralized error enum conforming to LocalizedError
+  - `modelContainerFailed`, `saveFailed`, `deleteFailed`
+  - `locationPermissionDenied`, `locationUnavailable`
+  - `invalidInput` for user input validation
+- **ErrorAlert**: Reusable ViewModifier for consistent error presentation
+- **LocationManager**: @Published error property for reactive error handling
 
-#### Platform-Specific Code
-- **iOS**: Full feature set with photo picker, location services, sharing UI
-- **watchOS**: Simplified interface with core tracking functionality in `CareKeeper Watch App/`
+#### SwiftUI Views (iOS)
+- **Main App**: `CareKeeperV2App.swift` - TabView with Carees tab
+- **Caree Management**: `CareeListView`, `CareeDetailView`, `CareeEditView`
+- **Activity Type Management**: `ActivityTypeEditView`, `ActivityTypeListView`
+- **Activity Tracking**: `TrackActivityView`, `ActivityDetailView`, `ActivityListView`
+- **Shared Components**: `ErrorAlert`, reusable view modifiers
 
-#### Third-Party Integrations
-- **PhotoPicker**: Custom photo selection implementation (see `PhotoPicker/README.md`)
-- **CloudKit Sharing**: Based on Apple's CloudKit sharing sample code (see `Sharing/README.md`)
+#### SwiftUI Views (watchOS)
+- **Main App**: `CareKeeperV2WatchApp.swift` - NavigationStack root
+- **Caree List**: Primary view for selecting caree
+- **Activity Tracking**: `TrackActivityView` with Digital Crown quantity input
+- **Activity Details**: Basic view/delete functionality (edit pending)
+
+#### Services
+- **LocationManager**: Cross-platform location service for iOS/watchOS
+  - @MainActor class with CLLocationManager integration
+  - @Published properties for location, authorization, errors
+  - Reactive permission handling with error propagation
 
 ### Key Patterns
-- Uses SwiftUI with `@StateObject` and `@ObservableObject` for state management
-- Core Data entities are shared between iOS and watchOS targets
-- CloudKit integration handles both private and shared data stores
-- Custom error handling system for persistence and general errors
-- Location tracking optional per behavior with `CLLocationManager`
+- SwiftUI with `@State`, `@StateObject`, `@Environment` for state management
+- SwiftData models shared between iOS and watchOS targets via project.yml
+- CloudKit sync prepared (entitlements commented out until Phase 2)
+- LocalizedError protocol for user-friendly error messages
+- Input validation with helpful feedback messages
+- Location tracking optional per ActivityType
 
 ### File Organization
-- `/CareKeeper/`: Main iOS app source
-- `/CareKeeper Watch App/`: watchOS-specific code
-- `/CareKeeper/Controllers/`: Core Data and persistence logic
-- `/CareKeeper/Sharing/`: CloudKit sharing implementation
-- `/CareKeeper/PhotoPicker/`: Photo selection functionality
-- `/CareKeeper/ActivityTracking/`: Multi-step activity entry views
+- `/CareKeeperV2/`: Main iOS app source
+  - `/App/`: App entry point and initialization
+  - `/Models/`: SwiftData model entities
+  - `/Views/`: Feature-organized view hierarchy
+    - `/Caree/`, `/ActivityType/`, `/Activity/`
+    - `/Components/`: Shared view components
+  - `/Services/`: LocationManager, AppError
+  - `/Preview/`: Preview data and container
+- `/CareKeeperV2 Watch App/`: watchOS-specific code
+  - `/App/`, `/Views/`: Parallel structure to iOS
+  - Shares Models, Services, Components from iOS via project.yml
 
 ### Development Notes
 - Uses CloudKit container identifier: `iCloud.com.kareemf.CareKeeperCK`
-- Both iOS and watchOS apps share the same Core Data model
-- Location services integrated for activity tracking when enabled per behavior
-- History tracking enables synchronization between devices and shared databases
+- Both iOS and watchOS apps share the same SwiftData models
+- Location services integrated for activities when ActivityType.hasLocation == true
+- XcodeGen project generation from `project.yml`
+- Unit tests with in-memory ModelContainer for isolation
 
 ## Development Guidelines
 
@@ -161,5 +179,100 @@ The app uses a Core Data model (`CareKeeperCoreData.xcdatamodeld`) with four mai
 - Multi-language support (architecture prepared with NSLocalizedString)
 - Advanced analytics/reporting
 
-### TODO Tracking (Implementation Phase)
-*This section will be updated during development to track progress on each requirement*
+### CloudKit Implementation Specification
+
+#### Purpose & User Problem
+Enable multiple caregivers to track activities for the same caree(s) across their devices. Currently, data is isolated to a single device, making coordination between caregivers impossible.
+
+#### Success Criteria
+1. **Basic Sync**: User's data automatically syncs across their own iOS/watchOS devices
+2. **Sharing**: Users can share specific carees with other caregivers via share link
+3. **Reliability**: Conflict resolution handles concurrent edits gracefully
+4. **Privacy**: Only explicitly shared carees are accessible to other users
+5. **Offline UX**: Persistent sync status indicator with manual retry
+
+#### Implementation Phases
+
+**Phase 2.1: Basic CloudKit Sync**
+- Enable CloudKit container and entitlements
+- Configure ModelContainer with CloudKit sync
+- Sync status indicator component with manual retry
+- Verify sync across user's devices (iOS ↔️ iOS, iOS ↔️ watchOS)
+- Handle network errors and offline mode
+- Test conflict resolution for concurrent edits
+
+**Phase 2.2: CloudKit Sharing**
+- Share individual Carees with other users via share link
+- Invitation flow (generate share link for Messages/copy-paste)
+- Accept shared carees from link
+- Participant management UI (view participants, remove if owner)
+- Permission implementation:
+  - ✅ Participants: add/edit/delete activities and activity types, edit caree details
+  - ❌ Participants: cannot delete caree (owner only)
+- Handle share acceptance errors
+- Sharing controls in both CareeDetailView toolbar and CareeEditView
+
+#### Technical Details
+
+**CloudKit Container**: `iCloud.com.kareemf.CareKeeperCK`
+
+**SwiftData Configuration**:
+- Add CloudKit option to ModelConfiguration
+- Use `cloudKitDatabase: .private` for user's private data
+- Use `cloudKitDatabase: .shared` for shared carees
+
+**Sync Status Component**:
+- Observable service monitoring CloudKit sync state
+- Three states: syncing, synced, failed
+- Manual retry action
+- Positioned in navigation/toolbar
+
+**Data Model**:
+- Caree is the sharable root entity
+- ActivityType and Activity cascade from Caree
+- Sharing a Caree includes all its ActivityTypes and Activities
+
+#### Out of Scope (CloudKit)
+- Granular permissions (read-only access)
+- Share activity history/analytics
+- Custom offline conflict resolution UI (rely on CloudKit defaults)
+- Share multiple carees at once
+- Mock CloudKit for testing (future enhancement)
+
+### Implementation Status
+
+#### Phase 0: Foundation ✅ COMPLETE
+- Project setup with XcodeGen and modern architecture
+- SwiftData models (Caree, ActivityType, Activity)
+- Basic navigation structure (TabView, NavigationStack)
+- Preview data for prototyping
+
+#### Phase 1: Core Features ✅ COMPLETE
+- Caree management (CRUD) with photo picker
+- Activity Type management (CRUD) with icons and configuration
+- Activity tracking with location and quantity support
+- Basic watchOS companion with Digital Crown input
+- Unit test coverage (40 tests across all models)
+
+#### Phase 2: Polish & Sharing 🔄 IN PROGRESS
+**Completed:**
+- ✅ Error handling infrastructure (AppError, ErrorAlert view modifier)
+- ✅ Replaced print() debugging with user-facing error alerts
+- ✅ Input validation with user feedback (quantity, name validation)
+- ✅ Location error handling and permission management
+
+**Completed:**
+- ✅ Phase 2.1: Basic CloudKit Sync
+  - ✅ CloudKit entitlements and ModelContainer configuration
+  - ✅ Sync status indicator with manual retry
+  - ✅ Network monitoring and iCloud account status detection
+  - ⚠️ Cross-device sync verification (requires device testing)
+  - ⚠️ Conflict resolution testing (relies on CloudKit automatic handling)
+
+**Pending:**
+- ⏳ Phase 2.2: CloudKit Sharing (share links, participant management)
+- ⏳ UI polish: animations, transitions, loading states
+- ⏳ UI test coverage for critical user flows
+
+**Deferred:**
+- watchOS feature parity (ActivityListView, edit capability)

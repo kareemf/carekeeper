@@ -161,6 +161,14 @@ struct TrackActivityView: View {
     }
 
     private func saveActivity(for activityType: ActivityType) {
+        // Validate quantity if required
+        if activityType.hasQuantity && quantity < 0 {
+            error = AppError.invalidInput(
+                NSLocalizedString("Please enter a valid quantity (0 or greater)", comment: "Invalid quantity error")
+            )
+            return
+        }
+
         let location = includeLocation ? locationManager.location : nil
 
         let activity = Activity(

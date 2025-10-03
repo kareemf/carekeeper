@@ -165,8 +165,19 @@ struct TrackActivityView: View {
     private func saveActivity() {
         guard let activityType = selectedActivityType else { return }
 
+        // Validate quantity if required
+        var quantityValue: Double? = nil
+        if activityType.hasQuantity {
+            guard let parsedQuantity = Double(quantity), parsedQuantity >= 0 else {
+                error = AppError.invalidInput(
+                    NSLocalizedString("Please enter a valid quantity (0 or greater)", comment: "Invalid quantity error")
+                )
+                return
+            }
+            quantityValue = parsedQuantity
+        }
+
         let activityDateTime = useCustomTime ? customDateTime : Date()
-        let quantityValue = activityType.hasQuantity ? Double(quantity) : nil
         let location = includeLocation ? locationManager.location : nil
         let latitude = location?.coordinate.latitude
         let longitude = location?.coordinate.longitude

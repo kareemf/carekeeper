@@ -52,6 +52,8 @@ targets:
       properties:
         com.apple.developer.icloud-container-identifiers:
           - iCloud.com.kareemf.CareKeeperCK
+        com.apple.developer.icloud-services:
+          - CloudKit
         com.apple.developer.ubiquity-kvstore-identifier: "$(TeamIdentifierPrefix)$(CFBundleIdentifier)"
         com.apple.security.application-groups:
           - group.com.kareemf.CareKeeper
@@ -90,6 +92,16 @@ targets:
         WKCompanionAppBundleIdentifier: com.kareemf.CareKeeperV2
         WKApplication: true
         NSLocationWhenInUseUsageDescription: "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types."
+    entitlements:
+      path: "CareKeeperV2 Watch App/CareKeeperV2 Watch App.entitlements"
+      properties:
+        com.apple.developer.icloud-container-identifiers:
+          - iCloud.com.kareemf.CareKeeperCK
+        com.apple.developer.icloud-services:
+          - CloudKit
+        com.apple.developer.ubiquity-kvstore-identifier: "$(TeamIdentifierPrefix)$(CFBundleIdentifier)"
+        com.apple.security.application-groups:
+          - group.com.kareemf.CareKeeper
 
   CareKeeperV2Tests:
     type: bundle.unit-test
