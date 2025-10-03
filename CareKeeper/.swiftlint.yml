@@ -1,4 +1,0 @@
-disabled_rules:
-- multiple_closures_with_trailing_closure # I might agree but this seems to be idiomatic
-line_length: warning
-
