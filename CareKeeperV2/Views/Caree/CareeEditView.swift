@@ -12,6 +12,7 @@ struct CareeEditView: View {
     @State private var imageData: Data?
     @State private var error: Error?
     @State private var shakeField: Bool = false
+    @FocusState private var isNameFieldFocused: Bool
 
     private var isEditing: Bool { caree != nil }
     
@@ -31,6 +32,7 @@ struct CareeEditView: View {
 
                     TextField(NSLocalizedString("Name", comment: "Name field label"), text: $name)
                         .textInputAutocapitalization(.words)
+                        .focused($isNameFieldFocused)
                         .modifier(ShakeEffect(shakes: shakeField ? 2 : 0))
                         .onChange(of: shakeField) { _, _ in
                             if shakeField {
@@ -64,7 +66,7 @@ struct CareeEditView: View {
             // Auto-focus on name field for new carees
             if !isEditing {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    // Focus will be handled by the text field being first responder
+                    isNameFieldFocused = true
                 }
             }
         }
