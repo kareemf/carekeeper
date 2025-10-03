@@ -58,6 +58,7 @@ struct CareeDetailView: View {
                             }
                         }
                     }
+                    .textCase(nil)
 
                     // Only show recent activities section if activity types exist
                     if !caree.sortedActivityTypes.isEmpty {
@@ -79,6 +80,7 @@ struct CareeDetailView: View {
                                 }
                             }
                         }
+                        .textCase(nil)
                     } else {
                         Section {
                             noActivityTypesGuidance
@@ -165,12 +167,12 @@ struct CareeDetailView: View {
             profileImageView(for: caree)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) activity types",
+                Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) Activity types",
                                      comment: "Activity types count"))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 
-                Text(NSLocalizedString("\(caree.activities?.count ?? 0) total activities",
+                Text(NSLocalizedString("\(caree.activities?.count ?? 0) Total activities",
                                      comment: "Total activities count"))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
