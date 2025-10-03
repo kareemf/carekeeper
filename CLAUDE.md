@@ -264,9 +264,12 @@ Enable multiple caregivers to track activities for the same caree(s) across thei
 **Completed:**
 - ✅ Phase 2.1: Basic CloudKit Sync
   - ✅ CloudKit entitlements and ModelContainer configuration
+  - ✅ Made all model properties CloudKit-compatible with default values
+  - ✅ Updated all views to handle optional relationships
   - ✅ Sync status indicator with manual retry
   - ✅ Network monitoring and iCloud account status detection
-  - ⚠️ Cross-device sync verification (requires device testing)
+  - ✅ ModelContainer successfully initializes with CloudKit enabled
+  - ⚠️ Cross-device sync verification (requires device testing with signed-in iCloud account)
   - ⚠️ Conflict resolution testing (relies on CloudKit automatic handling)
 
 - ✅ Phase 2.2: CloudKit Sharing

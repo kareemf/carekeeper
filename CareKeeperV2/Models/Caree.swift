@@ -1,23 +1,22 @@
 import Foundation
 import SwiftData
-import CloudKit
 
 @Model
 final class Caree {
-    var id: UUID
-    var name: String
+    var id: UUID = UUID()
+    var name: String = ""
     var image: Data?
-    var listOrder: Int
-    var dateCreated: Date
-    
+    var listOrder: Int = 0
+    var dateCreated: Date = Date()
+
     // Relationships
     @Relationship(deleteRule: .cascade, inverse: \ActivityType.caree)
-    var activityTypes: [ActivityType] = []
-    
+    var activityTypes: [ActivityType]? = []
+
     @Relationship(deleteRule: .cascade, inverse: \Activity.caree)
-    var activities: [Activity] = []
-    
-    init(name: String, image: Data? = nil, listOrder: Int = 0) {
+    var activities: [Activity]? = []
+
+    init(name: String = "", image: Data? = nil, listOrder: Int = 0) {
         self.id = UUID()
         self.name = name
         self.image = image
@@ -29,11 +28,11 @@ final class Caree {
 // MARK: - Computed Properties
 extension Caree {
     var sortedActivityTypes: [ActivityType] {
-        activityTypes.sorted { $0.listOrder < $1.listOrder }
+        (activityTypes ?? []).sorted { $0.listOrder < $1.listOrder }
     }
-    
+
     var recentActivities: [Activity] {
-        activities.sorted { $0.dateTime > $1.dateTime }
+        (activities ?? []).sorted { $0.dateTime > $1.dateTime }
     }
 }
 

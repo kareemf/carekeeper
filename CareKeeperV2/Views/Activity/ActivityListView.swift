@@ -106,7 +106,7 @@ struct ActivityListView: View {
     }
 
     private func filteredActivities(for caree: Caree) -> [Activity] {
-        let activities = caree.activities.sorted { $0.dateTime > $1.dateTime }
+        let activities = (caree.activities ?? []).sorted { $0.dateTime > $1.dateTime }
 
         if let selectedType = selectedActivityType {
             return activities.filter { $0.activityType?.id == selectedType.id }

@@ -14,13 +14,13 @@ class CloudKitSyncMonitor {
         var displayMessage: String {
             switch self {
             case .idle:
-                return NSLocalizedString("iCloud", comment: "Sync status: idle")
+                return NSLocalizedString("Synced", comment: "Sync status: idle")
             case .offline:
                 return NSLocalizedString("Offline", comment: "Sync status: offline")
             case .checking:
                 return NSLocalizedString("Checking...", comment: "Sync status: checking")
             case .accountIssue:
-                return NSLocalizedString("iCloud issue", comment: "Sync status: account issue")
+                return NSLocalizedString("Syncing Issue", comment: "Sync status: account issue")
             }
         }
 

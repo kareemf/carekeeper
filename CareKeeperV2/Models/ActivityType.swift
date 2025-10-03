@@ -1,32 +1,31 @@
 import Foundation
 import SwiftData
-import CloudKit
 
 @Model
 final class ActivityType {
-    var id: UUID
-    var name: String
+    var id: UUID = UUID()
+    var name: String = ""
     var icon: String?
-    var hasQuantity: Bool
+    var hasQuantity: Bool = false
     var quantityUnit: String?
-    var hasLocation: Bool
-    var listOrder: Int
-    var dateCreated: Date
-    
+    var hasLocation: Bool = false
+    var listOrder: Int = 0
+    var dateCreated: Date = Date()
+
     // Relationships
     var caree: Caree?
-    
+
     @Relationship(deleteRule: .cascade, inverse: \Activity.activityType)
-    var activities: [Activity] = []
-    
+    var activities: [Activity]? = []
+
     init(
-        name: String,
+        name: String = "",
         icon: String? = nil,
         hasQuantity: Bool = false,
         quantityUnit: String? = nil,
         hasLocation: Bool = false,
         listOrder: Int = 0,
-        caree: Caree
+        caree: Caree? = nil
     ) {
         self.id = UUID()
         self.name = name
@@ -50,11 +49,11 @@ extension ActivityType {
     }
     
     var recentActivities: [Activity] {
-        activities.sorted { $0.dateTime > $1.dateTime }
+        (activities ?? []).sorted { $0.dateTime > $1.dateTime }
     }
-    
+
     var totalActivitiesCount: Int {
-        activities.count
+        activities?.count ?? 0
     }
 }
 

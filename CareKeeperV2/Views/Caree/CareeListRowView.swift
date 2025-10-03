@@ -11,7 +11,7 @@ struct CareeListRowView: View {
                 Text(caree.name)
                     .font(.headline)
                 
-                Text(NSLocalizedString("\(caree.activityTypes.count) activity types", 
+                Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) activity types",
                                      comment: "Activity types count in caree row"))
                     .font(.caption)
                     .foregroundColor(.secondary)

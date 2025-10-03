@@ -98,7 +98,7 @@ struct ActivityTypeEditView: View {
                 hasQuantity: hasQuantity,
                 quantityUnit: hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil,
                 hasLocation: hasLocation,
-                listOrder: caree.activityTypes.count,
+                listOrder: caree.activityTypes?.count ?? 0,
                 caree: caree
             )
             modelContext.insert(newActivityType)

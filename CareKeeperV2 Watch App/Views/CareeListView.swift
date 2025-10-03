@@ -51,7 +51,7 @@ struct CareeRowView: View {
             Text(caree.name)
                 .font(.headline)
 
-            Text(NSLocalizedString("\(caree.activityTypes.count) types", comment: "Activity types count"))
+            Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) types", comment: "Activity types count"))
                 .font(.caption2)
                 .foregroundColor(.secondary)
         }

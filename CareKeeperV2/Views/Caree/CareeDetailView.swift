@@ -79,12 +79,12 @@ struct CareeDetailView: View {
             profileImageView(for: caree)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text(NSLocalizedString("\(caree.activityTypes.count) activity types",
+                Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) activity types",
                                      comment: "Activity types count"))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 
-                Text(NSLocalizedString("\(caree.activities.count) total activities",
+                Text(NSLocalizedString("\(caree.activities?.count ?? 0) total activities",
                                      comment: "Total activities count"))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
@@ -126,7 +126,7 @@ struct CareeDetailView: View {
             .background(Color.green.opacity(0.8))
             .cornerRadius(12)
         }
-        .disabled(caree.activityTypes.isEmpty)
+        .disabled(caree.activityTypes?.isEmpty ?? true)
     }
 
     private func activityTypesSection(for caree: Caree) -> some View {

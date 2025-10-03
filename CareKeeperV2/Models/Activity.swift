@@ -4,26 +4,26 @@ import CoreLocation
 
 @Model
 final class Activity {
-    var id: UUID
-    var dateTime: Date
+    var id: UUID = UUID()
+    var dateTime: Date = Date()
     var notes: String?
     var quantity: Double?
     var latitude: Double?
     var longitude: Double?
-    var dateCreated: Date
-    
+    var dateCreated: Date = Date()
+
     // Relationships
     var activityType: ActivityType?
     var caree: Caree?
-    
+
     init(
         dateTime: Date = Date(),
         notes: String? = nil,
         quantity: Double? = nil,
         latitude: Double? = nil,
         longitude: Double? = nil,
-        activityType: ActivityType,
-        caree: Caree
+        activityType: ActivityType? = nil,
+        caree: Caree? = nil
     ) {
         self.id = UUID()
         self.dateTime = dateTime
