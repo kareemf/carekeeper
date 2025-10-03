@@ -31,7 +31,6 @@ struct CareeDetailView: View {
                     Section {
                         headerSection(for: caree)
                     }
-                    .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
 
                     // Only show track activity button if activity types exist
@@ -39,7 +38,6 @@ struct CareeDetailView: View {
                         Section {
                             trackActivityButton(for: caree)
                         }
-                        .listRowInsets(EdgeInsets())
                         .listRowBackground(Color.clear)
                     }
 
