@@ -43,25 +43,6 @@ struct CareeDetailView: View {
                         .listRowSeparator(.hidden)
                     }
 
-                    Section(header: activityTypesSectionHeader) {
-                        if !caree.sortedActivityTypes.isEmpty {
-                            ForEach(caree.sortedActivityTypes) { activityType in
-                                ActivityTypeRowView(activityType: activityType)
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                        Button(role: .destructive) {
-                                            activityTypeToDelete = activityType
-                                            showingDeleteActivityTypeConfirmation = true
-                                        } label: {
-                                            Label(NSLocalizedString("Delete", comment: "Delete button"), systemImage: "trash")
-                                        }
-                                    }
-                            }
-                            .onMove(perform: moveActivityTypes)
-                        }
-                    }
-                    .textCase(nil)
-                    .listRowSeparator(.hidden)
-
                     // Only show recent activities section if activity types exist
                     if !caree.sortedActivityTypes.isEmpty {
                         Section(header: recentActivitiesSectionHeader(for: caree)) {
@@ -84,7 +65,28 @@ struct CareeDetailView: View {
                         }
                         .textCase(nil)
                         .listRowSeparator(.hidden)
-                    } else {
+                    }
+
+                    Section(header: activityTypesSectionHeader) {
+                        if !caree.sortedActivityTypes.isEmpty {
+                            ForEach(caree.sortedActivityTypes) { activityType in
+                                ActivityTypeRowView(activityType: activityType)
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                        Button(role: .destructive) {
+                                            activityTypeToDelete = activityType
+                                            showingDeleteActivityTypeConfirmation = true
+                                        } label: {
+                                            Label(NSLocalizedString("Delete", comment: "Delete button"), systemImage: "trash")
+                                        }
+                                    }
+                            }
+                            .onMove(perform: moveActivityTypes)
+                        }
+                    }
+                    .textCase(nil)
+                    .listRowSeparator(.hidden)
+
+                    if caree.sortedActivityTypes.isEmpty {
                         Section {
                             noActivityTypesGuidance
                         }
