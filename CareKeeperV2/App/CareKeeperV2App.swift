@@ -11,9 +11,8 @@ struct CareKeeperV2App: App {
             Activity.self
         ])
 
-        // Configure CloudKit sync with private database
-        // Use app group to share data with watchOS
-        let modelConfiguration = ModelConfiguration(
+        // Try CloudKit configuration first
+        let cloudKitConfig = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
             groupContainer: .identifier("group.com.kareemf.CareKeeper"),
@@ -21,22 +20,36 @@ struct CareKeeperV2App: App {
         )
 
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            return try ModelContainer(for: schema, configurations: [cloudKitConfig])
         } catch {
-            // Log the error and fall back to in-memory storage
-            print("⚠️ Failed to create CloudKit-enabled ModelContainer: \(error.localizedDescription)")
-            print("   Falling back to in-memory storage (data will not persist)")
+            print("⚠️ CloudKit ModelContainer failed: \(error.localizedDescription)")
+            print("   Attempting local storage without CloudKit...")
 
-            // Fallback to in-memory store for development
-            let fallbackConfig = ModelConfiguration(
+            // Fallback to local storage without CloudKit
+            let localConfig = ModelConfiguration(
                 schema: schema,
-                isStoredInMemoryOnly: true
+                isStoredInMemoryOnly: false,
+                groupContainer: .identifier("group.com.kareemf.CareKeeper")
             )
 
             do {
-                return try ModelContainer(for: schema, configurations: [fallbackConfig])
+                return try ModelContainer(for: schema, configurations: [localConfig])
             } catch {
-                fatalError("Could not create ModelContainer: \(error)")
+                print("⚠️ Local storage failed: \(error.localizedDescription)")
+                print("   Using in-memory storage (data will not persist)")
+
+                // Last resort: in-memory storage
+                let memoryConfig = ModelConfiguration(
+                    schema: schema,
+                    isStoredInMemoryOnly: true
+                )
+
+                do {
+                    return try ModelContainer(for: schema, configurations: [memoryConfig])
+                } catch {
+                    // If even in-memory fails, there's a fundamental issue
+                    fatalError("Cannot create ModelContainer even with in-memory storage: \(error)")
+                }
             }
         }
     }()
