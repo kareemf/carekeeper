@@ -15,10 +15,34 @@ echo ""
 IOS_DEVICE=$(xcrun simctl list devices | grep "iPhone.*Booted" | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
 WATCH_DEVICE=$(xcrun simctl list devices | grep "Apple Watch.*Booted" | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
 
+# If no iOS device is booted, boot one
 if [ -z "$IOS_DEVICE" ]; then
     echo "⚠️  No booted iPhone simulator found"
-    echo "Please boot an iPhone simulator first"
-    exit 1
+    echo "🔄 Finding available iPhone simulator to boot..."
+
+    # Try to find iPhone 16 first, then any iPhone
+    IOS_DEVICE=$(xcrun simctl list devices | grep "iPhone 16 " | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
+
+    if [ -z "$IOS_DEVICE" ]; then
+        # Fallback to any available iPhone
+        IOS_DEVICE=$(xcrun simctl list devices | grep "iPhone" | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
+    fi
+
+    if [ -z "$IOS_DEVICE" ]; then
+        echo "❌ No iPhone simulators found"
+        echo "Please install an iPhone simulator using Xcode"
+        exit 1
+    fi
+
+    echo "🚀 Booting iPhone simulator: $IOS_DEVICE"
+    xcrun simctl boot "$IOS_DEVICE" 2>/dev/null || true
+
+    # Wait for device to boot
+    echo "⏳ Waiting for simulator to boot..."
+    sleep 3
+
+    # Open Simulator app
+    open -a Simulator
 fi
 
 if [ -z "$WATCH_DEVICE" ]; then
