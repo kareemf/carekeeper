@@ -88,14 +88,14 @@ xcodebuild -project CareKeeper.xcodeproj \
 xcrun simctl list devices | grep Booted
 
 # Uninstall existing app (if needed)
-xcrun simctl uninstall booted com.kareemf.CareKeeperV2
+xcrun simctl uninstall booted com.kareemf.CareKeeper
 
 # Install the app
 xcrun simctl install booted \
   ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-iphonesimulator/CareKeeperV2.app
 
 # Launch the app
-xcrun simctl launch booted com.kareemf.CareKeeperV2
+xcrun simctl launch booted com.kareemf.CareKeeper
 ```
 
 **watchOS App:**
@@ -104,14 +104,14 @@ xcrun simctl launch booted com.kareemf.CareKeeperV2
 xcrun simctl boot "Apple Watch Ultra 2 (49mm)"
 
 # Uninstall existing app (if needed)
-xcrun simctl uninstall booted com.kareemf.CareKeeperV2.watchkitapp
+xcrun simctl uninstall booted com.kareemf.CareKeeper.watchkitapp
 
 # Install the app
 xcrun simctl install booted \
   ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-watchsimulator/CareKeeperV2\ Watch\ App.app
 
 # Launch the app
-xcrun simctl launch booted com.kareemf.CareKeeperV2.watchkitapp
+xcrun simctl launch booted com.kareemf.CareKeeper.watchkitapp
 ```
 
 #### Quick Development Workflow
@@ -128,10 +128,10 @@ xcrun simctl launch booted com.kareemf.CareKeeperV2.watchkitapp
 # Build, install, and launch iOS app in one command
 xcodebuild -project CareKeeper.xcodeproj -scheme CareKeeperV2 \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build && \
-xcrun simctl uninstall booted com.kareemf.CareKeeperV2 && \
+xcrun simctl uninstall booted com.kareemf.CareKeeper && \
 xcrun simctl install booted \
   ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-iphonesimulator/CareKeeperV2.app && \
-xcrun simctl launch booted com.kareemf.CareKeeperV2
+xcrun simctl launch booted com.kareemf.CareKeeper
 ```
 
 #### Build from Xcode

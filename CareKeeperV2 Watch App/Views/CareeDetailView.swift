@@ -60,7 +60,7 @@ struct CareeDetailView: View {
             .background(Color.green.opacity(0.8))
             .cornerRadius(12)
         }
-        .disabled(caree.activityTypes.isEmpty)
+        .disabled(caree.activityTypes?.isEmpty ?? true)
     }
 
     private var gettingStartedView: some View {

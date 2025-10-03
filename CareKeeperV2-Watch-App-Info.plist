@@ -25,6 +25,6 @@
 	<key>WKApplication</key>
 	<true/>
 	<key>WKCompanionAppBundleIdentifier</key>
-	<string>com.kareemf.CareKeeperV2</string>
+	<string>com.kareemf.CareKeeper</string>
 </dict>
 </plist>

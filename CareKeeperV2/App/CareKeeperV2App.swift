@@ -18,7 +18,7 @@ struct CareKeeperV2App: App {
                 isStoredInMemoryOnly: false,
                 allowsSave: true,
                 groupContainer: .identifier("group.com.kareemf.CareKeeper"),
-                cloudKitDatabase: .private(/* uses default container */)
+                cloudKitDatabase: .private("iCloud.com.kareemf.CareKeeperCK")
             )
 
             return try ModelContainer(

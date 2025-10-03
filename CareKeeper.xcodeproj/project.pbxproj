@@ -963,7 +963,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperV2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
@@ -983,8 +983,8 @@
 				INFOPLIST_FILE = "CareKeeperV2-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "CareKeeper v2";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types.";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeperV2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperV2.watchkitapp;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -1056,8 +1056,8 @@
 				INFOPLIST_FILE = "CareKeeperV2-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "CareKeeper v2";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types.";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeperV2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperV2.watchkitapp;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -1078,7 +1078,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperV2Tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperTests;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1212,7 +1212,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperV2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
@@ -1232,7 +1232,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperV2Tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperTests;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

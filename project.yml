@@ -25,7 +25,7 @@ targets:
       - target: CareKeeperV2 Watch App
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeperV2
+        PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeper
         INFOPLIST_FILE: CareKeeperV2/Info.plist
         CODE_SIGN_ENTITLEMENTS: CareKeeperV2/CareKeeperV2.entitlements
         CODE_SIGN_STYLE: Automatic
@@ -70,7 +70,7 @@ targets:
       - path: CareKeeperV2/Views/Components
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeperV2.watchkitapp
+        PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeper.watchkitapp
         INFOPLIST_FILE: CareKeeperV2-Watch-App-Info.plist
         CODE_SIGN_ENTITLEMENTS: "CareKeeperV2 Watch App/CareKeeperV2 Watch App.entitlements"
         CODE_SIGN_STYLE: Automatic
@@ -83,13 +83,13 @@ targets:
         WATCHOS_DEPLOYMENT_TARGET: "10.0"
         SKIP_INSTALL: YES
         INFOPLIST_KEY_CFBundleDisplayName: "CareKeeper v2"
-        INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.kareemf.CareKeeperV2
+        INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.kareemf.CareKeeper
         INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types."
     info:
       path: CareKeeperV2-Watch-App-Info.plist
       properties:
         CFBundleDisplayName: "CareKeeper v2"
-        WKCompanionAppBundleIdentifier: com.kareemf.CareKeeperV2
+        WKCompanionAppBundleIdentifier: com.kareemf.CareKeeper
         WKApplication: true
         NSLocationWhenInUseUsageDescription: "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types."
     entitlements:
@@ -113,7 +113,7 @@ targets:
       - target: CareKeeperV2
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeperV2Tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeperTests
         SWIFT_VERSION: "5.0"
         IPHONEOS_DEPLOYMENT_TARGET: "18.0"
         GENERATE_INFOPLIST_FILE: YES

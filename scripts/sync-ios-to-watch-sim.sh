@@ -79,8 +79,8 @@ mkdir -p "$WATCH_DB_DIR"
 
 # Terminate both apps if running
 echo "🛑 Stopping apps..."
-xcrun simctl terminate "$IOS_DEVICE" com.kareemf.CareKeeperV2 2>/dev/null || true
-xcrun simctl terminate "$WATCH_DEVICE" com.kareemf.CareKeeperV2.watchkitapp 2>/dev/null || true
+xcrun simctl terminate "$IOS_DEVICE" com.kareemf.CareKeeper 2>/dev/null || true
+xcrun simctl terminate "$WATCH_DEVICE" com.kareemf.CareKeeper.watchkitapp 2>/dev/null || true
 
 # Copy database files
 echo "📋 Copying database files..."
@@ -94,8 +94,8 @@ echo "✅ Database synced successfully! ($DB_SIZE)"
 
 echo ""
 echo "🚀 You can now launch both apps:"
-echo "   iOS:     xcrun simctl launch booted com.kareemf.CareKeeperV2"
-echo "   watchOS: xcrun simctl launch booted com.kareemf.CareKeeperV2.watchkitapp"
+echo "   iOS:     xcrun simctl launch booted com.kareemf.CareKeeper"
+echo "   watchOS: xcrun simctl launch booted com.kareemf.CareKeeper.watchkitapp"
 echo ""
 echo "📝 Note: Changes made on either simulator won't automatically sync."
 echo "   Run this script again after making changes on iOS to update watchOS."

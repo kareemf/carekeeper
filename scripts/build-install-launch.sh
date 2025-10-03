@@ -98,12 +98,12 @@ echo ""
 
 # Launch iOS app
 echo "🚀 Launching iOS app..."
-xcrun simctl launch booted com.kareemf.CareKeeperV2
+xcrun simctl launch booted com.kareemf.CareKeeper
 
 # Launch watchOS app (if watch simulator is booted)
 if [ -n "$WATCH_DEVICE" ]; then
     echo "🚀 Launching watchOS app..."
-    xcrun simctl launch booted com.kareemf.CareKeeperV2.watchkitapp
+    xcrun simctl launch booted com.kareemf.CareKeeper.watchkitapp
 fi
 
 echo ""
