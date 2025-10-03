@@ -261,24 +261,28 @@ struct CareeDetailView: View {
     }
 
     private var emptyActivitiesView: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "clock.circle")
-                .font(.system(size: 40))
-                .foregroundColor(.secondary)
+        HStack {
+            Spacer()
+            VStack(spacing: 12) {
+                Image(systemName: "clock.circle")
+                    .font(.system(size: 40))
+                    .foregroundColor(.secondary)
 
-            Text(NSLocalizedString("No activities yet", comment: "Empty activities message"))
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+                Text(NSLocalizedString("No activities yet", comment: "Empty activities message"))
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
 
-            Text(NSLocalizedString("This list will be populated once you start tracking activities.",
-                                 comment: "Empty activities description"))
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
+                Text(NSLocalizedString("This list will be populated once you start tracking activities.",
+                                     comment: "Empty activities description"))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding()
+            .background(Color(.systemGray6))
+            .cornerRadius(12)
+            Spacer()
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
     }
 
     private var noActivityTypesGuidance: some View {
