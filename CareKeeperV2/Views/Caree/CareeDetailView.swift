@@ -32,6 +32,7 @@ struct CareeDetailView: View {
                         headerSection(for: caree)
                     }
                     .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
 
                     // Only show track activity button if activity types exist
                     if !caree.sortedActivityTypes.isEmpty {
@@ -39,6 +40,7 @@ struct CareeDetailView: View {
                             trackActivityButton(for: caree)
                         }
                         .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
                     }
 
                     Section(header: activityTypesSectionHeader) {
@@ -58,6 +60,7 @@ struct CareeDetailView: View {
                         }
                     }
                     .textCase(nil)
+                    .listRowSeparator(.hidden)
 
                     // Only show recent activities section if activity types exist
                     if !caree.sortedActivityTypes.isEmpty {
@@ -80,11 +83,13 @@ struct CareeDetailView: View {
                             }
                         }
                         .textCase(nil)
+                        .listRowSeparator(.hidden)
                     } else {
                         Section {
                             noActivityTypesGuidance
                         }
                         .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
                     }
                 }
                 .listStyle(.plain)
