@@ -17,6 +17,8 @@ struct CareeDetailView: View {
     @State private var showingTrackActivity = false
     @State private var activityTypeToDelete: ActivityType?
     @State private var showingDeleteActivityTypeConfirmation = false
+    @State private var activityToDelete: Activity?
+    @State private var showingDeleteActivityConfirmation = false
 
     init(careeID: UUID) {
         self.careeID = careeID
@@ -25,26 +27,66 @@ struct CareeDetailView: View {
     var body: some View {
         Group {
             if let caree = caree {
-                ScrollView {
-                    VStack(spacing: 20) {
+                List {
+                    Section {
                         headerSection(for: caree)
+                    }
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
 
-                        // Only show track activity button if activity types exist
-                        if !caree.sortedActivityTypes.isEmpty {
+                    // Only show track activity button if activity types exist
+                    if !caree.sortedActivityTypes.isEmpty {
+                        Section {
                             trackActivityButton(for: caree)
                         }
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                    }
 
-                        activityTypesSection(for: caree)
-
-                        // Only show recent activities section if activity types exist
+                    Section(header: activityTypesSectionHeader) {
                         if !caree.sortedActivityTypes.isEmpty {
-                            recentActivitiesSection(for: caree)
-                        } else {
-                            noActivityTypesGuidance
+                            ForEach(caree.sortedActivityTypes) { activityType in
+                                ActivityTypeRowView(activityType: activityType)
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                        Button(role: .destructive) {
+                                            activityTypeToDelete = activityType
+                                            showingDeleteActivityTypeConfirmation = true
+                                        } label: {
+                                            Label(NSLocalizedString("Delete", comment: "Delete button"), systemImage: "trash")
+                                        }
+                                    }
+                            }
                         }
                     }
-                    .padding()
+
+                    // Only show recent activities section if activity types exist
+                    if !caree.sortedActivityTypes.isEmpty {
+                        Section(header: recentActivitiesSectionHeader(for: caree)) {
+                            if caree.recentActivities.isEmpty {
+                                emptyActivitiesView
+                                    .listRowBackground(Color.clear)
+                            } else {
+                                ForEach(Array(caree.recentActivities.prefix(5))) { activity in
+                                    ActivityRowView(activity: activity)
+                                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                            Button(role: .destructive) {
+                                                activityToDelete = activity
+                                                showingDeleteActivityConfirmation = true
+                                            } label: {
+                                                Label(NSLocalizedString("Delete", comment: "Delete button"), systemImage: "trash")
+                                            }
+                                        }
+                                }
+                            }
+                        }
+                    } else {
+                        Section {
+                            noActivityTypesGuidance
+                        }
+                        .listRowBackground(Color.clear)
+                    }
                 }
+                .listStyle(.insetGrouped)
                 .navigationTitle(caree.name)
                 .navigationBarTitleDisplayMode(.large)
                 .toolbar {
@@ -85,6 +127,22 @@ struct CareeDetailView: View {
                 } message: {
                     Text(NSLocalizedString("This will also delete all associated activities. This cannot be undone.", comment: "Delete activity type confirmation message"))
                 }
+                .confirmationDialog(
+                    NSLocalizedString("Delete Activity?", comment: "Delete activity confirmation title"),
+                    isPresented: $showingDeleteActivityConfirmation,
+                    titleVisibility: .visible
+                ) {
+                    Button(NSLocalizedString("Delete", comment: "Delete button"), role: .destructive) {
+                        if let activity = activityToDelete {
+                            deleteActivity(activity)
+                        }
+                    }
+                    Button(NSLocalizedString("Cancel", comment: "Cancel button"), role: .cancel) {
+                        activityToDelete = nil
+                    }
+                } message: {
+                    Text(NSLocalizedString("This cannot be undone.", comment: "Delete activity confirmation message"))
+                }
             } else {
                 Text(NSLocalizedString("Caree not found", comment: "Caree not found message"))
                     .foregroundColor(.secondary)
@@ -95,6 +153,11 @@ struct CareeDetailView: View {
     private func deleteActivityType(_ activityType: ActivityType) {
         modelContext.delete(activityType)
         activityTypeToDelete = nil
+    }
+
+    private func deleteActivity(_ activity: Activity) {
+        modelContext.delete(activity)
+        activityToDelete = nil
     }
     
     private func headerSection(for caree: Caree) -> some View {
@@ -152,63 +215,30 @@ struct CareeDetailView: View {
         .disabled(caree.activityTypes?.isEmpty ?? true)
     }
 
-    private func activityTypesSection(for caree: Caree) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(NSLocalizedString("Activity Types", comment: "Activity types section title"))
-                    .font(.headline)
+    private var activityTypesSectionHeader: some View {
+        HStack {
+            Text(NSLocalizedString("Activity Types", comment: "Activity types section title"))
 
-                Spacer()
+            Spacer()
 
-                Button(NSLocalizedString("Add", comment: "Add activity type button")) {
-                    showingAddActivityType = true
-                }
-                .font(.subheadline)
+            Button(NSLocalizedString("Add", comment: "Add activity type button")) {
+                showingAddActivityType = true
             }
-
-            if !caree.sortedActivityTypes.isEmpty {
-                activityTypesList(for: caree)
-            }
+            .font(.subheadline)
         }
     }
 
-    private func activityTypesList(for caree: Caree) -> some View {
-        LazyVStack(spacing: 8) {
-            ForEach(caree.sortedActivityTypes) { activityType in
-                ActivityTypeRowView(activityType: activityType)
-                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                        Button(role: .destructive) {
-                            activityTypeToDelete = activityType
-                            showingDeleteActivityTypeConfirmation = true
-                        } label: {
-                            Label(NSLocalizedString("Delete", comment: "Delete button"), systemImage: "trash")
-                        }
-                    }
-            }
-        }
-    }
+    private func recentActivitiesSectionHeader(for caree: Caree) -> some View {
+        HStack {
+            Text(NSLocalizedString("Recent Activities", comment: "Recent activities section title"))
 
-    private func recentActivitiesSection(for caree: Caree) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(NSLocalizedString("Recent Activities", comment: "Recent activities section title"))
-                    .font(.headline)
+            Spacer()
 
-                Spacer()
-
-                if !caree.recentActivities.isEmpty {
-                    NavigationLink(destination: ActivityListView(careeID: caree.id)) {
-                        Text(NSLocalizedString("View All", comment: "View all activities button"))
-                            .font(.subheadline)
-                            .foregroundColor(.accentColor)
-                    }
+            if !caree.recentActivities.isEmpty {
+                NavigationLink(destination: ActivityListView(careeID: caree.id)) {
+                    Text(NSLocalizedString("View All", comment: "View all activities button"))
+                        .font(.subheadline)
                 }
-            }
-
-            if caree.recentActivities.isEmpty {
-                emptyActivitiesView
-            } else {
-                recentActivitiesList(for: caree)
             }
         }
     }
@@ -232,14 +262,6 @@ struct CareeDetailView: View {
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(12)
-    }
-
-    private func recentActivitiesList(for caree: Caree) -> some View {
-        LazyVStack(spacing: 8) {
-            ForEach(Array(caree.recentActivities.prefix(5))) { activity in
-                ActivityRowView(activity: activity)
-            }
-        }
     }
 
     private var noActivityTypesGuidance: some View {
