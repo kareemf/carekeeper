@@ -56,6 +56,7 @@ struct CareeDetailView: View {
                                         }
                                     }
                             }
+                            .onMove(perform: moveActivityTypes)
                         }
                     }
                     .textCase(nil)
@@ -88,7 +89,7 @@ struct CareeDetailView: View {
                         .listRowBackground(Color.clear)
                     }
                 }
-                .listStyle(.insetGrouped)
+                .listStyle(.plain)
                 .navigationTitle(caree.name)
                 .navigationBarTitleDisplayMode(.large)
                 .toolbar {
@@ -161,18 +162,29 @@ struct CareeDetailView: View {
         modelContext.delete(activity)
         activityToDelete = nil
     }
-    
+
+    private func moveActivityTypes(from source: IndexSet, to destination: Int) {
+        guard let caree = caree else { return }
+
+        var updatedActivityTypes = caree.sortedActivityTypes
+        updatedActivityTypes.move(fromOffsets: source, toOffset: destination)
+
+        for (index, activityType) in updatedActivityTypes.enumerated() {
+            activityType.listOrder = index
+        }
+    }
+
     private func headerSection(for caree: Caree) -> some View {
         HStack {
             profileImageView(for: caree)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) Activity types",
+                Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) Activity Types",
                                      comment: "Activity types count"))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 
-                Text(NSLocalizedString("\(caree.activities?.count ?? 0) Total activities",
+                Text(NSLocalizedString("\(caree.activities?.count ?? 0) Total Activities",
                                      comment: "Total activities count"))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
