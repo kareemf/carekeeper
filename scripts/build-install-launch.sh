@@ -47,8 +47,44 @@ fi
 
 if [ -z "$WATCH_DEVICE" ]; then
     echo "⚠️  No booted Apple Watch simulator found"
-    echo "Skipping watchOS app (will only build and install iOS app)"
-    WATCH_DEVICE=""
+    echo "🔄 Finding available Apple Watch simulator to boot..."
+
+    # Find a watch simulator running watchOS 10.0 or higher
+    # First try watchOS 26 (latest), then 11, then 10
+    WATCH_DEVICE=$(xcrun simctl list devices watchOS | \
+        sed -n '/-- watchOS 26/,/-- /p' | \
+        grep -E "Apple Watch (Ultra|Series)" | \
+        head -1 | \
+        sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
+
+    if [ -z "$WATCH_DEVICE" ]; then
+        WATCH_DEVICE=$(xcrun simctl list devices watchOS | \
+            sed -n '/-- watchOS 11/,/-- /p' | \
+            grep "Apple Watch" | \
+            head -1 | \
+            sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
+    fi
+
+    if [ -z "$WATCH_DEVICE" ]; then
+        WATCH_DEVICE=$(xcrun simctl list devices watchOS | \
+            sed -n '/-- watchOS 10/,/-- /p' | \
+            grep "Apple Watch" | \
+            head -1 | \
+            sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
+    fi
+
+    if [ -z "$WATCH_DEVICE" ]; then
+        echo "⚠️  No Apple Watch simulators with watchOS 10.0+ found"
+        echo "Continuing with iOS app only"
+        WATCH_DEVICE=""
+    else
+        echo "🚀 Booting Apple Watch simulator: $WATCH_DEVICE"
+        xcrun simctl boot "$WATCH_DEVICE" 2>/dev/null || true
+
+        # Wait for device to boot
+        echo "⏳ Waiting for watch simulator to boot..."
+        sleep 3
+    fi
 fi
 
 echo "📱 iOS Simulator: $IOS_DEVICE"
@@ -98,12 +134,12 @@ echo ""
 
 # Launch iOS app
 echo "🚀 Launching iOS app..."
-xcrun simctl launch booted com.kareemf.CareKeeper
+xcrun simctl launch "$IOS_DEVICE" com.kareemf.CareKeeper
 
 # Launch watchOS app (if watch simulator is booted)
 if [ -n "$WATCH_DEVICE" ]; then
     echo "🚀 Launching watchOS app..."
-    xcrun simctl launch booted com.kareemf.CareKeeper.watchkitapp
+    xcrun simctl launch "$WATCH_DEVICE" com.kareemf.CareKeeper.watchkitapp
 fi
 
 echo ""
