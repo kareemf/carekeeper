@@ -47,8 +47,14 @@ struct CareeDetailView: View {
                 .navigationBarTitleDisplayMode(.large)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(NSLocalizedString("Edit", comment: "Edit button")) {
-                            showingEditCaree = true
+                        HStack(spacing: 16) {
+                            #if os(iOS)
+                            CareeShareButton(caree: caree)
+                            #endif
+
+                            Button(NSLocalizedString("Edit", comment: "Edit button")) {
+                                showingEditCaree = true
+                            }
                         }
                     }
                 }

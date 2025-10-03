@@ -269,8 +269,16 @@ Enable multiple caregivers to track activities for the same caree(s) across thei
   - ⚠️ Cross-device sync verification (requires device testing)
   - ⚠️ Conflict resolution testing (relies on CloudKit automatic handling)
 
+- ✅ Phase 2.2: CloudKit Sharing
+  - ✅ CloudKitSharingService for share management
+  - ✅ Share button UI in CareeDetailView and CareeEditView
+  - ✅ CloudSharingView (iOS-only UICloudSharingController wrapper)
+  - ✅ ShareParticipantsView for participant management
+  - ✅ Share acceptance flow via URL handling
+  - ✅ Permission checks (owner-only caree deletion)
+  - ⚠️ Full sharing flow testing (requires real CloudKit setup and multiple iCloud accounts)
+
 **Pending:**
-- ⏳ Phase 2.2: CloudKit Sharing (share links, participant management)
 - ⏳ UI polish: animations, transitions, loading states
 - ⏳ UI test coverage for critical user flows
 

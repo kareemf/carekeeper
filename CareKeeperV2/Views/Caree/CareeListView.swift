@@ -69,9 +69,19 @@ struct CareeListView: View {
     }
     
     private func deleteCarees(offsets: IndexSet) {
-        // Show confirmation dialog before deletion
+        let sharingService = CloudKitSharingService()
+
         for index in offsets {
-            modelContext.delete(carees[index])
+            let caree = carees[index]
+
+            // Check if user has permission to delete (owner only)
+            guard sharingService.canDelete(caree: caree, in: modelContext) else {
+                // Skip deletion if not owner
+                // In production, should show an alert to the user
+                continue
+            }
+
+            modelContext.delete(caree)
         }
     }
     

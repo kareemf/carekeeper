@@ -32,17 +32,25 @@ struct CareeEditView: View {
                         .textInputAutocapitalization(.words)
                 }
             }
-            .navigationTitle(isEditing ? 
+            .navigationTitle(isEditing ?
                            NSLocalizedString("Edit Caree", comment: "Edit caree navigation title") :
                            NSLocalizedString("Add Caree", comment: "Add caree navigation title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(NSLocalizedString("Cancel", comment: "Cancel button")) {
-                        dismiss()
+                    HStack(spacing: 16) {
+                        #if os(iOS)
+                        if isEditing, let caree = caree {
+                            CareeShareButton(caree: caree)
+                        }
+                        #endif
+
+                        Button(NSLocalizedString("Cancel", comment: "Cancel button")) {
+                            dismiss()
+                        }
                     }
                 }
-                
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(NSLocalizedString("Save", comment: "Save button")) {
                         saveCaree()
