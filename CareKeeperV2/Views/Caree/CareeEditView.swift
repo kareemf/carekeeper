@@ -11,6 +11,7 @@ struct CareeEditView: View {
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var imageData: Data?
     @State private var error: Error?
+    @State private var shakeField: Bool = false
 
     private var isEditing: Bool { caree != nil }
     
@@ -27,9 +28,17 @@ struct CareeEditView: View {
             Form {
                 Section {
                     profileImageSection
-                    
+
                     TextField(NSLocalizedString("Name", comment: "Name field label"), text: $name)
                         .textInputAutocapitalization(.words)
+                        .modifier(ShakeEffect(shakes: shakeField ? 2 : 0))
+                        .onChange(of: shakeField) { _, _ in
+                            if shakeField {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    shakeField = false
+                                }
+                            }
+                        }
                 }
             }
             .navigationTitle(isEditing ?
@@ -132,6 +141,9 @@ struct CareeEditView: View {
     private func saveCaree() {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedName.isEmpty else {
+            withAnimation(.default) {
+                shakeField = true
+            }
             error = AppError.invalidInput(
                 NSLocalizedString("Please enter a name for the caree", comment: "Empty caree name error")
             )

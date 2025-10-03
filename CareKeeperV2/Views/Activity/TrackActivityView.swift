@@ -15,6 +15,7 @@ struct TrackActivityView: View {
     @State private var includeLocation: Bool = false
     @StateObject private var locationManager = LocationManager()
     @State private var error: Error?
+    @State private var isSaving: Bool = false
     
     private var sortedActivityTypes: [ActivityType] {
         caree.sortedActivityTypes
@@ -24,13 +25,17 @@ struct TrackActivityView: View {
         NavigationView {
             Form {
                 activityTypeSection
-                
+
                 if selectedActivityType != nil {
                     detailsSection
+                        .transition(.move(edge: .leading).combined(with: .opacity))
                     timingSection
+                        .transition(.move(edge: .leading).combined(with: .opacity))
                     locationSection
+                        .transition(.move(edge: .leading).combined(with: .opacity))
                 }
             }
+            .animation(.easeInOut(duration: 0.3), value: selectedActivityType?.id)
             .navigationTitle(NSLocalizedString("Track Activity", comment: "Track activity navigation title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -41,10 +46,19 @@ struct TrackActivityView: View {
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(NSLocalizedString("Save", comment: "Save button")) {
+                    Button(action: {
                         saveActivity()
+                    }) {
+                        if isSaving {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                                .scaleEffect(0.8)
+                        } else {
+                            Text(NSLocalizedString("Save", comment: "Save button"))
+                                .fontWeight(.semibold)
+                        }
                     }
-                    .disabled(selectedActivityType == nil)
+                    .disabled(selectedActivityType == nil || isSaving)
                 }
             }
         }
@@ -67,19 +81,26 @@ struct TrackActivityView: View {
                     .foregroundColor(.secondary)
             } else {
                 ForEach(sortedActivityTypes) { activityType in
-                    Button(action: { selectedActivityType = activityType }) {
+                    Button(action: {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                            selectedActivityType = activityType
+                        }
+                    }) {
                         HStack {
                             Text(activityType.displayIcon)
                                 .font(.title2)
-                            
+                                .scaleEffect(selectedActivityType?.id == activityType.id ? 1.1 : 1.0)
+
                             Text(activityType.name)
                                 .foregroundColor(.primary)
-                            
+                                .fontWeight(selectedActivityType?.id == activityType.id ? .semibold : .regular)
+
                             Spacer()
-                            
+
                             if selectedActivityType?.id == activityType.id {
-                                Image(systemName: "checkmark")
+                                Image(systemName: "checkmark.circle.fill")
                                     .foregroundColor(.accentColor)
+                                    .transition(.scale.combined(with: .opacity))
                             }
                         }
                     }
@@ -177,24 +198,36 @@ struct TrackActivityView: View {
             quantityValue = parsedQuantity
         }
 
-        let activityDateTime = useCustomTime ? customDateTime : Date()
-        let location = includeLocation ? locationManager.location : nil
-        let latitude = location?.coordinate.latitude
-        let longitude = location?.coordinate.longitude
+        isSaving = true
 
-        let newActivity = Activity(
-            dateTime: activityDateTime,
-            notes: notes.isEmpty ? nil : notes,
-            quantity: quantityValue,
-            latitude: latitude,
-            longitude: longitude,
-            activityType: activityType,
-            caree: caree
-        )
+        // Add slight delay for visual feedback
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let activityDateTime = useCustomTime ? customDateTime : Date()
+            let location = includeLocation ? locationManager.location : nil
+            let latitude = location?.coordinate.latitude
+            let longitude = location?.coordinate.longitude
 
-        modelContext.insert(newActivity)
-        locationManager.stopUpdating()
-        dismiss()
+            let newActivity = Activity(
+                dateTime: activityDateTime,
+                notes: notes.isEmpty ? nil : notes,
+                quantity: quantityValue,
+                latitude: latitude,
+                longitude: longitude,
+                activityType: activityType,
+                caree: caree
+            )
+
+            withAnimation(.easeOut(duration: 0.2)) {
+                modelContext.insert(newActivity)
+                locationManager.stopUpdating()
+                isSaving = false
+            }
+
+            // Dismiss with slight delay for smoother transition
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                dismiss()
+            }
+        }
     }
 }
 
