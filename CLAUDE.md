@@ -287,8 +287,18 @@ Enable multiple caregivers to track activities for the same caree(s) across thei
   - ✅ Activity tracking UX polish with loading states
   - ✅ Form validation feedback with shake animations
 
-**Pending:**
-- ⏳ UI test coverage for critical user flows
+- ✅ UI test coverage for critical user flows
+  - ✅ CareeManagementUITests (CRUD operations)
+  - ✅ ActivityTypeUITests (type configuration)
+  - ✅ ActivityTrackingUITests (activity tracking flows)
+  - ⚠️ Some tests have timing/interaction flakiness (common XCTest UI testing challenges)
+
+- ✅ watchOS widget/complication support
+  - ✅ WidgetKit extension target
+  - ✅ Four complication families (circular, rectangular, inline, corner)
+  - ✅ Timeline provider with 15-minute updates
+  - ✅ Display today's activity count
+  - ✅ App group sharing for data access
 
 **Deferred:**
 - watchOS feature parity (ActivityListView, edit capability)

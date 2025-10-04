@@ -63,6 +63,29 @@ targets:
         com.apple.security.application-groups:
           - group.com.kareemf.CareKeeper
 
+  CareKeeperV2 Widget:
+    type: app-extension
+    platform: watchOS
+    deploymentTarget: "10.0"
+    sources:
+      - path: CareKeeperV2 Widget
+      - path: CareKeeperV2/Models
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeper.watchkitapp.widget
+        INFOPLIST_FILE: CareKeeperV2-Widget-Info.plist
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: "CareKeeperV2 Widget/CareKeeperV2 Widget.entitlements"
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "4"
+        WATCHOS_DEPLOYMENT_TARGET: "10.0"
+        SKIP_INSTALL: YES
+    entitlements:
+      path: "CareKeeperV2 Widget/CareKeeperV2 Widget.entitlements"
+      properties:
+        com.apple.security.application-groups:
+          - group.com.kareemf.CareKeeper
+
   CareKeeperV2 Watch App:
     type: application
     platform: watchOS
@@ -73,6 +96,9 @@ targets:
       - path: CareKeeperV2/Preview
       - path: CareKeeperV2/Services
       - path: CareKeeperV2/Views/Components
+    dependencies:
+      - target: CareKeeperV2 Widget
+        embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeper.watchkitapp
