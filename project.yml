@@ -46,6 +46,8 @@ targets:
           UIApplicationSupportsMultipleScenes: true
         UIApplicationSupportsIndirectInputEvents: true
         UILaunchScreen: {}
+        UIBackgroundModes:
+          - remote-notification
         NSLocationWhenInUseUsageDescription: "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types."
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
