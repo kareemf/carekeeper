@@ -123,6 +123,24 @@ targets:
         CODE_SIGN_STYLE: Automatic
 
 schemes:
+  CareKeeper:
+    build:
+      targets:
+        CareKeeperV2: all
+        CareKeeperV2 Watch App: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - CareKeeperV2Tests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+
   CareKeeperV2:
     build:
       targets:
