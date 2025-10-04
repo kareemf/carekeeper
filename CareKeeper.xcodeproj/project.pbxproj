@@ -56,6 +56,7 @@
 		D7A6752318BB0C8EFF5EEF0D /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BDD832C3A966D99072E15C8 /* CareeDetailView.swift */; };
 		DC3D255CFB44AD9F3C39DB76 /* CareKeeperV2 Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 85161FD61189C644DC863547 /* CareKeeperV2 Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DF6FBB6C9E2D241411838F0E /* ActivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8929A24685E0D06AF3CCA78C /* ActivityTests.swift */; };
+		E090EFCE6A4D602925E9C98E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 585FB1BCEEE106EC7B47C2E3 /* Preview Assets.xcassets */; };
 		E4CD10AECA514C023A31B0B6 /* TrackActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B090F6CCCD5E8D95521DCD /* TrackActivityView.swift */; };
 		E77FEDB47486C7901244812E /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B891A79098EB2F885B7EE8C3 /* ActivityType.swift */; };
 		EA33E703003CFE89F512D9FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D341BBBC8A307763AE849260 /* Assets.xcassets */; };
@@ -127,6 +128,7 @@
 		48E2E1E92765420A15B8C96E /* ActivityRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRowView.swift; sourceTree = "<group>"; };
 		5394A28349D2536DACEC55AD /* CareKeeperV2WatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperV2WatchApp.swift; sourceTree = "<group>"; };
 		55B817EC7B2594E7047F4B99 /* ActivityTypeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeRowView.swift; sourceTree = "<group>"; };
+		585FB1BCEEE106EC7B47C2E3 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		5BEF407E55D6E35CDFA694B2 /* CareeManagementUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeManagementUITests.swift; sourceTree = "<group>"; };
 		6B1CD125EDB7D626B6E51DC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		705AB44FD17075847F5967A1 /* CareeListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListRowView.swift; sourceTree = "<group>"; };
@@ -189,6 +191,14 @@
 				A8B090F6CCCD5E8D95521DCD /* TrackActivityView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		1CF9F45EFC39ADF864F9952C /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				585FB1BCEEE106EC7B47C2E3 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 		2D0BD90839CB2F8F2A4A2340 /* ActivityType */ = {
@@ -283,6 +293,7 @@
 				6B1CD125EDB7D626B6E51DC9 /* Assets.xcassets */,
 				C9E016748886279F33CFECD3 /* CareKeeperV2 Watch App.entitlements */,
 				03E57D925EAA465A1F27B15C /* App */,
+				1CF9F45EFC39ADF864F9952C /* Preview Content */,
 				14DA52296EF70487C40E5C0C /* Views */,
 			);
 			path = "CareKeeperV2 Watch App";
@@ -495,6 +506,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				27FA247EAD48C2EBF0A87C80 /* Assets.xcassets in Resources */,
+				E090EFCE6A4D602925E9C98E /* Preview Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
