@@ -33,12 +33,22 @@ struct CareeShareButton: View {
         .disabled(isLoading)
         .sheet(isPresented: $showingShareSheet) {
             if let share = share {
+                // Existing share
                 CloudSharingView(
                     share: share,
                     container: container,
                     onDismiss: {
                         showingShareSheet = false
                         self.share = nil
+                    }
+                )
+            } else {
+                // New share - use preparation handler
+                CloudSharingView(
+                    careeID: caree.id.uuidString,
+                    container: container,
+                    onDismiss: {
+                        showingShareSheet = false
                     }
                 )
             }
@@ -53,19 +63,11 @@ struct CareeShareButton: View {
         // Check if already shared
         if let existingShare = sharingService.getShare(for: caree, in: modelContext) {
             share = existingShare
-            showingShareSheet = true
-            return
+        } else {
+            // New share - will be created by UICloudSharingController's preparation handler
+            share = nil
         }
 
-        // Create new share
-        // Note: Actual share creation requires access to the persistent store coordinator
-        // This is a simplified version - production code needs proper SwiftData+CloudKit integration
-        let newShare = CKShare(rootRecord: CKRecord(recordType: "Caree"))
-        newShare[CKShare.SystemFieldKey.title] = caree.name as CKRecordValue
-        newShare.publicPermission = .none
-
-        // Set permissions: participants can read/write but not delete
-        share = newShare
         showingShareSheet = true
     }
 }

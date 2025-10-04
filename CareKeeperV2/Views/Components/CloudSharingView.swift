@@ -4,19 +4,50 @@ import CloudKit
 import UIKit
 
 struct CloudSharingView: UIViewControllerRepresentable {
-    let share: CKShare
+    let share: CKShare?
     let container: CKContainer
+    let careeID: String?
     let onDismiss: () -> Void
 
+    // Initializer for existing share
+    init(share: CKShare, container: CKContainer, onDismiss: @escaping () -> Void) {
+        self.share = share
+        self.container = container
+        self.careeID = nil
+        self.onDismiss = onDismiss
+    }
+
+    // Initializer for new share with preparation handler
+    init(careeID: String, container: CKContainer, onDismiss: @escaping () -> Void) {
+        self.share = nil
+        self.container = container
+        self.careeID = careeID
+        self.onDismiss = onDismiss
+    }
+
     func makeUIViewController(context: Context) -> UICloudSharingController {
-        let controller = UICloudSharingController(
-            share: share,
-            container: container
-        )
-        controller.delegate = context.coordinator
-        controller.availablePermissions = [.allowReadWrite, .allowPrivate]
-        controller.modalPresentationStyle = .formSheet
-        return controller
+        if let share = share {
+            // Existing share
+            let controller = UICloudSharingController(
+                share: share,
+                container: container
+            )
+            controller.delegate = context.coordinator
+            controller.availablePermissions = [.allowReadWrite, .allowPrivate]
+            controller.modalPresentationStyle = .formSheet
+            return controller
+        } else {
+            // New share with preparation handler
+            let controller = UICloudSharingController { controller, completion in
+                Task {
+                    await context.coordinator.prepareShare(container: container, careeID: careeID, completion: completion)
+                }
+            }
+            controller.delegate = context.coordinator
+            controller.availablePermissions = [.allowReadWrite, .allowPrivate]
+            controller.modalPresentationStyle = .formSheet
+            return controller
+        }
     }
 
     func updateUIViewController(_ uiViewController: UICloudSharingController, context: Context) {
@@ -32,6 +63,36 @@ struct CloudSharingView: UIViewControllerRepresentable {
 
         init(onDismiss: @escaping () -> Void) {
             self.onDismiss = onDismiss
+        }
+
+        func prepareShare(container: CKContainer, careeID: String?, completion: @escaping (CKShare?, CKContainer?, Error?) -> Void) async {
+            guard let careeID = careeID else {
+                completion(nil, nil, NSError(domain: "CloudSharingView", code: -1, userInfo: [NSLocalizedDescriptionKey: "Caree ID not provided"]))
+                return
+            }
+
+            do {
+                // Query CloudKit for the Caree record
+                // SwiftData creates records with type "CD_EntityName"
+                let recordID = CKRecord.ID(recordName: careeID)
+                let database = container.privateCloudDatabase
+
+                // Fetch the record
+                let record = try await database.record(for: recordID)
+
+                // Create a share for this record
+                let share = CKShare(rootRecord: record)
+                share[CKShare.SystemFieldKey.title] = record["name"] ?? "Caree" as CKRecordValue
+                share.publicPermission = .none
+
+                // Save the share
+                try await database.save(share)
+
+                completion(share, container, nil)
+            } catch {
+                print("❌ Failed to prepare share: \(error.localizedDescription)")
+                completion(nil, nil, error)
+            }
         }
 
         func cloudSharingController(_ csc: UICloudSharingController, failedToSaveShareWithError error: Error) {
