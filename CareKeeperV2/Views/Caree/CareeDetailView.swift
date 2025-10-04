@@ -49,6 +49,7 @@ struct CareeDetailView: View {
                             if caree.recentActivities.isEmpty {
                                 emptyActivitiesView
                                     .listRowBackground(Color.clear)
+                                    .listRowSeparator(.hidden)
                             } else {
                                 ForEach(Array(caree.recentActivities.prefix(5))) { activity in
                                     ActivityRowView(activity: activity)
@@ -64,7 +65,6 @@ struct CareeDetailView: View {
                             }
                         }
                         .textCase(nil)
-                        .listRowSeparator(.hidden)
                     }
 
                     Section(header: activityTypesSectionHeader) {
@@ -84,7 +84,6 @@ struct CareeDetailView: View {
                         }
                     }
                     .textCase(nil)
-                    .listRowSeparator(.hidden)
 
                     if caree.sortedActivityTypes.isEmpty {
                         Section {

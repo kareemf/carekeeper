@@ -14,7 +14,7 @@ struct ContentView: View {
             
             SharingView()
                 .tabItem {
-                    Label(NSLocalizedString("Sharing", comment: "Tab title for sharing"), 
+                    Label(NSLocalizedString("Shared", comment: "Tab title for shared carees"),
                           systemImage: "person.2")
                 }
                 .tag(1)
