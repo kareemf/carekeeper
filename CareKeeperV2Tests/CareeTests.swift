@@ -42,8 +42,8 @@ final class CareeTests: XCTestCase {
         XCTAssertNil(caree.image, "Image should be nil by default")
         XCTAssertEqual(caree.listOrder, 0, "List order should default to 0")
         XCTAssertNotNil(caree.dateCreated, "Date created should be set")
-        XCTAssertTrue(caree.activityTypes.isEmpty, "Activity types should be empty initially")
-        XCTAssertTrue(caree.activities.isEmpty, "Activities should be empty initially")
+        XCTAssertTrue(caree.activityTypes?.isEmpty ?? true, "Activity types should be empty initially")
+        XCTAssertTrue(caree.activities?.isEmpty ?? true, "Activities should be empty initially")
     }
 
     func testCareeInitializationWithImage() {
@@ -110,8 +110,8 @@ final class CareeTests: XCTestCase {
 
         try modelContext.save()
 
-        XCTAssertEqual(caree.activityTypes.count, 1, "Caree should have one activity type")
-        XCTAssertEqual(caree.activityTypes.first?.name, "Feeding", "Activity type should be correct")
+        XCTAssertEqual(caree.activityTypes?.count, 1, "Caree should have one activity type")
+        XCTAssertEqual(caree.activityTypes?.first?.name, "Feeding", "Activity type should be correct")
     }
 
     func testCareeCascadeDeleteActivityTypes() throws {

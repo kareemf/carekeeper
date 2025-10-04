@@ -138,7 +138,7 @@ final class ActivityTypeTests: XCTestCase {
         try modelContext.save()
 
         XCTAssertEqual(activityType.caree?.name, "Test Caree", "Should be linked to caree")
-        XCTAssertTrue(caree.activityTypes.contains(where: { $0.id == activityType.id }), "Caree should have activity type")
+        XCTAssertTrue(caree.activityTypes?.contains(where: { $0.id == activityType.id }) ?? false, "Caree should have activity type")
     }
 
     func testActivityTypeCascadeDeleteActivities() throws {

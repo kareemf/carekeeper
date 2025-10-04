@@ -156,8 +156,8 @@ final class ActivityTests: XCTestCase {
 
         XCTAssertEqual(activity.activityType?.name, "Feeding", "Should be linked to activity type")
         XCTAssertEqual(activity.caree?.name, "Test Caree", "Should be linked to caree")
-        XCTAssertTrue(activityType.activities.contains(where: { $0.id == activity.id }), "Activity type should have activity")
-        XCTAssertTrue(caree.activities.contains(where: { $0.id == activity.id }), "Caree should have activity")
+        XCTAssertTrue(activityType.activities?.contains(where: { $0.id == activity.id }) ?? false, "Activity type should have activity")
+        XCTAssertTrue(caree.activities?.contains(where: { $0.id == activity.id }) ?? false, "Caree should have activity")
     }
 
     // MARK: - Location Tests

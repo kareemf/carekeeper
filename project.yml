@@ -122,6 +122,22 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         CODE_SIGN_STYLE: Automatic
 
+  CareKeeperV2UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: CareKeeperV2UITests
+    dependencies:
+      - target: CareKeeperV2
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeperUITests
+        SWIFT_VERSION: "5.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_STYLE: Automatic
+        TEST_TARGET_NAME: CareKeeperV2
+
 schemes:
   CareKeeper:
     build:
@@ -134,6 +150,7 @@ schemes:
       config: Debug
       targets:
         - CareKeeperV2Tests
+        - CareKeeperV2UITests
     profile:
       config: Release
     analyze:
@@ -152,6 +169,7 @@ schemes:
       config: Debug
       targets:
         - CareKeeperV2Tests
+        - CareKeeperV2UITests
     profile:
       config: Release
     analyze:

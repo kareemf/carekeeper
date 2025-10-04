@@ -64,6 +64,17 @@
                ReferencedContainer = "container:CareKeeper.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "77775D7F7018071707CE8419"
+               BuildableName = "CareKeeperV2UITests.xctest"
+               BlueprintName = "CareKeeperV2UITests"
+               ReferencedContainer = "container:CareKeeper.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <CommandLineArguments>
       </CommandLineArguments>

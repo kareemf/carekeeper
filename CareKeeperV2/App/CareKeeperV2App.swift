@@ -5,26 +5,42 @@ import CloudKit
 @main
 struct CareKeeperV2App: App {
     var sharedModelContainer: ModelContainer = {
+        let schema = Schema([
+            Caree.self,
+            ActivityType.self,
+            Activity.self
+        ])
+
+        // Check if running UI tests
+        let isUITesting = ProcessInfo.processInfo.arguments.contains("UI-Testing")
+
         do {
-            let schema = Schema([
-                Caree.self,
-                ActivityType.self,
-                Activity.self
-            ])
+            if isUITesting {
+                // Use in-memory container for UI tests to ensure clean state
+                let modelConfiguration = ModelConfiguration(
+                    schema: schema,
+                    isStoredInMemoryOnly: true
+                )
 
-            // Configure for CloudKit sync with local storage
-            let modelConfiguration = ModelConfiguration(
-                schema: schema,
-                isStoredInMemoryOnly: false,
-                allowsSave: true,
-                groupContainer: .identifier("group.com.kareemf.CareKeeper"),
-                cloudKitDatabase: .private("iCloud.com.kareemf.CareKeeperCK")
-            )
+                return try ModelContainer(
+                    for: schema,
+                    configurations: [modelConfiguration]
+                )
+            } else {
+                // Configure for CloudKit sync with local storage
+                let modelConfiguration = ModelConfiguration(
+                    schema: schema,
+                    isStoredInMemoryOnly: false,
+                    allowsSave: true,
+                    groupContainer: .identifier("group.com.kareemf.CareKeeper"),
+                    cloudKitDatabase: .private("iCloud.com.kareemf.CareKeeperCK")
+                )
 
-            return try ModelContainer(
-                for: schema,
-                configurations: [modelConfiguration]
-            )
+                return try ModelContainer(
+                    for: schema,
+                    configurations: [modelConfiguration]
+                )
+            }
         } catch {
             print("⚠️ Failed to create ModelContainer: \(error)")
             print("   Error details: \(String(describing: error))")
