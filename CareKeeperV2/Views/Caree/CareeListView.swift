@@ -7,6 +7,8 @@ struct CareeListView: View {
     @State private var showingAddCaree = false
     @State private var careeToDelete: IndexSet?
     @State private var showingDeleteConfirmation = false
+
+    @StateObject private var syncService = CloudKitSyncService()
     
     var body: some View {
         NavigationView {
@@ -105,7 +107,19 @@ struct CareeListView: View {
             }
             .onMove(perform: moveCarees)
         }
+        .refreshable {
+            await refreshAllCarees()
+        }
         .animation(.easeInOut(duration: 0.3), value: carees.map { $0.id })
+    }
+
+    private func refreshAllCarees() async {
+        // Check sync status for all carees
+        // This refreshes the general CloudKit state
+        // Individual sync status is checked in CareeDetailView
+        for caree in carees {
+            _ = await syncService.isSynced(caree: caree)
+        }
     }
     
     private func deleteCarees(offsets: IndexSet) {

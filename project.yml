@@ -58,7 +58,7 @@ targets:
       path: CareKeeperV2/CareKeeperV2.entitlements
       properties:
         com.apple.developer.icloud-container-identifiers:
-          - iCloud.com.kareemf.CareKeeperCK
+          - iCloud.com.kareemf.CareKeeperCloudKit
         com.apple.developer.icloud-services:
           - CloudKit
         com.apple.developer.ubiquity-kvstore-identifier: "$(TeamIdentifierPrefix)$(CFBundleIdentifier)"
@@ -129,7 +129,7 @@ targets:
       path: "CareKeeperV2 Watch App/CareKeeperV2 Watch App.entitlements"
       properties:
         com.apple.developer.icloud-container-identifiers:
-          - iCloud.com.kareemf.CareKeeperCK
+          - iCloud.com.kareemf.CareKeeperCloudKit
         com.apple.developer.icloud-services:
           - CloudKit
         com.apple.developer.ubiquity-kvstore-identifier: "$(TeamIdentifierPrefix)$(CFBundleIdentifier)"

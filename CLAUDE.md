@@ -82,7 +82,7 @@ The app uses SwiftData with three main model entities:
   - Shares Models, Services, Components from iOS via project.yml
 
 ### Development Notes
-- Uses CloudKit container identifier: `iCloud.com.kareemf.CareKeeperCK`
+- Uses CloudKit container identifier: `iCloud.com.kareemf.CareKeeperCloudKit`
 - Both iOS and watchOS apps share the same SwiftData models
 - Location services integrated for activities when ActivityType.hasLocation == true
 - XcodeGen project generation from `project.yml`
@@ -214,7 +214,7 @@ Enable multiple caregivers to track activities for the same caree(s) across thei
 
 #### Technical Details
 
-**CloudKit Container**: `iCloud.com.kareemf.CareKeeperCK`
+**CloudKit Container**: `iCloud.com.kareemf.CareKeeperCloudKit`
 
 **SwiftData Configuration**:
 - Add CloudKit option to ModelConfiguration

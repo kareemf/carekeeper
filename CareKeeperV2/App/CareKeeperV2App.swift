@@ -33,7 +33,7 @@ struct CareKeeperV2App: App {
                     isStoredInMemoryOnly: false,
                     allowsSave: true,
                     groupContainer: .identifier("group.com.kareemf.CareKeeper"),
-                    cloudKitDatabase: .private("iCloud.com.kareemf.CareKeeperCK")
+                    cloudKitDatabase: .private("iCloud.com.kareemf.CareKeeperCloudKit")
                 )
 
                 return try ModelContainer(
@@ -64,7 +64,7 @@ struct CareKeeperV2App: App {
             return
         }
 
-        let container = CKContainer(identifier: "iCloud.com.kareemf.CareKeeperCK")
+        let container = CKContainer(identifier: "iCloud.com.kareemf.CareKeeperCloudKit")
 
         // Fetch the share metadata from the URL
         container.fetchShareMetadata(with: url) { metadata, error in

@@ -76,13 +76,38 @@ struct CloudSharingView: UIViewControllerRepresentable {
             }
 
             do {
+                // Check iCloud account status
+                let accountStatus = try await container.accountStatus()
+                print("☁️ iCloud account status: \(accountStatus.rawValue)")
+
+                guard accountStatus == .available else {
+                    let errorMessage: String
+                    switch accountStatus {
+                    case .couldNotDetermine:
+                        errorMessage = "Could not determine iCloud account status"
+                    case .noAccount:
+                        errorMessage = "No iCloud account found. Please sign in to iCloud in Settings."
+                    case .restricted:
+                        errorMessage = "iCloud account is restricted"
+                    case .temporarilyUnavailable:
+                        errorMessage = "iCloud is temporarily unavailable"
+                    default:
+                        errorMessage = "iCloud account not available"
+                    }
+                    throw NSError(domain: "CloudSharingView", code: -2, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+                }
+
                 // Query CloudKit for the Caree record
                 // SwiftData creates records with type "CD_EntityName"
                 let recordID = CKRecord.ID(recordName: careeID)
                 let database = container.privateCloudDatabase
 
+                print("🔍 Attempting to fetch CloudKit record with ID: \(careeID)")
+
                 // Fetch the record
                 let record = try await database.record(for: recordID)
+
+                print("✅ Successfully fetched record: \(record.recordID.recordName)")
 
                 // Create a share for this record
                 let share = CKShare(rootRecord: record)
@@ -90,11 +115,18 @@ struct CloudSharingView: UIViewControllerRepresentable {
                 share.publicPermission = .none
 
                 // Save the share
+                print("💾 Saving share to CloudKit...")
                 try await database.save(share)
 
+                print("✅ Share saved successfully")
                 completion(share, container, nil)
             } catch {
                 print("❌ Failed to prepare share: \(error.localizedDescription)")
+                print("❌ Error details: \(error)")
+                if let ckError = error as? CKError {
+                    print("❌ CKError code: \(ckError.code.rawValue)")
+                    print("❌ CKError user info: \(ckError.userInfo)")
+                }
                 completion(nil, nil, error)
             }
         }

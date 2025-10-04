@@ -19,6 +19,10 @@ struct CareeDetailView: View {
     @State private var showingDeleteActivityTypeConfirmation = false
     @State private var activityToDelete: Activity?
     @State private var showingDeleteActivityConfirmation = false
+    @State private var isSyncedToCloudKit: Bool? = nil
+    @State private var isCheckingSync = false
+
+    @StateObject private var syncService = CloudKitSyncService()
 
     init(careeID: UUID) {
         self.careeID = careeID
@@ -98,11 +102,23 @@ struct CareeDetailView: View {
                 .listStyle(.plain)
                 .navigationTitle(caree.name)
                 .navigationBarTitleDisplayMode(.large)
+                .refreshable {
+                    await checkSyncStatus(for: caree)
+                }
+                .task {
+                    await checkSyncStatus(for: caree)
+                }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         HStack(spacing: 16) {
                             #if os(iOS)
-                            CareeShareButton(caree: caree)
+                            // Sync status indicator
+                            syncStatusIndicator
+
+                            CareeShareButton(
+                                caree: caree,
+                                isSynced: isSyncedToCloudKit ?? false
+                            )
                             #endif
 
                             Button(NSLocalizedString("Edit", comment: "Edit button")) {
@@ -311,6 +327,25 @@ struct CareeDetailView: View {
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(12)
+    }
+
+    private var syncStatusIndicator: some View {
+        Group {
+            if isCheckingSync {
+                ProgressView()
+                    .scaleEffect(0.7)
+            } else if let isSynced = isSyncedToCloudKit {
+                Image(systemName: isSynced ? "icloud.and.arrow.up.fill" : "icloud.slash")
+                    .foregroundColor(isSynced ? .green : .secondary)
+                    .help(isSynced ? "Synced to iCloud" : "Not synced to iCloud")
+            }
+        }
+    }
+
+    private func checkSyncStatus(for caree: Caree) async {
+        isCheckingSync = true
+        isSyncedToCloudKit = await syncService.isSynced(caree: caree)
+        isCheckingSync = false
     }
 }
 

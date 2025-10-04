@@ -6,7 +6,7 @@ import CloudKit
 class CloudKitSharingService: ObservableObject {
     private let container: CKContainer
 
-    init(containerIdentifier: String = "iCloud.com.kareemf.CareKeeperCK") {
+    init(containerIdentifier: String = "iCloud.com.kareemf.CareKeeperCloudKit") {
         self.container = CKContainer(identifier: containerIdentifier)
     }
 
