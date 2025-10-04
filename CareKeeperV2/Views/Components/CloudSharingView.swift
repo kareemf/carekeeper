@@ -38,6 +38,10 @@ struct CloudSharingView: UIViewControllerRepresentable {
             return controller
         } else {
             // New share with preparation handler
+            // NOTE: UICloudSharingController.init(preparationHandler:) is deprecated in iOS 17.0,
+            // but remains the standard approach for CloudKit sharing with SwiftData.
+            // The suggested alternative (UIActivityViewController) is not appropriate for CloudKit-specific sharing.
+            // This is a known limitation until Apple provides native SwiftData/SwiftUI CloudKit sharing APIs.
             let controller = UICloudSharingController { controller, completion in
                 Task {
                     await context.coordinator.prepareShare(container: container, careeID: careeID, completion: completion)
