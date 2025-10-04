@@ -1,9 +1,15 @@
 import SwiftUI
+import SwiftData
 
 struct ActivityTypeRowView: View {
     let activityType: ActivityType
     @State private var showingEdit = false
-    
+    @Query private var allActivities: [Activity]
+
+    private var activitiesCount: Int {
+        allActivities.filter { $0.activityType?.id == activityType.id }.count
+    }
+
     var body: some View {
         HStack {
             // Icon
@@ -33,12 +39,12 @@ struct ActivityTypeRowView: View {
             }
             
             Spacer()
-            
+
             VStack(alignment: .trailing) {
-                Text("\(activityType.totalActivitiesCount)")
+                Text("\(activitiesCount)")
                     .font(.headline)
                     .foregroundColor(.secondary)
-                
+
                 Text(NSLocalizedString("activities", comment: "Activities count label"))
                     .font(.caption2)
                     .foregroundColor(.secondary)
