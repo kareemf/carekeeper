@@ -65,6 +65,7 @@ struct CareeDetailView: View {
                             }
                         }
                         .textCase(nil)
+                        .listRowSeparator(.hidden)
                     }
 
                     Section(header: activityTypesSectionHeader) {
@@ -84,6 +85,7 @@ struct CareeDetailView: View {
                         }
                     }
                     .textCase(nil)
+                    .listRowSeparator(.hidden)
 
                     if caree.sortedActivityTypes.isEmpty {
                         Section {
