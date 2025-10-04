@@ -50,28 +50,23 @@ struct CareeShareButton: View {
         isLoading = true
         defer { isLoading = false }
 
-        do {
-            // Check if already shared
-            if let existingShare = sharingService.getShare(for: caree, in: modelContext) {
-                share = existingShare
-                showingShareSheet = true
-                return
-            }
-
-            // Create new share
-            // Note: Actual share creation requires access to the persistent store coordinator
-            // This is a simplified version - production code needs proper SwiftData+CloudKit integration
-            let newShare = CKShare(rootRecord: CKRecord(recordType: "Caree"))
-            newShare[CKShare.SystemFieldKey.title] = caree.name as CKRecordValue
-            newShare.publicPermission = .none
-
-            // Set permissions: participants can read/write but not delete
-            share = newShare
+        // Check if already shared
+        if let existingShare = sharingService.getShare(for: caree, in: modelContext) {
+            share = existingShare
             showingShareSheet = true
-
-        } catch {
-            self.error = AppError.saveFailed(error.localizedDescription)
+            return
         }
+
+        // Create new share
+        // Note: Actual share creation requires access to the persistent store coordinator
+        // This is a simplified version - production code needs proper SwiftData+CloudKit integration
+        let newShare = CKShare(rootRecord: CKRecord(recordType: "Caree"))
+        newShare[CKShare.SystemFieldKey.title] = caree.name as CKRecordValue
+        newShare.publicPermission = .none
+
+        // Set permissions: participants can read/write but not delete
+        share = newShare
+        showingShareSheet = true
     }
 }
 
