@@ -28,6 +28,10 @@ struct CareKeeperV2App: App {
                 )
             } else {
                 // Configure for CloudKit sync with local storage
+                print("🔧 Initializing ModelContainer with CloudKit sync")
+                print("   Container: iCloud.com.kareemf.CareKeeperCloudKit")
+                print("   App Group: group.com.kareemf.CareKeeper")
+
                 let modelConfiguration = ModelConfiguration(
                     schema: schema,
                     isStoredInMemoryOnly: false,
@@ -36,10 +40,13 @@ struct CareKeeperV2App: App {
                     cloudKitDatabase: .private("iCloud.com.kareemf.CareKeeperCloudKit")
                 )
 
-                return try ModelContainer(
+                let container = try ModelContainer(
                     for: schema,
                     configurations: [modelConfiguration]
                 )
+
+                print("✅ ModelContainer created successfully")
+                return container
             }
         } catch {
             print("⚠️ Failed to create ModelContainer: \(error)")
@@ -51,11 +58,40 @@ struct CareKeeperV2App: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    checkCloudKitStatus()
+                }
                 .onOpenURL { url in
                     handleIncomingURL(url)
                 }
         }
         .modelContainer(sharedModelContainer)
+    }
+
+    private func checkCloudKitStatus() {
+        let container = CKContainer(identifier: "iCloud.com.kareemf.CareKeeperCloudKit")
+
+        Task {
+            do {
+                let status = try await container.accountStatus()
+                switch status {
+                case .available:
+                    print("✅ iCloud account: Available")
+                case .noAccount:
+                    print("❌ iCloud account: No account signed in")
+                case .restricted:
+                    print("❌ iCloud account: Restricted")
+                case .couldNotDetermine:
+                    print("⚠️ iCloud account: Could not determine")
+                case .temporarilyUnavailable:
+                    print("⚠️ iCloud account: Temporarily unavailable")
+                @unknown default:
+                    print("⚠️ iCloud account: Unknown status")
+                }
+            } catch {
+                print("❌ Failed to check iCloud account status: \(error)")
+            }
+        }
     }
 
     private func handleIncomingURL(_ url: URL) {

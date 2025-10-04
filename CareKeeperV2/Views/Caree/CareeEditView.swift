@@ -146,6 +146,7 @@ struct CareeEditView: View {
 
         if let existingCaree = caree {
             // Update existing caree
+            print("📝 Updating caree: \(trimmedName) (ID: \(existingCaree.id.uuidString))")
             existingCaree.name = trimmedName
             existingCaree.image = imageData
         } else {
@@ -155,13 +156,18 @@ struct CareeEditView: View {
                 image: imageData,
                 listOrder: 0 // Will be updated based on list position
             )
+            print("➕ Creating new caree: \(trimmedName) (ID: \(newCaree.id.uuidString))")
             modelContext.insert(newCaree)
         }
 
         do {
+            print("💾 Saving to SwiftData...")
             try modelContext.save()
+            print("✅ Save successful - SwiftData will sync to CloudKit automatically")
+            print("⏳ CloudKit sync typically takes 5-15 seconds")
             dismiss()
         } catch {
+            print("❌ Save failed: \(error.localizedDescription)")
             self.error = AppError.saveFailed(error.localizedDescription)
         }
     }
