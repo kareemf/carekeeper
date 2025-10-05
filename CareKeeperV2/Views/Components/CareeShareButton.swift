@@ -20,15 +20,10 @@ struct CareeShareButton: View {
 
     var body: some View {
         Button {
-            print("📤 Share button tapped for caree: \(caree.name) (ID: \(caree.id.uuidString))")
-            print("   Sync status: \(isSynced ? "✅ Synced" : "❌ Not synced")")
-
             // Pre-share validation
             if !isSynced {
-                print("⚠️ Showing 'not synced' alert to user")
                 showingSyncAlert = true
             } else {
-                print("✅ Proceeding with share preparation")
                 Task {
                     await prepareShare()
                 }
@@ -54,22 +49,12 @@ struct CareeShareButton: View {
         }
         .sheet(isPresented: $showingShareSheet) {
             if let share = share {
-                // Existing share
                 CloudSharingView(
                     share: share,
                     container: container,
                     onDismiss: {
                         showingShareSheet = false
                         self.share = nil
-                    }
-                )
-            } else {
-                // New share - use preparation handler
-                CloudSharingView(
-                    careeID: caree.id.uuidString,
-                    container: container,
-                    onDismiss: {
-                        showingShareSheet = false
                     }
                 )
             }
@@ -81,47 +66,67 @@ struct CareeShareButton: View {
         isLoading = true
         defer { isLoading = false }
 
-        print("📤 Share button tapped for caree: \(caree.name) (ID: \(caree.id.uuidString))")
-
         // Check if already shared
         if let existingShare = sharingService.getShare(for: caree, in: modelContext) {
-            print("✅ Found existing share for caree")
             share = existingShare
-        } else {
-            print("🆕 No existing share found - will create new share")
+            showingShareSheet = true
+            return
+        }
 
-            // Check if caree has synced to CloudKit (query by CD_id field)
-            do {
-                let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
-                let database = container.privateCloudDatabase
+        // Create the share before presenting UICloudSharingController
+        do {
+            let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
+            let database = container.privateCloudDatabase
 
-                let predicate = NSPredicate(format: "CD_id == %@", caree.id.uuidString)
-                let query = CKQuery(recordType: "CD_Caree", predicate: predicate)
+            let predicate = NSPredicate(format: "CD_id == %@", caree.id.uuidString)
+            let query = CKQuery(recordType: "CD_Caree", predicate: predicate)
 
-                let (matchResults, _) = try await database.records(matching: query, inZoneWith: zoneID)
+            let (matchResults, _) = try await database.records(matching: query, inZoneWith: zoneID)
 
-                if let firstMatch = matchResults.first {
-                    let (_, result) = firstMatch
-                    if case .success(let record) = result {
-                        print("✅ Caree record found in CloudKit")
-                        print("   CloudKit record ID: \(record.recordID.recordName)")
-                        print("   CD_id: \(record["CD_id"] as? String ?? "unknown")")
-                    }
-                } else {
-                    print("⚠️ Caree record not yet synced to CloudKit")
+            guard let firstMatch = matchResults.first else {
+                throw NSError(domain: "CareeShareButton", code: -1, userInfo: [NSLocalizedDescriptionKey: "Caree record not found in CloudKit. Please wait for sync to complete."])
+            }
+
+            let (_, result) = firstMatch
+            guard case .success(let record) = result else {
+                if case .failure(let error) = result {
+                    throw error
                 }
-            } catch {
-                print("⚠️ Error checking CloudKit sync: \(error.localizedDescription)")
-                if let ckError = error as? CKError {
-                    print("⚠️ CKError code: \(ckError.code.rawValue)")
+                throw NSError(domain: "CareeShareButton", code: -2, userInfo: [NSLocalizedDescriptionKey: "Failed to fetch record"])
+            }
+
+            // Create a share for this record
+            let newShare = CKShare(rootRecord: record)
+            newShare[CKShare.SystemFieldKey.title] = record["CD_name"] as? CKRecordValue ?? "Caree" as CKRecordValue
+            newShare.publicPermission = .none
+
+            // Save both the record and share together
+            let (savedRecords, _) = try await database.modifyRecords(
+                saving: [record, newShare],
+                deleting: [],
+                savePolicy: .changedKeys
+            )
+
+            // Find the saved share
+            var savedShare: CKShare?
+            for (recordID, result) in savedRecords {
+                if case .success(let savedRecord) = result, let share = savedRecord as? CKShare {
+                    savedShare = share
+                    break
                 }
             }
 
-            // New share - will be created by UICloudSharingController's preparation handler
-            share = nil
-        }
+            guard let finalShare = savedShare else {
+                throw NSError(domain: "CareeShareButton", code: -3, userInfo: [NSLocalizedDescriptionKey: "Failed to save share"])
+            }
 
-        showingShareSheet = true
+            // Set the share and present the sheet
+            share = finalShare
+            showingShareSheet = true
+
+        } catch {
+            self.error = error
+        }
     }
 }
 
