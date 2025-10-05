@@ -7,526 +7,534 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		019F3D0FA6BEC7EF7CA5EEEE /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0E024D0D96F2261DFEDB12 /* Caree.swift */; };
-		048ADB4D38C8A311F7089D0A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C956433CB3EF2251FA35385 /* ContentView.swift */; };
-		0581540E5C21709255EC0B4C /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B891A79098EB2F885B7EE8C3 /* ActivityType.swift */; };
-		08B5C1244AD9B1D0B2073EAC /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B379F85DC676CFD654FBE7 /* Activity.swift */; };
-		14FDCFB053BFDAA9065DFB6A /* CloudKitSharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9173707B34D8027FD46F5E4 /* CloudKitSharingService.swift */; };
-		19573307099BF324AD960B89 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CE58E42508DBBBF18823839 /* ShareSheet.swift */; };
-		19F506A7D3A3551BDC63A94B /* CareeListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705AB44FD17075847F5967A1 /* CareeListRowView.swift */; };
-		1E3CF0C5E578D3A385F58BEC /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B631055803CFC97FAFCC9538 /* ActivityDetailView.swift */; };
-		26F41A349B99D754078366D3 /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8B18F582BA68B6B567BC18 /* CloudKitConfig.swift */; };
-		27FA247EAD48C2EBF0A87C80 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B1CD125EDB7D626B6E51DC9 /* Assets.xcassets */; };
-		2A84479E76A99E4AD493A597 /* CloudKitSyncMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5496091330CAD6201AD306 /* CloudKitSyncMonitor.swift */; };
-		2A8B596F5D72FC49CD074884 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A69987D453D2359155BFFFEE /* Preview Assets.xcassets */; };
-		2AE2970A4F2F5252B7DE3C02 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CE58E42508DBBBF18823839 /* ShareSheet.swift */; };
-		2AE30C11E64B40CE43C397EC /* CareKeeperV2WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5394A28349D2536DACEC55AD /* CareKeeperV2WatchApp.swift */; };
-		2C767CF4BAC4785ED75ACB8B /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A7DC7DAE5761427EEDECF7 /* ActivityDetailView.swift */; };
-		316865E3EA904B1776A6D084 /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8B18F582BA68B6B567BC18 /* CloudKitConfig.swift */; };
-		3177C9877FB9B354EB2CA846 /* ActivityRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48E2E1E92765420A15B8C96E /* ActivityRowView.swift */; };
-		38DCA5D2C8CAF3236F3C513F /* XCUIElementExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B188F415D238DE24FAF906D4 /* XCUIElementExtensions.swift */; };
-		390EBE4554F93E93EB6668EE /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E5F89CB58DAA1911ACE334 /* LocationManager.swift */; };
-		3F2BAAF17E46D077C909412C /* ActivityTrackingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50455BE9108B9BE32B54425 /* ActivityTrackingUITests.swift */; };
-		401B3BAF4C0A5BE53876C494 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D570E01BB9E019E67E3A94C9 /* CareeListView.swift */; };
-		4A6F4BC427D6A44E957EF9CE /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264CD9E2FB06C5E7AA16A887 /* CareeListView.swift */; };
-		4F905E3D41124B488C0F78B7 /* CloudKitSyncMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5496091330CAD6201AD306 /* CloudKitSyncMonitor.swift */; };
-		5119FE50D16B690D2C25DC2B /* SharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4BC9A5CC8DF0E6A53D7373C /* SharingView.swift */; };
-		5AD9C43C6F1D3D135A85EC9F /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B379F85DC676CFD654FBE7 /* Activity.swift */; };
-		6015572B8A8F4855F89330FB /* CloudKitSharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9173707B34D8027FD46F5E4 /* CloudKitSharingService.swift */; };
-		603424C3EE06BEB4F81F0452 /* CareKeeperV2 Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 41184B27495199C82E027912 /* CareKeeperV2 Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		64D6B68083B2FC37DCAF64E1 /* CareeShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A95DF025B5A93481F518EA /* CareeShareButton.swift */; };
-		6647BC63093D57B17BEEEB7B /* CareeExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1294F654A4099893CF97852A /* CareeExportService.swift */; };
-		68F7B5AEEE631A4EF4B601DB /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08859ED6A9782131FB87749 /* CloudKitSyncService.swift */; };
-		6BD9D97886C5525C96E2E0E3 /* SyncStatusIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EF40533648E0AC97814A87 /* SyncStatusIndicator.swift */; };
-		6DE89BDF18F7D4A5901C2350 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E5F89CB58DAA1911ACE334 /* LocationManager.swift */; };
-		71A1F9F6F2A93552AF2973BF /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40792041A2DC1BDA880278A8 /* PreviewData.swift */; };
-		73FDBCCAEC6C668C3C16302F /* CareeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22B50C0487FB49AF13D4D5DF /* CareeTests.swift */; };
-		7831AE78D0B9B4FBC9E47852 /* ActivityListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA915A8B9B58471A28E73195 /* ActivityListView.swift */; };
-		78B72302447D4574004A4161 /* CareKeeperWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43F1AD5DEDF5564D724186F /* CareKeeperWidget.swift */; };
-		7A5D03CE4CA4A30AEB0ABAD7 /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08859ED6A9782131FB87749 /* CloudKitSyncService.swift */; };
-		80D66CFECCF3679EEDA8FBC2 /* ActivityTypeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 136ED347A244AAB0407629A1 /* ActivityTypeTests.swift */; };
-		820E4069BB93603590C14498 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0E024D0D96F2261DFEDB12 /* Caree.swift */; };
-		85DC048830898A290E85DE93 /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF676307B4DF7BA70486E0D4 /* ShakeEffect.swift */; };
-		87C2738F0624C7BAFEF7BB2F /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40792041A2DC1BDA880278A8 /* PreviewData.swift */; };
-		899DACF0637249F2AFC2F43D /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7B99A534A6E1F1B10F21E7 /* AppError.swift */; };
-		8C77BD9677E7940642B8DC99 /* SyncStatusIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EF40533648E0AC97814A87 /* SyncStatusIndicator.swift */; };
-		959A001223A3955EF91094E8 /* CloudSharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2B559D138854B24D6AE20C /* CloudSharingView.swift */; };
-		95EA4C6E3C1B7F304EAED088 /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8687F3F7995864074BA7FC62 /* PreviewContainer.swift */; };
-		9ABF86274E1C8BECB6256415 /* CareeShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A95DF025B5A93481F518EA /* CareeShareButton.swift */; };
-		9B76703375010200AA0532F9 /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B891A79098EB2F885B7EE8C3 /* ActivityType.swift */; };
-		9D22792C72A2F3B70455A645 /* CareeManagementUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEF407E55D6E35CDFA694B2 /* CareeManagementUITests.swift */; };
-		9D3271D9F2AA1666EF52B2C0 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B379F85DC676CFD654FBE7 /* Activity.swift */; };
-		9DD1F4DF60DBDDB6166E2DC7 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B379F85DC676CFD654FBE7 /* Activity.swift */; };
-		A04311B0AB5D02A245EB04A1 /* CloudKitSyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC3062FE870CFA91C5C3495 /* CloudKitSyncStatusView.swift */; };
-		A4D1FC41604F205388B16F28 /* CareeEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D92530A8EA9D7FED7C0414EA /* CareeEditView.swift */; };
-		A7A03168B404D7FD6C4F1BF8 /* CloudKitSyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC3062FE870CFA91C5C3495 /* CloudKitSyncStatusView.swift */; };
-		AE2D0DC285908FAA9D1D1F89 /* ActivityTypeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B817EC7B2594E7047F4B99 /* ActivityTypeRowView.swift */; };
-		C1ED336C808C1CD4E7AB3A7D /* ActivityTypeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 980EC8CEF247085CFDFD5188 /* ActivityTypeUITests.swift */; };
-		CDD1BA8E85BB7BB2E938D383 /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F76D243061A40A8C87C86C5 /* ErrorAlert.swift */; };
-		CE611BA043D64709EAC21138 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0E024D0D96F2261DFEDB12 /* Caree.swift */; };
-		D27188B636BEBE063B759FFE /* ShareParticipantsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52F1BF5FA5D9DED2C0CE2C9 /* ShareParticipantsView.swift */; };
-		D5399897A7F3684C02C274CF /* CareKeeperWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D224B27A0060DD9258C8B178 /* CareKeeperWidgetBundle.swift */; };
-		D7A6752318BB0C8EFF5EEF0D /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BDD832C3A966D99072E15C8 /* CareeDetailView.swift */; };
-		DAA23663BBA770EE23DF7653 /* CareeExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1294F654A4099893CF97852A /* CareeExportService.swift */; };
-		DBCBC1AB5102DB663CFC76A5 /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B891A79098EB2F885B7EE8C3 /* ActivityType.swift */; };
-		DC3D255CFB44AD9F3C39DB76 /* CareKeeperV2 Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 85161FD61189C644DC863547 /* CareKeeperV2 Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		DF6FBB6C9E2D241411838F0E /* ActivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8929A24685E0D06AF3CCA78C /* ActivityTests.swift */; };
-		E090EFCE6A4D602925E9C98E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 585FB1BCEEE106EC7B47C2E3 /* Preview Assets.xcassets */; };
-		E4CD10AECA514C023A31B0B6 /* TrackActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B090F6CCCD5E8D95521DCD /* TrackActivityView.swift */; };
-		E77FEDB47486C7901244812E /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B891A79098EB2F885B7EE8C3 /* ActivityType.swift */; };
-		E97CE794065D8AE6226928C3 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0E024D0D96F2261DFEDB12 /* Caree.swift */; };
-		EA33E703003CFE89F512D9FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D341BBBC8A307763AE849260 /* Assets.xcassets */; };
-		EDD259508C70C163E93CFBCD /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7B99A534A6E1F1B10F21E7 /* AppError.swift */; };
-		EF37239ED2D4CFDD4D1BBECD /* CloudSharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2B559D138854B24D6AE20C /* CloudSharingView.swift */; };
-		EFB1307079F88ABF2A64293D /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F76D243061A40A8C87C86C5 /* ErrorAlert.swift */; };
-		F03D95A5CC1DC29FFEEC1BDF /* TrackActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8112617D9FA97E8E677035 /* TrackActivityView.swift */; };
-		F2DF86428CBEB7EFA932ABEE /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8187C52A135E5A9456DAF /* CareeDetailView.swift */; };
-		F3BAF1DDC8B16FC2A9FD150D /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8687F3F7995864074BA7FC62 /* PreviewContainer.swift */; };
-		F4BB352FA5DDC45AA1324D51 /* ActivityTypeEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A6D88ECF96D344D93D6FBBF /* ActivityTypeEditView.swift */; };
-		F72C502DED4A42329F3534C7 /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF676307B4DF7BA70486E0D4 /* ShakeEffect.swift */; };
-		F9D1603943AAC5BC7FF298D3 /* CareKeeperV2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F7245C4875E7F8AF42ADA25 /* CareKeeperV2App.swift */; };
+		028EABF37E1C605E55B05623 /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5829D5A326A5D68626D7E483 /* ErrorAlert.swift */; };
+		07E476CC1FB5FA111AF2DA60 /* CareKeeperWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F6079C2D611AE02903EA9 /* CareKeeperWidgetBundle.swift */; };
+		0ACB1D1952F0107CEA77E2AB /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72711EB0C16E9E4851A2AF2C /* Caree.swift */; };
+		11E98B912697507A785E09A1 /* CloudKitSyncMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C72AD1FB3E583ECC8A97EB /* CloudKitSyncMonitor.swift */; };
+		130FCDA433310F6AAED4476F /* CareeEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073B8ABFD7260C235A4CD017 /* CareeEditView.swift */; };
+		174FACFFEF8A26394A888700 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D48AF5D29BE95FF4982D277 /* AppError.swift */; };
+		1ACD811C263D77D505DDC1D9 /* CareKeeper Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1C40B2F36B2FEF8D200C1D6A /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F445F3809EAF0F93A2583BD1 /* LocationManager.swift */; };
+		2AE6F0B5667E58000BF31695 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A8D35563F0827622269172EA /* Assets.xcassets */; };
+		331480192628E58BC1A5FE92 /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8A9109CFC17794F75FB515 /* PreviewContainer.swift */; };
+		3350CAF1AE029C3165492CAF /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF1FB5B93A58A39C08B20E /* Activity.swift */; };
+		36E0A774A306A89F50588425 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D48AF5D29BE95FF4982D277 /* AppError.swift */; };
+		3890A6296673A11AE7FAD3DE /* CareeExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA18C0C9732E97C003B19 /* CareeExportService.swift */; };
+		389311D1F0430C2B8EFB0ECB /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97C3E57DFB34FB3E1A7DDCFA /* CareeListView.swift */; };
+		39F58B5C38E814CB5204F1C2 /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2175240D9BAD7816FB66C468 /* PreviewData.swift */; };
+		3A782AFE4D02BACD6480493B /* ActivityListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F06F9069D14E10D6982D203 /* ActivityListView.swift */; };
+		3B70776BE3E3FE9FB5FFB249 /* CloudSharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819A85BF80DD82661CF815BC /* CloudSharingView.swift */; };
+		3D8E9B4266B8EC7C1DC7B25D /* CareeManagementUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C45AE24F86869D588B83293 /* CareeManagementUITests.swift */; };
+		3E195F8A62FC0F32DF1D41F0 /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC044C52BF16B9B99F3C6DD /* CareeDetailView.swift */; };
+		3E448B517856B0EA3162862B /* CloudKitSyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDA07594728D63C97B9757C /* CloudKitSyncStatusView.swift */; };
+		3F84479D5728287D022D2011 /* SharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6529ECA6E98FC332C8BFCBEA /* SharingView.swift */; };
+		406E8C951037236B6E9AE368 /* ActivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9427CFA7993E809BA9C6AD5 /* ActivityTests.swift */; };
+		42B90386A09ED9F1D5FECC34 /* CloudKitSyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDA07594728D63C97B9757C /* CloudKitSyncStatusView.swift */; };
+		43367A6015A77A4F542337C5 /* XCUIElementExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532BD9A9DD1376130D5EECB7 /* XCUIElementExtensions.swift */; };
+		438F2A86C6F04298D158FF9D /* CareeShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E375C957E5E1FC91F609F4C /* CareeShareButton.swift */; };
+		46B3202086651EC9FB1E6329 /* ActivityTrackingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5920D4FC9751E0A79BC5C4BD /* ActivityTrackingUITests.swift */; };
+		494D452F3F54A6F73CF9C255 /* TrackActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A609C8698F0EC74D2BF3823 /* TrackActivityView.swift */; };
+		4C31CD7DE91CA50650522467 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84796E5CF92AEDF6DD4E92AA /* CareeListView.swift */; };
+		4E114657A3231882FA9BF351 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72711EB0C16E9E4851A2AF2C /* Caree.swift */; };
+		5254CFFBDD7B99E254EE2835 /* ActivityTypeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3506093819653D2432F0A945 /* ActivityTypeRowView.swift */; };
+		55BFB4F90A35463A9C34B7A2 /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 006FB7D6F3CF5C1F82A959E6 /* ActivityDetailView.swift */; };
+		56EC91126DBC4BC1FC4AD21C /* SyncStatusIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E796C238D68EB0869513BD1 /* SyncStatusIndicator.swift */; };
+		586ECFDC8FF2C4DF973040A4 /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCF3E0DF8D8A33BDC9F0492E /* ActivityDetailView.swift */; };
+		5D2E5A6E7C48E79961E156CB /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E47FB3CDD0A1400A3E550B /* ActivityType.swift */; };
+		5E47CD9CB6E2295A046A9633 /* CloudKitSyncMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C72AD1FB3E583ECC8A97EB /* CloudKitSyncMonitor.swift */; };
+		5F70ED238471FE040C9B3326 /* ActivityTypeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7FC66039C53C043A170CDEB /* ActivityTypeTests.swift */; };
+		60A55A30F4670BA6C8BBD566 /* ActivityTypeEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 809D3531A09EC3C28AE554CF /* ActivityTypeEditView.swift */; };
+		628D3C39DBA7D8652A8285D5 /* CareKeeperWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFF0F7407FAB7635569FDB8F /* CareKeeperWidget.swift */; };
+		6897A307CA11300D86B247F9 /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E47FB3CDD0A1400A3E550B /* ActivityType.swift */; };
+		70C427674A7954E9DDC6CBC1 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D56064A0416085AD5C7749D0 /* Preview Assets.xcassets */; };
+		75595A31EB7E8AFC9DA52DF4 /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5829D5A326A5D68626D7E483 /* ErrorAlert.swift */; };
+		765FBB72C7AF33F9F532FF23 /* TrackActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A908972F0AB5024EB3BB819 /* TrackActivityView.swift */; };
+		770A4488C02071798279442F /* CloudKitSharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6CD974E62394F6A1ED007F /* CloudKitSharingService.swift */; };
+		77A0B826624E73B28E119403 /* ShareParticipantsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B72B65A1FDC34AE310BC5CA5 /* ShareParticipantsView.swift */; };
+		80559336FEFAFAC97106F9BC /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72711EB0C16E9E4851A2AF2C /* Caree.swift */; };
+		805AB8CA18C75280907BB24A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FD4EE14A1A83C8E2F7FC6687 /* Preview Assets.xcassets */; };
+		805FDC233580EBD9384D803E /* CloudSharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819A85BF80DD82661CF815BC /* CloudSharingView.swift */; };
+		8B7945FFF2E7241C88842EE7 /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1691E9BC2E13D39D27D6AAD1 /* CloudKitSyncService.swift */; };
+		8E0366ED5C824FD04EFD6635 /* CareeExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA18C0C9732E97C003B19 /* CareeExportService.swift */; };
+		9577A1CBFF2D0CA7A596DF2E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E16FBE8C16D3C0D2B5A0DD7F /* Assets.xcassets */; };
+		95B655A1C3DE6BFF2CD061EE /* CareKeeper Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D33886BD3B065B6BF5ECD6AA /* CareKeeper Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		9901C31F745FA77024E99DFD /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D16A365A7CB69E3FF4A955A /* CareeDetailView.swift */; };
+		99937891E8B849274D0C9DCA /* CareKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41782EA520212480E5BCFE74 /* CareKeeperApp.swift */; };
+		9EED98DBD69AB6AEE2D56D16 /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 258AEEC1B61C2ECD4857BD40 /* ShakeEffect.swift */; };
+		A424BB5045DBA45B28B6BA34 /* SyncStatusIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E796C238D68EB0869513BD1 /* SyncStatusIndicator.swift */; };
+		A4912D2B4DD4DA471EACBE92 /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F1C6113D31E7FBED78498C0 /* CloudKitConfig.swift */; };
+		A7E024A5B00557BC8A73D316 /* CareKeeperWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF8AB3750E092280F6B93E1 /* CareKeeperWatchApp.swift */; };
+		ABB4713F42E2FAE30CE7564A /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8A9109CFC17794F75FB515 /* PreviewContainer.swift */; };
+		ACA2F67C4D1E482F462ED518 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF1FB5B93A58A39C08B20E /* Activity.swift */; };
+		ACD19F7F12830E6D2DB5AB55 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF1FB5B93A58A39C08B20E /* Activity.swift */; };
+		B3D954DC9B97C5EF41E208D1 /* ActivityRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F045A407E5D82FE3B07CC3 /* ActivityRowView.swift */; };
+		B4A23D60C6FB8F5D7DDD445F /* CareeShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E375C957E5E1FC91F609F4C /* CareeShareButton.swift */; };
+		B5559848F13F6B70E4352449 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9FDB6B1D732C3F073280581 /* ContentView.swift */; };
+		BD5A2B58CF5E1912440D158C /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 258AEEC1B61C2ECD4857BD40 /* ShakeEffect.swift */; };
+		C1B750DAA7023A5564DA45E9 /* CloudKitSharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6CD974E62394F6A1ED007F /* CloudKitSharingService.swift */; };
+		C99A960973C3E61182243E0A /* CareeListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215FD04BA6F77AB5615011D9 /* CareeListRowView.swift */; };
+		C9BD4ADC5031848421189B5D /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F1C6113D31E7FBED78498C0 /* CloudKitConfig.swift */; };
+		D0FCDB85F21F66AF22057A05 /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E47FB3CDD0A1400A3E550B /* ActivityType.swift */; };
+		DA14B3C7F46D9E22448B3A4A /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6D3EDE5A10FB8C7AD1B2F9E /* ShareSheet.swift */; };
+		DA1C3D3F680D0F5D8E236AC7 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6D3EDE5A10FB8C7AD1B2F9E /* ShareSheet.swift */; };
+		DC9BF3EF522F3C23831403DA /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2175240D9BAD7816FB66C468 /* PreviewData.swift */; };
+		DD767D182D049F0F3637E62B /* ActivityTypeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96A6784B396063FE17BEC14 /* ActivityTypeUITests.swift */; };
+		DF4706E830236720AE485E58 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF1FB5B93A58A39C08B20E /* Activity.swift */; };
+		EA7AF08C138745E22324B258 /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E47FB3CDD0A1400A3E550B /* ActivityType.swift */; };
+		F308997BB6F53ACB26559A33 /* CareeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602A75653E2F86CB58273405 /* CareeTests.swift */; };
+		F7B1CB49BDB2377419B9808B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F445F3809EAF0F93A2583BD1 /* LocationManager.swift */; };
+		F91A4C9A369CBF04CBC2FE09 /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1691E9BC2E13D39D27D6AAD1 /* CloudKitSyncService.swift */; };
+		FF74614916397C2B174DD8C6 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72711EB0C16E9E4851A2AF2C /* Caree.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		7F56362D51210D9EDF519F9E /* PBXContainerItemProxy */ = {
+		15523689010121925D8811F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D73F9B8A4F010D7EC1AB2F1E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 5864BADE6AABF03AA09BCA6D;
-			remoteInfo = CareKeeperV2;
+			remoteGlobalIDString = 2EF062019E59968F3B129711;
+			remoteInfo = "CareKeeper iOS";
 		};
-		8F66B864DC0349DD713A9FCC /* PBXContainerItemProxy */ = {
+		4326D37DB3ED6C244B6F7B9F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D73F9B8A4F010D7EC1AB2F1E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 5864BADE6AABF03AA09BCA6D;
-			remoteInfo = CareKeeperV2;
+			remoteGlobalIDString = 2EF062019E59968F3B129711;
+			remoteInfo = "CareKeeper iOS";
 		};
-		E4D17681DBB02E7A3FF447AE /* PBXContainerItemProxy */ = {
+		511B64A5DA53FB9A97A6B052 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D73F9B8A4F010D7EC1AB2F1E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 634D8DF20813ACBC6529A6F4;
-			remoteInfo = "CareKeeperV2 Widget";
+			remoteGlobalIDString = D33AEF414D4813AD6FD4E498;
+			remoteInfo = "CareKeeper Watch App";
 		};
-		EA57768CF393C4EE708D8305 /* PBXContainerItemProxy */ = {
+		DB5EB161880CFB84F5A8E076 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D73F9B8A4F010D7EC1AB2F1E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CDBD9A71E6A9D897B8CF6186;
-			remoteInfo = "CareKeeperV2 Watch App";
+			remoteGlobalIDString = B7D95FF7DEF6E95C2851C31F;
+			remoteInfo = "CareKeeper Widget";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		CBE0737FD52754F155345E66 /* Embed Foundation Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				603424C3EE06BEB4F81F0452 /* CareKeeperV2 Widget.appex in Embed Foundation Extensions */,
-			);
-			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E8822F6FCF45F9E879740653 /* Embed Watch Content */ = {
+		9B1C309C0CDB21D49399FD23 /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				DC3D255CFB44AD9F3C39DB76 /* CareKeeperV2 Watch App.app in Embed Watch Content */,
+				1ACD811C263D77D505DDC1D9 /* CareKeeper Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F70ECED9495E7C49DF3BFBAC /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				95B655A1C3DE6BFF2CD061EE /* CareKeeper Widget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		05FE31454AB58301B0B745F0 /* CareKeeperV2.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CareKeeperV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		0C5496091330CAD6201AD306 /* CloudKitSyncMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncMonitor.swift; sourceTree = "<group>"; };
-		0E0E024D0D96F2261DFEDB12 /* Caree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Caree.swift; sourceTree = "<group>"; };
-		1294F654A4099893CF97852A /* CareeExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeExportService.swift; sourceTree = "<group>"; };
-		136ED347A244AAB0407629A1 /* ActivityTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeTests.swift; sourceTree = "<group>"; };
-		16EF40533648E0AC97814A87 /* SyncStatusIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusIndicator.swift; sourceTree = "<group>"; };
-		18A59D9B8FAAA3F47F469AA3 /* CareKeeperV2UITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CareKeeperV2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		1C956433CB3EF2251FA35385 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		22B50C0487FB49AF13D4D5DF /* CareeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeTests.swift; sourceTree = "<group>"; };
-		264CD9E2FB06C5E7AA16A887 /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
-		2A6D88ECF96D344D93D6FBBF /* ActivityTypeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeEditView.swift; sourceTree = "<group>"; };
-		2F7245C4875E7F8AF42ADA25 /* CareKeeperV2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperV2App.swift; sourceTree = "<group>"; };
-		30A95DF025B5A93481F518EA /* CareeShareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeShareButton.swift; sourceTree = "<group>"; };
-		3658F15B57408C93FEFBDD57 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		3740FB941FEFEC6CA3DEEB77 /* CareKeeperV2Tests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CareKeeperV2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		40792041A2DC1BDA880278A8 /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
-		41184B27495199C82E027912 /* CareKeeperV2 Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "CareKeeperV2 Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		48E2E1E92765420A15B8C96E /* ActivityRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRowView.swift; sourceTree = "<group>"; };
-		4E7F7E3E6C5868A0C16EA4B7 /* CareKeeperV2 Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeperV2 Widget.entitlements"; sourceTree = "<group>"; };
-		5394A28349D2536DACEC55AD /* CareKeeperV2WatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperV2WatchApp.swift; sourceTree = "<group>"; };
-		55B817EC7B2594E7047F4B99 /* ActivityTypeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeRowView.swift; sourceTree = "<group>"; };
-		585FB1BCEEE106EC7B47C2E3 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		5BEF407E55D6E35CDFA694B2 /* CareeManagementUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeManagementUITests.swift; sourceTree = "<group>"; };
-		5CE58E42508DBBBF18823839 /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
-		6B1CD125EDB7D626B6E51DC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		705AB44FD17075847F5967A1 /* CareeListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListRowView.swift; sourceTree = "<group>"; };
-		80C8187C52A135E5A9456DAF /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
-		85161FD61189C644DC863547 /* CareKeeperV2 Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CareKeeperV2 Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		8687F3F7995864074BA7FC62 /* PreviewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewContainer.swift; sourceTree = "<group>"; };
-		8929A24685E0D06AF3CCA78C /* ActivityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTests.swift; sourceTree = "<group>"; };
-		8A2B559D138854B24D6AE20C /* CloudSharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSharingView.swift; sourceTree = "<group>"; };
-		8B7B99A534A6E1F1B10F21E7 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
-		980EC8CEF247085CFDFD5188 /* ActivityTypeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeUITests.swift; sourceTree = "<group>"; };
-		9BDD832C3A966D99072E15C8 /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
-		9E8B18F582BA68B6B567BC18 /* CloudKitConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitConfig.swift; sourceTree = "<group>"; };
-		9F76D243061A40A8C87C86C5 /* ErrorAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorAlert.swift; sourceTree = "<group>"; };
-		A69987D453D2359155BFFFEE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		A8B090F6CCCD5E8D95521DCD /* TrackActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackActivityView.swift; sourceTree = "<group>"; };
-		A9173707B34D8027FD46F5E4 /* CloudKitSharingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSharingService.swift; sourceTree = "<group>"; };
-		A9A7DC7DAE5761427EEDECF7 /* ActivityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailView.swift; sourceTree = "<group>"; };
-		AF676307B4DF7BA70486E0D4 /* ShakeEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeEffect.swift; sourceTree = "<group>"; };
-		AFA0B244053244763E644EDB /* CareKeeperV2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CareKeeperV2.entitlements; sourceTree = "<group>"; };
-		B188F415D238DE24FAF906D4 /* XCUIElementExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCUIElementExtensions.swift; sourceTree = "<group>"; };
-		B631055803CFC97FAFCC9538 /* ActivityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailView.swift; sourceTree = "<group>"; };
-		B891A79098EB2F885B7EE8C3 /* ActivityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityType.swift; sourceTree = "<group>"; };
-		C4BC9A5CC8DF0E6A53D7373C /* SharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingView.swift; sourceTree = "<group>"; };
-		C50455BE9108B9BE32B54425 /* ActivityTrackingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTrackingUITests.swift; sourceTree = "<group>"; };
-		C9E016748886279F33CFECD3 /* CareKeeperV2 Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeperV2 Watch App.entitlements"; sourceTree = "<group>"; };
-		D224B27A0060DD9258C8B178 /* CareKeeperWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWidgetBundle.swift; sourceTree = "<group>"; };
-		D341BBBC8A307763AE849260 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		D52F1BF5FA5D9DED2C0CE2C9 /* ShareParticipantsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareParticipantsView.swift; sourceTree = "<group>"; };
-		D570E01BB9E019E67E3A94C9 /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
-		D92530A8EA9D7FED7C0414EA /* CareeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeEditView.swift; sourceTree = "<group>"; };
-		DB8112617D9FA97E8E677035 /* TrackActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackActivityView.swift; sourceTree = "<group>"; };
-		E08859ED6A9782131FB87749 /* CloudKitSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncService.swift; sourceTree = "<group>"; };
-		E43F1AD5DEDF5564D724186F /* CareKeeperWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWidget.swift; sourceTree = "<group>"; };
-		E9E5F89CB58DAA1911ACE334 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
-		EEC3062FE870CFA91C5C3495 /* CloudKitSyncStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncStatusView.swift; sourceTree = "<group>"; };
-		F9B379F85DC676CFD654FBE7 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
-		FA915A8B9B58471A28E73195 /* ActivityListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListView.swift; sourceTree = "<group>"; };
+		006FB7D6F3CF5C1F82A959E6 /* ActivityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailView.swift; sourceTree = "<group>"; };
+		073B8ABFD7260C235A4CD017 /* CareeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeEditView.swift; sourceTree = "<group>"; };
+		0A609C8698F0EC74D2BF3823 /* TrackActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackActivityView.swift; sourceTree = "<group>"; };
+		0D16A365A7CB69E3FF4A955A /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
+		0E375C957E5E1FC91F609F4C /* CareeShareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeShareButton.swift; sourceTree = "<group>"; };
+		0F06F9069D14E10D6982D203 /* ActivityListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListView.swift; sourceTree = "<group>"; };
+		1691E9BC2E13D39D27D6AAD1 /* CloudKitSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncService.swift; sourceTree = "<group>"; };
+		1A59BA7B7B42B0EC50766C3B /* CareKeeperTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CareKeeperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1C45AE24F86869D588B83293 /* CareeManagementUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeManagementUITests.swift; sourceTree = "<group>"; };
+		215FD04BA6F77AB5615011D9 /* CareeListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListRowView.swift; sourceTree = "<group>"; };
+		2175240D9BAD7816FB66C468 /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
+		258AEEC1B61C2ECD4857BD40 /* ShakeEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeEffect.swift; sourceTree = "<group>"; };
+		31F045A407E5D82FE3B07CC3 /* ActivityRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRowView.swift; sourceTree = "<group>"; };
+		3506093819653D2432F0A945 /* ActivityTypeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeRowView.swift; sourceTree = "<group>"; };
+		41782EA520212480E5BCFE74 /* CareKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperApp.swift; sourceTree = "<group>"; };
+		4D48AF5D29BE95FF4982D277 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
+		4DCF1FB5B93A58A39C08B20E /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
+		4F1C6113D31E7FBED78498C0 /* CloudKitConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitConfig.swift; sourceTree = "<group>"; };
+		52ACA18C0C9732E97C003B19 /* CareeExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeExportService.swift; sourceTree = "<group>"; };
+		532BD9A9DD1376130D5EECB7 /* XCUIElementExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCUIElementExtensions.swift; sourceTree = "<group>"; };
+		5829D5A326A5D68626D7E483 /* ErrorAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorAlert.swift; sourceTree = "<group>"; };
+		5920D4FC9751E0A79BC5C4BD /* ActivityTrackingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTrackingUITests.swift; sourceTree = "<group>"; };
+		602A75653E2F86CB58273405 /* CareeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeTests.swift; sourceTree = "<group>"; };
+		6529ECA6E98FC332C8BFCBEA /* SharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingView.swift; sourceTree = "<group>"; };
+		678952FF260BAEEF68CB2491 /* CareKeeper Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeper Widget.entitlements"; sourceTree = "<group>"; };
+		68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CareKeeper Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		72711EB0C16E9E4851A2AF2C /* Caree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Caree.swift; sourceTree = "<group>"; };
+		79E3642CDD5DAF433EB9D083 /* CareKeeperUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CareKeeperUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		809D3531A09EC3C28AE554CF /* ActivityTypeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeEditView.swift; sourceTree = "<group>"; };
+		819A85BF80DD82661CF815BC /* CloudSharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSharingView.swift; sourceTree = "<group>"; };
+		83E47FB3CDD0A1400A3E550B /* ActivityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityType.swift; sourceTree = "<group>"; };
+		84796E5CF92AEDF6DD4E92AA /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
+		88D9EC2B1F9A2FB0F13364A2 /* CareKeeper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CareKeeper.entitlements; sourceTree = "<group>"; };
+		8B8A9109CFC17794F75FB515 /* PreviewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewContainer.swift; sourceTree = "<group>"; };
+		97C3E57DFB34FB3E1A7DDCFA /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
+		9A908972F0AB5024EB3BB819 /* TrackActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackActivityView.swift; sourceTree = "<group>"; };
+		9C3F6079C2D611AE02903EA9 /* CareKeeperWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWidgetBundle.swift; sourceTree = "<group>"; };
+		9E796C238D68EB0869513BD1 /* SyncStatusIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusIndicator.swift; sourceTree = "<group>"; };
+		A81DFDF2739935BF8FAA685F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		A8D35563F0827622269172EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AD6CD974E62394F6A1ED007F /* CloudKitSharingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSharingService.swift; sourceTree = "<group>"; };
+		B2C72AD1FB3E583ECC8A97EB /* CloudKitSyncMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncMonitor.swift; sourceTree = "<group>"; };
+		B72B65A1FDC34AE310BC5CA5 /* ShareParticipantsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareParticipantsView.swift; sourceTree = "<group>"; };
+		B9427CFA7993E809BA9C6AD5 /* ActivityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTests.swift; sourceTree = "<group>"; };
+		BCA3FD650EAAFE8CD1629C8D /* CareKeeper iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "CareKeeper iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C96A6784B396063FE17BEC14 /* ActivityTypeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeUITests.swift; sourceTree = "<group>"; };
+		CCDA07594728D63C97B9757C /* CloudKitSyncStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncStatusView.swift; sourceTree = "<group>"; };
+		D33886BD3B065B6BF5ECD6AA /* CareKeeper Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "CareKeeper Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D56064A0416085AD5C7749D0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		D6D3EDE5A10FB8C7AD1B2F9E /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
+		DDC044C52BF16B9B99F3C6DD /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
+		E16FBE8C16D3C0D2B5A0DD7F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		EFF0F7407FAB7635569FDB8F /* CareKeeperWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWidget.swift; sourceTree = "<group>"; };
+		F445F3809EAF0F93A2583BD1 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		F7FC66039C53C043A170CDEB /* ActivityTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeTests.swift; sourceTree = "<group>"; };
+		F9FDB6B1D732C3F073280581 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		FCF3E0DF8D8A33BDC9F0492E /* ActivityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailView.swift; sourceTree = "<group>"; };
+		FD4EE14A1A83C8E2F7FC6687 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		FF35B00333E669D852B2B9BF /* CareKeeper Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeper Watch App.entitlements"; sourceTree = "<group>"; };
+		FFF8AB3750E092280F6B93E1 /* CareKeeperWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWatchApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		03E57D925EAA465A1F27B15C /* App */ = {
+		155787F01B7FE1B61FA4205B /* CareKeeperTests */ = {
 			isa = PBXGroup;
 			children = (
-				5394A28349D2536DACEC55AD /* CareKeeperV2WatchApp.swift */,
+				B9427CFA7993E809BA9C6AD5 /* ActivityTests.swift */,
+				F7FC66039C53C043A170CDEB /* ActivityTypeTests.swift */,
+				602A75653E2F86CB58273405 /* CareeTests.swift */,
 			);
-			path = App;
+			path = CareKeeperTests;
 			sourceTree = "<group>";
 		};
-		0DE2417C2F4FD8C13D5D06AA /* CareKeeperV2Tests */ = {
+		29ECDC02903BE34BDA4E1B1E /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				8929A24685E0D06AF3CCA78C /* ActivityTests.swift */,
-				136ED347A244AAB0407629A1 /* ActivityTypeTests.swift */,
-				22B50C0487FB49AF13D4D5DF /* CareeTests.swift */,
-			);
-			path = CareKeeperV2Tests;
-			sourceTree = "<group>";
-		};
-		14DA52296EF70487C40E5C0C /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				B631055803CFC97FAFCC9538 /* ActivityDetailView.swift */,
-				80C8187C52A135E5A9456DAF /* CareeDetailView.swift */,
-				264CD9E2FB06C5E7AA16A887 /* CareeListView.swift */,
-				A8B090F6CCCD5E8D95521DCD /* TrackActivityView.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		1CF9F45EFC39ADF864F9952C /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				585FB1BCEEE106EC7B47C2E3 /* Preview Assets.xcassets */,
+				D56064A0416085AD5C7749D0 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		2D0BD90839CB2F8F2A4A2340 /* ActivityType */ = {
+		364945D556AA0A317E9737E9 /* CareKeeper */ = {
 			isa = PBXGroup;
 			children = (
-				2A6D88ECF96D344D93D6FBBF /* ActivityTypeEditView.swift */,
-				55B817EC7B2594E7047F4B99 /* ActivityTypeRowView.swift */,
+				E16FBE8C16D3C0D2B5A0DD7F /* Assets.xcassets */,
+				88D9EC2B1F9A2FB0F13364A2 /* CareKeeper.entitlements */,
+				A81DFDF2739935BF8FAA685F /* Info.plist */,
+				DC1D5DF71CD043322835FA70 /* App */,
+				5E724EF99C343B475B10F3B8 /* Models */,
+				90B165AE3BB97E0ADADD835D /* Preview */,
+				29ECDC02903BE34BDA4E1B1E /* Preview Content */,
+				E6352C74DEDBD820A1B6402D /* Services */,
+				AAA00EA0784DE941D6655B92 /* Views */,
 			);
-			path = ActivityType;
+			path = CareKeeper;
 			sourceTree = "<group>";
 		};
-		41B924BF4890EFA1CF40A113 /* Components */ = {
+		3FE913D039CAB64DB537CB03 /* CareKeeper Watch App */ = {
 			isa = PBXGroup;
 			children = (
-				30A95DF025B5A93481F518EA /* CareeShareButton.swift */,
-				EEC3062FE870CFA91C5C3495 /* CloudKitSyncStatusView.swift */,
-				8A2B559D138854B24D6AE20C /* CloudSharingView.swift */,
-				9F76D243061A40A8C87C86C5 /* ErrorAlert.swift */,
-				AF676307B4DF7BA70486E0D4 /* ShakeEffect.swift */,
-				5CE58E42508DBBBF18823839 /* ShareSheet.swift */,
-				16EF40533648E0AC97814A87 /* SyncStatusIndicator.swift */,
+				A8D35563F0827622269172EA /* Assets.xcassets */,
+				FF35B00333E669D852B2B9BF /* CareKeeper Watch App.entitlements */,
+				7AD0290E39CCE533ED2BDEE1 /* App */,
+				CE6047F9E684668365191BDF /* Preview Content */,
+				7472EFCCE75EDA2301426A37 /* Views */,
 			);
-			path = Components;
+			path = "CareKeeper Watch App";
+			sourceTree = "<group>";
+		};
+		4EEE0A387658FAB0C223F250 /* ActivityType */ = {
+			isa = PBXGroup;
+			children = (
+				809D3531A09EC3C28AE554CF /* ActivityTypeEditView.swift */,
+				3506093819653D2432F0A945 /* ActivityTypeRowView.swift */,
+			);
+			path = ActivityType;
 			sourceTree = "<group>";
 		};
 		4F693B2665B385AFBE2F92C7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				85161FD61189C644DC863547 /* CareKeeperV2 Watch App.app */,
-				41184B27495199C82E027912 /* CareKeeperV2 Widget.appex */,
-				05FE31454AB58301B0B745F0 /* CareKeeperV2.app */,
-				3740FB941FEFEC6CA3DEEB77 /* CareKeeperV2Tests.xctest */,
-				18A59D9B8FAAA3F47F469AA3 /* CareKeeperV2UITests.xctest */,
+				BCA3FD650EAAFE8CD1629C8D /* CareKeeper iOS.app */,
+				68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */,
+				D33886BD3B065B6BF5ECD6AA /* CareKeeper Widget.appex */,
+				1A59BA7B7B42B0EC50766C3B /* CareKeeperTests.xctest */,
+				79E3642CDD5DAF433EB9D083 /* CareKeeperUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		54E9EF6476C95ECDEE618EB7 /* Preview Content */ = {
+		569CE10ABF0C6E70183E104B /* Activity */ = {
 			isa = PBXGroup;
 			children = (
-				A69987D453D2359155BFFFEE /* Preview Assets.xcassets */,
+				FCF3E0DF8D8A33BDC9F0492E /* ActivityDetailView.swift */,
+				0F06F9069D14E10D6982D203 /* ActivityListView.swift */,
+				31F045A407E5D82FE3B07CC3 /* ActivityRowView.swift */,
+				9A908972F0AB5024EB3BB819 /* TrackActivityView.swift */,
 			);
-			path = "Preview Content";
+			path = Activity;
 			sourceTree = "<group>";
 		};
-		5AE0926FBD848299AE2E20FF /* Views */ = {
+		5AA3F9BE70D6A5C2E78ED343 /* CareKeeper Widget */ = {
 			isa = PBXGroup;
 			children = (
-				1C956433CB3EF2251FA35385 /* ContentView.swift */,
-				C9322D90ADFDD08382676A25 /* Activity */,
-				2D0BD90839CB2F8F2A4A2340 /* ActivityType */,
-				746F5E18FE4455DE2068C0D0 /* Caree */,
-				41B924BF4890EFA1CF40A113 /* Components */,
-				FAD2DDF8F4A2B698D8DEDF10 /* Sharing */,
+				678952FF260BAEEF68CB2491 /* CareKeeper Widget.entitlements */,
+				EFF0F7407FAB7635569FDB8F /* CareKeeperWidget.swift */,
+				9C3F6079C2D611AE02903EA9 /* CareKeeperWidgetBundle.swift */,
 			);
-			path = Views;
+			path = "CareKeeper Widget";
+			sourceTree = "<group>";
+		};
+		5E724EF99C343B475B10F3B8 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				4DCF1FB5B93A58A39C08B20E /* Activity.swift */,
+				83E47FB3CDD0A1400A3E550B /* ActivityType.swift */,
+				72711EB0C16E9E4851A2AF2C /* Caree.swift */,
+			);
+			name = Models;
+			path = CareKeeper/Models;
 			sourceTree = "<group>";
 		};
 		6082FA992EBB1FA2D05C686F = {
 			isa = PBXGroup;
 			children = (
-				E7BA0075BE818C29A778C260 /* CareKeeperV2 */,
-				8D80FA2755D541A3D9379FFC /* CareKeeperV2 Watch App */,
-				9D947004F015EFF391E39B15 /* CareKeeperV2 Widget */,
-				0DE2417C2F4FD8C13D5D06AA /* CareKeeperV2Tests */,
-				6B8E4611D4C0CB25E7AD95B0 /* CareKeeperV2UITests */,
+				364945D556AA0A317E9737E9 /* CareKeeper */,
+				3FE913D039CAB64DB537CB03 /* CareKeeper Watch App */,
+				5AA3F9BE70D6A5C2E78ED343 /* CareKeeper Widget */,
+				155787F01B7FE1B61FA4205B /* CareKeeperTests */,
+				C3291ABD65557F8EE06B5517 /* CareKeeperUITests */,
+				7BBE528F0E46520127A0328D /* Components */,
+				5E724EF99C343B475B10F3B8 /* Models */,
+				90B165AE3BB97E0ADADD835D /* Preview */,
+				E6352C74DEDBD820A1B6402D /* Services */,
 				4F693B2665B385AFBE2F92C7 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		6B8E4611D4C0CB25E7AD95B0 /* CareKeeperV2UITests */ = {
+		7472EFCCE75EDA2301426A37 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				C50455BE9108B9BE32B54425 /* ActivityTrackingUITests.swift */,
-				980EC8CEF247085CFDFD5188 /* ActivityTypeUITests.swift */,
-				5BEF407E55D6E35CDFA694B2 /* CareeManagementUITests.swift */,
-				B188F415D238DE24FAF906D4 /* XCUIElementExtensions.swift */,
+				006FB7D6F3CF5C1F82A959E6 /* ActivityDetailView.swift */,
+				0D16A365A7CB69E3FF4A955A /* CareeDetailView.swift */,
+				97C3E57DFB34FB3E1A7DDCFA /* CareeListView.swift */,
+				0A609C8698F0EC74D2BF3823 /* TrackActivityView.swift */,
 			);
-			path = CareKeeperV2UITests;
+			path = Views;
 			sourceTree = "<group>";
 		};
-		746F5E18FE4455DE2068C0D0 /* Caree */ = {
+		7AD0290E39CCE533ED2BDEE1 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				9BDD832C3A966D99072E15C8 /* CareeDetailView.swift */,
-				D92530A8EA9D7FED7C0414EA /* CareeEditView.swift */,
-				705AB44FD17075847F5967A1 /* CareeListRowView.swift */,
-				D570E01BB9E019E67E3A94C9 /* CareeListView.swift */,
-			);
-			path = Caree;
-			sourceTree = "<group>";
-		};
-		8D80FA2755D541A3D9379FFC /* CareKeeperV2 Watch App */ = {
-			isa = PBXGroup;
-			children = (
-				6B1CD125EDB7D626B6E51DC9 /* Assets.xcassets */,
-				C9E016748886279F33CFECD3 /* CareKeeperV2 Watch App.entitlements */,
-				03E57D925EAA465A1F27B15C /* App */,
-				1CF9F45EFC39ADF864F9952C /* Preview Content */,
-				14DA52296EF70487C40E5C0C /* Views */,
-			);
-			path = "CareKeeperV2 Watch App";
-			sourceTree = "<group>";
-		};
-		9D947004F015EFF391E39B15 /* CareKeeperV2 Widget */ = {
-			isa = PBXGroup;
-			children = (
-				4E7F7E3E6C5868A0C16EA4B7 /* CareKeeperV2 Widget.entitlements */,
-				E43F1AD5DEDF5564D724186F /* CareKeeperWidget.swift */,
-				D224B27A0060DD9258C8B178 /* CareKeeperWidgetBundle.swift */,
-			);
-			path = "CareKeeperV2 Widget";
-			sourceTree = "<group>";
-		};
-		AB6EEAEDDFA4446044B5CC5E /* Preview */ = {
-			isa = PBXGroup;
-			children = (
-				8687F3F7995864074BA7FC62 /* PreviewContainer.swift */,
-				40792041A2DC1BDA880278A8 /* PreviewData.swift */,
-			);
-			path = Preview;
-			sourceTree = "<group>";
-		};
-		C9322D90ADFDD08382676A25 /* Activity */ = {
-			isa = PBXGroup;
-			children = (
-				A9A7DC7DAE5761427EEDECF7 /* ActivityDetailView.swift */,
-				FA915A8B9B58471A28E73195 /* ActivityListView.swift */,
-				48E2E1E92765420A15B8C96E /* ActivityRowView.swift */,
-				DB8112617D9FA97E8E677035 /* TrackActivityView.swift */,
-			);
-			path = Activity;
-			sourceTree = "<group>";
-		};
-		E7BA0075BE818C29A778C260 /* CareKeeperV2 */ = {
-			isa = PBXGroup;
-			children = (
-				D341BBBC8A307763AE849260 /* Assets.xcassets */,
-				AFA0B244053244763E644EDB /* CareKeeperV2.entitlements */,
-				3658F15B57408C93FEFBDD57 /* Info.plist */,
-				F94ECE7EA8EC4B5CA4B73443 /* App */,
-				F7B1635295465A23398351D8 /* Models */,
-				AB6EEAEDDFA4446044B5CC5E /* Preview */,
-				54E9EF6476C95ECDEE618EB7 /* Preview Content */,
-				F48C9222BE4BF9F9C1E6FC84 /* Services */,
-				5AE0926FBD848299AE2E20FF /* Views */,
-			);
-			path = CareKeeperV2;
-			sourceTree = "<group>";
-		};
-		F48C9222BE4BF9F9C1E6FC84 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				8B7B99A534A6E1F1B10F21E7 /* AppError.swift */,
-				1294F654A4099893CF97852A /* CareeExportService.swift */,
-				9E8B18F582BA68B6B567BC18 /* CloudKitConfig.swift */,
-				A9173707B34D8027FD46F5E4 /* CloudKitSharingService.swift */,
-				0C5496091330CAD6201AD306 /* CloudKitSyncMonitor.swift */,
-				E08859ED6A9782131FB87749 /* CloudKitSyncService.swift */,
-				E9E5F89CB58DAA1911ACE334 /* LocationManager.swift */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
-		F7B1635295465A23398351D8 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				F9B379F85DC676CFD654FBE7 /* Activity.swift */,
-				B891A79098EB2F885B7EE8C3 /* ActivityType.swift */,
-				0E0E024D0D96F2261DFEDB12 /* Caree.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		F94ECE7EA8EC4B5CA4B73443 /* App */ = {
-			isa = PBXGroup;
-			children = (
-				2F7245C4875E7F8AF42ADA25 /* CareKeeperV2App.swift */,
+				FFF8AB3750E092280F6B93E1 /* CareKeeperWatchApp.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
 		};
-		FAD2DDF8F4A2B698D8DEDF10 /* Sharing */ = {
+		7BBE528F0E46520127A0328D /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				D52F1BF5FA5D9DED2C0CE2C9 /* ShareParticipantsView.swift */,
-				C4BC9A5CC8DF0E6A53D7373C /* SharingView.swift */,
+				0E375C957E5E1FC91F609F4C /* CareeShareButton.swift */,
+				CCDA07594728D63C97B9757C /* CloudKitSyncStatusView.swift */,
+				819A85BF80DD82661CF815BC /* CloudSharingView.swift */,
+				5829D5A326A5D68626D7E483 /* ErrorAlert.swift */,
+				258AEEC1B61C2ECD4857BD40 /* ShakeEffect.swift */,
+				D6D3EDE5A10FB8C7AD1B2F9E /* ShareSheet.swift */,
+				9E796C238D68EB0869513BD1 /* SyncStatusIndicator.swift */,
+			);
+			name = Components;
+			path = CareKeeper/Views/Components;
+			sourceTree = "<group>";
+		};
+		7E1DEF685353BED56CF8CE04 /* Sharing */ = {
+			isa = PBXGroup;
+			children = (
+				B72B65A1FDC34AE310BC5CA5 /* ShareParticipantsView.swift */,
+				6529ECA6E98FC332C8BFCBEA /* SharingView.swift */,
 			);
 			path = Sharing;
+			sourceTree = "<group>";
+		};
+		90B165AE3BB97E0ADADD835D /* Preview */ = {
+			isa = PBXGroup;
+			children = (
+				8B8A9109CFC17794F75FB515 /* PreviewContainer.swift */,
+				2175240D9BAD7816FB66C468 /* PreviewData.swift */,
+			);
+			name = Preview;
+			path = CareKeeper/Preview;
+			sourceTree = "<group>";
+		};
+		AAA00EA0784DE941D6655B92 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F9FDB6B1D732C3F073280581 /* ContentView.swift */,
+				569CE10ABF0C6E70183E104B /* Activity */,
+				4EEE0A387658FAB0C223F250 /* ActivityType */,
+				F7AF0595B3C0A3FFB6B07FE5 /* Caree */,
+				7BBE528F0E46520127A0328D /* Components */,
+				7E1DEF685353BED56CF8CE04 /* Sharing */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		C3291ABD65557F8EE06B5517 /* CareKeeperUITests */ = {
+			isa = PBXGroup;
+			children = (
+				5920D4FC9751E0A79BC5C4BD /* ActivityTrackingUITests.swift */,
+				C96A6784B396063FE17BEC14 /* ActivityTypeUITests.swift */,
+				1C45AE24F86869D588B83293 /* CareeManagementUITests.swift */,
+				532BD9A9DD1376130D5EECB7 /* XCUIElementExtensions.swift */,
+			);
+			path = CareKeeperUITests;
+			sourceTree = "<group>";
+		};
+		CE6047F9E684668365191BDF /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				FD4EE14A1A83C8E2F7FC6687 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		DC1D5DF71CD043322835FA70 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				41782EA520212480E5BCFE74 /* CareKeeperApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		E6352C74DEDBD820A1B6402D /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				4D48AF5D29BE95FF4982D277 /* AppError.swift */,
+				52ACA18C0C9732E97C003B19 /* CareeExportService.swift */,
+				4F1C6113D31E7FBED78498C0 /* CloudKitConfig.swift */,
+				AD6CD974E62394F6A1ED007F /* CloudKitSharingService.swift */,
+				B2C72AD1FB3E583ECC8A97EB /* CloudKitSyncMonitor.swift */,
+				1691E9BC2E13D39D27D6AAD1 /* CloudKitSyncService.swift */,
+				F445F3809EAF0F93A2583BD1 /* LocationManager.swift */,
+			);
+			name = Services;
+			path = CareKeeper/Services;
+			sourceTree = "<group>";
+		};
+		F7AF0595B3C0A3FFB6B07FE5 /* Caree */ = {
+			isa = PBXGroup;
+			children = (
+				DDC044C52BF16B9B99F3C6DD /* CareeDetailView.swift */,
+				073B8ABFD7260C235A4CD017 /* CareeEditView.swift */,
+				215FD04BA6F77AB5615011D9 /* CareeListRowView.swift */,
+				84796E5CF92AEDF6DD4E92AA /* CareeListView.swift */,
+			);
+			path = Caree;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5864BADE6AABF03AA09BCA6D /* CareKeeperV2 */ = {
+		00FFD98344F57489DEF0C740 /* CareKeeperTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D4D8DA5FEFFEB4FED359BA0D /* Build configuration list for PBXNativeTarget "CareKeeperV2" */;
+			buildConfigurationList = F2C05258557BFE1FD3D283A4 /* Build configuration list for PBXNativeTarget "CareKeeperTests" */;
 			buildPhases = (
-				D86BC807B8BE8260B402EABB /* Sources */,
-				9266356F82D02DD8C0182568 /* Resources */,
-				E8822F6FCF45F9E879740653 /* Embed Watch Content */,
+				E20B6A5C5641334E8344564D /* Sources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				406EC9BD8E0AE7AF4824FFE8 /* PBXTargetDependency */,
+				C24738DEF9530B1130F5184A /* PBXTargetDependency */,
 			);
-			name = CareKeeperV2;
+			name = CareKeeperTests;
 			packageProductDependencies = (
 			);
-			productName = CareKeeperV2;
-			productReference = 05FE31454AB58301B0B745F0 /* CareKeeperV2.app */;
-			productType = "com.apple.product-type.application";
-		};
-		634D8DF20813ACBC6529A6F4 /* CareKeeperV2 Widget */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DFEFF097882CBDBBE95AC790 /* Build configuration list for PBXNativeTarget "CareKeeperV2 Widget" */;
-			buildPhases = (
-				AF48991B2DBD65D3275941F2 /* Sources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "CareKeeperV2 Widget";
-			packageProductDependencies = (
-			);
-			productName = "CareKeeperV2 Widget";
-			productReference = 41184B27495199C82E027912 /* CareKeeperV2 Widget.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
-		77775D7F7018071707CE8419 /* CareKeeperV2UITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = C18387D954D98080980A0886 /* Build configuration list for PBXNativeTarget "CareKeeperV2UITests" */;
-			buildPhases = (
-				16ABC7D896E546788FC23D2A /* Sources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				81D3E5FC751E3E79F774BA94 /* PBXTargetDependency */,
-			);
-			name = CareKeeperV2UITests;
-			packageProductDependencies = (
-			);
-			productName = CareKeeperV2UITests;
-			productReference = 18A59D9B8FAAA3F47F469AA3 /* CareKeeperV2UITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
-		9C71D5E24D0279A78CE4A870 /* CareKeeperV2Tests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 0D198DDBAB4D5C1B7551A477 /* Build configuration list for PBXNativeTarget "CareKeeperV2Tests" */;
-			buildPhases = (
-				53D4355F089CB92149FCC64A /* Sources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				6AD1C98D24C7E95D6C0C5684 /* PBXTargetDependency */,
-			);
-			name = CareKeeperV2Tests;
-			packageProductDependencies = (
-			);
-			productName = CareKeeperV2Tests;
-			productReference = 3740FB941FEFEC6CA3DEEB77 /* CareKeeperV2Tests.xctest */;
+			productName = CareKeeperTests;
+			productReference = 1A59BA7B7B42B0EC50766C3B /* CareKeeperTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		CDBD9A71E6A9D897B8CF6186 /* CareKeeperV2 Watch App */ = {
+		2EF062019E59968F3B129711 /* CareKeeper iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F1DFA9366F7FF2D842568CCF /* Build configuration list for PBXNativeTarget "CareKeeperV2 Watch App" */;
+			buildConfigurationList = 25B5ECE3C04A3496249CEF52 /* Build configuration list for PBXNativeTarget "CareKeeper iOS" */;
 			buildPhases = (
-				76716F9A703B84D313132845 /* Sources */,
-				7FD22D38A641A10EFCA14CF4 /* Resources */,
-				CBE0737FD52754F155345E66 /* Embed Foundation Extensions */,
+				8B0C51C0B9B73D363E32B729 /* Sources */,
+				AE830C89523195A05968E3CF /* Resources */,
+				9B1C309C0CDB21D49399FD23 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				8D5B3919AAA4E2B3D5765315 /* PBXTargetDependency */,
+				36DA12DBE2513B36C7EE43F8 /* PBXTargetDependency */,
 			);
-			name = "CareKeeperV2 Watch App";
+			name = "CareKeeper iOS";
 			packageProductDependencies = (
 			);
-			productName = "CareKeeperV2 Watch App";
-			productReference = 85161FD61189C644DC863547 /* CareKeeperV2 Watch App.app */;
+			productName = "CareKeeper iOS";
+			productReference = BCA3FD650EAAFE8CD1629C8D /* CareKeeper iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		3C404C4EC684A32FA1110025 /* CareKeeperUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 97691FD874ED9F730CA81785 /* Build configuration list for PBXNativeTarget "CareKeeperUITests" */;
+			buildPhases = (
+				7C3512C28D98F0B8691F49C4 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				04689B80FF6D64BB81BDD411 /* PBXTargetDependency */,
+			);
+			name = CareKeeperUITests;
+			packageProductDependencies = (
+			);
+			productName = CareKeeperUITests;
+			productReference = 79E3642CDD5DAF433EB9D083 /* CareKeeperUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		B7D95FF7DEF6E95C2851C31F /* CareKeeper Widget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B4542A9B6ED817EB9400F045 /* Build configuration list for PBXNativeTarget "CareKeeper Widget" */;
+			buildPhases = (
+				B0ABA4E27EC2E543D7826B45 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CareKeeper Widget";
+			packageProductDependencies = (
+			);
+			productName = "CareKeeper Widget";
+			productReference = D33886BD3B065B6BF5ECD6AA /* CareKeeper Widget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		D33AEF414D4813AD6FD4E498 /* CareKeeper Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BBC90296502FD4A99E93605C /* Build configuration list for PBXNativeTarget "CareKeeper Watch App" */;
+			buildPhases = (
+				E9894483CC5FAB5AB02545EF /* Sources */,
+				7F4B0BC84CAAA87119CA1D84 /* Resources */,
+				F70ECED9495E7C49DF3BFBAC /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				10D4B85854059D80E6F6DF02 /* PBXTargetDependency */,
+			);
+			name = "CareKeeper Watch App";
+			packageProductDependencies = (
+			);
+			productName = "CareKeeper Watch App";
+			productReference = 68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -538,24 +546,24 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
-					5864BADE6AABF03AA09BCA6D = {
+					00FFD98344F57489DEF0C740 = {
 						DevelopmentTeam = 8C7EB23ZZP;
 						ProvisioningStyle = Automatic;
 					};
-					634D8DF20813ACBC6529A6F4 = {
+					2EF062019E59968F3B129711 = {
 						DevelopmentTeam = 8C7EB23ZZP;
 						ProvisioningStyle = Automatic;
 					};
-					77775D7F7018071707CE8419 = {
+					3C404C4EC684A32FA1110025 = {
 						DevelopmentTeam = 8C7EB23ZZP;
 						ProvisioningStyle = Automatic;
-						TestTargetID = 5864BADE6AABF03AA09BCA6D;
+						TestTargetID = 2EF062019E59968F3B129711;
 					};
-					9C71D5E24D0279A78CE4A870 = {
+					B7D95FF7DEF6E95C2851C31F = {
 						DevelopmentTeam = 8C7EB23ZZP;
 						ProvisioningStyle = Automatic;
 					};
-					CDBD9A71E6A9D897B8CF6186 = {
+					D33AEF414D4813AD6FD4E498 = {
 						DevelopmentTeam = 8C7EB23ZZP;
 						ProvisioningStyle = Automatic;
 					};
@@ -575,190 +583,170 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5864BADE6AABF03AA09BCA6D /* CareKeeperV2 */,
-				CDBD9A71E6A9D897B8CF6186 /* CareKeeperV2 Watch App */,
-				634D8DF20813ACBC6529A6F4 /* CareKeeperV2 Widget */,
-				9C71D5E24D0279A78CE4A870 /* CareKeeperV2Tests */,
-				77775D7F7018071707CE8419 /* CareKeeperV2UITests */,
+				D33AEF414D4813AD6FD4E498 /* CareKeeper Watch App */,
+				B7D95FF7DEF6E95C2851C31F /* CareKeeper Widget */,
+				2EF062019E59968F3B129711 /* CareKeeper iOS */,
+				00FFD98344F57489DEF0C740 /* CareKeeperTests */,
+				3C404C4EC684A32FA1110025 /* CareKeeperUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		7FD22D38A641A10EFCA14CF4 /* Resources */ = {
+		7F4B0BC84CAAA87119CA1D84 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27FA247EAD48C2EBF0A87C80 /* Assets.xcassets in Resources */,
-				E090EFCE6A4D602925E9C98E /* Preview Assets.xcassets in Resources */,
+				2AE6F0B5667E58000BF31695 /* Assets.xcassets in Resources */,
+				805AB8CA18C75280907BB24A /* Preview Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9266356F82D02DD8C0182568 /* Resources */ = {
+		AE830C89523195A05968E3CF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EA33E703003CFE89F512D9FB /* Assets.xcassets in Resources */,
-				2A8B596F5D72FC49CD074884 /* Preview Assets.xcassets in Resources */,
+				9577A1CBFF2D0CA7A596DF2E /* Assets.xcassets in Resources */,
+				70C427674A7954E9DDC6CBC1 /* Preview Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		16ABC7D896E546788FC23D2A /* Sources */ = {
+		7C3512C28D98F0B8691F49C4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3F2BAAF17E46D077C909412C /* ActivityTrackingUITests.swift in Sources */,
-				C1ED336C808C1CD4E7AB3A7D /* ActivityTypeUITests.swift in Sources */,
-				9D22792C72A2F3B70455A645 /* CareeManagementUITests.swift in Sources */,
-				38DCA5D2C8CAF3236F3C513F /* XCUIElementExtensions.swift in Sources */,
+				46B3202086651EC9FB1E6329 /* ActivityTrackingUITests.swift in Sources */,
+				DD767D182D049F0F3637E62B /* ActivityTypeUITests.swift in Sources */,
+				3D8E9B4266B8EC7C1DC7B25D /* CareeManagementUITests.swift in Sources */,
+				43367A6015A77A4F542337C5 /* XCUIElementExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		53D4355F089CB92149FCC64A /* Sources */ = {
+		8B0C51C0B9B73D363E32B729 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5AD9C43C6F1D3D135A85EC9F /* Activity.swift in Sources */,
-				DF6FBB6C9E2D241411838F0E /* ActivityTests.swift in Sources */,
-				9B76703375010200AA0532F9 /* ActivityType.swift in Sources */,
-				80D66CFECCF3679EEDA8FBC2 /* ActivityTypeTests.swift in Sources */,
-				019F3D0FA6BEC7EF7CA5EEEE /* Caree.swift in Sources */,
-				73FDBCCAEC6C668C3C16302F /* CareeTests.swift in Sources */,
+				ACA2F67C4D1E482F462ED518 /* Activity.swift in Sources */,
+				586ECFDC8FF2C4DF973040A4 /* ActivityDetailView.swift in Sources */,
+				3A782AFE4D02BACD6480493B /* ActivityListView.swift in Sources */,
+				B3D954DC9B97C5EF41E208D1 /* ActivityRowView.swift in Sources */,
+				EA7AF08C138745E22324B258 /* ActivityType.swift in Sources */,
+				60A55A30F4670BA6C8BBD566 /* ActivityTypeEditView.swift in Sources */,
+				5254CFFBDD7B99E254EE2835 /* ActivityTypeRowView.swift in Sources */,
+				174FACFFEF8A26394A888700 /* AppError.swift in Sources */,
+				99937891E8B849274D0C9DCA /* CareKeeperApp.swift in Sources */,
+				FF74614916397C2B174DD8C6 /* Caree.swift in Sources */,
+				3E195F8A62FC0F32DF1D41F0 /* CareeDetailView.swift in Sources */,
+				130FCDA433310F6AAED4476F /* CareeEditView.swift in Sources */,
+				8E0366ED5C824FD04EFD6635 /* CareeExportService.swift in Sources */,
+				C99A960973C3E61182243E0A /* CareeListRowView.swift in Sources */,
+				4C31CD7DE91CA50650522467 /* CareeListView.swift in Sources */,
+				B4A23D60C6FB8F5D7DDD445F /* CareeShareButton.swift in Sources */,
+				C9BD4ADC5031848421189B5D /* CloudKitConfig.swift in Sources */,
+				770A4488C02071798279442F /* CloudKitSharingService.swift in Sources */,
+				11E98B912697507A785E09A1 /* CloudKitSyncMonitor.swift in Sources */,
+				F91A4C9A369CBF04CBC2FE09 /* CloudKitSyncService.swift in Sources */,
+				3E448B517856B0EA3162862B /* CloudKitSyncStatusView.swift in Sources */,
+				805FDC233580EBD9384D803E /* CloudSharingView.swift in Sources */,
+				B5559848F13F6B70E4352449 /* ContentView.swift in Sources */,
+				028EABF37E1C605E55B05623 /* ErrorAlert.swift in Sources */,
+				1C40B2F36B2FEF8D200C1D6A /* LocationManager.swift in Sources */,
+				ABB4713F42E2FAE30CE7564A /* PreviewContainer.swift in Sources */,
+				39F58B5C38E814CB5204F1C2 /* PreviewData.swift in Sources */,
+				9EED98DBD69AB6AEE2D56D16 /* ShakeEffect.swift in Sources */,
+				77A0B826624E73B28E119403 /* ShareParticipantsView.swift in Sources */,
+				DA1C3D3F680D0F5D8E236AC7 /* ShareSheet.swift in Sources */,
+				3F84479D5728287D022D2011 /* SharingView.swift in Sources */,
+				A424BB5045DBA45B28B6BA34 /* SyncStatusIndicator.swift in Sources */,
+				765FBB72C7AF33F9F532FF23 /* TrackActivityView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		76716F9A703B84D313132845 /* Sources */ = {
+		B0ABA4E27EC2E543D7826B45 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9D3271D9F2AA1666EF52B2C0 /* Activity.swift in Sources */,
-				1E3CF0C5E578D3A385F58BEC /* ActivityDetailView.swift in Sources */,
-				E77FEDB47486C7901244812E /* ActivityType.swift in Sources */,
-				899DACF0637249F2AFC2F43D /* AppError.swift in Sources */,
-				2AE30C11E64B40CE43C397EC /* CareKeeperV2WatchApp.swift in Sources */,
-				820E4069BB93603590C14498 /* Caree.swift in Sources */,
-				F2DF86428CBEB7EFA932ABEE /* CareeDetailView.swift in Sources */,
-				DAA23663BBA770EE23DF7653 /* CareeExportService.swift in Sources */,
-				4A6F4BC427D6A44E957EF9CE /* CareeListView.swift in Sources */,
-				64D6B68083B2FC37DCAF64E1 /* CareeShareButton.swift in Sources */,
-				316865E3EA904B1776A6D084 /* CloudKitConfig.swift in Sources */,
-				14FDCFB053BFDAA9065DFB6A /* CloudKitSharingService.swift in Sources */,
-				2A84479E76A99E4AD493A597 /* CloudKitSyncMonitor.swift in Sources */,
-				68F7B5AEEE631A4EF4B601DB /* CloudKitSyncService.swift in Sources */,
-				A7A03168B404D7FD6C4F1BF8 /* CloudKitSyncStatusView.swift in Sources */,
-				959A001223A3955EF91094E8 /* CloudSharingView.swift in Sources */,
-				CDD1BA8E85BB7BB2E938D383 /* ErrorAlert.swift in Sources */,
-				6DE89BDF18F7D4A5901C2350 /* LocationManager.swift in Sources */,
-				F3BAF1DDC8B16FC2A9FD150D /* PreviewContainer.swift in Sources */,
-				71A1F9F6F2A93552AF2973BF /* PreviewData.swift in Sources */,
-				85DC048830898A290E85DE93 /* ShakeEffect.swift in Sources */,
-				19573307099BF324AD960B89 /* ShareSheet.swift in Sources */,
-				8C77BD9677E7940642B8DC99 /* SyncStatusIndicator.swift in Sources */,
-				E4CD10AECA514C023A31B0B6 /* TrackActivityView.swift in Sources */,
+				DF4706E830236720AE485E58 /* Activity.swift in Sources */,
+				6897A307CA11300D86B247F9 /* ActivityType.swift in Sources */,
+				628D3C39DBA7D8652A8285D5 /* CareKeeperWidget.swift in Sources */,
+				07E476CC1FB5FA111AF2DA60 /* CareKeeperWidgetBundle.swift in Sources */,
+				0ACB1D1952F0107CEA77E2AB /* Caree.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AF48991B2DBD65D3275941F2 /* Sources */ = {
+		E20B6A5C5641334E8344564D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				08B5C1244AD9B1D0B2073EAC /* Activity.swift in Sources */,
-				DBCBC1AB5102DB663CFC76A5 /* ActivityType.swift in Sources */,
-				78B72302447D4574004A4161 /* CareKeeperWidget.swift in Sources */,
-				D5399897A7F3684C02C274CF /* CareKeeperWidgetBundle.swift in Sources */,
-				E97CE794065D8AE6226928C3 /* Caree.swift in Sources */,
+				ACD19F7F12830E6D2DB5AB55 /* Activity.swift in Sources */,
+				406E8C951037236B6E9AE368 /* ActivityTests.swift in Sources */,
+				5D2E5A6E7C48E79961E156CB /* ActivityType.swift in Sources */,
+				5F70ED238471FE040C9B3326 /* ActivityTypeTests.swift in Sources */,
+				4E114657A3231882FA9BF351 /* Caree.swift in Sources */,
+				F308997BB6F53ACB26559A33 /* CareeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D86BC807B8BE8260B402EABB /* Sources */ = {
+		E9894483CC5FAB5AB02545EF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9DD1F4DF60DBDDB6166E2DC7 /* Activity.swift in Sources */,
-				2C767CF4BAC4785ED75ACB8B /* ActivityDetailView.swift in Sources */,
-				7831AE78D0B9B4FBC9E47852 /* ActivityListView.swift in Sources */,
-				3177C9877FB9B354EB2CA846 /* ActivityRowView.swift in Sources */,
-				0581540E5C21709255EC0B4C /* ActivityType.swift in Sources */,
-				F4BB352FA5DDC45AA1324D51 /* ActivityTypeEditView.swift in Sources */,
-				AE2D0DC285908FAA9D1D1F89 /* ActivityTypeRowView.swift in Sources */,
-				EDD259508C70C163E93CFBCD /* AppError.swift in Sources */,
-				F9D1603943AAC5BC7FF298D3 /* CareKeeperV2App.swift in Sources */,
-				CE611BA043D64709EAC21138 /* Caree.swift in Sources */,
-				D7A6752318BB0C8EFF5EEF0D /* CareeDetailView.swift in Sources */,
-				A4D1FC41604F205388B16F28 /* CareeEditView.swift in Sources */,
-				6647BC63093D57B17BEEEB7B /* CareeExportService.swift in Sources */,
-				19F506A7D3A3551BDC63A94B /* CareeListRowView.swift in Sources */,
-				401B3BAF4C0A5BE53876C494 /* CareeListView.swift in Sources */,
-				9ABF86274E1C8BECB6256415 /* CareeShareButton.swift in Sources */,
-				26F41A349B99D754078366D3 /* CloudKitConfig.swift in Sources */,
-				6015572B8A8F4855F89330FB /* CloudKitSharingService.swift in Sources */,
-				4F905E3D41124B488C0F78B7 /* CloudKitSyncMonitor.swift in Sources */,
-				7A5D03CE4CA4A30AEB0ABAD7 /* CloudKitSyncService.swift in Sources */,
-				A04311B0AB5D02A245EB04A1 /* CloudKitSyncStatusView.swift in Sources */,
-				EF37239ED2D4CFDD4D1BBECD /* CloudSharingView.swift in Sources */,
-				048ADB4D38C8A311F7089D0A /* ContentView.swift in Sources */,
-				EFB1307079F88ABF2A64293D /* ErrorAlert.swift in Sources */,
-				390EBE4554F93E93EB6668EE /* LocationManager.swift in Sources */,
-				95EA4C6E3C1B7F304EAED088 /* PreviewContainer.swift in Sources */,
-				87C2738F0624C7BAFEF7BB2F /* PreviewData.swift in Sources */,
-				F72C502DED4A42329F3534C7 /* ShakeEffect.swift in Sources */,
-				D27188B636BEBE063B759FFE /* ShareParticipantsView.swift in Sources */,
-				2AE2970A4F2F5252B7DE3C02 /* ShareSheet.swift in Sources */,
-				5119FE50D16B690D2C25DC2B /* SharingView.swift in Sources */,
-				6BD9D97886C5525C96E2E0E3 /* SyncStatusIndicator.swift in Sources */,
-				F03D95A5CC1DC29FFEEC1BDF /* TrackActivityView.swift in Sources */,
+				3350CAF1AE029C3165492CAF /* Activity.swift in Sources */,
+				55BFB4F90A35463A9C34B7A2 /* ActivityDetailView.swift in Sources */,
+				D0FCDB85F21F66AF22057A05 /* ActivityType.swift in Sources */,
+				36E0A774A306A89F50588425 /* AppError.swift in Sources */,
+				A7E024A5B00557BC8A73D316 /* CareKeeperWatchApp.swift in Sources */,
+				80559336FEFAFAC97106F9BC /* Caree.swift in Sources */,
+				9901C31F745FA77024E99DFD /* CareeDetailView.swift in Sources */,
+				3890A6296673A11AE7FAD3DE /* CareeExportService.swift in Sources */,
+				389311D1F0430C2B8EFB0ECB /* CareeListView.swift in Sources */,
+				438F2A86C6F04298D158FF9D /* CareeShareButton.swift in Sources */,
+				A4912D2B4DD4DA471EACBE92 /* CloudKitConfig.swift in Sources */,
+				C1B750DAA7023A5564DA45E9 /* CloudKitSharingService.swift in Sources */,
+				5E47CD9CB6E2295A046A9633 /* CloudKitSyncMonitor.swift in Sources */,
+				8B7945FFF2E7241C88842EE7 /* CloudKitSyncService.swift in Sources */,
+				42B90386A09ED9F1D5FECC34 /* CloudKitSyncStatusView.swift in Sources */,
+				3B70776BE3E3FE9FB5FFB249 /* CloudSharingView.swift in Sources */,
+				75595A31EB7E8AFC9DA52DF4 /* ErrorAlert.swift in Sources */,
+				F7B1CB49BDB2377419B9808B /* LocationManager.swift in Sources */,
+				331480192628E58BC1A5FE92 /* PreviewContainer.swift in Sources */,
+				DC9BF3EF522F3C23831403DA /* PreviewData.swift in Sources */,
+				BD5A2B58CF5E1912440D158C /* ShakeEffect.swift in Sources */,
+				DA14B3C7F46D9E22448B3A4A /* ShareSheet.swift in Sources */,
+				56EC91126DBC4BC1FC4AD21C /* SyncStatusIndicator.swift in Sources */,
+				494D452F3F54A6F73CF9C255 /* TrackActivityView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		406EC9BD8E0AE7AF4824FFE8 /* PBXTargetDependency */ = {
+		04689B80FF6D64BB81BDD411 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = CDBD9A71E6A9D897B8CF6186 /* CareKeeperV2 Watch App */;
-			targetProxy = EA57768CF393C4EE708D8305 /* PBXContainerItemProxy */;
+			target = 2EF062019E59968F3B129711 /* CareKeeper iOS */;
+			targetProxy = 4326D37DB3ED6C244B6F7B9F /* PBXContainerItemProxy */;
 		};
-		6AD1C98D24C7E95D6C0C5684 /* PBXTargetDependency */ = {
+		10D4B85854059D80E6F6DF02 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 5864BADE6AABF03AA09BCA6D /* CareKeeperV2 */;
-			targetProxy = 7F56362D51210D9EDF519F9E /* PBXContainerItemProxy */;
+			target = B7D95FF7DEF6E95C2851C31F /* CareKeeper Widget */;
+			targetProxy = DB5EB161880CFB84F5A8E076 /* PBXContainerItemProxy */;
 		};
-		81D3E5FC751E3E79F774BA94 /* PBXTargetDependency */ = {
+		36DA12DBE2513B36C7EE43F8 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 5864BADE6AABF03AA09BCA6D /* CareKeeperV2 */;
-			targetProxy = 8F66B864DC0349DD713A9FCC /* PBXContainerItemProxy */;
+			target = D33AEF414D4813AD6FD4E498 /* CareKeeper Watch App */;
+			targetProxy = 511B64A5DA53FB9A97A6B052 /* PBXContainerItemProxy */;
 		};
-		8D5B3919AAA4E2B3D5765315 /* PBXTargetDependency */ = {
+		C24738DEF9530B1130F5184A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 634D8DF20813ACBC6529A6F4 /* CareKeeperV2 Widget */;
-			targetProxy = E4D17681DBB02E7A3FF447AE /* PBXContainerItemProxy */;
+			target = 2EF062019E59968F3B129711 /* CareKeeper iOS */;
+			targetProxy = 15523689010121925D8811F6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		0E636DB13EEDEE6E9B713239 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperUITests;
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = CareKeeperV2;
-			};
-			name = Release;
-		};
 		12E5FD1AAD4FBFC97EE1381F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -825,135 +813,7 @@
 			};
 			name = Debug;
 		};
-		27A7B901E1AB560B415C3241 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "CareKeeperV2 Widget/CareKeeperV2 Widget.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = "CareKeeperV2-Widget-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp.widget;
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-			};
-			name = Release;
-		};
-		2804E2B10087B0D1E693F6AA /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = CareKeeperV2/CareKeeperV2.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperV2/Preview Content\"";
-				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = CareKeeperV2/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
-				SDKROOT = iphoneos;
-				SUPPORTS_MACCATALYST = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		2A342F44C7819B681018AE58 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "CareKeeperV2 Watch App/CareKeeperV2 Watch App.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperV2 Watch App/Preview Content\"";
-				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = "CareKeeperV2-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "CareKeeper v2";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types.";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp;
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-			};
-			name = Debug;
-		};
-		2EAC400DCCB4802EFEBA3FE0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "CareKeeperV2 Widget/CareKeeperV2 Widget.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = "CareKeeperV2-Widget-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp.widget;
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-			};
-			name = Debug;
-		};
-		70F14D446C2614DCB20D2DAC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperUITests;
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = CareKeeperV2;
-			};
-			name = Debug;
-		};
-		8C9282DF06479343A17B9AAF /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "CareKeeperV2 Watch App/CareKeeperV2 Watch App.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperV2 Watch App/Preview Content\"";
-				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = "CareKeeperV2-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "CareKeeper v2";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types.";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp;
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-			};
-			name = Release;
-		};
-		9793EBAA03760E241EF2A6EE /* Release */ = {
+		3423FABB29598AA4FF01E611 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -969,7 +829,113 @@
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CareKeeperV2.app/CareKeeperV2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CareKeeper iOS.app/CareKeeper iOS";
+			};
+			name = Debug;
+		};
+		469E1EF2628437940EE401B7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperUITests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "CareKeeper iOS";
+			};
+			name = Debug;
+		};
+		605A0B5ADA260757E1BA7243 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperUITests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "CareKeeper iOS";
+			};
+			name = Release;
+		};
+		70585D3C1F7B71E83D62AE29 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "CareKeeper Watch App/CareKeeper Watch App.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper Watch App/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "CareKeeper-Watch-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types.";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		7A2D6A58338287100487DB22 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CareKeeper iOS.app/CareKeeper iOS";
+			};
+			name = Release;
+		};
+		9607D1F1394150ACB9D90583 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CareKeeper/CareKeeper.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = CareKeeper/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1032,17 +998,57 @@
 			};
 			name = Release;
 		};
-		D4E999FFE68FD754BBDF64FB /* Debug */ = {
+		A262557C7B987304F353D332 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "CareKeeper Widget/CareKeeper Widget.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "CareKeeper-Widget-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp.widget;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		B4BD718AAD9A7A1CD2861825 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "CareKeeper Widget/CareKeeper Widget.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "CareKeeper-Widget-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp.widget;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		C7EF1FC688B2850B97447C09 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = CareKeeperV2/CareKeeperV2.entitlements;
+				CODE_SIGN_ENTITLEMENTS = CareKeeper/CareKeeper.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"CareKeeperV2/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = CareKeeperV2/Info.plist;
+				INFOPLIST_FILE = CareKeeper/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1056,34 +1062,36 @@
 			};
 			name = Debug;
 		};
-		DDB9F11F6B9AC8F047BEE48E /* Debug */ = {
+		D41CB91D679AC1BBC377141E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "CareKeeper Watch App/CareKeeper Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeperTests;
-				SDKROOT = iphoneos;
+				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper Watch App/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "CareKeeper-Watch-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = CareKeeper;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types.";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kareemf.CareKeeper;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CareKeeperV2.app/CareKeeperV2";
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
-			name = Debug;
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		0D198DDBAB4D5C1B7551A477 /* Build configuration list for PBXNativeTarget "CareKeeperV2Tests" */ = {
+		25B5ECE3C04A3496249CEF52 /* Build configuration list for PBXNativeTarget "CareKeeper iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				DDB9F11F6B9AC8F047BEE48E /* Debug */,
-				9793EBAA03760E241EF2A6EE /* Release */,
+				C7EF1FC688B2850B97447C09 /* Debug */,
+				9607D1F1394150ACB9D90583 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -1097,38 +1105,38 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		C18387D954D98080980A0886 /* Build configuration list for PBXNativeTarget "CareKeeperV2UITests" */ = {
+		97691FD874ED9F730CA81785 /* Build configuration list for PBXNativeTarget "CareKeeperUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				70F14D446C2614DCB20D2DAC /* Debug */,
-				0E636DB13EEDEE6E9B713239 /* Release */,
+				469E1EF2628437940EE401B7 /* Debug */,
+				605A0B5ADA260757E1BA7243 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		D4D8DA5FEFFEB4FED359BA0D /* Build configuration list for PBXNativeTarget "CareKeeperV2" */ = {
+		B4542A9B6ED817EB9400F045 /* Build configuration list for PBXNativeTarget "CareKeeper Widget" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				D4E999FFE68FD754BBDF64FB /* Debug */,
-				2804E2B10087B0D1E693F6AA /* Release */,
+				B4BD718AAD9A7A1CD2861825 /* Debug */,
+				A262557C7B987304F353D332 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		DFEFF097882CBDBBE95AC790 /* Build configuration list for PBXNativeTarget "CareKeeperV2 Widget" */ = {
+		BBC90296502FD4A99E93605C /* Build configuration list for PBXNativeTarget "CareKeeper Watch App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2EAC400DCCB4802EFEBA3FE0 /* Debug */,
-				27A7B901E1AB560B415C3241 /* Release */,
+				70585D3C1F7B71E83D62AE29 /* Debug */,
+				D41CB91D679AC1BBC377141E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		F1DFA9366F7FF2D842568CCF /* Build configuration list for PBXNativeTarget "CareKeeperV2 Watch App" */ = {
+		F2C05258557BFE1FD3D283A4 /* Build configuration list for PBXNativeTarget "CareKeeperTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2A342F44C7819B681018AE58 /* Debug */,
-				8C9282DF06479343A17B9AAF /* Release */,
+				3423FABB29598AA4FF01E611 /* Debug */,
+				7A2D6A58338287100487DB22 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

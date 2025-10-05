@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5864BADE6AABF03AA09BCA6D"
-               BuildableName = "CareKeeperV2.app"
-               BlueprintName = "CareKeeperV2"
+               BlueprintIdentifier = "D33AEF414D4813AD6FD4E498"
+               BuildableName = "CareKeeper Watch App.app"
+               BlueprintName = "CareKeeper Watch App"
                ReferencedContainer = "container:CareKeeper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -29,9 +29,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CDBD9A71E6A9D897B8CF6186"
-               BuildableName = "CareKeeperV2 Watch App.app"
-               BlueprintName = "CareKeeperV2 Watch App"
+               BlueprintIdentifier = "2EF062019E59968F3B129711"
+               BuildableName = "CareKeeper iOS.app"
+               BlueprintName = "CareKeeper iOS"
                ReferencedContainer = "container:CareKeeper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,9 +46,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5864BADE6AABF03AA09BCA6D"
-            BuildableName = "CareKeeperV2.app"
-            BlueprintName = "CareKeeperV2"
+            BlueprintIdentifier = "D33AEF414D4813AD6FD4E498"
+            BuildableName = "CareKeeper Watch App.app"
+            BlueprintName = "CareKeeper Watch App"
             ReferencedContainer = "container:CareKeeper.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -58,9 +58,9 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9C71D5E24D0279A78CE4A870"
-               BuildableName = "CareKeeperV2Tests.xctest"
-               BlueprintName = "CareKeeperV2Tests"
+               BlueprintIdentifier = "00FFD98344F57489DEF0C740"
+               BuildableName = "CareKeeperTests.xctest"
+               BlueprintName = "CareKeeperTests"
                ReferencedContainer = "container:CareKeeper.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -69,9 +69,9 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "77775D7F7018071707CE8419"
-               BuildableName = "CareKeeperV2UITests.xctest"
-               BlueprintName = "CareKeeperV2UITests"
+               BlueprintIdentifier = "3C404C4EC684A32FA1110025"
+               BuildableName = "CareKeeperUITests.xctest"
+               BlueprintName = "CareKeeperUITests"
                ReferencedContainer = "container:CareKeeper.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -93,9 +93,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5864BADE6AABF03AA09BCA6D"
-            BuildableName = "CareKeeperV2.app"
-            BlueprintName = "CareKeeperV2"
+            BlueprintIdentifier = "D33AEF414D4813AD6FD4E498"
+            BuildableName = "CareKeeper Watch App.app"
+            BlueprintName = "CareKeeper Watch App"
             ReferencedContainer = "container:CareKeeper.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -112,9 +112,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5864BADE6AABF03AA09BCA6D"
-            BuildableName = "CareKeeperV2.app"
-            BlueprintName = "CareKeeperV2"
+            BlueprintIdentifier = "D33AEF414D4813AD6FD4E498"
+            BuildableName = "CareKeeper Watch App.app"
+            BlueprintName = "CareKeeper Watch App"
             ReferencedContainer = "container:CareKeeper.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

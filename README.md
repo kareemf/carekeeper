@@ -1,4 +1,4 @@
-# CareKeeper v2
+# CareKeeper
 
 A fast, collaborative activity tracking app for caregivers with iOS and watchOS companions. Built with SwiftUI and SwiftData, featuring CloudKit integration for seamless sharing between multiple caregivers.
 
@@ -79,18 +79,18 @@ open CareKeeper.xcodeproj
 
 **iOS App:**
 ```bash
-# Build CareKeeperV2 for iOS Simulator
+# Build CareKeeper for iOS Simulator
 xcodebuild -project CareKeeper.xcodeproj \
-  -scheme CareKeeperV2 \
+  -scheme CareKeeper \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
   build
 ```
 
 **watchOS App:**
 ```bash
-# Build CareKeeperV2 Watch App for Apple Watch Simulator
+# Build CareKeeper Watch App for Apple Watch Simulator
 xcodebuild -project CareKeeper.xcodeproj \
-  -scheme "CareKeeperV2 Watch App" \
+  -scheme "CareKeeper Watch App" \
   -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 2 (49mm)' \
   build
 ```
@@ -107,7 +107,7 @@ xcrun simctl uninstall booted com.kareemf.CareKeeper
 
 # Install the app
 xcrun simctl install booted \
-  ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-iphonesimulator/CareKeeperV2.app
+  ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-iphonesimulator/CareKeeper.app
 
 # Launch the app
 xcrun simctl launch booted com.kareemf.CareKeeper
@@ -123,7 +123,7 @@ xcrun simctl uninstall booted com.kareemf.CareKeeper.watchkitapp
 
 # Install the app
 xcrun simctl install booted \
-  ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-watchsimulator/CareKeeperV2\ Watch\ App.app
+  ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-watchsimulator/CareKeeper\ Watch\ App.app
 
 # Launch the app
 xcrun simctl launch booted com.kareemf.CareKeeper.watchkitapp
@@ -141,11 +141,11 @@ xcrun simctl launch booted com.kareemf.CareKeeper.watchkitapp
 
 ```bash
 # Build, install, and launch iOS app in one command
-xcodebuild -project CareKeeper.xcodeproj -scheme CareKeeperV2 \
+xcodebuild -project CareKeeper.xcodeproj -scheme CareKeeper \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build && \
 xcrun simctl uninstall booted com.kareemf.CareKeeper && \
 xcrun simctl install booted \
-  ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-iphonesimulator/CareKeeperV2.app && \
+  ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-iphonesimulator/CareKeeper.app && \
 xcrun simctl launch booted com.kareemf.CareKeeper
 ```
 
@@ -153,19 +153,17 @@ xcrun simctl launch booted com.kareemf.CareKeeper
 
 1. Open `CareKeeper.xcodeproj` in Xcode
 2. Select your target device or simulator
-3. Choose either "CareKeeper" (v1) or "CareKeeperV2" (v2) scheme
+3. Choose the "CareKeeper" scheme
 4. Build and run the project (⌘+R)
 
 The app will automatically create sample data on first launch for development purposes.
 
-> **Tip**: Use the CareKeeperV2 scheme for the latest version with SwiftData.
-
 ## Project Structure
 
 ```
-CareKeeperV2/
+CareKeeper/
 ├── App/
-│   └── CareKeeperV2App.swift          # Main app entry point
+│   └── CareKeeperApp.swift            # Main app entry point
 ├── Models/
 │   ├── Caree.swift                    # Care recipient model
 │   ├── ActivityType.swift             # Activity type model (formerly Behavior)
@@ -245,17 +243,17 @@ For end-to-end testing on simulators, use the provided sync script to copy data 
 # Run all unit tests
 xcodebuild test -scheme CareKeeper \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
-  -only-testing:CareKeeperV2Tests
+  -only-testing:CareKeeperTests
 
 # Run specific test class
 xcodebuild test -scheme CareKeeper \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
-  -only-testing:CareKeeperV2Tests/CareeTests
+  -only-testing:CareKeeperTests/CareeTests
 
 # Run specific test method
 xcodebuild test -scheme CareKeeper \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
-  -only-testing:CareKeeperV2Tests/CareeTests/testCreateCaree
+  -only-testing:CareKeeperTests/CareeTests/testCreateCaree
 ```
 
 **UI Tests:**
@@ -263,12 +261,12 @@ xcodebuild test -scheme CareKeeper \
 # Run all UI tests
 xcodebuild test -scheme CareKeeper \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
-  -only-testing:CareKeeperV2UITests
+  -only-testing:CareKeeperUITests
 
 # Run specific UI test class
 xcodebuild test -scheme CareKeeper \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
-  -only-testing:CareKeeperV2UITests/CareeManagementUITests
+  -only-testing:CareKeeperUITests/CareeManagementUITests
 
 # Run both unit and UI tests
 xcodebuild test -scheme CareKeeper \

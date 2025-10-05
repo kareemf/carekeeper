@@ -96,7 +96,7 @@ echo ""
 # Build iOS app
 echo "🔨 Building iOS app..."
 xcodebuild -project CareKeeper.xcodeproj \
-  -scheme CareKeeperV2 \
+  -scheme CareKeeper \
   -destination "platform=iOS Simulator,id=$IOS_DEVICE" \
   build \
   | grep -E "(error|warning|BUILD)" \
@@ -108,7 +108,7 @@ echo ""
 if [ -n "$WATCH_DEVICE" ]; then
     echo "🔨 Building watchOS app..."
     xcodebuild -project CareKeeper.xcodeproj \
-      -scheme "CareKeeperV2 Watch App" \
+      -scheme "CareKeeper Watch App" \
       -destination "platform=watchOS Simulator,id=$WATCH_DEVICE" \
       build \
       | grep -E "(error|warning|BUILD)" \
@@ -119,13 +119,13 @@ fi
 # Install iOS app
 echo "📲 Installing iOS app..."
 xcrun simctl install "$IOS_DEVICE" \
-  ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-iphonesimulator/CareKeeperV2.app
+  ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-iphonesimulator/CareKeeper.app
 
 # Install watchOS app (if watch simulator is booted)
 if [ -n "$WATCH_DEVICE" ]; then
     echo "📲 Installing watchOS app..."
     xcrun simctl install "$WATCH_DEVICE" \
-      ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-watchsimulator/CareKeeperV2\ Watch\ App.app
+      ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-watchsimulator/CareKeeper\ Watch\ App.app
 fi
 
 echo ""

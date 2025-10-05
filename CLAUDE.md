@@ -17,7 +17,7 @@ CareKeeper is an iOS/watchOS app for tracking care activities using SwiftUI and 
 - Run tests through Xcode Test Navigator or Cmd+U
 - No specific test scripts configured - uses standard Xcode testing
 
-## Code Architecture (v2)
+## Code Architecture
 
 ### SwiftData Model
 The app uses SwiftData with three main model entities:
@@ -42,14 +42,14 @@ The app uses SwiftData with three main model entities:
 - **LocationManager**: @Published error property for reactive error handling
 
 #### SwiftUI Views (iOS)
-- **Main App**: `CareKeeperV2App.swift` - TabView with Carees tab
+- **Main App**: `CareKeeperApp.swift` - TabView with Carees tab
 - **Caree Management**: `CareeListView`, `CareeDetailView`, `CareeEditView`
 - **Activity Type Management**: `ActivityTypeEditView`, `ActivityTypeListView`
 - **Activity Tracking**: `TrackActivityView`, `ActivityDetailView`, `ActivityListView`
 - **Shared Components**: `ErrorAlert`, reusable view modifiers
 
 #### SwiftUI Views (watchOS)
-- **Main App**: `CareKeeperV2WatchApp.swift` - NavigationStack root
+- **Main App**: `CareKeeperWatchApp.swift` - NavigationStack root
 - **Caree List**: Primary view for selecting caree
 - **Activity Tracking**: `TrackActivityView` with Digital Crown quantity input
 - **Activity Details**: Basic view/delete functionality (edit pending)
@@ -69,7 +69,7 @@ The app uses SwiftData with three main model entities:
 - Location tracking optional per ActivityType
 
 ### File Organization
-- `/CareKeeperV2/`: Main iOS app source
+- `/CareKeeper/`: Main iOS app source
   - `/App/`: App entry point and initialization
   - `/Models/`: SwiftData model entities
   - `/Views/`: Feature-organized view hierarchy
@@ -77,7 +77,7 @@ The app uses SwiftData with three main model entities:
     - `/Components/`: Shared view components
   - `/Services/`: LocationManager, AppError
   - `/Preview/`: Preview data and container
-- `/CareKeeperV2 Watch App/`: watchOS-specific code
+- `/CareKeeper Watch App/`: watchOS-specific code
   - `/App/`, `/Views/`: Parallel structure to iOS
   - Shares Models, Services, Components from iOS via project.yml
 
@@ -95,7 +95,7 @@ The app uses SwiftData with three main model entities:
 - Use descriptive commit messages that reference the specific requirement
 - Commit early and often to track progress on individual features
 
-## CareKeeper v2 - Project Specification
+## CareKeeper - Project Specification
 
 ### Project Overview
 **Purpose**: A fast, collaborative activity tracking app for caregivers (child care, pet care, etc.) with iOS and watchOS companions. Prioritizes quick data entry and coordination between multiple caregivers.

@@ -4,7 +4,7 @@ import CloudKit
 import CoreData
 
 @main
-struct CareKeeperV2App: App {
+struct CareKeeperApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Caree.self,

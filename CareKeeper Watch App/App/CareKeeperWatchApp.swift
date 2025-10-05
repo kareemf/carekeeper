@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct CareKeeperV2WatchApp: App {
+struct CareKeeperWatchApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Caree.self,
