@@ -61,6 +61,7 @@ targets:
           - iCloud.com.kareemf.CareKeeperCloudKit
         com.apple.developer.icloud-services:
           - CloudKit
+          - CloudDocuments
         com.apple.developer.ubiquity-kvstore-identifier: "$(TeamIdentifierPrefix)$(CFBundleIdentifier)"
         com.apple.security.application-groups:
           - group.com.kareemf.CareKeeper
@@ -132,6 +133,7 @@ targets:
           - iCloud.com.kareemf.CareKeeperCloudKit
         com.apple.developer.icloud-services:
           - CloudKit
+          - CloudDocuments
         com.apple.developer.ubiquity-kvstore-identifier: "$(TeamIdentifierPrefix)$(CFBundleIdentifier)"
         com.apple.security.application-groups:
           - group.com.kareemf.CareKeeper

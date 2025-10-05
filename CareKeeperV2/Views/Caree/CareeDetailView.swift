@@ -343,8 +343,10 @@ struct CareeDetailView: View {
     }
 
     private func checkSyncStatus(for caree: Caree) async {
+        print("🔄 Pull-to-refresh: Checking sync status for caree: \(caree.name)")
         isCheckingSync = true
         isSyncedToCloudKit = await syncService.isSynced(caree: caree)
+        print("🔄 Pull-to-refresh complete: Sync status = \(isSyncedToCloudKit == true ? "✅ Synced" : "❌ Not synced")")
         isCheckingSync = false
     }
 }

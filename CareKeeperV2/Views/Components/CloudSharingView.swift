@@ -97,15 +97,30 @@ struct CloudSharingView: UIViewControllerRepresentable {
                     throw NSError(domain: "CloudSharingView", code: -2, userInfo: [NSLocalizedDescriptionKey: errorMessage])
                 }
 
-                // Query CloudKit for the Caree record
-                // SwiftData creates records with type "CD_EntityName"
-                let recordID = CKRecord.ID(recordName: careeID)
+                // Query CloudKit for the Caree record by CD_id field
+                // (CloudKit record ID is different from SwiftData model ID)
+                let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
                 let database = container.privateCloudDatabase
 
-                print("🔍 Attempting to fetch CloudKit record with ID: \(careeID)")
+                print("🔍 Querying CloudKit for record with CD_id: \(careeID)")
+                print("   From zone: \(CloudKitConfig.zoneName)")
 
-                // Fetch the record
-                let record = try await database.record(for: recordID)
+                let predicate = NSPredicate(format: "CD_id == %@", careeID)
+                let query = CKQuery(recordType: "CD_Caree", predicate: predicate)
+
+                let (matchResults, _) = try await database.records(matching: query, inZoneWith: zoneID)
+
+                guard let firstMatch = matchResults.first else {
+                    throw NSError(domain: "CloudSharingView", code: -3, userInfo: [NSLocalizedDescriptionKey: "Caree record not found in CloudKit. Please wait for sync to complete."])
+                }
+
+                let (_, result) = firstMatch
+                guard case .success(let record) = result else {
+                    if case .failure(let error) = result {
+                        throw error
+                    }
+                    throw NSError(domain: "CloudSharingView", code: -4, userInfo: [NSLocalizedDescriptionKey: "Failed to fetch record"])
+                }
 
                 print("✅ Successfully fetched record: \(record.recordID.recordName)")
 

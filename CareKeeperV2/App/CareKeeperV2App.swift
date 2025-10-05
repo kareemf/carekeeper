@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import CloudKit
+import CoreData
 
 @main
 struct CareKeeperV2App: App {
@@ -29,16 +30,21 @@ struct CareKeeperV2App: App {
             } else {
                 // Configure for CloudKit sync with local storage
                 print("🔧 Initializing ModelContainer with CloudKit sync")
-                print("   Container: iCloud.com.kareemf.CareKeeperCloudKit")
-                print("   App Group: group.com.kareemf.CareKeeper")
+                print("   Container: \(CloudKitConfig.containerID)")
+                print("   App Group: \(CloudKitConfig.appGroupID)")
 
+                // Configure for both local (iOS↔️watchOS) and cloud (iCloud) sync
                 let modelConfiguration = ModelConfiguration(
                     schema: schema,
                     isStoredInMemoryOnly: false,
-                    allowsSave: true,
-                    groupContainer: .identifier("group.com.kareemf.CareKeeper"),
-                    cloudKitDatabase: .private("iCloud.com.kareemf.CareKeeperCloudKit")
+                    groupContainer: .identifier(CloudKitConfig.appGroupID),
+                    cloudKitDatabase: .private(CloudKitConfig.containerID)
                 )
+
+                print("   📋 Configuration details:")
+                print("      - isStoredInMemoryOnly: false")
+                print("      - groupContainer: \(CloudKitConfig.appGroupID)")
+                print("      - cloudKitDatabase: private(\(CloudKitConfig.containerID))")
 
                 let container = try ModelContainer(
                     for: schema,
@@ -46,11 +52,69 @@ struct CareKeeperV2App: App {
                 )
 
                 print("✅ ModelContainer created successfully")
+                if let url = container.configurations.first?.url {
+                    print("   📦 Container URL: \(url.path)")
+                }
+
+                // Monitor for sync errors
+                NotificationCenter.default.addObserver(
+                    forName: Notification.Name("NSPersistentStoreRemoteChange"),
+                    object: nil,
+                    queue: nil
+                ) { notification in
+                    print("📡 Persistent store remote change notification: \(notification)")
+                }
+
+                // Monitor for delete operations and CloudKit export
+                NotificationCenter.default.addObserver(
+                    forName: .NSManagedObjectContextDidSave,
+                    object: nil,
+                    queue: nil
+                ) { notification in
+                    if let deleted = notification.userInfo?[NSDeletedObjectsKey] as? Set<NSManagedObject> {
+                        if !deleted.isEmpty {
+                            print("⚠️ DELETE DETECTED: \(deleted.count) objects deleted")
+                            for obj in deleted {
+                                print("   - Deleted: \(type(of: obj)) - \(obj)")
+                            }
+                        }
+                    }
+                    if let inserted = notification.userInfo?[NSInsertedObjectsKey] as? Set<NSManagedObject> {
+                        if !inserted.isEmpty {
+                            print("➕ INSERT DETECTED: \(inserted.count) objects inserted")
+                            for obj in inserted {
+                                print("   - Inserted: \(type(of: obj)) - \(obj)")
+                            }
+                            print("   ⏳ Waiting for CloudKit export (should happen within 5-30 seconds)...")
+                        }
+                    }
+                    if let updated = notification.userInfo?[NSUpdatedObjectsKey] as? Set<NSManagedObject> {
+                        if !updated.isEmpty {
+                            print("✏️ UPDATE DETECTED: \(updated.count) objects updated")
+                        }
+                    }
+                }
+
+                // Monitor for CloudKit import/export events
+                NotificationCenter.default.addObserver(
+                    forName: NSNotification.Name("NSPersistentCloudKitContainer.eventChangedNotification"),
+                    object: nil,
+                    queue: nil
+                ) { notification in
+                    print("☁️ CloudKit event notification: \(notification)")
+                }
+
                 return container
             }
         } catch {
-            print("⚠️ Failed to create ModelContainer: \(error)")
+            print("❌ CRITICAL: Failed to create ModelContainer")
+            print("   Error: \(error)")
             print("   Error details: \(String(describing: error))")
+            if let nsError = error as NSError? {
+                print("   Domain: \(nsError.domain)")
+                print("   Code: \(nsError.code)")
+                print("   UserInfo: \(nsError.userInfo)")
+            }
             fatalError("Cannot create ModelContainer: \(error)")
         }
     }()
@@ -69,7 +133,7 @@ struct CareKeeperV2App: App {
     }
 
     private func checkCloudKitStatus() {
-        let container = CKContainer(identifier: "iCloud.com.kareemf.CareKeeperCloudKit")
+        let container = CKContainer(identifier: CloudKitConfig.containerID)
 
         Task {
             do {
@@ -100,7 +164,7 @@ struct CareKeeperV2App: App {
             return
         }
 
-        let container = CKContainer(identifier: "iCloud.com.kareemf.CareKeeperCloudKit")
+        let container = CKContainer(identifier: CloudKitConfig.containerID)
 
         // Fetch the share metadata from the URL
         container.fetchShareMetadata(with: url) { metadata, error in

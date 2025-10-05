@@ -16,14 +16,19 @@ struct CareeShareButton: View {
     @State private var showingSyncAlert = false
 
     private let sharingService = CloudKitSharingService()
-    private let container = CKContainer(identifier: "iCloud.com.kareemf.CareKeeperCloudKit")
+    private let container = CKContainer(identifier: CloudKitConfig.containerID)
 
     var body: some View {
         Button {
+            print("📤 Share button tapped for caree: \(caree.name) (ID: \(caree.id.uuidString))")
+            print("   Sync status: \(isSynced ? "✅ Synced" : "❌ Not synced")")
+
             // Pre-share validation
             if !isSynced {
+                print("⚠️ Showing 'not synced' alert to user")
                 showingSyncAlert = true
             } else {
+                print("✅ Proceeding with share preparation")
                 Task {
                     await prepareShare()
                 }
@@ -85,15 +90,28 @@ struct CareeShareButton: View {
         } else {
             print("🆕 No existing share found - will create new share")
 
-            // Check if caree has synced to CloudKit
+            // Check if caree has synced to CloudKit (query by CD_id field)
             do {
-                let recordID = CKRecord.ID(recordName: caree.id.uuidString)
+                let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
                 let database = container.privateCloudDatabase
-                _ = try await database.record(for: recordID)
-                print("✅ Caree record found in CloudKit - ready to share")
+
+                let predicate = NSPredicate(format: "CD_id == %@", caree.id.uuidString)
+                let query = CKQuery(recordType: "CD_Caree", predicate: predicate)
+
+                let (matchResults, _) = try await database.records(matching: query, inZoneWith: zoneID)
+
+                if let firstMatch = matchResults.first {
+                    let (_, result) = firstMatch
+                    if case .success(let record) = result {
+                        print("✅ Caree record found in CloudKit")
+                        print("   CloudKit record ID: \(record.recordID.recordName)")
+                        print("   CD_id: \(record["CD_id"] as? String ?? "unknown")")
+                    }
+                } else {
+                    print("⚠️ Caree record not yet synced to CloudKit")
+                }
             } catch {
-                print("⚠️ Caree record not yet synced to CloudKit")
-                print("⚠️ Error: \(error.localizedDescription)")
+                print("⚠️ Error checking CloudKit sync: \(error.localizedDescription)")
                 if let ckError = error as? CKError {
                     print("⚠️ CKError code: \(ckError.code.rawValue)")
                 }
