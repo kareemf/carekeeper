@@ -2,24 +2,57 @@ import SwiftUI
 
 struct CareeListRowView: View {
     let caree: Caree
-    
+
+    @State private var isCheckingSync = false
+    @State private var isSyncedToCloudKit: Bool? = nil
+    @StateObject private var syncService = CloudKitSyncService()
+
     var body: some View {
         HStack {
             profileImageView
-            
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(caree.name)
                     .font(.headline)
-                
-                Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) activity types",
-                                     comment: "Activity types count in caree row"))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+
+                HStack(spacing: 12) {
+                    Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) Activity Types",
+                                         comment: "Activity types count in caree row"))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    Text("•")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    Text(NSLocalizedString("\(caree.activities?.count ?? 0) Activities",
+                                         comment: "Activities count in caree row"))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    #if os(iOS)
+                    // Sync status indicator
+                    if isCheckingSync || isSyncedToCloudKit != nil {
+                        Text("•")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+
+                        CloudKitSyncStatusView(
+                            isChecking: isCheckingSync,
+                            isSynced: isSyncedToCloudKit,
+                            size: .small
+                        )
+                    }
+                    #endif
+                }
             }
-            
-            Spacer()
         }
         .padding(.vertical, 4)
+        .task {
+            isCheckingSync = true
+            isSyncedToCloudKit = await syncService.isSynced(caree: caree)
+            isCheckingSync = false
+        }
     }
     
     private var profileImageView: some View {

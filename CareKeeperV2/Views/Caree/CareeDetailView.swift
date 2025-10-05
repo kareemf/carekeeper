@@ -112,9 +112,6 @@ struct CareeDetailView: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         HStack(spacing: 16) {
                             #if os(iOS)
-                            // Sync status indicator
-                            syncStatusIndicator
-
                             CareeShareButton(
                                 caree: caree,
                                 isSynced: isSyncedToCloudKit ?? false
@@ -206,13 +203,18 @@ struct CareeDetailView: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 
-                Text(NSLocalizedString("\(caree.activities?.count ?? 0) Total Activities",
+                Text(NSLocalizedString("\(caree.activities?.count ?? 0) Activities",
                                      comment: "Total activities count"))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
 
             Spacer()
+
+            #if os(iOS)
+            // Sync status indicator
+            syncStatusIndicator
+            #endif
         }
     }
 
@@ -330,16 +332,11 @@ struct CareeDetailView: View {
     }
 
     private var syncStatusIndicator: some View {
-        Group {
-            if isCheckingSync {
-                ProgressView()
-                    .scaleEffect(0.7)
-            } else if let isSynced = isSyncedToCloudKit {
-                Image(systemName: isSynced ? "icloud.and.arrow.up.fill" : "icloud.slash")
-                    .foregroundColor(isSynced ? .green : .secondary)
-                    .help(isSynced ? "Synced to iCloud" : "Not synced to iCloud")
-            }
-        }
+        CloudKitSyncStatusView(
+            isChecking: isCheckingSync,
+            isSynced: isSyncedToCloudKit,
+            size: .medium
+        )
     }
 
     private func checkSyncStatus(for caree: Caree) async {

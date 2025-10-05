@@ -14,11 +14,13 @@
 		14FDCFB053BFDAA9065DFB6A /* CloudKitSharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9173707B34D8027FD46F5E4 /* CloudKitSharingService.swift */; };
 		19F506A7D3A3551BDC63A94B /* CareeListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705AB44FD17075847F5967A1 /* CareeListRowView.swift */; };
 		1E3CF0C5E578D3A385F58BEC /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B631055803CFC97FAFCC9538 /* ActivityDetailView.swift */; };
+		26F41A349B99D754078366D3 /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8B18F582BA68B6B567BC18 /* CloudKitConfig.swift */; };
 		27FA247EAD48C2EBF0A87C80 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B1CD125EDB7D626B6E51DC9 /* Assets.xcassets */; };
 		2A84479E76A99E4AD493A597 /* CloudKitSyncMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5496091330CAD6201AD306 /* CloudKitSyncMonitor.swift */; };
 		2A8B596F5D72FC49CD074884 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A69987D453D2359155BFFFEE /* Preview Assets.xcassets */; };
 		2AE30C11E64B40CE43C397EC /* CareKeeperV2WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5394A28349D2536DACEC55AD /* CareKeeperV2WatchApp.swift */; };
 		2C767CF4BAC4785ED75ACB8B /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A7DC7DAE5761427EEDECF7 /* ActivityDetailView.swift */; };
+		316865E3EA904B1776A6D084 /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8B18F582BA68B6B567BC18 /* CloudKitConfig.swift */; };
 		3177C9877FB9B354EB2CA846 /* ActivityRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48E2E1E92765420A15B8C96E /* ActivityRowView.swift */; };
 		38DCA5D2C8CAF3236F3C513F /* XCUIElementExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B188F415D238DE24FAF906D4 /* XCUIElementExtensions.swift */; };
 		390EBE4554F93E93EB6668EE /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E5F89CB58DAA1911ACE334 /* LocationManager.swift */; };
@@ -52,7 +54,9 @@
 		9D22792C72A2F3B70455A645 /* CareeManagementUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEF407E55D6E35CDFA694B2 /* CareeManagementUITests.swift */; };
 		9D3271D9F2AA1666EF52B2C0 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B379F85DC676CFD654FBE7 /* Activity.swift */; };
 		9DD1F4DF60DBDDB6166E2DC7 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B379F85DC676CFD654FBE7 /* Activity.swift */; };
+		A04311B0AB5D02A245EB04A1 /* CloudKitSyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC3062FE870CFA91C5C3495 /* CloudKitSyncStatusView.swift */; };
 		A4D1FC41604F205388B16F28 /* CareeEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D92530A8EA9D7FED7C0414EA /* CareeEditView.swift */; };
+		A7A03168B404D7FD6C4F1BF8 /* CloudKitSyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC3062FE870CFA91C5C3495 /* CloudKitSyncStatusView.swift */; };
 		AE2D0DC285908FAA9D1D1F89 /* ActivityTypeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B817EC7B2594E7047F4B99 /* ActivityTypeRowView.swift */; };
 		C1ED336C808C1CD4E7AB3A7D /* ActivityTypeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 980EC8CEF247085CFDFD5188 /* ActivityTypeUITests.swift */; };
 		CDD1BA8E85BB7BB2E938D383 /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F76D243061A40A8C87C86C5 /* ErrorAlert.swift */; };
@@ -168,6 +172,7 @@
 		8B7B99A534A6E1F1B10F21E7 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		980EC8CEF247085CFDFD5188 /* ActivityTypeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeUITests.swift; sourceTree = "<group>"; };
 		9BDD832C3A966D99072E15C8 /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
+		9E8B18F582BA68B6B567BC18 /* CloudKitConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitConfig.swift; sourceTree = "<group>"; };
 		9F76D243061A40A8C87C86C5 /* ErrorAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorAlert.swift; sourceTree = "<group>"; };
 		A69987D453D2359155BFFFEE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A8B090F6CCCD5E8D95521DCD /* TrackActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackActivityView.swift; sourceTree = "<group>"; };
@@ -190,6 +195,7 @@
 		E08859ED6A9782131FB87749 /* CloudKitSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncService.swift; sourceTree = "<group>"; };
 		E43F1AD5DEDF5564D724186F /* CareKeeperWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWidget.swift; sourceTree = "<group>"; };
 		E9E5F89CB58DAA1911ACE334 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		EEC3062FE870CFA91C5C3495 /* CloudKitSyncStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncStatusView.swift; sourceTree = "<group>"; };
 		F9B379F85DC676CFD654FBE7 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
 		FA915A8B9B58471A28E73195 /* ActivityListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -245,6 +251,7 @@
 			isa = PBXGroup;
 			children = (
 				30A95DF025B5A93481F518EA /* CareeShareButton.swift */,
+				EEC3062FE870CFA91C5C3495 /* CloudKitSyncStatusView.swift */,
 				8A2B559D138854B24D6AE20C /* CloudSharingView.swift */,
 				9F76D243061A40A8C87C86C5 /* ErrorAlert.swift */,
 				AF676307B4DF7BA70486E0D4 /* ShakeEffect.swift */,
@@ -382,6 +389,7 @@
 			isa = PBXGroup;
 			children = (
 				8B7B99A534A6E1F1B10F21E7 /* AppError.swift */,
+				9E8B18F582BA68B6B567BC18 /* CloudKitConfig.swift */,
 				A9173707B34D8027FD46F5E4 /* CloudKitSharingService.swift */,
 				0C5496091330CAD6201AD306 /* CloudKitSyncMonitor.swift */,
 				E08859ED6A9782131FB87749 /* CloudKitSyncService.swift */,
@@ -627,9 +635,11 @@
 				F2DF86428CBEB7EFA932ABEE /* CareeDetailView.swift in Sources */,
 				4A6F4BC427D6A44E957EF9CE /* CareeListView.swift in Sources */,
 				64D6B68083B2FC37DCAF64E1 /* CareeShareButton.swift in Sources */,
+				316865E3EA904B1776A6D084 /* CloudKitConfig.swift in Sources */,
 				14FDCFB053BFDAA9065DFB6A /* CloudKitSharingService.swift in Sources */,
 				2A84479E76A99E4AD493A597 /* CloudKitSyncMonitor.swift in Sources */,
 				68F7B5AEEE631A4EF4B601DB /* CloudKitSyncService.swift in Sources */,
+				A7A03168B404D7FD6C4F1BF8 /* CloudKitSyncStatusView.swift in Sources */,
 				959A001223A3955EF91094E8 /* CloudSharingView.swift in Sources */,
 				CDD1BA8E85BB7BB2E938D383 /* ErrorAlert.swift in Sources */,
 				6DE89BDF18F7D4A5901C2350 /* LocationManager.swift in Sources */,
@@ -672,9 +682,11 @@
 				19F506A7D3A3551BDC63A94B /* CareeListRowView.swift in Sources */,
 				401B3BAF4C0A5BE53876C494 /* CareeListView.swift in Sources */,
 				9ABF86274E1C8BECB6256415 /* CareeShareButton.swift in Sources */,
+				26F41A349B99D754078366D3 /* CloudKitConfig.swift in Sources */,
 				6015572B8A8F4855F89330FB /* CloudKitSharingService.swift in Sources */,
 				4F905E3D41124B488C0F78B7 /* CloudKitSyncMonitor.swift in Sources */,
 				7A5D03CE4CA4A30AEB0ABAD7 /* CloudKitSyncService.swift in Sources */,
+				A04311B0AB5D02A245EB04A1 /* CloudKitSyncStatusView.swift in Sources */,
 				EF37239ED2D4CFDD4D1BBECD /* CloudSharingView.swift in Sources */,
 				048ADB4D38C8A311F7089D0A /* ContentView.swift in Sources */,
 				EFB1307079F88ABF2A64293D /* ErrorAlert.swift in Sources */,
