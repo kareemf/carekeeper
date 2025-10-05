@@ -21,8 +21,12 @@ struct CareeDetailView: View {
     @State private var showingDeleteActivityConfirmation = false
     @State private var isSyncedToCloudKit: Bool? = nil
     @State private var isCheckingSync = false
+    @State private var exportItem: ExportItem?
+    @State private var exportError: Error?
 
     @StateObject private var syncService = CloudKitSyncService()
+
+    private let exportService = CareeExportService()
 
     init(careeID: UUID) {
         self.careeID = careeID
@@ -116,6 +120,12 @@ struct CareeDetailView: View {
                                 caree: caree,
                                 isSynced: isSyncedToCloudKit ?? false
                             )
+
+                            Button {
+                                exportCaree(caree)
+                            } label: {
+                                Image(systemName: "square.and.arrow.up.on.square")
+                            }
                             #endif
 
                             Button(NSLocalizedString("Edit", comment: "Edit button")) {
@@ -165,6 +175,12 @@ struct CareeDetailView: View {
                 } message: {
                     Text(NSLocalizedString("This cannot be undone.", comment: "Delete activity confirmation message"))
                 }
+                #if os(iOS)
+                .sheet(item: $exportItem) { item in
+                    ShareSheet(items: [item.url])
+                }
+                .errorAlert($exportError)
+                #endif
             } else {
                 Text(NSLocalizedString("Caree not found", comment: "Caree not found message"))
                     .foregroundColor(.secondary)
@@ -346,6 +362,32 @@ struct CareeDetailView: View {
         print("🔄 Pull-to-refresh complete: Sync status = \(isSyncedToCloudKit == true ? "✅ Synced" : "❌ Not synced")")
         isCheckingSync = false
     }
+
+    private func exportCaree(_ caree: Caree) {
+        do {
+            // Generate JSON data
+            let jsonData = try exportService.exportToJSON(caree: caree)
+
+            // Create temporary file
+            let filename = exportService.generateFilename(for: caree)
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
+
+            try jsonData.write(to: tempURL)
+
+            // Set export item to trigger share sheet
+            exportItem = ExportItem(url: tempURL, filename: filename)
+        } catch {
+            exportError = error
+        }
+    }
+}
+
+// MARK: - Helper Types
+
+struct ExportItem: Identifiable {
+    let id = UUID()
+    let url: URL
+    let filename: String
 }
 
 #Preview {
