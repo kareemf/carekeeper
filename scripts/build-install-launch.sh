@@ -119,7 +119,7 @@ fi
 # Install iOS app
 echo "📲 Installing iOS app..."
 xcrun simctl install "$IOS_DEVICE" \
-  ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-iphonesimulator/CareKeeper.app
+  ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-iphonesimulator/CareKeeper\ iOS.app
 
 # Install watchOS app (if watch simulator is booted)
 if [ -n "$WATCH_DEVICE" ]; then

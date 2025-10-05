@@ -178,6 +178,7 @@ schemes:
         CareKeeper Watch App: all
     run:
       config: Debug
+      executable: CareKeeper iOS
     test:
       config: Debug
       targets:

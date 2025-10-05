@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "1600"
-   version = "1.3">
+   version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
-      buildImplicitDependencies = "YES">
+      buildImplicitDependencies = "YES"
+      runPostActionsOnFailure = "NO">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -40,13 +41,14 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      onlyGenerateCoverageForSpecifiedTargets = "NO">
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D33AEF414D4813AD6FD4E498"
-            BuildableName = "CareKeeper Watch App.app"
-            BlueprintName = "CareKeeper Watch App"
+            BlueprintIdentifier = "2EF062019E59968F3B129711"
+            BuildableName = "CareKeeper iOS.app"
+            BlueprintName = "CareKeeper iOS"
             ReferencedContainer = "container:CareKeeper.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -63,7 +65,8 @@
             </BuildableReference>
          </TestableReference>
          <TestableReference
-            skipped = "NO">
+            skipped = "NO"
+            parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3C404C4EC684A32FA1110025"
@@ -73,6 +76,8 @@
             </BuildableReference>
          </TestableReference>
       </Testables>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -88,12 +93,14 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D33AEF414D4813AD6FD4E498"
-            BuildableName = "CareKeeper Watch App.app"
-            BlueprintName = "CareKeeper Watch App"
+            BlueprintIdentifier = "2EF062019E59968F3B129711"
+            BuildableName = "CareKeeper iOS.app"
+            BlueprintName = "CareKeeper iOS"
             ReferencedContainer = "container:CareKeeper.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -105,12 +112,14 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D33AEF414D4813AD6FD4E498"
-            BuildableName = "CareKeeper Watch App.app"
-            BlueprintName = "CareKeeper Watch App"
+            BlueprintIdentifier = "2EF062019E59968F3B129711"
+            BuildableName = "CareKeeper iOS.app"
+            BlueprintName = "CareKeeper iOS"
             ReferencedContainer = "container:CareKeeper.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
