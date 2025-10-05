@@ -43,13 +43,28 @@ xcodegen generate
 
 > **Note**: If you don't use XcodeGen, you can still use the pre-generated `.xcodeproj` file directly.
 
-### 3. Open in Xcode
+### 3. Configure Git Hooks (Optional but Recommended)
+
+This project includes a pre-commit hook that automatically runs XcodeGen before each commit, ensuring the Xcode project stays in sync with `project.yml`.
+
+```bash
+git config core.hooksPath .githooks
+```
+
+The pre-commit hook will:
+- Check if XcodeGen is installed
+- Regenerate the Xcode project if needed
+- Automatically stage any project file changes
+
+> **Note**: This step requires XcodeGen to be installed (see step 2).
+
+### 4. Open in Xcode
 
 ```bash
 open CareKeeper.xcodeproj
 ```
 
-### 4. Configure CloudKit
+### 5. Configure CloudKit
 
 1. In Xcode, select your project in the navigator
 2. Select the CareKeeper target
@@ -58,7 +73,7 @@ open CareKeeper.xcodeproj
 5. Enable "CloudKit" capability
 6. Select or create a CloudKit container
 
-### 5. Build and Run
+### 6. Build and Run
 
 #### Build from Command Line
 

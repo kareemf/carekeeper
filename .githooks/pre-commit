@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Pre-commit hook to run xcodegen
+# This ensures the Xcode project is always up-to-date with project.yml
+
+# Exit on error
+set -e
+
+echo "Running xcodegen..."
+
+# Check if xcodegen is installed
+if ! command -v xcodegen &> /dev/null; then
+    echo "Error: xcodegen is not installed"
+    echo "Install it with: brew install xcodegen"
+    exit 1
+fi
+
+# Run xcodegen
+if ! xcodegen; then
+    echo "Error: xcodegen failed"
+    exit 1
+fi
+
+# Check if the project file was modified
+if git diff --name-only | grep -q "CareKeeper.xcodeproj/"; then
+    echo "Xcode project was regenerated. Staging changes..."
+    git add CareKeeper.xcodeproj/
+fi
+
+echo "✓ xcodegen completed successfully"
+exit 0
