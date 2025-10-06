@@ -1,4 +1,5 @@
 import SwiftUI
+import os
 import SwiftData
 import CloudKit
 
@@ -52,7 +53,7 @@ class CloudKitSharingService: ObservableObject {
         do {
             try await database.deleteRecord(withID: share.recordID)
         } catch {
-            print("❌ Failed to delete share: \(error.localizedDescription)")
+            os_log("❌ Failed to delete share: %{public}@", log: OSLog.default, type: .error, error.localizedDescription)
             throw error
         }
     }
@@ -71,7 +72,7 @@ class CloudKitSharingService: ObservableObject {
         do {
             try await database.save(share)
         } catch {
-            print("❌ Failed to save share: \(error.localizedDescription)")
+            os_log("❌ Failed to save share: %{public}@", log: OSLog.default, type: .error, error.localizedDescription)
             throw error
         }
     }

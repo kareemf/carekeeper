@@ -41,7 +41,7 @@ struct CloudSharingView: UIViewControllerRepresentable {
         }
 
         func cloudSharingController(_ csc: UICloudSharingController, failedToSaveShareWithError error: Error) {
-            print("❌ Failed to save share with error: \(error.localizedDescription)")
+            os_log("❌ Failed to save share with error: %{public}@", log: OSLog.default, type: .error, error.localizedDescription)
             onDismiss()
         }
 
