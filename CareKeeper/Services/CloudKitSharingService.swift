@@ -49,7 +49,12 @@ class CloudKitSharingService: ObservableObject {
         }
 
         let database = container.sharedCloudDatabase
-        try await database.deleteRecord(withID: share.recordID)
+        do {
+            try await database.deleteRecord(withID: share.recordID)
+        } catch {
+            print("❌ Failed to delete share: \(error.localizedDescription)")
+            throw error
+        }
     }
 
     func removeParticipant(_ participant: CKShare.Participant, from share: CKShare) async throws {
@@ -63,7 +68,12 @@ class CloudKitSharingService: ObservableObject {
         share.removeParticipant(participant)
 
         // Save the updated share
-        try await database.save(share)
+        do {
+            try await database.save(share)
+        } catch {
+            print("❌ Failed to save share: \(error.localizedDescription)")
+            throw error
+        }
     }
 
     func fetchParticipants(for share: CKShare) -> [CKShare.Participant] {
