@@ -53,7 +53,7 @@ class CloudKitSharingService: ObservableObject {
         do {
             try await database.deleteRecord(withID: share.recordID)
         } catch {
-            os_log("❌ Failed to delete share: %{public}@", log: OSLog.default, type: .error, error.localizedDescription)
+            Logger.logError("Failed to delete share", error: error)
             throw error
         }
     }
@@ -72,7 +72,7 @@ class CloudKitSharingService: ObservableObject {
         do {
             try await database.save(share)
         } catch {
-            os_log("❌ Failed to save share: %{public}@", log: OSLog.default, type: .error, error.localizedDescription)
+            Logger.logError("Failed to save share", error: error)
             throw error
         }
     }
