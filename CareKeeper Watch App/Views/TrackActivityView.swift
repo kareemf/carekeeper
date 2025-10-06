@@ -147,11 +147,13 @@ struct TrackActivityView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button(NSLocalizedString("Back", comment: "Back button")) {
+                Button {
                     showingStep2 = false
                     selectedActivityType = nil
                     includeLocation = false
                     locationManager.stopUpdating()
+                } label: {
+                    Image(systemName: "chevron.left")
                 }
             }
         }

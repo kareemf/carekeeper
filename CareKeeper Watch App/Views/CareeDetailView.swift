@@ -21,22 +21,30 @@ struct CareeDetailView: View {
     var body: some View {
         Group {
             if let caree = caree {
-                ScrollView {
-                    VStack(spacing: 16) {
-                        // Track activity button (only if activity types exist)
-                        if !caree.sortedActivityTypes.isEmpty {
+                if !caree.sortedActivityTypes.isEmpty {
+                    TabView {
+                        // Track tab
+                        VStack {
+                            Spacer()
                             trackActivityButton(for: caree)
-                            // Recent activities section
-                            recentActivitiesSection(for: caree)
-                        } else {
-                            gettingStartedView
+                            Spacer()
                         }
+                        .containerBackground(.background, for: .tabView)
+
+                        // Today tab
+                        todayActivitiesSection(for: caree)
+                            .containerBackground(.background, for: .tabView)
                     }
-                    .padding()
-                }
-                .navigationTitle(caree.name)
-                .sheet(isPresented: $showingTrackActivity) {
-                    TrackActivityView(caree: caree)
+                    .tabViewStyle(.verticalPage)
+                    .navigationTitle(caree.name)
+                    .sheet(isPresented: $showingTrackActivity) {
+                        TrackActivityView(caree: caree)
+                    }
+                } else {
+                    ScrollView {
+                        gettingStartedView
+                    }
+                    .navigationTitle(caree.name)
                 }
             } else {
                 Text(NSLocalizedString("Caree not found", comment: "Caree not found message"))
@@ -55,11 +63,12 @@ struct CareeDetailView: View {
                     .fontWeight(.semibold)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 100)
+            .padding(.vertical, 24)
             .foregroundColor(.white)
             .background(Color.green.opacity(0.8))
             .cornerRadius(12)
         }
+        .padding(.horizontal, 12)
         .disabled(caree.activityTypes?.isEmpty ?? true)
     }
 
@@ -80,46 +89,73 @@ struct CareeDetailView: View {
         .padding()
     }
 
-    private func recentActivitiesSection(for caree: Caree) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(NSLocalizedString("Recent Activities", comment: "Recent activities section title"))
+    private func todayActivities(for caree: Caree) -> [Activity] {
+        let allActivities = caree.activities ?? []
+        return allActivities
+            .filter { Calendar.current.isDateInToday($0.dateTime) }
+            .sorted { $0.dateTime > $1.dateTime }
+    }
+
+    private func todayActivitiesSection(for caree: Caree) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(NSLocalizedString("Today", comment: "Today's activities section title"))
                 .font(.headline)
+                .padding(.horizontal)
+                .padding(.top, 8)
 
-            if caree.recentActivities.isEmpty {
-                Text(NSLocalizedString("No activities yet", comment: "Empty activities message"))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            } else {
-                ForEach(Array(caree.recentActivities.prefix(3))) { activity in
-                    NavigationLink(destination: ActivityDetailView(activityID: activity.id)) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack {
-                                Text(activity.activityType?.displayIcon ?? "⭐")
-                                    .font(.caption)
-
-                                Text(activity.activityType?.name ?? NSLocalizedString("Unknown", comment: "Unknown activity type"))
-                                    .font(.caption)
-
-                                Spacer()
-
-                                Text(activity.formattedDateTime)
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                            }
-
-                            if let notes = activity.notes, !notes.isEmpty {
-                                Text(notes)
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
-                            }
-                        }
-                        .padding(.vertical, 2)
-                    }
-                    .buttonStyle(.plain)
+            if todayActivities(for: caree).isEmpty {
+                VStack(spacing: 12) {
+                    Text(NSLocalizedString("No activities recorded today", comment: "Empty today's activities message"))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List {
+                    ForEach(todayActivities(for: caree)) { activity in
+                        NavigationLink(destination: ActivityDetailView(activityID: activity.id)) {
+                            activityRow(for: activity)
+                        }
+                    }
+                }
+                .listStyle(.plain)
             }
         }
+    }
+
+    private func activityRow(for activity: Activity) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(activity.activityType?.displayIcon ?? "⭐")
+                    .font(.title3)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(activity.activityType?.name ?? NSLocalizedString("Unknown", comment: "Unknown activity type"))
+                        .font(.headline)
+
+                    Text(activity.formattedDateTime)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+            }
+
+            if let formattedQuantity = activity.formattedQuantity {
+                Text(formattedQuantity)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            if let notes = activity.notes, !notes.isEmpty {
+                Text(notes)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 

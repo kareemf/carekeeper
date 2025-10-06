@@ -4,6 +4,7 @@ import MapKit
 
 struct ActivityDetailView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
 
     let activityID: UUID
     @Query private var allActivities: [Activity]
@@ -12,6 +13,12 @@ struct ActivityDetailView: View {
     private var activity: Activity? {
         allActivities.first { $0.id == activityID }
     }
+
+    @State private var isEditing = false
+    @State private var editingNotes: String = ""
+    @State private var editingQuantity: String = ""
+    @State private var showingDeleteConfirmation = false
+    @State private var error: Error?
 
     init(activityID: UUID) {
         self.activityID = activityID
@@ -28,16 +35,71 @@ struct ActivityDetailView: View {
                         if activity.hasLocation {
                             locationSection(for: activity)
                         }
+
+                        if isEditing {
+                            Button {
+                                saveChanges(for: activity)
+                            } label: {
+                                Text(NSLocalizedString("Save", comment: "Save button"))
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .padding(.top, 8)
+
+                            Button {
+                                cancelEditing(for: activity)
+                            } label: {
+                                Text(NSLocalizedString("Cancel", comment: "Cancel button"))
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                        } else {
+                            Button(role: .destructive) {
+                                showingDeleteConfirmation = true
+                            } label: {
+                                Text(NSLocalizedString("Delete Activity", comment: "Delete activity button"))
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                            .padding(.top, 8)
+                        }
                     }
                     .padding()
                 }
                 .navigationTitle(activity.activityType?.name ?? NSLocalizedString("Activity", comment: "Activity title"))
                 .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        if !isEditing {
+                            Button {
+                                startEditing(for: activity)
+                            } label: {
+                                Image(systemName: "pencil")
+                            }
+                        }
+                    }
+                }
+                .confirmationDialog(
+                    NSLocalizedString("Delete Activity?", comment: "Delete confirmation title"),
+                    isPresented: $showingDeleteConfirmation,
+                    titleVisibility: .visible
+                ) {
+                    Button(NSLocalizedString("Delete", comment: "Delete button"), role: .destructive) {
+                        deleteActivity(activity)
+                    }
+                    Button(NSLocalizedString("Cancel", comment: "Cancel button"), role: .cancel) {}
+                } message: {
+                    Text(NSLocalizedString("This cannot be undone.", comment: "Delete confirmation message"))
+                }
+                .onAppear {
+                    setupEditingValues(for: activity)
+                }
             } else {
                 Text(NSLocalizedString("Activity not found", comment: "Activity not found message"))
                     .foregroundColor(.secondary)
             }
         }
+        .errorAlert($error)
     }
 
     private func headerSection(for activity: Activity) -> some View {
@@ -58,24 +120,57 @@ struct ActivityDetailView: View {
     private func detailsSection(for activity: Activity) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             // Quantity section
-            if let formattedQuantity = activity.formattedQuantity {
+            if activity.activityType?.hasQuantity == true {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(NSLocalizedString("Quantity", comment: "Quantity section title"))
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    Text(formattedQuantity)
-                        .font(.title3)
+
+                    if isEditing {
+                        HStack {
+                            TextField(NSLocalizedString("Amount", comment: "Quantity placeholder"),
+                                     text: $editingQuantity)
+
+                            if let unit = activity.activityType?.quantityUnit {
+                                Text(unit)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    } else {
+                        if let formattedQuantity = activity.formattedQuantity {
+                            Text(formattedQuantity)
+                                .font(.title3)
+                        } else {
+                            Text(NSLocalizedString("None", comment: "No quantity"))
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .italic()
+                        }
+                    }
                 }
             }
 
             // Notes section
-            if let notes = activity.notes, !notes.isEmpty {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(NSLocalizedString("Notes", comment: "Notes section title"))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text(notes)
-                        .font(.body)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(NSLocalizedString("Notes", comment: "Notes section title"))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                if isEditing {
+                    TextField(NSLocalizedString("Add notes...", comment: "Notes placeholder"),
+                             text: $editingNotes, axis: .vertical)
+                        .lineLimit(2...4)
+                } else {
+                    if let notes = activity.notes, !notes.isEmpty {
+                        Text(notes)
+                            .font(.body)
+                    } else {
+                        Text(NSLocalizedString("None", comment: "No notes"))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .italic()
+                    }
                 }
             }
         }
@@ -105,6 +200,44 @@ struct ActivityDetailView: View {
                     .fontDesign(.monospaced)
                     .foregroundColor(.secondary)
             }
+        }
+    }
+
+    private func setupEditingValues(for activity: Activity) {
+        editingNotes = activity.notes ?? ""
+        editingQuantity = activity.quantity?.description ?? ""
+    }
+
+    private func startEditing(for activity: Activity) {
+        isEditing = true
+        setupEditingValues(for: activity)
+    }
+
+    private func cancelEditing(for activity: Activity) {
+        setupEditingValues(for: activity)
+        isEditing = false
+    }
+
+    private func saveChanges(for activity: Activity) {
+        activity.notes = editingNotes.isEmpty ? nil : editingNotes
+        activity.quantity = Double(editingQuantity)
+
+        do {
+            try modelContext.save()
+            isEditing = false
+        } catch {
+            self.error = AppError.saveFailed(error.localizedDescription)
+        }
+    }
+
+    private func deleteActivity(_ activity: Activity) {
+        modelContext.delete(activity)
+
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            self.error = AppError.deleteFailed(error.localizedDescription)
         }
     }
 }

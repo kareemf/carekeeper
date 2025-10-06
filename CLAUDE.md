@@ -300,5 +300,9 @@ Enable multiple caregivers to track activities for the same caree(s) across thei
   - ✅ Display today's activity count
   - ✅ App group sharing for data access
 
-**Deferred:**
-- watchOS feature parity (ActivityListView, edit capability)
+- ✅ watchOS feature parity
+  - ✅ ActivityListView with filtering by activity type (tap-to-cycle filter)
+  - ✅ Edit capability in ActivityDetailView (notes, quantity, dateTime)
+  - ✅ Delete functionality with confirmation dialogs
+  - ✅ Navigation from CareeDetailView to full activity list
+  - ✅ watchOS-specific UI adaptations (no Menu, wheel date picker)
