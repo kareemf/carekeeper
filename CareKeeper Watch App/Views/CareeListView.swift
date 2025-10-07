@@ -47,14 +47,39 @@ struct CareeRowView: View {
     let caree: Caree
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(caree.name)
-                .font(.headline)
+        HStack {
+            ProfileImageView(caree: caree)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(caree.name)
+                    .font(.headline)
 
-            Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) Types", comment: "Activity Types count"))
-                .font(.caption2)
-                .foregroundColor(.secondary)
+                Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) Activity Types", comment: "Activity Types count"))
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
         }
+    }
+}
+
+struct ProfileImageView: View {
+    let caree: Caree
+    
+    var body: some View {
+        Group {
+            if let imageData = caree.image, let uiImage = UIImage(data: imageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } else {
+                Image(systemName: "person.crop.circle.fill")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .frame(width: 50, height: 50)
+        .clipShape(Circle())
     }
 }
 
