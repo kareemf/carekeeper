@@ -71,6 +71,7 @@
 		B3D954DC9B97C5EF41E208D1 /* ActivityRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F045A407E5D82FE3B07CC3 /* ActivityRowView.swift */; };
 		B4A23D60C6FB8F5D7DDD445F /* CareeShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E375C957E5E1FC91F609F4C /* CareeShareButton.swift */; };
 		B5559848F13F6B70E4352449 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9FDB6B1D732C3F073280581 /* ContentView.swift */; };
+		BBA446A86BED0760D51B5A84 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1845C1146E0E407D25D942AC /* Logger.swift */; };
 		BD5A2B58CF5E1912440D158C /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 258AEEC1B61C2ECD4857BD40 /* ShakeEffect.swift */; };
 		C1B750DAA7023A5564DA45E9 /* CloudKitSharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6CD974E62394F6A1ED007F /* CloudKitSharingService.swift */; };
 		C99A960973C3E61182243E0A /* CareeListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215FD04BA6F77AB5615011D9 /* CareeListRowView.swift */; };
@@ -85,6 +86,7 @@
 		F308997BB6F53ACB26559A33 /* CareeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602A75653E2F86CB58273405 /* CareeTests.swift */; };
 		F7B1CB49BDB2377419B9808B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F445F3809EAF0F93A2583BD1 /* LocationManager.swift */; };
 		F91A4C9A369CBF04CBC2FE09 /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1691E9BC2E13D39D27D6AAD1 /* CloudKitSyncService.swift */; };
+		FC5D49DE6CC6C23CAC1F8C21 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1845C1146E0E407D25D942AC /* Logger.swift */; };
 		FF74614916397C2B174DD8C6 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72711EB0C16E9E4851A2AF2C /* Caree.swift */; };
 /* End PBXBuildFile section */
 
@@ -152,6 +154,7 @@
 		0E375C957E5E1FC91F609F4C /* CareeShareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeShareButton.swift; sourceTree = "<group>"; };
 		0F06F9069D14E10D6982D203 /* ActivityListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListView.swift; sourceTree = "<group>"; };
 		1691E9BC2E13D39D27D6AAD1 /* CloudKitSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncService.swift; sourceTree = "<group>"; };
+		1845C1146E0E407D25D942AC /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		1A59BA7B7B42B0EC50766C3B /* CareKeeperTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CareKeeperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C45AE24F86869D588B83293 /* CareeManagementUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeManagementUITests.swift; sourceTree = "<group>"; };
 		215FD04BA6F77AB5615011D9 /* CareeListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListRowView.swift; sourceTree = "<group>"; };
@@ -428,6 +431,7 @@
 				B2C72AD1FB3E583ECC8A97EB /* CloudKitSyncMonitor.swift */,
 				1691E9BC2E13D39D27D6AAD1 /* CloudKitSyncService.swift */,
 				F445F3809EAF0F93A2583BD1 /* LocationManager.swift */,
+				1845C1146E0E407D25D942AC /* Logger.swift */,
 			);
 			name = Services;
 			path = CareKeeper/Services;
@@ -657,6 +661,7 @@
 				B5559848F13F6B70E4352449 /* ContentView.swift in Sources */,
 				028EABF37E1C605E55B05623 /* ErrorAlert.swift in Sources */,
 				1C40B2F36B2FEF8D200C1D6A /* LocationManager.swift in Sources */,
+				BBA446A86BED0760D51B5A84 /* Logger.swift in Sources */,
 				ABB4713F42E2FAE30CE7564A /* PreviewContainer.swift in Sources */,
 				39F58B5C38E814CB5204F1C2 /* PreviewData.swift in Sources */,
 				9EED98DBD69AB6AEE2D56D16 /* ShakeEffect.swift in Sources */,
@@ -716,6 +721,7 @@
 				3B70776BE3E3FE9FB5FFB249 /* CloudSharingView.swift in Sources */,
 				75595A31EB7E8AFC9DA52DF4 /* ErrorAlert.swift in Sources */,
 				F7B1CB49BDB2377419B9808B /* LocationManager.swift in Sources */,
+				FC5D49DE6CC6C23CAC1F8C21 /* Logger.swift in Sources */,
 				331480192628E58BC1A5FE92 /* PreviewContainer.swift in Sources */,
 				DC9BF3EF522F3C23831403DA /* PreviewData.swift in Sources */,
 				BD5A2B58CF5E1912440D158C /* ShakeEffect.swift in Sources */,

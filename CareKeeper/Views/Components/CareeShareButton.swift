@@ -109,15 +109,19 @@ struct CareeShareButton: View {
 
             // Find the saved share
             var savedShare: CKShare?
+            var results: String = ""
             for (recordID, result) in savedRecords {
+                Logger.log("RESULT of saved share: \(String(describing: result)) for recordID: \(recordID)")
                 if case .success(let savedRecord) = result, let share = savedRecord as? CKShare {
                     savedShare = share
                     break
+                } else if case .none = error {
+                    results.append(error?.localizedDescription ?? "Unknown error")
                 }
             }
 
             guard let finalShare = savedShare else {
-                throw NSError(domain: "CareeShareButton", code: -3, userInfo: [NSLocalizedDescriptionKey: "Failed to save share"])
+                throw NSError(domain: "CareeShareButton", code: -3, userInfo: [NSLocalizedDescriptionKey: "Failed to save share: \(results)"])
             }
 
             // Set the share and present the sheet
