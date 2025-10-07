@@ -15,8 +15,8 @@ struct CareKeeperWatchApp: App {
         let modelConfiguration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
-            groupContainer: .identifier("group.com.kareemf.CareKeeper"),
-            cloudKitDatabase: .private("iCloud.com.kareemf.CareKeeperCK")
+            groupContainer: .identifier(CloudKitConfig.appGroupID),
+            cloudKitDatabase: .private(CloudKitConfig.containerID)
         )
 
         do {

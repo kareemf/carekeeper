@@ -41,11 +41,6 @@ struct CareKeeperApp: App {
                     cloudKitDatabase: .private(CloudKitConfig.containerID)
                 )
 
-                print("   📋 Configuration details:")
-                print("      - isStoredInMemoryOnly: false")
-                print("      - groupContainer: \(CloudKitConfig.appGroupID)")
-                print("      - cloudKitDatabase: private(\(CloudKitConfig.containerID))")
-
                 let container = try ModelContainer(
                     for: schema,
                     configurations: [modelConfiguration]
