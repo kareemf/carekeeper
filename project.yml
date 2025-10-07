@@ -54,6 +54,7 @@ targets:
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
+        CKSharingSupported: true
     entitlements:
       path: CareKeeper/CareKeeper.entitlements
       properties:
@@ -62,7 +63,6 @@ targets:
         com.apple.developer.icloud-services:
           - CloudKit
           - CloudDocuments
-        com.apple.developer.cloudkit.sharing: true
         com.apple.developer.ubiquity-kvstore-identifier: "$(TeamIdentifierPrefix)$(CFBundleIdentifier)"        
         com.apple.security.application-groups:
           - group.com.kareemf.CareKeeper
