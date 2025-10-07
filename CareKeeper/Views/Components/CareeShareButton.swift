@@ -97,7 +97,7 @@ struct CareeShareButton: View {
 
             // Create a share for this record
             let newShare = CKShare(rootRecord: record)
-            newShare[CKShare.SystemFieldKey.title] = record["CD_name"] as? CKRecordValue ?? "Caree" as CKRecordValue
+            newShare[CKShare.SystemFieldKey.title] = record["CD_name"] ?? "Caree"
             newShare.publicPermission = .none
 
             // Save both the record and share together
