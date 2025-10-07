@@ -82,6 +82,7 @@
 		DC9BF3EF522F3C23831403DA /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2175240D9BAD7816FB66C468 /* PreviewData.swift */; };
 		DD767D182D049F0F3637E62B /* ActivityTypeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96A6784B396063FE17BEC14 /* ActivityTypeUITests.swift */; };
 		DF4706E830236720AE485E58 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF1FB5B93A58A39C08B20E /* Activity.swift */; };
+		E7C3BD47A86378F75C45808B /* ShareInviteHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F069DA7AE2FED6F361A87F9B /* ShareInviteHandler.swift */; };
 		EA7AF08C138745E22324B258 /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E47FB3CDD0A1400A3E550B /* ActivityType.swift */; };
 		F308997BB6F53ACB26559A33 /* CareeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602A75653E2F86CB58273405 /* CareeTests.swift */; };
 		F7B1CB49BDB2377419B9808B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F445F3809EAF0F93A2583BD1 /* LocationManager.swift */; };
@@ -202,6 +203,7 @@
 		DDC044C52BF16B9B99F3C6DD /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
 		E16FBE8C16D3C0D2B5A0DD7F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EFF0F7407FAB7635569FDB8F /* CareKeeperWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWidget.swift; sourceTree = "<group>"; };
+		F069DA7AE2FED6F361A87F9B /* ShareInviteHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareInviteHandler.swift; sourceTree = "<group>"; };
 		F445F3809EAF0F93A2583BD1 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		F7FC66039C53C043A170CDEB /* ActivityTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeTests.swift; sourceTree = "<group>"; };
 		F9FDB6B1D732C3F073280581 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -365,6 +367,7 @@
 		7E1DEF685353BED56CF8CE04 /* Sharing */ = {
 			isa = PBXGroup;
 			children = (
+				F069DA7AE2FED6F361A87F9B /* ShareInviteHandler.swift */,
 				B72B65A1FDC34AE310BC5CA5 /* ShareParticipantsView.swift */,
 				6529ECA6E98FC332C8BFCBEA /* SharingView.swift */,
 			);
@@ -665,6 +668,7 @@
 				ABB4713F42E2FAE30CE7564A /* PreviewContainer.swift in Sources */,
 				39F58B5C38E814CB5204F1C2 /* PreviewData.swift in Sources */,
 				9EED98DBD69AB6AEE2D56D16 /* ShakeEffect.swift in Sources */,
+				E7C3BD47A86378F75C45808B /* ShareInviteHandler.swift in Sources */,
 				77A0B826624E73B28E119403 /* ShareParticipantsView.swift in Sources */,
 				DA1C3D3F680D0F5D8E236AC7 /* ShareSheet.swift in Sources */,
 				3F84479D5728287D022D2011 /* SharingView.swift in Sources */,

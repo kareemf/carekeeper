@@ -121,7 +121,7 @@ struct CareKeeperApp: App {
                     checkCloudKitStatus()
                 }
                 .onOpenURL { url in
-                    handleIncomingURL(url)
+                    ShareInviteHandler.shared.handleIncomingShareURL(url)
                 }
         }
         .modelContainer(sharedModelContainer)
@@ -149,42 +149,6 @@ struct CareKeeperApp: App {
                 }
             } catch {
                 print("❌ Failed to check iCloud account status: \(error)")
-            }
-        }
-    }
-
-    private func handleIncomingURL(_ url: URL) {
-        // Handle CloudKit share acceptance
-        guard url.scheme == "https" && url.host == "www.icloud.com" else {
-            return
-        }
-
-        let container = CKContainer(identifier: CloudKitConfig.containerID)
-
-        // Fetch the share metadata from the URL
-        container.fetchShareMetadata(with: url) { metadata, error in
-            if let error = error {
-                print("❌ Failed to fetch share metadata: \(error.localizedDescription)")
-                return
-            }
-
-            guard let metadata = metadata else {
-                print("❌ No metadata found for share")
-                return
-            }
-
-            // Accept the share
-            container.accept(metadata) { acceptedShare, error in
-                if let error = error {
-                    print("❌ Failed to accept share: \(error.localizedDescription)")
-                    return
-                }
-
-                if let acceptedShare = acceptedShare {
-                    print("✅ Successfully accepted share: \(acceptedShare.recordID)")
-                    // The shared data will automatically sync to the local store
-                    // SwiftData + CloudKit handles the rest
-                }
             }
         }
     }
