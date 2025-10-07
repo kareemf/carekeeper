@@ -110,7 +110,7 @@ struct CareeShareButton: View {
             // Find the saved share
             var savedShare: CKShare?
             var results: String = ""
-            for (recordID, result) in savedRecords {
+            for (_, result) in savedRecords {
                 if case .success(let savedRecord) = result, let share = savedRecord as? CKShare {
                     savedShare = share
                     break
