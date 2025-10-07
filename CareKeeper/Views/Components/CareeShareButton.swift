@@ -111,7 +111,6 @@ struct CareeShareButton: View {
             var savedShare: CKShare?
             var results: String = ""
             for (recordID, result) in savedRecords {
-                Logger.log("RESULT of saved share: \(String(describing: result)) for recordID: \(recordID)")
                 if case .success(let savedRecord) = result, let share = savedRecord as? CKShare {
                     savedShare = share
                     break
