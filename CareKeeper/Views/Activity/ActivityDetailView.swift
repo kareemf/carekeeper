@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import MapKit
 
 struct ActivityDetailView: View {
     @Environment(\.dismiss) private var dismiss
@@ -190,20 +191,36 @@ struct ActivityDetailView: View {
                 .font(.headline)
 
             if let location = activity.location {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(String(format: "%.6f, %.6f",
-                               location.coordinate.latitude,
-                               location.coordinate.longitude))
-                        .font(.body)
-                        .fontDesign(.monospaced)
-
-                    Text(NSLocalizedString("Tap to view in Maps", comment: "Maps CTA"))
-                        .font(.caption)
-                        .foregroundColor(.accentColor)
+                Map(position: .constant(.region(MKCoordinateRegion(
+                    center: location.coordinate,
+                    span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                )))) {
+                    Marker("", coordinate: location.coordinate)
                 }
+                .frame(height: 180)
+                .cornerRadius(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                )
+                .contentShape(Rectangle()) // Make the map tappable area clear
                 .onTapGesture {
                     openInMaps(for: activity)
                 }
+
+                Text(String(format: "%.6f, %.6f",
+                           location.coordinate.latitude,
+                           location.coordinate.longitude))
+                    .font(.body)
+                    .fontDesign(.monospaced)
+
+                Text(NSLocalizedString("Tap to view in Maps", comment: "Maps CTA"))
+                    .font(.caption)
+                    .foregroundColor(.accentColor)
+                    .padding(.top, 2)
+                    .onTapGesture {
+                        openInMaps(for: activity)
+                    }
             }
         }
     }
