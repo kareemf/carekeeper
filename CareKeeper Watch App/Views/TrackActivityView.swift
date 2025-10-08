@@ -16,6 +16,8 @@ struct TrackActivityView: View {
     @State private var includeLocation: Bool = false
     @StateObject private var locationManager = LocationManager()
     @State private var error: Error?
+    @State private var useCustomTime: Bool = false
+    @State private var customTime: Date = Date()
 
     var body: some View {
         NavigationStack {
@@ -105,6 +107,27 @@ struct TrackActivityView: View {
                         }
                     }
 
+                    // Time section (watch-friendly, time-only)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(NSLocalizedString("Time", comment: "Time section"))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+
+                        Toggle(NSLocalizedString("Custom time", comment: "Custom time toggle"), isOn: $useCustomTime)
+
+                        if useCustomTime {
+                            // Time-only picker; watchOS will use crown-friendly interaction
+                            DatePicker(
+                                NSLocalizedString("Time", comment: "Time picker label"),
+                                selection: $customTime,
+                                displayedComponents: .hourAndMinute
+                            )
+                            .labelsHidden()
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, 4)
+                        }
+                    }
+
                     // Location section
                     if activityType.hasLocation {
                         VStack(alignment: .leading, spacing: 4) {
@@ -174,7 +197,12 @@ struct TrackActivityView: View {
 
         let location = includeLocation ? locationManager.location : nil
 
+        // Build the final dateTime using today's date + selected time (if custom)
+        let now = Date()
+        let finalDateTime: Date = useCustomTime ? combine(date: now, timeOfDayFrom: customTime) : now
+
         let activity = Activity(
+            dateTime: finalDateTime,
             notes: notes.isEmpty ? nil : notes,
             quantity: activityType.hasQuantity && quantity > 0 ? quantity : nil,
             latitude: location?.coordinate.latitude,
@@ -193,6 +221,17 @@ struct TrackActivityView: View {
         } catch {
             self.error = AppError.saveFailed(error.localizedDescription)
         }
+    }
+
+    // Combine a base date (today) with the hour/minute from a time-of-day Date
+    private func combine(date baseDate: Date, timeOfDayFrom time: Date) -> Date {
+        let calendar = Calendar.current
+        let timeComponents = calendar.dateComponents([.hour, .minute, .second], from: time)
+        var dateComponents = calendar.dateComponents([.year, .month, .day], from: baseDate)
+        dateComponents.hour = timeComponents.hour
+        dateComponents.minute = timeComponents.minute
+        dateComponents.second = timeComponents.second ?? 0
+        return calendar.date(from: dateComponents) ?? baseDate
     }
 }
 

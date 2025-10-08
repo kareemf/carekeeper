@@ -17,6 +17,8 @@ struct ActivityDetailView: View {
     @State private var isEditing = false
     @State private var editingNotes: String = ""
     @State private var editingQuantity: String = ""
+    @State private var useCustomTime: Bool = false
+    @State private var editingTime: Date = Date()
     @State private var showingDeleteConfirmation = false
     @State private var error: Error?
 
@@ -119,6 +121,28 @@ struct ActivityDetailView: View {
 
     private func detailsSection(for activity: Activity) -> some View {
         VStack(alignment: .leading, spacing: 12) {
+            // Time section (watch-friendly, time-only)
+            if isEditing {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(NSLocalizedString("Time", comment: "Time section"))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    Toggle(NSLocalizedString("Custom time", comment: "Custom time toggle"), isOn: $useCustomTime)
+
+                    if useCustomTime {
+                        DatePicker(
+                            NSLocalizedString("Time", comment: "Time picker label"),
+                            selection: $editingTime,
+                            displayedComponents: .hourAndMinute
+                        )
+                        .labelsHidden()
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 4)
+                    }
+                }
+            }
+
             // Quantity section
             if activity.activityType?.hasQuantity == true {
                 VStack(alignment: .leading, spacing: 4) {
@@ -206,6 +230,8 @@ struct ActivityDetailView: View {
     private func setupEditingValues(for activity: Activity) {
         editingNotes = activity.notes ?? ""
         editingQuantity = activity.quantity?.description ?? ""
+        useCustomTime = false
+        editingTime = activity.dateTime
     }
 
     private func startEditing(for activity: Activity) {
@@ -222,12 +248,28 @@ struct ActivityDetailView: View {
         activity.notes = editingNotes.isEmpty ? nil : editingNotes
         activity.quantity = Double(editingQuantity)
 
+        if useCustomTime {
+            // Preserve the original date, change only the time component.
+            activity.dateTime = combine(date: activity.dateTime, timeOfDayFrom: editingTime)
+        }
+
         do {
             try modelContext.save()
             isEditing = false
         } catch {
             self.error = AppError.saveFailed(error.localizedDescription)
         }
+    }
+
+    // Combine a base date with the hour/minute from a time-of-day Date
+    private func combine(date baseDate: Date, timeOfDayFrom time: Date) -> Date {
+        let calendar = Calendar.current
+        let timeComponents = calendar.dateComponents([.hour, .minute, .second], from: time)
+        var dateComponents = calendar.dateComponents([.year, .month, .day], from: baseDate)
+        dateComponents.hour = timeComponents.hour
+        dateComponents.minute = timeComponents.minute
+        dateComponents.second = timeComponents.second ?? 0
+        return calendar.date(from: dateComponents) ?? baseDate
     }
 
     private func deleteActivity(_ activity: Activity) {
