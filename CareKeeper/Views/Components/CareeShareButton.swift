@@ -66,67 +66,10 @@ struct CareeShareButton: View {
         isLoading = true
         defer { isLoading = false }
 
-        // Check if already shared
-        if let existingShare = sharingService.getShare(for: caree, in: modelContext) {
-            share = existingShare
-            showingShareSheet = true
-            return
-        }
-
-        // Create the share before presenting UICloudSharingController
         do {
-            let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
-            let database = container.privateCloudDatabase
-
-            let predicate = NSPredicate(format: "CD_id == %@", caree.id.uuidString)
-            let query = CKQuery(recordType: "CD_Caree", predicate: predicate)
-
-            let (matchResults, _) = try await database.records(matching: query, inZoneWith: zoneID)
-
-            guard let firstMatch = matchResults.first else {
-                throw NSError(domain: "CareeShareButton", code: -1, userInfo: [NSLocalizedDescriptionKey: "Caree record not found in CloudKit. Please wait for sync to complete."])
-            }
-
-            let (_, result) = firstMatch
-            guard case .success(let record) = result else {
-                if case .failure(let error) = result {
-                    throw error
-                }
-                throw NSError(domain: "CareeShareButton", code: -2, userInfo: [NSLocalizedDescriptionKey: "Failed to fetch record"])
-            }
-
-            // Create a share for this record
-            let newShare = CKShare(rootRecord: record)
-            newShare[CKShare.SystemFieldKey.title] = record["CD_name"] ?? "Caree"
-            newShare.publicPermission = .none
-
-            // Save both the record and share together
-            let (savedRecords, _) = try await database.modifyRecords(
-                saving: [record, newShare],
-                deleting: [],
-                savePolicy: .changedKeys
-            )
-
-            // Find the saved share
-            var savedShare: CKShare?
-            var results: String = ""
-            for (_, result) in savedRecords {
-                if case .success(let savedRecord) = result, let share = savedRecord as? CKShare {
-                    savedShare = share
-                    break
-                } else if case .none = error {
-                    results.append(error?.localizedDescription ?? "Unknown error")
-                }
-            }
-
-            guard let finalShare = savedShare else {
-                throw NSError(domain: "CareeShareButton", code: -3, userInfo: [NSLocalizedDescriptionKey: "Failed to save share: \(results)"])
-            }
-
-            // Set the share and present the sheet
-            share = finalShare
-            showingShareSheet = true
-
+            let finalShare = try await sharingService.createOrGetShare(for: caree, in: modelContext)
+            self.share = finalShare
+            self.showingShareSheet = true
         } catch {
             self.error = error
         }

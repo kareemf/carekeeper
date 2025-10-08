@@ -3,49 +3,50 @@
 import UIKit
 import CloudKit
 
+extension Notification.Name {
+    static let cloudKitShareAccepted = Notification.Name("CloudKitShareAccepted")
+    static let cloudKitShareAcceptanceFailed = Notification.Name("CloudKitShareAcceptanceFailed")
+}
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    // @see https://developer.apple.com/documentation/coredata/accepting-share-invitations-in-a-swiftui-app
     func windowScene(_ windowScene: UIWindowScene,
-        userDidAcceptCloudKitShareWith cloudKitShareMetadata: CKShare.Metadata) {
-        print("✅ userDidAcceptCloudKitShareWith: \(cloudKitShareMetadata)")
-        
+                     userDidAcceptCloudKitShareWith cloudKitShareMetadata: CKShare.Metadata) {
         let container = CKContainer(identifier: CloudKitConfig.containerID)
 
-        container.accept(cloudKitShareMetadata) { acceptedShare, error in
-            if let error = error {
-                print("❌ Failed to accept share: \(error.localizedDescription)")
-                // TODO: enable
-                //self.alert(error.localizedDescription)
-                return
-            }
-
-            if let acceptedShare = acceptedShare {
+        Task {
+            do {
+                let acceptedShare = try await acceptShare(with: cloudKitShareMetadata, in: container)
                 print("✅ Successfully accepted share: \(acceptedShare.recordID)")
-                // The shared data will automatically sync to the local store
-                // SwiftData + CloudKit handles the rest
-
-                //TODO: Update your app's data model with the shared data?
+                
+                // Notify SwiftUI to present an app-wide alert (see ShareAcceptanceNotifier)
+                NotificationCenter.default.post(name: .cloudKitShareAccepted, object: acceptedShare)
+            } catch {
+                print("❌ Failed to accept share: \(error.localizedDescription)")
+                
+                // Notify SwiftUI to present an app-wide alert (see ShareAcceptanceNotifier)
+                NotificationCenter.default.post(name: .cloudKitShareAcceptanceFailed, object: error)
             }
         }
     }
-    
-    private func alert(_ message: String) {
-        
-        let alert = UIAlertController(
-            title: NSLocalizedString("Failed To Accept Share", comment: "Failed To Accept Share alert title"),
-            message: message,
-            preferredStyle: .alert
-        )
-        
-        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Dismiss button"), style: .default, handler: nil))
-        
-        // Present the alert
-        // TODO: "Call must be made on main thread", find the proper way to do this
-        if let rootViewController = UIApplication.shared.connectedScenes
-            .compactMap({ $0 as? UIWindowScene })
-            .flatMap({ $0.windows })
-            .first(where: { $0.isKeyWindow })?.rootViewController {
-            rootViewController.present(alert, animated: true, completion: nil)
+
+    // Wrap CKContainer.accept in async/await.
+    // @see https://developer.apple.com/documentation/uikit/uicloudsharingcontroller
+    private func acceptShare(with metadata: CKShare.Metadata, in container: CKContainer) async throws -> CKShare {
+        try await withCheckedThrowingContinuation { continuation in
+            container.accept(metadata) { acceptedShare, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else if let share = acceptedShare {
+                    continuation.resume(returning: share)
+                } else {
+                    continuation.resume(throwing: NSError(
+                        domain: "SceneDelegate",
+                        code: -1,
+                        userInfo: [NSLocalizedDescriptionKey: "Unknown share acceptance state"]
+                    ))
+                }
+            }
         }
     }
-    
 }

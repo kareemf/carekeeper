@@ -5,9 +5,11 @@ import CoreData
 
 @main
 struct CareKeeperApp: App {
-    // https://developer.apple.com/documentation/coredata/accepting-share-invitations-in-a-swiftui-app
+    // @see https://developer.apple.com/documentation/coredata/accepting-share-invitations-in-a-swiftui-app
     @UIApplicationDelegateAdaptor var appDelegate: AppDelegate
-    
+
+    @StateObject private var shareNotifier = ShareAcceptanceNotifier()
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Caree.self,
@@ -122,6 +124,14 @@ struct CareKeeperApp: App {
             ContentView()
                 .onAppear {
                     checkCloudKitStatus()
+                }
+                // App-wide alert to surface share acceptance/failure from SceneDelegate notifications.
+                .alert(shareNotifier.alertTitle, isPresented: $shareNotifier.isPresentingAlert) {
+                    Button(NSLocalizedString("OK", comment: "OK button"), role: .cancel) {
+                        shareNotifier.isPresentingAlert = false
+                    }
+                } message: {
+                    Text(shareNotifier.alertMessage)
                 }
         }
         .modelContainer(sharedModelContainer)
