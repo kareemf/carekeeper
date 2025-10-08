@@ -19,7 +19,7 @@ class CloudKitSharingService: ObservableObject {
     // Returns the CKShare associated with this SwiftData model if one exists.
     // Implementation detail: SwiftData currently doesn't expose first-class share APIs.
     // We bridge to the underlying Core Data stack to use the NSPersistentStoreCoordinator sharing APIs.
-    // This uses a KVC-based accessor to reach NSManagedObjectContext from ModelContext and to get the
+    // This uses a private bridge to reach NSManagedObjectContext from ModelContext and to get the
     // underlying NSManagedObject for a SwiftData model instance.
     //
     // @see https://developer.apple.com/documentation/coredata/sharing-core-data-objects-between-icloud-users
@@ -175,7 +175,7 @@ class CloudKitSharingService: ObservableObject {
  Trade-offs:
  - Private bridging:
    SwiftData doesn’t currently expose public share APIs, so we access the underlying Core Data stack
-   via KVC/selectors to obtain NSManagedObjectContext and the backing NSManagedObject. This is
+   via dynamic selectors to obtain NSManagedObjectContext and the backing NSManagedObject. This is
    pragmatic but private; we keep it isolated here for easy replacement if Apple provides public APIs.
 
  - Alternative (raw CKQuery) pros/cons:
@@ -190,18 +190,20 @@ class CloudKitSharingService: ObservableObject {
 
 private extension ModelContext {
     // Access the underlying NSManagedObjectContext when using SwiftData.
-    // Note: This uses a private bridge via KVC to reach Core Data until SwiftData exposes public sharing APIs.
-    // Keep this isolated so it can be swapped out in the future if needed.
+    // Use dynamic selector instead of KVC to avoid crashes on non-KVC-compliant runtimes.
     //
-    // @see https://developer.apple.com/documentation/coredata/sharing-core-data-objects-between-icloud-users
+    // Returns nil if the private selector isn't available (kept isolated for easy replacement).
     var _nsManagedObjectContext: NSManagedObjectContext? {
-        (self as AnyObject).value(forKey: "nsContext") as? NSManagedObjectContext
+        let selector = Selector(("nsContext"))
+        let anyObject = self as AnyObject
+        guard anyObject.responds(to: selector) else { return nil }
+        return anyObject.perform(selector)?.takeUnretainedValue() as? NSManagedObjectContext
     }
 }
 
 private extension NSManagedObjectContext {
     // Obtain the underlying NSManagedObject that backs a SwiftData model instance.
-    // This uses KVC to access SwiftData's internal bridging layer.
+    // This uses a private selector to access SwiftData's internal bridging layer.
     //
     // Implementation notes:
     // - SwiftData models are backed by Core Data entities at runtime.
@@ -210,8 +212,6 @@ private extension NSManagedObjectContext {
     //
     // If this ever changes, keep this helper as the single place to update.
     func _managedObject(forSwiftDataModel model: AnyObject) -> NSManagedObject? {
-        // Known internal key used by SwiftData to get the underlying managed object for a model instance.
-        // We purposefully keep this KVC usage isolated.
         (self as AnyObject).perform(Selector(("_managedObjectFor:")), with: model)?.takeUnretainedValue() as? NSManagedObject
     }
 }
