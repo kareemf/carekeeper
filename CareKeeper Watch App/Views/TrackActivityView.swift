@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import CoreLocation
+import WidgetKit
 
 struct TrackActivityView: View {
     @Environment(\.dismiss) private var dismiss
@@ -187,6 +188,7 @@ struct TrackActivityView: View {
         do {
             try modelContext.save()
             locationManager.stopUpdating()
+            WidgetCenter.shared.reloadAllTimelines()
             dismiss()
         } catch {
             self.error = AppError.saveFailed(error.localizedDescription)

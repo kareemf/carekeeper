@@ -74,6 +74,7 @@ targets:
     sources:
       - path: CareKeeper Widget
       - path: CareKeeper/Models
+      - path: CareKeeper/Services/CloudKitConfig.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeper.watchkitapp.widget

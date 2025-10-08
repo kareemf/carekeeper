@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreLocation
+import WidgetKit
 
 struct TrackActivityView: View {
     @Environment(\.modelContext) private var modelContext
@@ -214,6 +215,12 @@ struct TrackActivityView: View {
 
             withAnimation(.easeOut(duration: 0.2)) {
                 modelContext.insert(newActivity)
+                do {
+                    try modelContext.save()
+                    WidgetCenter.shared.reloadAllTimelines()
+                } catch {
+                    self.error = AppError.saveFailed(error.localizedDescription)
+                }
                 locationManager.stopUpdating()
                 isSaving = false
             }

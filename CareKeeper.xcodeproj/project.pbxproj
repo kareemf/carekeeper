@@ -66,6 +66,7 @@
 		A424BB5045DBA45B28B6BA34 /* SyncStatusIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E796C238D68EB0869513BD1 /* SyncStatusIndicator.swift */; };
 		A4912D2B4DD4DA471EACBE92 /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F1C6113D31E7FBED78498C0 /* CloudKitConfig.swift */; };
 		A7E024A5B00557BC8A73D316 /* CareKeeperWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF8AB3750E092280F6B93E1 /* CareKeeperWatchApp.swift */; };
+		A8ADADAE8CF3E1ECAB3705BA /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F1C6113D31E7FBED78498C0 /* CloudKitConfig.swift */; };
 		ABB4713F42E2FAE30CE7564A /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8A9109CFC17794F75FB515 /* PreviewContainer.swift */; };
 		ACA2F67C4D1E482F462ED518 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF1FB5B93A58A39C08B20E /* Activity.swift */; };
 		ACD19F7F12830E6D2DB5AB55 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF1FB5B93A58A39C08B20E /* Activity.swift */; };
@@ -694,6 +695,7 @@
 				628D3C39DBA7D8652A8285D5 /* CareKeeperWidget.swift in Sources */,
 				07E476CC1FB5FA111AF2DA60 /* CareKeeperWidgetBundle.swift in Sources */,
 				0ACB1D1952F0107CEA77E2AB /* Caree.swift in Sources */,
+				A8ADADAE8CF3E1ECAB3705BA /* CloudKitConfig.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
