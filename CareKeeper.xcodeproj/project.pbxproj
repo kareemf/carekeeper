@@ -69,6 +69,7 @@
 		ACA2F67C4D1E482F462ED518 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF1FB5B93A58A39C08B20E /* Activity.swift */; };
 		ACD19F7F12830E6D2DB5AB55 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF1FB5B93A58A39C08B20E /* Activity.swift */; };
 		B3D954DC9B97C5EF41E208D1 /* ActivityRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F045A407E5D82FE3B07CC3 /* ActivityRowView.swift */; };
+		B3F684F48479BFBEC5B7139A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD077A1E7DC30A9AF398FCD9 /* AppDelegate.swift */; };
 		B4A23D60C6FB8F5D7DDD445F /* CareeShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E375C957E5E1FC91F609F4C /* CareeShareButton.swift */; };
 		B5559848F13F6B70E4352449 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9FDB6B1D732C3F073280581 /* ContentView.swift */; };
 		BBA446A86BED0760D51B5A84 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1845C1146E0E407D25D942AC /* Logger.swift */; };
@@ -79,10 +80,10 @@
 		D0FCDB85F21F66AF22057A05 /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E47FB3CDD0A1400A3E550B /* ActivityType.swift */; };
 		DA14B3C7F46D9E22448B3A4A /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6D3EDE5A10FB8C7AD1B2F9E /* ShareSheet.swift */; };
 		DA1C3D3F680D0F5D8E236AC7 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6D3EDE5A10FB8C7AD1B2F9E /* ShareSheet.swift */; };
+		DC4EBD22C93A5DC15C92CAD6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E320C8D74E7DFAF7B0B5FB /* SceneDelegate.swift */; };
 		DC9BF3EF522F3C23831403DA /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2175240D9BAD7816FB66C468 /* PreviewData.swift */; };
 		DD767D182D049F0F3637E62B /* ActivityTypeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96A6784B396063FE17BEC14 /* ActivityTypeUITests.swift */; };
 		DF4706E830236720AE485E58 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF1FB5B93A58A39C08B20E /* Activity.swift */; };
-		E7C3BD47A86378F75C45808B /* ShareInviteHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F069DA7AE2FED6F361A87F9B /* ShareInviteHandler.swift */; };
 		EA7AF08C138745E22324B258 /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E47FB3CDD0A1400A3E550B /* ActivityType.swift */; };
 		F308997BB6F53ACB26559A33 /* CareeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602A75653E2F86CB58273405 /* CareeTests.swift */; };
 		F7B1CB49BDB2377419B9808B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F445F3809EAF0F93A2583BD1 /* LocationManager.swift */; };
@@ -177,6 +178,7 @@
 		68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CareKeeper Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		72711EB0C16E9E4851A2AF2C /* Caree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Caree.swift; sourceTree = "<group>"; };
 		73D3B0237A1629CAD6628A7E /* ActivityListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListView.swift; sourceTree = "<group>"; };
+		77E320C8D74E7DFAF7B0B5FB /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		79E3642CDD5DAF433EB9D083 /* CareKeeperUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CareKeeperUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		809D3531A09EC3C28AE554CF /* ActivityTypeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeEditView.swift; sourceTree = "<group>"; };
 		819A85BF80DD82661CF815BC /* CloudSharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSharingView.swift; sourceTree = "<group>"; };
@@ -200,10 +202,10 @@
 		D33886BD3B065B6BF5ECD6AA /* CareKeeper Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "CareKeeper Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D56064A0416085AD5C7749D0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		D6D3EDE5A10FB8C7AD1B2F9E /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
+		DD077A1E7DC30A9AF398FCD9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DDC044C52BF16B9B99F3C6DD /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
 		E16FBE8C16D3C0D2B5A0DD7F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EFF0F7407FAB7635569FDB8F /* CareKeeperWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWidget.swift; sourceTree = "<group>"; };
-		F069DA7AE2FED6F361A87F9B /* ShareInviteHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareInviteHandler.swift; sourceTree = "<group>"; };
 		F445F3809EAF0F93A2583BD1 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		F7FC66039C53C043A170CDEB /* ActivityTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeTests.swift; sourceTree = "<group>"; };
 		F9FDB6B1D732C3F073280581 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -367,7 +369,6 @@
 		7E1DEF685353BED56CF8CE04 /* Sharing */ = {
 			isa = PBXGroup;
 			children = (
-				F069DA7AE2FED6F361A87F9B /* ShareInviteHandler.swift */,
 				B72B65A1FDC34AE310BC5CA5 /* ShareParticipantsView.swift */,
 				6529ECA6E98FC332C8BFCBEA /* SharingView.swift */,
 			);
@@ -419,7 +420,9 @@
 		DC1D5DF71CD043322835FA70 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				DD077A1E7DC30A9AF398FCD9 /* AppDelegate.swift */,
 				41782EA520212480E5BCFE74 /* CareKeeperApp.swift */,
+				77E320C8D74E7DFAF7B0B5FB /* SceneDelegate.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -646,6 +649,7 @@
 				EA7AF08C138745E22324B258 /* ActivityType.swift in Sources */,
 				60A55A30F4670BA6C8BBD566 /* ActivityTypeEditView.swift in Sources */,
 				5254CFFBDD7B99E254EE2835 /* ActivityTypeRowView.swift in Sources */,
+				B3F684F48479BFBEC5B7139A /* AppDelegate.swift in Sources */,
 				174FACFFEF8A26394A888700 /* AppError.swift in Sources */,
 				99937891E8B849274D0C9DCA /* CareKeeperApp.swift in Sources */,
 				FF74614916397C2B174DD8C6 /* Caree.swift in Sources */,
@@ -667,8 +671,8 @@
 				BBA446A86BED0760D51B5A84 /* Logger.swift in Sources */,
 				ABB4713F42E2FAE30CE7564A /* PreviewContainer.swift in Sources */,
 				39F58B5C38E814CB5204F1C2 /* PreviewData.swift in Sources */,
+				DC4EBD22C93A5DC15C92CAD6 /* SceneDelegate.swift in Sources */,
 				9EED98DBD69AB6AEE2D56D16 /* ShakeEffect.swift in Sources */,
-				E7C3BD47A86378F75C45808B /* ShareInviteHandler.swift in Sources */,
 				77A0B826624E73B28E119403 /* ShareParticipantsView.swift in Sources */,
 				DA1C3D3F680D0F5D8E236AC7 /* ShareSheet.swift in Sources */,
 				3F84479D5728287D022D2011 /* SharingView.swift in Sources */,

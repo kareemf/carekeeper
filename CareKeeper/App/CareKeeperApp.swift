@@ -5,6 +5,9 @@ import CoreData
 
 @main
 struct CareKeeperApp: App {
+    // https://developer.apple.com/documentation/coredata/accepting-share-invitations-in-a-swiftui-app
+    @UIApplicationDelegateAdaptor var appDelegate: AppDelegate
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Caree.self,
@@ -119,9 +122,6 @@ struct CareKeeperApp: App {
             ContentView()
                 .onAppear {
                     checkCloudKitStatus()
-                }
-                .onOpenURL { url in
-                    ShareInviteHandler.shared.handleIncomingShareURL(url)
                 }
         }
         .modelContainer(sharedModelContainer)
