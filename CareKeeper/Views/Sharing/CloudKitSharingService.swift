@@ -18,31 +18,30 @@ class CloudKitSharingService: ObservableObject {
 
     // Returns the CKShare associated with this SwiftData model if one exists.
     // Implementation detail: SwiftData currently doesn't expose first-class share APIs.
-    // We bridge to the underlying Core Data stack to use the NSPersistentStoreCoordinator sharing APIs.
-    // This uses a private bridge to reach NSManagedObjectContext from ModelContext and to get the
-    // underlying NSManagedObject for a SwiftData model instance.
+    // We bridge to the underlying Core Data stack (NSPersistentCloudKitContainer) to use its sharing APIs.
     //
     // @see https://developer.apple.com/documentation/coredata/sharing-core-data-objects-between-icloud-users
-    func getShare(for caree: Caree, in modelContext: ModelContext) -> CKShare? {
+    func getShare(for caree: Caree, in modelContext: ModelContext) async throws -> CKShare? {
         guard
             let nsContext = modelContext._nsManagedObjectContext,
-            let psc = nsContext.persistentStoreCoordinator,
-            let managedObject = nsContext._managedObject(forSwiftDataModel: caree)
+            let managedObject = nsContext._managedObject(forSwiftDataModel: caree),
+            let pckContainer = nsContext._persistentCloudKitContainer
         else {
             return nil
         }
 
-        do {
-            // Ask PSC for the share associated with this object.
-            return try psc.getShare(for: managedObject.objectID, in: nsContext)
-        } catch {
-            Logger.logError("Failed to fetch CKShare for Caree", error: error)
-            return nil
-        }
+        // Fetch existing share for this objectID
+        let mapping = try pckContainer._fetchShares(matching: [managedObject.objectID])
+        return mapping[managedObject.objectID]
     }
 
-    func isShared(_ caree: Caree, in modelContext: ModelContext) -> Bool {
-        return getShare(for: caree, in: modelContext) != nil
+    func isShared(_ caree: Caree, in modelContext: ModelContext) async -> Bool {
+        do {
+            return try await getShare(for: caree, in: modelContext) != nil
+        } catch {
+            Logger.logError("Failed to check share status", error: error)
+            return false
+        }
     }
 
     // MARK: - Create or Get Share
@@ -52,22 +51,22 @@ class CloudKitSharingService: ObservableObject {
     //
     // @see https://developer.apple.com/documentation/coredata/sharing-core-data-objects-between-icloud-users
     func createOrGetShare(for caree: Caree, in modelContext: ModelContext) async throws -> CKShare {
-        if let existing = getShare(for: caree, in: modelContext) {
+        if let existing = try await getShare(for: caree, in: modelContext) {
             return existing
         }
 
         guard
             let nsContext = modelContext._nsManagedObjectContext,
-            let psc = nsContext.persistentStoreCoordinator,
-            let managedObject = nsContext._managedObject(forSwiftDataModel: caree)
+            let managedObject = nsContext._managedObject(forSwiftDataModel: caree),
+            let pckContainer = nsContext._persistentCloudKitContainer
         else {
             throw AppError.invalidInput("Unable to access Core Data bridge for sharing.")
         }
 
         do {
-            // Create a new share for this object using PSC sharing APIs.
-            // The returned tuple is (CKShare, CKRecord for the root object).
-            let (share, _) = try psc.createShare(for: managedObject.objectID, to: container, in: nsContext)
+            // Create a new share for this object using NSPersistentCloudKitContainer sharing APIs.
+            let share = try await pckContainer._share([managedObject])
+
             share[CKShare.SystemFieldKey.title] = caree.name
             share.publicPermission = .none
 
@@ -89,27 +88,34 @@ class CloudKitSharingService: ObservableObject {
         return share.owner == share.currentUserParticipant
     }
 
-    func canDelete(caree: Caree, in modelContext: ModelContext) -> Bool {
-        guard let share = getShare(for: caree, in: modelContext) else {
-            // No share means user owns it locally
-            return true
+    func canDelete(caree: Caree, in modelContext: ModelContext) async -> Bool {
+        do {
+            guard let share = try await getShare(for: caree, in: modelContext) else {
+                // No share means user owns it locally
+                return true
+            }
+            return isOwner(of: share)
+        } catch {
+            Logger.logError("Failed to determine delete permission", error: error)
+            return false
         }
-
-        return isOwner(of: share)
     }
 
     // MARK: - Share Management
 
     func stopSharing(caree: Caree, in modelContext: ModelContext) async throws {
-        // To stop sharing, we delete the share from CloudKit
-        // SwiftData will handle updating the local store
-        guard let share = getShare(for: caree, in: modelContext) else {
+        // To stop sharing, delete the share from the owner's private database.
+        guard let share = try await getShare(for: caree, in: modelContext) else {
             return // Not shared
         }
 
-        let database = container.sharedCloudDatabase
+        // Only the owner can stop sharing; callers should check, but we enforce as well.
+        guard isOwner(of: share) else {
+            throw AppError.invalidInput("Only the owner can stop sharing this item.")
+        }
+
         do {
-            try await database.deleteRecord(withID: share.recordID)
+            try await container.privateCloudDatabase.deleteRecord(withID: share.recordID)
         } catch {
             Logger.logError("Failed to delete share", error: error)
             throw error
@@ -121,14 +127,12 @@ class CloudKitSharingService: ObservableObject {
             throw AppError.invalidInput("Cannot remove the owner from a share")
         }
 
-        let database = container.sharedCloudDatabase
-
         // Remove the participant from the share
         share.removeParticipant(participant)
 
-        // Save the updated share
+        // Save the updated share to the owner's private database
         do {
-            try await database.save(share)
+            _ = try await container.privateCloudDatabase.save(share)
         } catch {
             Logger.logError("Failed to save share", error: error)
             throw error
@@ -149,80 +153,137 @@ class CloudKitSharingService: ObservableObject {
 // MARK: - SwiftData/Core Data bridge helpers
 
 /*
- Design decision: Use the SwiftData → Core Data bridge (PSC sharing APIs) instead of raw CKQuery
+ Design decision: Use the SwiftData → Core Data bridge (NSPersistentCloudKitContainer sharing APIs).
 
  Why this approach:
  - Official sharing path for Core Data/SwiftData mirroring:
-   Apple documents sharing via the Core Data stack (NSPersistentCloudKitContainer / PSC) rather than
-   hand-rolling CloudKit queries when your data is mirrored.
+   Apple documents sharing via NSPersistentCloudKitContainer rather than hand-rolled CloudKit queries.
    @see https://developer.apple.com/documentation/coredata/sharing-core-data-objects-between-icloud-users
    @see https://developer.apple.com/documentation/coredata/accepting-share-invitations-in-a-swiftui-app
    @see https://developer.apple.com/documentation/uikit/uicloudsharingcontroller
 
  - Correctness and metadata consistency:
-   The store maintains the association between your model object and its CKShare/CKRecord. Using PSC
-   getShare/createShare keeps that association correct and persisted so future calls “just work”.
+   The store maintains the association between your model object and its CKShare/CKRecord. Using the
+   container’s share/fetchShares keeps that association correct and persisted.
 
  - Avoids brittle schema coupling:
-   Raw CKQuery requires hardcoding recordType/field names (e.g., "CD_Caree", "CD_id") that are an
-   implementation detail of SwiftData’s CloudKit mapping, not a public contract. The mapping could
-   evolve; PSC APIs abstract this.
-
- - Cleaner integration with UICloudSharingController:
-   The controller expects to manage shares that the store knows about. PSC APIs ensure both the store
-   and controller are in sync.
+   Raw CKQuery requires hardcoding recordType/field names that are an implementation detail of SwiftData’s mapping.
 
  Trade-offs:
  - Private bridging:
-   SwiftData doesn’t currently expose public share APIs, so we access the underlying Core Data stack
-   via dynamic selectors to obtain NSManagedObjectContext and the backing NSManagedObject. This is
-   pragmatic but private; we keep it isolated here for easy replacement if Apple provides public APIs.
-
- - Alternative (raw CKQuery) pros/cons:
-   Direct CloudKit queries give full manual control, but you take on zone/record management and risk
-   creating shares the store doesn’t know about unless you also write back share metadata correctly.
-   That’s more code and easier to get wrong in a mirrored setup.
-
- Summary:
- - For a SwiftData + CloudKit mirrored app, PSC sharing APIs are the recommended, least brittle path.
-   We use a small, isolated bridge here to reach them until SwiftData exposes first-class sharing APIs.
+   We access the underlying NSManagedObjectContext and locate the NSPersistentCloudKitContainer via a small
+   private/KVC lookup from the context’s persistentStoreCoordinator. Kept isolated here for easy replacement
+   if public APIs appear.
 */
 
 private extension ModelContext {
     // Access the underlying NSManagedObjectContext when using SwiftData.
-    // Use dynamic selector instead of KVC to avoid crashes on non-KVC-compliant runtimes.
-    //
-    // Returns nil if the private selector isn't available (kept isolated for easy replacement).
     var _nsManagedObjectContext: NSManagedObjectContext? {
-        let selector = Selector(("nsContext"))
         let anyObject = self as AnyObject
-        guard anyObject.responds(to: selector) else { return nil }
-        return anyObject.perform(selector)?.takeUnretainedValue() as? NSManagedObjectContext
+
+        // Prefer selector-based getters (safe).
+        let getterSelectors = [
+            "nsContext",                // exposed on many SDKs
+            "managedObjectContext",     // observed on some builds
+            "_managedObjectContext"     // internal name on some builds
+        ]
+        for name in getterSelectors {
+            let sel = NSSelectorFromString(name)
+            if anyObject.responds(to: sel),
+               let unmanaged = anyObject.perform(sel) {
+                return unmanaged.takeUnretainedValue() as? NSManagedObjectContext
+            }
+        }
+
+        // Fallback: KVC only if a matching getter selector exists (avoids NSUndefinedKeyException).
+        for name in getterSelectors {
+            let sel = NSSelectorFromString(name)
+            if anyObject.responds(to: sel),
+               let ctx = anyObject.value(forKey: name) as? NSManagedObjectContext {
+                return ctx
+            }
+        }
+
+        return nil
     }
 }
 
 private extension NSManagedObjectContext {
     // Obtain the underlying NSManagedObject that backs a SwiftData model instance.
-    // This uses a private selector to access SwiftData's internal bridging layer.
-    //
-    // Implementation notes:
-    // - SwiftData models are backed by Core Data entities at runtime.
-    // - We ask the context to resolve the "backing" NSManagedObject for the given SwiftData model object.
-    // - This avoids relying on PersistentIdentifier.uriRepresentation, which isn't publicly available.
-    //
-    // If this ever changes, keep this helper as the single place to update.
     func _managedObject(forSwiftDataModel model: AnyObject) -> NSManagedObject? {
-        (self as AnyObject).perform(Selector(("_managedObjectFor:")), with: model)?.takeUnretainedValue() as? NSManagedObject
+        let candidates = [
+            "_managedObjectFor:",       // observed in current toolchains
+            "_managedObjectForModel:"   // alternate internal name on some builds
+        ]
+        for name in candidates {
+            let sel = NSSelectorFromString(name)
+            if (self as AnyObject).responds(to: sel),
+               let unmanaged = (self as AnyObject).perform(sel, with: model) {
+                return unmanaged.takeUnretainedValue() as? NSManagedObject
+            }
+        }
+        return nil
+    }
+
+    // Locate the NSPersistentCloudKitContainer associated with this context’s coordinator.
+    // Minimal private/KVC lookup; kept isolated.
+    var _persistentCloudKitContainer: NSPersistentCloudKitContainer? {
+        guard let psc = self.persistentStoreCoordinator else { return nil }
+
+        // Try a few plausible getters on the coordinator.
+        let keys = ["container", "_container", "persistentContainer"]
+        let coordinatorObj = psc as NSObject
+        for key in keys {
+            let sel = NSSelectorFromString(key)
+            if coordinatorObj.responds(to: sel),
+               let unmanaged = coordinatorObj.perform(sel),
+               let value = unmanaged.takeUnretainedValue() as? NSPersistentCloudKitContainer {
+                return value
+            }
+        }
+
+        // Some toolchains may keep a weak back-reference on one of the persistent stores.
+        for store in psc.persistentStores {
+            let storeObj = store as NSObject
+            for key in keys {
+                let sel = NSSelectorFromString(key)
+                if storeObj.responds(to: sel),
+                   let unmanaged = storeObj.perform(sel),
+                   let value = unmanaged.takeUnretainedValue() as? NSPersistentCloudKitContainer {
+                    return value
+                }
+            }
+        }
+
+        return nil
     }
 }
 
-private extension NSPersistentStoreCoordinator {
-    // Wrapper helpers for clarity at call sites.
-    func getShare(for objectID: NSManagedObjectID, in context: NSManagedObjectContext) throws -> CKShare? {
-        try self.getShare(for: objectID, in: context)
+// MARK: - Async wrappers for NSPersistentCloudKitContainer sharing APIs
+
+private extension NSPersistentCloudKitContainer {
+    // On this toolchain, fetchShares(matching:) is synchronous throwing. Call it directly (no await).
+    func _fetchShares(matching objectIDs: [NSManagedObjectID]) throws -> [NSManagedObjectID: CKShare] {
+        return try self.fetchShares(matching: objectIDs)
     }
 
-    func createShare(for objectID: NSManagedObjectID, to container: CKContainer, in context: NSManagedObjectContext) throws -> (CKShare, CKRecord) {
-        try self.createShare(for: objectID, to: container, in: context)
+    // Creating a new share uses the completion-handler overload that takes an optional CKShare.
+    // Completion signature on this SDK: (Set<NSManagedObjectID>?, CKShare?, CKContainer?, Error?) -> Void
+    func _share(_ objects: [NSManagedObject]) async throws -> CKShare {
+        try await withCheckedThrowingContinuation { continuation in
+            self.share(objects, to: nil, completion: { objectIDs, share, _, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else if let share = share {
+                    continuation.resume(returning: share)
+                } else {
+                    continuation.resume(throwing: NSError(
+                        domain: "CloudKitSharingService",
+                        code: -1,
+                        userInfo: [NSLocalizedDescriptionKey: "Unknown share creation state"]
+                    ))
+                }
+            })
+        }
     }
 }

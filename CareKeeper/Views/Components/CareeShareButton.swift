@@ -14,6 +14,7 @@ struct CareeShareButton: View {
     @State private var error: Error?
     @State private var isLoading = false
     @State private var showingSyncAlert = false
+    @State private var isShared = false
 
     private let sharingService = CloudKitSharingService()
     private let container = CKContainer(identifier: CloudKitConfig.containerID)
@@ -33,7 +34,7 @@ struct CareeShareButton: View {
                 ProgressView()
                     .scaleEffect(0.8)
             } else {
-                Image(systemName: sharingService.isShared(caree, in: modelContext)
+                Image(systemName: isShared
                       ? "person.crop.circle.badge.checkmark"
                       : "square.and.arrow.up")
             }
@@ -55,9 +56,17 @@ struct CareeShareButton: View {
                     onDismiss: {
                         showingShareSheet = false
                         self.share = nil
+                        // Refresh share status on dismiss
+                        Task {
+                            self.isShared = await sharingService.isShared(caree, in: modelContext)
+                        }
                     }
                 )
             }
+        }
+        .task(id: caree.id) {
+            // Load/refresh share status when the view appears or caree changes
+            self.isShared = await sharingService.isShared(caree, in: modelContext)
         }
         .errorAlert($error)
     }
@@ -69,6 +78,7 @@ struct CareeShareButton: View {
         do {
             let finalShare = try await sharingService.createOrGetShare(for: caree, in: modelContext)
             self.share = finalShare
+            self.isShared = true
             self.showingShareSheet = true
         } catch {
             self.error = error

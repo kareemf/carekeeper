@@ -50,8 +50,10 @@ struct CareeListView: View {
             ) {
                 Button(NSLocalizedString("Delete", comment: "Delete button"), role: .destructive) {
                     if let offsets = careeToDelete {
-                        deleteCarees(offsets: offsets)
-                        careeToDelete = nil
+                        Task { @MainActor in
+                            await deleteCarees(offsets: offsets)
+                            careeToDelete = nil
+                        }
                     }
                 }
                 Button(NSLocalizedString("Cancel", comment: "Cancel button"), role: .cancel) {
@@ -122,20 +124,29 @@ struct CareeListView: View {
         }
     }
     
-    private func deleteCarees(offsets: IndexSet) {
+    @MainActor
+    private func deleteCarees(offsets: IndexSet) async {
         let sharingService = CloudKitSharingService()
 
+        // Resolve indices to concrete Caree instances first
+        let itemsToConsider = offsets.compactMap { index in
+            carees.indices.contains(index) ? carees[index] : nil
+        }
+
+        // Check permissions asynchronously (owner can delete)
+        var deletable: [Caree] = []
+        for caree in itemsToConsider {
+            let allowed = await sharingService.canDelete(caree: caree, in: modelContext)
+            if allowed {
+                deletable.append(caree)
+            } else {
+                // Optionally surface a user-facing message here
+            }
+        }
+
+        // Perform deletions with animation on the main actor
         withAnimation(.easeInOut(duration: 0.3)) {
-            for index in offsets {
-                let caree = carees[index]
-
-                // Check if user has permission to delete (owner only)
-                guard sharingService.canDelete(caree: caree, in: modelContext) else {
-                    // Skip deletion if not owner
-                    // In production, should show an alert to the user
-                    continue
-                }
-
+            for caree in deletable {
                 modelContext.delete(caree)
             }
         }

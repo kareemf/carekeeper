@@ -10,6 +10,9 @@ struct SharingView: View {
     @State private var showingStopSharingConfirmation = false
     @State private var error: Error?
 
+    // Cache of CKShare by Caree.id so UI can compute synchronously
+    @State private var sharesByCareeID: [UUID: CKShare] = [:]
+
     private let sharingService = CloudKitSharingService()
 
     var body: some View {
@@ -20,7 +23,10 @@ struct SharingView: View {
                     Section {
                         ForEach(sharedByMe) { caree in
                             NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
-                                SharedByMeRowView(caree: caree)
+                                SharedByMeRowView(
+                                    caree: caree,
+                                    share: sharesByCareeID[caree.id]
+                                )
                             }
                         }
                     } header: {
@@ -42,7 +48,10 @@ struct SharingView: View {
                     Section {
                         ForEach(sharedWithMe) { caree in
                             NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
-                                SharedWithMeRowView(caree: caree)
+                                SharedWithMeRowView(
+                                    caree: caree,
+                                    share: sharesByCareeID[caree.id]
+                                )
                             }
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 Button(role: .destructive) {
@@ -87,6 +96,12 @@ struct SharingView: View {
                 Text(NSLocalizedString("You will no longer have access to this caree and its activities.", comment: "Stop sharing confirmation message"))
             }
         }
+        .task {
+            await refreshShares()
+        }
+        .onChange(of: carees) {
+            Task { await refreshShares() }
+        }
         .errorAlert($error)
     }
 
@@ -94,20 +109,14 @@ struct SharingView: View {
 
     private var sharedByMe: [Caree] {
         carees.filter { caree in
-            // Carees that are shared AND user is the owner
-            guard let share = sharingService.getShare(for: caree, in: modelContext) else {
-                return false
-            }
+            guard let share = sharesByCareeID[caree.id] else { return false }
             return sharingService.isOwner(of: share)
         }
     }
 
     private var sharedWithMe: [Caree] {
         carees.filter { caree in
-            // Carees that are shared AND user is NOT the owner
-            guard let share = sharingService.getShare(for: caree, in: modelContext) else {
-                return false
-            }
+            guard let share = sharesByCareeID[caree.id] else { return false }
             return !sharingService.isOwner(of: share)
         }
     }
@@ -135,12 +144,34 @@ struct SharingView: View {
 
     // MARK: - Actions
 
+    private func refreshShares() async {
+        var next: [UUID: CKShare] = [:]
+        for caree in carees {
+            do {
+                if let share = try await sharingService.getShare(for: caree, in: modelContext) {
+                    next[caree.id] = share
+                }
+            } catch {
+                // Non-fatal for UI; just skip this caree
+            }
+        }
+        await MainActor.run {
+            self.sharesByCareeID = next
+        }
+    }
+
     private func stopSharing(_ caree: Caree) async {
         do {
             try await sharingService.stopSharing(caree: caree, in: modelContext)
-            careeToStopSharing = nil
+            await MainActor.run {
+                careeToStopSharing = nil
+                // Remove from cache so UI updates immediately
+                sharesByCareeID[caree.id] = nil
+            }
         } catch {
-            self.error = AppError.deleteFailed(error.localizedDescription)
+            await MainActor.run {
+                self.error = AppError.deleteFailed(error.localizedDescription)
+            }
         }
     }
 }
@@ -149,7 +180,7 @@ struct SharingView: View {
 
 private struct SharedByMeRowView: View {
     let caree: Caree
-    @Environment(\.modelContext) private var modelContext
+    let share: CKShare?
 
     private let sharingService = CloudKitSharingService()
 
@@ -172,7 +203,7 @@ private struct SharedByMeRowView: View {
                 Text(caree.name)
                     .font(.headline)
 
-                if let share = sharingService.getShare(for: caree, in: modelContext) {
+                if let share {
                     let participantCount = sharingService.fetchParticipants(for: share).count
                     Text(participantCount == 1
                          ? NSLocalizedString("1 person", comment: "Participant count singular")
@@ -193,9 +224,7 @@ private struct SharedByMeRowView: View {
 
 private struct SharedWithMeRowView: View {
     let caree: Caree
-    @Environment(\.modelContext) private var modelContext
-
-    private let sharingService = CloudKitSharingService()
+    let share: CKShare?
 
     var body: some View {
         HStack {
@@ -216,7 +245,7 @@ private struct SharedWithMeRowView: View {
                 Text(caree.name)
                     .font(.headline)
 
-                if let share = sharingService.getShare(for: caree, in: modelContext) {
+                if let share {
                     let owner = share.owner
                     let ownerName = owner.userIdentity.nameComponents?.formatted(.name(style: .short)) ?? NSLocalizedString("Unknown", comment: "Unknown owner")
                     Text(String(format: NSLocalizedString("Shared by %@", comment: "Shared by owner name"), ownerName))
