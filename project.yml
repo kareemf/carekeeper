@@ -55,6 +55,7 @@ targets:
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
         CKSharingSupported: true
+        ITSAppUsesNonExemptEncryption: false 
     entitlements:
       path: CareKeeper/CareKeeper.entitlements
       properties:
