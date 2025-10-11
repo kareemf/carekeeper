@@ -3,19 +3,27 @@ import SwiftUI
 struct ActivityTypeEditView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    
+
     let caree: Caree
     let activityType: ActivityType?
-    
+
     @State private var name: String = ""
     @State private var icon: String = ""
     @State private var hasQuantity: Bool = false
     @State private var quantityUnit: String = ""
     @State private var hasLocation: Bool = false
     @State private var error: Error?
+    @State private var isSaving: Bool = false
     @FocusState private var isNameFieldFocused: Bool
 
+    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    @StateObject private var sharedDataService = CloudKitSharedDataService()
+
     private var isEditing: Bool { activityType != nil }
+
+    private var isSharedCaree: Bool {
+        sharedRecordsService.sharedCarees.contains { $0.id == caree.id }
+    }
     
     init(caree: Caree, activityType: ActivityType? = nil) {
         self.caree = caree
@@ -66,10 +74,18 @@ struct ActivityTypeEditView: View {
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(NSLocalizedString("Save", comment: "Save button")) {
+                    Button {
                         saveActivityType()
+                    } label: {
+                        if isSaving {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                                .scaleEffect(0.8)
+                        } else {
+                            Text(NSLocalizedString("Save", comment: "Save button"))
+                        }
                     }
-                    .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
                 }
             }
         }
@@ -80,6 +96,9 @@ struct ActivityTypeEditView: View {
                     isNameFieldFocused = true
                 }
             }
+        }
+        .task {
+            await sharedRecordsService.fetchSharedCarees()
         }
         .errorAlert($error)
     }
@@ -93,32 +112,79 @@ struct ActivityTypeEditView: View {
             return
         }
 
-        if let existingActivityType = activityType {
-            // Update existing activity type
-            existingActivityType.name = trimmedName
-            existingActivityType.icon = icon.isEmpty ? nil : icon
-            existingActivityType.hasQuantity = hasQuantity
-            existingActivityType.quantityUnit = hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil
-            existingActivityType.hasLocation = hasLocation
-        } else {
-            // Create new activity type
-            let newActivityType = ActivityType(
-                name: trimmedName,
-                icon: icon.isEmpty ? nil : icon,
-                hasQuantity: hasQuantity,
-                quantityUnit: hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil,
-                hasLocation: hasLocation,
-                listOrder: caree.activityTypes?.count ?? 0,
-                caree: caree
-            )
-            modelContext.insert(newActivityType)
-        }
+        isSaving = true
 
-        do {
-            try modelContext.save()
-            dismiss()
-        } catch {
-            self.error = AppError.saveFailed(error.localizedDescription)
+        if isSharedCaree {
+            // Handle shared caree - use CloudKit service
+            Task {
+                do {
+                    if let existingActivityType = activityType {
+                        // Update existing activity type in shared database
+                        existingActivityType.name = trimmedName
+                        existingActivityType.icon = icon.isEmpty ? nil : icon
+                        existingActivityType.hasQuantity = hasQuantity
+                        existingActivityType.quantityUnit = hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil
+                        existingActivityType.hasLocation = hasLocation
+
+                        try await sharedDataService.updateActivityType(existingActivityType, caree: caree)
+                    } else {
+                        // Create new activity type in shared database
+                        _ = try await sharedDataService.createActivityType(
+                            for: caree,
+                            name: trimmedName,
+                            icon: icon.isEmpty ? nil : icon,
+                            hasQuantity: hasQuantity,
+                            quantityUnit: hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil,
+                            hasLocation: hasLocation,
+                            listOrder: caree.activityTypes?.count ?? 0
+                        )
+                    }
+
+                    // Refresh shared carees to reflect changes
+                    await sharedRecordsService.fetchSharedCarees()
+
+                    await MainActor.run {
+                        isSaving = false
+                        dismiss()
+                    }
+                } catch {
+                    await MainActor.run {
+                        self.error = AppError.saveFailed(error.localizedDescription)
+                        isSaving = false
+                    }
+                }
+            }
+        } else {
+            // Handle owned caree - use SwiftData
+            if let existingActivityType = activityType {
+                // Update existing activity type
+                existingActivityType.name = trimmedName
+                existingActivityType.icon = icon.isEmpty ? nil : icon
+                existingActivityType.hasQuantity = hasQuantity
+                existingActivityType.quantityUnit = hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil
+                existingActivityType.hasLocation = hasLocation
+            } else {
+                // Create new activity type
+                let newActivityType = ActivityType(
+                    name: trimmedName,
+                    icon: icon.isEmpty ? nil : icon,
+                    hasQuantity: hasQuantity,
+                    quantityUnit: hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil,
+                    hasLocation: hasLocation,
+                    listOrder: caree.activityTypes?.count ?? 0,
+                    caree: caree
+                )
+                modelContext.insert(newActivityType)
+            }
+
+            do {
+                try modelContext.save()
+                isSaving = false
+                dismiss()
+            } catch {
+                self.error = AppError.saveFailed(error.localizedDescription)
+                isSaving = false
+            }
         }
     }
 }

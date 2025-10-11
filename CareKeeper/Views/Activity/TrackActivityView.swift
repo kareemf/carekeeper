@@ -17,6 +17,13 @@ struct TrackActivityView: View {
     @StateObject private var locationManager = LocationManager()
     @State private var error: Error?
     @State private var isSaving: Bool = false
+
+    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    @StateObject private var sharedDataService = CloudKitSharedDataService()
+
+    private var isSharedCaree: Bool {
+        sharedRecordsService.sharedCarees.contains { $0.id == caree.id }
+    }
     
     private var sortedActivityTypes: [ActivityType] {
         caree.sortedActivityTypes
@@ -64,6 +71,9 @@ struct TrackActivityView: View {
         }
         .onAppear {
             requestLocationIfNeeded()
+        }
+        .task {
+            await sharedRecordsService.fetchSharedCarees()
         }
         .onChange(of: locationManager.error != nil) { _, hasError in
             if hasError {
@@ -196,38 +206,72 @@ struct TrackActivityView: View {
 
         isSaving = true
 
-        // Add slight delay for visual feedback
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let activityDateTime = useCustomTime ? customDateTime : Date()
-            let location = includeLocation ? locationManager.location : nil
-            let latitude = location?.coordinate.latitude
-            let longitude = location?.coordinate.longitude
+        let activityDateTime = useCustomTime ? customDateTime : Date()
+        let location = includeLocation ? locationManager.location : nil
+        let latitude = location?.coordinate.latitude
+        let longitude = location?.coordinate.longitude
 
-            let newActivity = Activity(
-                dateTime: activityDateTime,
-                notes: notes.isEmpty ? nil : notes,
-                quantity: quantityValue,
-                latitude: latitude,
-                longitude: longitude,
-                activityType: activityType,
-                caree: caree
-            )
-
-            withAnimation(.easeOut(duration: 0.2)) {
-                modelContext.insert(newActivity)
+        if isSharedCaree {
+            // Handle shared caree - use CloudKit service
+            Task {
                 do {
-                    try modelContext.save()
-                    WidgetCenter.shared.reloadAllTimelines()
-                } catch {
-                    self.error = AppError.saveFailed(error.localizedDescription)
-                }
-                locationManager.stopUpdating()
-                isSaving = false
-            }
+                    _ = try await sharedDataService.createActivity(
+                        for: caree,
+                        activityType: activityType,
+                        dateTime: activityDateTime,
+                        notes: notes.isEmpty ? nil : notes,
+                        quantity: quantityValue,
+                        latitude: latitude,
+                        longitude: longitude
+                    )
 
-            // Dismiss with slight delay for smoother transition
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                dismiss()
+                    // Refresh shared carees to reflect changes
+                    await sharedRecordsService.fetchSharedCarees()
+
+                    await MainActor.run {
+                        locationManager.stopUpdating()
+                        WidgetCenter.shared.reloadAllTimelines()
+                        isSaving = false
+                        dismiss()
+                    }
+                } catch {
+                    await MainActor.run {
+                        self.error = AppError.saveFailed(error.localizedDescription)
+                        locationManager.stopUpdating()
+                        isSaving = false
+                    }
+                }
+            }
+        } else {
+            // Handle owned caree - use SwiftData
+            // Add slight delay for visual feedback
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                let newActivity = Activity(
+                    dateTime: activityDateTime,
+                    notes: notes.isEmpty ? nil : notes,
+                    quantity: quantityValue,
+                    latitude: latitude,
+                    longitude: longitude,
+                    activityType: activityType,
+                    caree: caree
+                )
+
+                withAnimation(.easeOut(duration: 0.2)) {
+                    modelContext.insert(newActivity)
+                    do {
+                        try modelContext.save()
+                        WidgetCenter.shared.reloadAllTimelines()
+                    } catch {
+                        self.error = AppError.saveFailed(error.localizedDescription)
+                    }
+                    locationManager.stopUpdating()
+                    isSaving = false
+                }
+
+                // Dismiss with slight delay for smoother transition
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    dismiss()
+                }
             }
         }
     }

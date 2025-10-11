@@ -19,6 +19,13 @@ struct TrackActivityView: View {
     @State private var useCustomTime: Bool = false
     @State private var customTime: Date = Date()
 
+    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    @StateObject private var sharedDataService = CloudKitSharedDataService()
+
+    private var isSharedCaree: Bool {
+        sharedRecordsService.sharedCarees.contains { $0.id == caree.id }
+    }
+
     var body: some View {
         NavigationStack {
             if !showingStep2 {
@@ -26,6 +33,9 @@ struct TrackActivityView: View {
             } else if let activityType = selectedActivityType {
                 activityDetailsForm(for: activityType)
             }
+        }
+        .task {
+            await sharedRecordsService.fetchSharedCarees()
         }
         .onChange(of: locationManager.error != nil) { _, hasError in
             if hasError {
@@ -201,25 +211,57 @@ struct TrackActivityView: View {
         let now = Date()
         let finalDateTime: Date = useCustomTime ? combine(date: now, timeOfDayFrom: customTime) : now
 
-        let activity = Activity(
-            dateTime: finalDateTime,
-            notes: notes.isEmpty ? nil : notes,
-            quantity: activityType.hasQuantity && quantity > 0 ? quantity : nil,
-            latitude: location?.coordinate.latitude,
-            longitude: location?.coordinate.longitude,
-            activityType: activityType,
-            caree: caree
-        )
+        if isSharedCaree {
+            // Handle shared caree - use CloudKit service
+            Task {
+                do {
+                    _ = try await sharedDataService.createActivity(
+                        for: caree,
+                        activityType: activityType,
+                        dateTime: finalDateTime,
+                        notes: notes.isEmpty ? nil : notes,
+                        quantity: activityType.hasQuantity && quantity > 0 ? quantity : nil,
+                        latitude: location?.coordinate.latitude,
+                        longitude: location?.coordinate.longitude
+                    )
 
-        modelContext.insert(activity)
+                    // Refresh shared carees to reflect changes
+                    await sharedRecordsService.fetchSharedCarees()
 
-        do {
-            try modelContext.save()
-            locationManager.stopUpdating()
-            WidgetCenter.shared.reloadAllTimelines()
-            dismiss()
-        } catch {
-            self.error = AppError.saveFailed(error.localizedDescription)
+                    await MainActor.run {
+                        locationManager.stopUpdating()
+                        WidgetCenter.shared.reloadAllTimelines()
+                        dismiss()
+                    }
+                } catch {
+                    await MainActor.run {
+                        self.error = AppError.saveFailed(error.localizedDescription)
+                        locationManager.stopUpdating()
+                    }
+                }
+            }
+        } else {
+            // Handle owned caree - use SwiftData
+            let activity = Activity(
+                dateTime: finalDateTime,
+                notes: notes.isEmpty ? nil : notes,
+                quantity: activityType.hasQuantity && quantity > 0 ? quantity : nil,
+                latitude: location?.coordinate.latitude,
+                longitude: location?.coordinate.longitude,
+                activityType: activityType,
+                caree: caree
+            )
+
+            modelContext.insert(activity)
+
+            do {
+                try modelContext.save()
+                locationManager.stopUpdating()
+                WidgetCenter.shared.reloadAllTimelines()
+                dismiss()
+            } catch {
+                self.error = AppError.saveFailed(error.localizedDescription)
+            }
         }
     }
 

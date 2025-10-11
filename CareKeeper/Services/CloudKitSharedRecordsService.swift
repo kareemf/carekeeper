@@ -43,10 +43,12 @@ class CloudKitSharedRecordsService: ObservableObject {
         await fetchSharedCarees()
     }
 
-    /// Fetch shared Caree records using zone-based discovery:
+    /// Fetch shared Caree records with their ActivityTypes and Activities using zone-based discovery:
     /// 1. Fetch all zones from the shared database
     /// 2. Query each zone for CD_Caree records
-    /// 3. Convert CloudKit records to temporary Caree objects
+    /// 3. Query each zone for CD_ActivityType records
+    /// 4. Query each zone for CD_Activity records
+    /// 5. Convert CloudKit records to temporary objects with relationships populated
     func fetchSharedCarees() async {
         await MainActor.run {
             isLoading = true
@@ -69,8 +71,10 @@ class CloudKitSharedRecordsService: ObservableObject {
                 return
             }
 
-            // Step 2: Query each zone for CD_Caree records and their CKShare
-            var allRecords: [CKRecord] = []
+            // Step 2: Query each zone for CD_Caree, CD_ActivityType, and CD_Activity records
+            var allCareeRecords: [CKRecord] = []
+            var allActivityTypeRecords: [CKRecord] = []
+            var allActivityRecords: [CKRecord] = []
             var shares: [UUID: CKShare] = [:]
 
             for zone in zones {
@@ -81,11 +85,11 @@ class CloudKitSharedRecordsService: ObservableObject {
 
                 logger.info("🔍 Querying zone: \(zone.zoneID.zoneName, privacy: .public)")
 
-                let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
-
+                // Query for Carees
+                let careeQuery = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
                 do {
                     let (matchResults, _) = try await sharedDatabase.records(
-                        matching: query,
+                        matching: careeQuery,
                         inZoneWith: zone.zoneID
                     )
 
@@ -93,7 +97,7 @@ class CloudKitSharedRecordsService: ObservableObject {
                     for (_, result) in matchResults {
                         switch result {
                         case .success(let record):
-                            allRecords.append(record)
+                            allCareeRecords.append(record)
                             logger.info("  ✅ Found caree: \(record["CD_name"] as? String ?? "unknown")")
 
                             // Fetch the CKShare for this record
@@ -111,17 +115,62 @@ class CloudKitSharedRecordsService: ObservableObject {
                                 }
                             }
                         case .failure(let error):
-                            logger.warning("  ⚠️ Failed to fetch record: \(error.localizedDescription)")
+                            logger.warning("  ⚠️ Failed to fetch caree record: \(error.localizedDescription)")
                         }
                     }
                 } catch {
-                    logger.warning("  ⚠️ Failed to query zone \(zone.zoneID.zoneName): \(error.localizedDescription)")
-                    // Continue with other zones instead of failing completely
+                    logger.warning("  ⚠️ Failed to query carees in zone \(zone.zoneID.zoneName): \(error.localizedDescription)")
+                }
+
+                // Query for ActivityTypes
+                let activityTypeQuery = CKQuery(recordType: "CD_ActivityType", predicate: NSPredicate(value: true))
+                do {
+                    let (matchResults, _) = try await sharedDatabase.records(
+                        matching: activityTypeQuery,
+                        inZoneWith: zone.zoneID
+                    )
+
+                    for (_, result) in matchResults {
+                        switch result {
+                        case .success(let record):
+                            allActivityTypeRecords.append(record)
+                            logger.info("  ✅ Found activity type: \(record["CD_name"] as? String ?? "unknown")")
+                        case .failure(let error):
+                            logger.warning("  ⚠️ Failed to fetch activity type record: \(error.localizedDescription)")
+                        }
+                    }
+                } catch {
+                    logger.warning("  ⚠️ Failed to query activity types in zone \(zone.zoneID.zoneName): \(error.localizedDescription)")
+                }
+
+                // Query for Activities
+                let activityQuery = CKQuery(recordType: "CD_Activity", predicate: NSPredicate(value: true))
+                do {
+                    let (matchResults, _) = try await sharedDatabase.records(
+                        matching: activityQuery,
+                        inZoneWith: zone.zoneID
+                    )
+
+                    for (_, result) in matchResults {
+                        switch result {
+                        case .success(let record):
+                            allActivityRecords.append(record)
+                            logger.info("  ✅ Found activity at: \(record["CD_dateTime"] as? Date ?? Date())")
+                        case .failure(let error):
+                            logger.warning("  ⚠️ Failed to fetch activity record: \(error.localizedDescription)")
+                        }
+                    }
+                } catch {
+                    logger.warning("  ⚠️ Failed to query activities in zone \(zone.zoneID.zoneName): \(error.localizedDescription)")
                 }
             }
 
-            // Step 3: Convert to Caree objects
-            let carees = try await convertRecordsToCarees(allRecords)
+            // Step 3: Convert to objects with relationships
+            let carees = try await convertRecordsToCarees(
+                allCareeRecords,
+                activityTypeRecords: allActivityTypeRecords,
+                activityRecords: allActivityRecords
+            )
 
             await MainActor.run {
                 self.sharedCarees = carees
@@ -139,29 +188,31 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
     }
 
-    /// Convert CloudKit records to temporary Caree objects for display
+    /// Convert CloudKit records to temporary objects for display with relationships populated
     /// These are not persisted in SwiftData - they're ephemeral representations of shared data
-    private func convertRecordsToCarees(_ records: [CKRecord]) async throws -> [Caree] {
-        var carees: [Caree] = []
+    private func convertRecordsToCarees(
+        _ careeRecords: [CKRecord],
+        activityTypeRecords: [CKRecord],
+        activityRecords: [CKRecord]
+    ) async throws -> [Caree] {
+        var careesByID: [UUID: Caree] = [:]
+        var activityTypesByID: [UUID: ActivityType] = [:]
 
-        for record: CKRecord in records {
-            // Extract data from CloudKit record
-            // SwiftData adds "CD_" prefix to all stored properties in CloudKit
+        // Step 1: Create Caree objects
+        for record in careeRecords {
             guard let cdId = record["CD_id"] as? String,
                   let uuid = UUID(uuidString: cdId),
                   let name = record["CD_name"] as? String else {
-                logger.warning("⚠️ Skipping record with missing required fields: \(record.recordID.recordName)")
+                logger.warning("⚠️ Skipping caree record with missing required fields: \(record.recordID.recordName)")
                 continue
             }
 
-            // Create a temporary Caree object (not persisted in SwiftData)
             let caree = Caree(
                 name: name,
                 listOrder: record["CD_listOrder"] as? Int ?? 0
             )
             caree.id = uuid
 
-            // Set other properties if they exist
             if let imageAsset = record["CD_image"] as? CKAsset,
                let imageURL = imageAsset.fileURL,
                let imageData = try? Data(contentsOf: imageURL) {
@@ -172,9 +223,94 @@ class CloudKitSharedRecordsService: ObservableObject {
                 caree.dateCreated = dateCreated
             }
 
-            carees.append(caree)
+            careesByID[uuid] = caree
         }
 
-        return carees.sorted { $0.listOrder < $1.listOrder }
+        // Step 2: Create ActivityType objects and link to Carees
+        for record in activityTypeRecords {
+            guard let cdId = record["CD_id"] as? String,
+                  let uuid = UUID(uuidString: cdId),
+                  let name = record["CD_name"] as? String else {
+                logger.warning("⚠️ Skipping activity type record with missing required fields: \(record.recordID.recordName)")
+                continue
+            }
+
+            let activityType = ActivityType(
+                name: name,
+                icon: record["CD_icon"] as? String,
+                hasQuantity: record["CD_hasQuantity"] as? Bool ?? false,
+                quantityUnit: record["CD_quantityUnit"] as? String,
+                hasLocation: record["CD_hasLocation"] as? Bool ?? false,
+                listOrder: record["CD_listOrder"] as? Int ?? 0
+            )
+            activityType.id = uuid
+
+            if let dateCreated = record["CD_dateCreated"] as? Date {
+                activityType.dateCreated = dateCreated
+            }
+
+            // Link to caree via CD_caree reference
+            if let careeReference = record["CD_caree"] as? CKRecord.Reference,
+               let careeIDString = careeReference.recordID.recordName.components(separatedBy: "/").last,
+               let careeUUID = UUID(uuidString: careeIDString),
+               let caree = careesByID[careeUUID] {
+                activityType.caree = caree
+                if caree.activityTypes == nil {
+                    caree.activityTypes = []
+                }
+                caree.activityTypes?.append(activityType)
+            }
+
+            activityTypesByID[uuid] = activityType
+        }
+
+        // Step 3: Create Activity objects and link to ActivityTypes and Carees
+        for record in activityRecords {
+            guard let cdId = record["CD_id"] as? String,
+                  let uuid = UUID(uuidString: cdId),
+                  let dateTime = record["CD_dateTime"] as? Date else {
+                logger.warning("⚠️ Skipping activity record with missing required fields: \(record.recordID.recordName)")
+                continue
+            }
+
+            let activity = Activity(
+                dateTime: dateTime,
+                notes: record["CD_notes"] as? String,
+                quantity: record["CD_quantity"] as? Double,
+                latitude: record["CD_latitude"] as? Double,
+                longitude: record["CD_longitude"] as? Double
+            )
+            activity.id = uuid
+
+            if let dateCreated = record["CD_dateCreated"] as? Date {
+                activity.dateCreated = dateCreated
+            }
+
+            // Link to activity type via CD_activityType reference
+            if let activityTypeReference = record["CD_activityType"] as? CKRecord.Reference,
+               let activityTypeIDString = activityTypeReference.recordID.recordName.components(separatedBy: "/").last,
+               let activityTypeUUID = UUID(uuidString: activityTypeIDString),
+               let activityType = activityTypesByID[activityTypeUUID] {
+                activity.activityType = activityType
+                if activityType.activities == nil {
+                    activityType.activities = []
+                }
+                activityType.activities?.append(activity)
+            }
+
+            // Link to caree via CD_caree reference
+            if let careeReference = record["CD_caree"] as? CKRecord.Reference,
+               let careeIDString = careeReference.recordID.recordName.components(separatedBy: "/").last,
+               let careeUUID = UUID(uuidString: careeIDString),
+               let caree = careesByID[careeUUID] {
+                activity.caree = caree
+                if caree.activities == nil {
+                    caree.activities = []
+                }
+                caree.activities?.append(activity)
+            }
+        }
+
+        return Array(careesByID.values).sorted { $0.listOrder < $1.listOrder }
     }
 }
