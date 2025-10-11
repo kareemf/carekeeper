@@ -54,7 +54,7 @@ class CloudKitSharedRecordsService: ObservableObject {
             // Step 1: Fetch all zones in the shared database
             // Each accepted share creates a zone with the owner's records
             let zones = try await sharedDatabase.allRecordZones()
-            logger.info("📱 Found \(zones.count) shared zones")
+            logger.info("📱 Found \(zones.count, privacy: .public) shared zones")
 
             if zones.isEmpty {
                 await MainActor.run {
@@ -105,7 +105,7 @@ class CloudKitSharedRecordsService: ObservableObject {
             await MainActor.run {
                 self.sharedCarees = carees
                 self.isLoading = false
-                logger.info("✅ Successfully fetched \(carees.count) shared carees from \(zones.count - 1) zones")
+                logger.info("✅ Successfully fetched \(carees.count, privacy: .public) shared carees from \(zones.count - 1, privacy: .public) zones")
             }
 
         } catch {
@@ -127,7 +127,7 @@ class CloudKitSharedRecordsService: ObservableObject {
             guard let cdId = record["CD_id"] as? String,
                   let uuid = UUID(uuidString: cdId),
                   let name = record["name"] as? String else {
-                logger.warning("⚠️ Skipping record with missing required fields: \(record.recordID.recordName)")
+                logger.warning("⚠️ Skipping record with missing required fields: \(record.recordID.recordName, privacy: .public)")
                 continue
             }
 

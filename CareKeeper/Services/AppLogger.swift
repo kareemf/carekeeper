@@ -33,6 +33,4 @@ enum AppLogger {
 
     Search by emoji:
     subsystem:com.kareemf.CareKeeper AND 📱
-
- Pro tip: Save your filters with Action → Save Search As...
  */
