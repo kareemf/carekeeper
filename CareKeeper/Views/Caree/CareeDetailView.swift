@@ -31,6 +31,7 @@ struct CareeDetailView: View {
     @State private var isCheckingSync = false
     @State private var exportItem: ExportItem?
     @State private var exportError: Error?
+    @State private var isLoadingSharedCaree = false
 
     @StateObject private var syncService = CloudKitSyncService()
 
@@ -42,7 +43,14 @@ struct CareeDetailView: View {
     
     var body: some View {
         Group {
-            if let caree = caree {
+            if isLoadingSharedCaree {
+                // Show loading state while fetching shared caree
+                VStack(spacing: 16) {
+                    ProgressView()
+                    Text(NSLocalizedString("Loading...", comment: "Loading shared caree message"))
+                        .foregroundColor(.secondary)
+                }
+            } else if let caree = caree {
                 List {
                     Section {
                         headerSection(for: caree)
@@ -120,8 +128,12 @@ struct CareeDetailView: View {
                 .task {
                     // Only fetch shared carees if this caree is not in myCarees
                     // This prevents unnecessary CloudKit queries when viewing owned carees
-                    if !myCarees.contains(where: { $0.id == careeID }) {
+                    let isMyCaree = myCarees.contains(where: { $0.id == careeID })
+
+                    if !isMyCaree {
+                        isLoadingSharedCaree = true
                         await sharedRecordsService.fetchSharedCarees()
+                        isLoadingSharedCaree = false
                     }
 
                     if let caree = self.caree {
@@ -131,9 +143,17 @@ struct CareeDetailView: View {
                 .task(id: careeID) {
                     // Refresh when caree ID changes
                     // Only fetch shared carees if this caree is not in myCarees
-                    if !myCarees.contains(where: { $0.id == careeID }) {
+                    let isMyCaree = myCarees.contains(where: { $0.id == careeID })
+
+                    if !isMyCaree {
+                        isLoadingSharedCaree = true
                         await sharedRecordsService.fetchSharedCarees()
+                        isLoadingSharedCaree = false
                     }
+                }
+                .onChange(of: sharedRecordsService.sharedCarees) {
+                    // Trigger UI update when shared carees change
+                    isLoadingSharedCaree = false
                 }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {

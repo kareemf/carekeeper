@@ -5,7 +5,15 @@ struct CareeDetailView: View {
     @Environment(\.modelContext) private var modelContext
 
     let careeID: UUID
-    @Query private var allCarees: [Caree]
+    @Query private var myCarees: [Caree]  // Only private database records
+
+    // Service for fetching shared records
+    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+
+    // Combined list of all carees (private + shared)
+    private var allCarees: [Caree] {
+        return myCarees + sharedRecordsService.sharedCarees
+    }
 
     // Computed property to get the specific caree
     private var caree: Caree? {
@@ -13,6 +21,7 @@ struct CareeDetailView: View {
     }
 
     @State private var showingTrackActivity = false
+    @State private var isLoadingSharedCaree = false
 
     init(careeID: UUID) {
         self.careeID = careeID
@@ -20,7 +29,15 @@ struct CareeDetailView: View {
 
     var body: some View {
         Group {
-            if let caree = caree {
+            if isLoadingSharedCaree {
+                // Show loading state while fetching shared caree
+                VStack(spacing: 12) {
+                    ProgressView()
+                    Text(NSLocalizedString("Loading...", comment: "Loading shared caree message"))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            } else if let caree = caree {
                 if !caree.sortedActivityTypes.isEmpty {
                     TabView {
                         // Track tab
@@ -50,6 +67,20 @@ struct CareeDetailView: View {
                 Text(NSLocalizedString("Caree not found", comment: "Caree not found message"))
                     .foregroundColor(.secondary)
             }
+        }
+        .task {
+            // Only fetch shared carees if this caree is not in myCarees
+            let isMyCaree = myCarees.contains(where: { $0.id == careeID })
+
+            if !isMyCaree {
+                isLoadingSharedCaree = true
+                await sharedRecordsService.fetchSharedCarees()
+                isLoadingSharedCaree = false
+            }
+        }
+        .onChange(of: sharedRecordsService.sharedCarees) {
+            // Trigger UI update when shared carees change
+            isLoadingSharedCaree = false
         }
     }
 
