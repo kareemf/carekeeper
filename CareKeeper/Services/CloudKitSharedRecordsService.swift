@@ -12,14 +12,6 @@ class CloudKitSharedRecordsService: ObservableObject {
     @Published var isLoading = false
     @Published var error: Error?
 
-    private var modelContext: ModelContext?
-
-    /// Set the model context for future use (currently unused but kept for API compatibility)
-    func setModelContext(_ context: ModelContext) {
-        self.modelContext = context
-        setupNotificationObservers()
-    }
-
     /// Setup notification observers for automatic refresh on CloudKit changes
     private func setupNotificationObservers() {
         NotificationCenter.default.addObserver(

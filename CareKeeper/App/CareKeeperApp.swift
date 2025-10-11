@@ -166,10 +166,7 @@ struct CareKeeperApp: App {
         }
     }
     
-    private func setupNotificationService() {
-        // Set the model context on the shared records service
-        sharedRecordsService.setModelContext(sharedModelContainer.mainContext)
-        
+    private func setupNotificationService() {        
         Task {
             // Setup CloudKit notifications
             await notificationService.setupNotifications(sharedRecordsService: sharedRecordsService)

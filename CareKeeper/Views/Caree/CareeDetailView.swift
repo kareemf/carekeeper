@@ -118,8 +118,6 @@ struct CareeDetailView: View {
                     await checkSyncStatus(for: caree)
                 }
                 .task {
-                    sharedRecordsService.setModelContext(modelContext)
-
                     // Only fetch shared carees if this caree is not in myCarees
                     // This prevents unnecessary CloudKit queries when viewing owned carees
                     if !myCarees.contains(where: { $0.id == careeID }) {
@@ -132,8 +130,6 @@ struct CareeDetailView: View {
                 }
                 .task(id: careeID) {
                     // Refresh when caree ID changes
-                    sharedRecordsService.setModelContext(modelContext)
-
                     // Only fetch shared carees if this caree is not in myCarees
                     if !myCarees.contains(where: { $0.id == careeID }) {
                         await sharedRecordsService.fetchSharedCarees()

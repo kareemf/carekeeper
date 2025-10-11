@@ -26,7 +26,6 @@ struct CareeListView: View {
             }
             .navigationTitle(NSLocalizedString("Carees", comment: "Navigation title for carees list"))
             .task {
-                sharedRecordsService.setModelContext(modelContext)
                 await sharedRecordsService.fetchSharedCarees()
             }
             .onReceive(sharedRecordsService.$error) { newError in
@@ -73,7 +72,6 @@ struct CareeListView: View {
             }
         }
         .refreshable {
-            sharedRecordsService.setModelContext(modelContext)
             await sharedRecordsService.fetchSharedCarees()
         }
     }

@@ -107,13 +107,11 @@ struct SharingView: View {
             }
         }
         .task {
-            sharedRecordsService.setModelContext(modelContext)
             await sharedRecordsService.fetchSharedCarees()
             await refreshShares()
         }
         .onChange(of: myCarees) {
             Task { 
-                sharedRecordsService.setModelContext(modelContext)
                 await sharedRecordsService.fetchSharedCarees()
                 await refreshShares() 
             }
