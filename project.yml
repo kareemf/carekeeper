@@ -93,8 +93,6 @@ targets:
           - group.com.kareemf.CareKeeper
         com.apple.developer.icloud-container-identifiers:
           - iCloud.com.kareemf.CareKeeperCloudKit
-        com.apple.developer.icloud-services:
-          - CloudKit
 
   CareKeeper Watch App:
     type: application

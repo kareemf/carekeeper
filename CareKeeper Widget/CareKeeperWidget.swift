@@ -1,7 +1,6 @@
 import WidgetKit
 import SwiftUI
 import SwiftData
-import CoreData
 
 struct CareKeeperWidget: Widget {
     let kind: String = "CareKeeperWidget"
@@ -30,6 +29,12 @@ struct Provider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
+        // In previews, return a quick snapshot without touching disk.
+        if context.isPreview {
+            completion(placeholder(in: context))
+            return
+        }
+
         let entry = fetchCurrentData()
         completion(entry)
     }
@@ -46,11 +51,13 @@ struct Provider: TimelineProvider {
 
     private func fetchCurrentData() -> SimpleEntry {
         let schema = Schema([Caree.self, ActivityType.self, Activity.self])
+
+        // IMPORTANT: Widget/complication should NOT attach CloudKit.
+        // Read only from the shared App Group store that the watch app writes to.
         let configuration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
-            groupContainer: .identifier(CloudKitConfig.appGroupID),
-            cloudKitDatabase: .private(CloudKitConfig.containerID)
+            groupContainer: .identifier(CloudKitConfig.appGroupID)
         )
 
         guard let container = try? ModelContainer(for: schema, configurations: [configuration]) else {
@@ -59,90 +66,40 @@ struct Provider: TimelineProvider {
 
         let context = ModelContext(container)
 
-        // Aggregate counts via Core Data bridge for performance.
-        let careeCount = aggregateCount(entityName: "Caree", in: context) ?? 0
+        // Count Carees via SwiftData fetch
+        let careeCount: Int = {
+            do {
+                let descriptor = FetchDescriptor<Caree>()
+                let carees = try context.fetch(descriptor)
+                return carees.count
+            } catch {
+                return 0
+            }
+        }()
 
-        // Today’s activities using a date predicate on Activity.dateTime
-        let calendar = Calendar.current
-        let now = Date()
-        let startOfDay = calendar.startOfDay(for: now)
-        let startOfTomorrow = calendar.date(byAdding: .day, value: 1, to: startOfDay) ?? now
+        // Today’s activities using a SwiftData predicate on Activity.dateTime
+        let todayActivities: Int = {
+            let calendar = Calendar.current
+            let now = Date()
+            let startOfDay = calendar.startOfDay(for: now)
+            let startOfTomorrow = calendar.date(byAdding: .day, value: 1, to: startOfDay) ?? now
 
-        let todayActivities = aggregateCount(
-            entityName: "Activity",
-            in: context,
-            dateKey: "dateTime",
-            from: startOfDay,
-            to: startOfTomorrow
-        ) ?? 0
+            let predicate = #Predicate<Activity> { activity in
+                activity.dateTime >= startOfDay && activity.dateTime < startOfTomorrow
+            }
+
+            do {
+                var descriptor = FetchDescriptor<Activity>(predicate: predicate)
+                // We only need the count; avoid heavy sort/relationships
+                descriptor.fetchLimit = 0 // fetch all; counting after fetch
+                let activities = try context.fetch(descriptor)
+                return activities.count
+            } catch {
+                return 0
+            }
+        }()
 
         return SimpleEntry(date: Date(), careeCount: careeCount, todayActivities: todayActivities)
-    }
-
-    // MARK: - Aggregate helpers (SwiftData -> Core Data bridge)
-
-    private func aggregateCount(entityName: String, in modelContext: ModelContext) -> Int? {
-        guard let nsContext = (modelContext as AnyObject).value(forKey: "nsContext") as? NSManagedObjectContext else {
-            return nil
-        }
-
-        let request = NSFetchRequest<NSDictionary>(entityName: entityName)
-        request.resultType = .dictionaryResultType
-
-        let countExpression = NSExpressionDescription()
-        countExpression.name = "count"
-        countExpression.expression = NSExpression(forFunction: "count:", arguments: [NSExpression(forKeyPath: "self")])
-        countExpression.expressionResultType = .integer64AttributeType
-
-        request.propertiesToFetch = [countExpression]
-        request.includesSubentities = true
-
-        do {
-            if let result = try nsContext.fetch(request).first,
-               let count = result["count"] as? NSNumber {
-                return count.intValue
-            }
-        } catch {
-            // In widget process, avoid heavy logging; return nil on failure.
-            return nil
-        }
-
-        return nil
-    }
-
-    private func aggregateCount(entityName: String,
-                                in modelContext: ModelContext,
-                                dateKey: String,
-                                from start: Date,
-                                to end: Date) -> Int? {
-        guard let nsContext = (modelContext as AnyObject).value(forKey: "nsContext") as? NSManagedObjectContext else {
-            return nil
-        }
-
-        let request = NSFetchRequest<NSDictionary>(entityName: entityName)
-        request.resultType = .dictionaryResultType
-
-        // dateKey BETWEEN {start, end}
-        request.predicate = NSPredicate(format: "%K >= %@ AND %K < %@", dateKey as NSString, start as NSDate, dateKey as NSString, end as NSDate)
-
-        let countExpression = NSExpressionDescription()
-        countExpression.name = "count"
-        countExpression.expression = NSExpression(forFunction: "count:", arguments: [NSExpression(forKeyPath: "self")])
-        countExpression.expressionResultType = .integer64AttributeType
-
-        request.propertiesToFetch = [countExpression]
-        request.includesSubentities = true
-
-        do {
-            if let result = try nsContext.fetch(request).first,
-               let count = result["count"] as? NSNumber {
-                return count.intValue
-            }
-        } catch {
-            return nil
-        }
-
-        return nil
     }
 }
 
