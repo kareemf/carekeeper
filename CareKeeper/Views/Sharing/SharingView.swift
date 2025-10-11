@@ -11,6 +11,8 @@ struct SharingView: View {
     @State private var careeToStopSharing: Caree?
     @State private var showingStopSharingConfirmation = false
     @State private var error: Error?
+    @State private var isInitialLoad = true
+    @State private var isRefreshingShares = false
 
     // Cache of CKShare by Caree.id so UI can compute synchronously
     @State private var sharesByCareeID: [UUID: CKShare] = [:]
@@ -27,9 +29,18 @@ struct SharingView: View {
 
     var body: some View {
         NavigationView {
-            List {
-                // Shared by Me section
-                if !sharedByMe.isEmpty {
+            Group {
+                if isInitialLoad {
+                    // Show loading state on first load
+                    VStack(spacing: 16) {
+                        ProgressView()
+                        Text(NSLocalizedString("Loading shared carees...", comment: "Loading shared carees message"))
+                            .foregroundColor(.secondary)
+                    }
+                } else {
+                    List {
+                        // Shared by Me section
+                        if !sharedByMe.isEmpty {
                     Section {
                         ForEach(sharedByMe) { caree in
                             NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
@@ -85,12 +96,35 @@ struct SharingView: View {
                         Text(NSLocalizedString("Shared with Me", comment: "Shared with me section header"))
                     }
                 }
+                    }
+                }
             }
             .refreshable {
+                isRefreshingShares = true
                 await sharedRecordsService.fetchSharedCarees()
                 await refreshShares()
+                isRefreshingShares = false
             }
             .navigationTitle(NSLocalizedString("Sharing", comment: "Sharing view title"))
+            .overlay {
+                if isRefreshingShares && !isInitialLoad {
+                    VStack {
+                        Spacer()
+                        HStack {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                            Text(NSLocalizedString("Refreshing...", comment: "Refreshing message"))
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(12)
+                        .background(Color(.systemBackground).opacity(0.9))
+                        .cornerRadius(10)
+                        .shadow(radius: 5)
+                        .padding(.bottom, 40)
+                    }
+                }
+            }
             .confirmationDialog(
                 NSLocalizedString("Stop Sharing?", comment: "Stop sharing confirmation title"),
                 isPresented: $showingStopSharingConfirmation,
@@ -111,8 +145,10 @@ struct SharingView: View {
             }
         }
         .task {
+            isInitialLoad = true
             await sharedRecordsService.fetchSharedCarees()
             await refreshShares()
+            isInitialLoad = false
         }
         .onChange(of: myCarees) {
             Task {
@@ -246,10 +282,6 @@ private struct SharedByMeRowView: View {
             }
 
             Spacer()
-
-            Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundColor(.secondary)
         }
     }
 }
@@ -287,10 +319,6 @@ private struct SharedWithMeRowView: View {
             }
 
             Spacer()
-
-            Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundColor(.secondary)
         }
     }
 }

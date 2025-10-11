@@ -4,9 +4,9 @@ struct CareeListRowView: View {
     let caree: Caree
     var isShared: Bool = false
 
-    @State private var isCheckingSync = false
-    @State private var isSyncedToCloudKit: Bool? = nil
-    @StateObject private var syncService = CloudKitSyncService()
+    @State private var hasShare = false
+    @StateObject private var sharingService = CloudKitSharingService()
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         HStack {
@@ -40,17 +40,15 @@ struct CareeListRowView: View {
                         .foregroundColor(.secondary)
 
                     #if os(iOS)
-                    // Sync status indicator
-                    if isCheckingSync || isSyncedToCloudKit != nil {
+                    // Share indicator - show if caree is shared with others
+                    if hasShare {
                         Text("•")
                             .font(.caption)
                             .foregroundColor(.secondary)
 
-                        CloudKitSyncStatusView(
-                            isChecking: isCheckingSync,
-                            isSynced: isSyncedToCloudKit,
-                            size: .small
-                        )
+                        Image(systemName: "person.2.fill")
+                            .font(.caption)
+                            .foregroundColor(.blue)
                     }
                     #endif
                 }
@@ -58,9 +56,10 @@ struct CareeListRowView: View {
         }
         .padding(.vertical, 4)
         .task {
-            isCheckingSync = true
-            isSyncedToCloudKit = await syncService.isSynced(caree: caree)
-            isCheckingSync = false
+            // Check if this caree has a share (is shared with others)
+            if !isShared {
+                hasShare = await sharingService.isShared(caree, in: modelContext)
+            }
         }
     }
     
