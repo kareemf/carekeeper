@@ -122,11 +122,12 @@ class CloudKitSharedRecordsService: ObservableObject {
     private func convertRecordsToCarees(_ records: [CKRecord]) async throws -> [Caree] {
         var carees: [Caree] = []
 
-        for record in records {
+        for record: CKRecord in records {
             // Extract data from CloudKit record
+            // SwiftData adds "CD_" prefix to all stored properties in CloudKit
             guard let cdId = record["CD_id"] as? String,
                   let uuid = UUID(uuidString: cdId),
-                  let name = record["name"] as? String else {
+                  let name = record["CD_name"] as? String else {
                 logger.warning("⚠️ Skipping record with missing required fields: \(record.recordID.recordName, privacy: .public)")
                 continue
             }
@@ -134,18 +135,18 @@ class CloudKitSharedRecordsService: ObservableObject {
             // Create a temporary Caree object (not persisted in SwiftData)
             let caree = Caree(
                 name: name,
-                listOrder: record["listOrder"] as? Int ?? 0
+                listOrder: record["CD_listOrder"] as? Int ?? 0
             )
             caree.id = uuid
 
             // Set other properties if they exist
-            if let imageAsset = record["image"] as? CKAsset,
+            if let imageAsset = record["CD_image"] as? CKAsset,
                let imageURL = imageAsset.fileURL,
                let imageData = try? Data(contentsOf: imageURL) {
                 caree.image = imageData
             }
 
-            if let dateCreated = record["dateCreated"] as? Date {
+            if let dateCreated = record["CD_dateCreated"] as? Date {
                 caree.dateCreated = dateCreated
             }
 
