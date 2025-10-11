@@ -4,9 +4,9 @@ struct CareeListRowView: View {
     let caree: Caree
     var isShared: Bool = false
 
-    @State private var hasShare = false
-    @StateObject private var sharingService = CloudKitSharingService()
-    @Environment(\.modelContext) private var modelContext
+    @State private var isCheckingSync = false
+    @State private var isSyncedToCloudKit: Bool? = nil
+    @StateObject private var syncService = CloudKitSyncService()
 
     var body: some View {
         HStack {
@@ -40,8 +40,9 @@ struct CareeListRowView: View {
                         .foregroundColor(.secondary)
 
                     #if os(iOS)
-                    // Share indicator - show if caree is shared with others
-                    if hasShare {
+                    // Show share icon for shared carees, sync status for owned carees
+                    if isShared {
+                        // This caree is shared with me - show share icon
                         Text("•")
                             .font(.caption)
                             .foregroundColor(.secondary)
@@ -49,6 +50,17 @@ struct CareeListRowView: View {
                         Image(systemName: "person.2.fill")
                             .font(.caption)
                             .foregroundColor(.blue)
+                    } else if isCheckingSync || isSyncedToCloudKit != nil {
+                        // This is my caree - show CloudKit sync status
+                        Text("•")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+
+                        CloudKitSyncStatusView(
+                            isChecking: isCheckingSync,
+                            isSynced: isSyncedToCloudKit,
+                            size: .small
+                        )
                     }
                     #endif
                 }
@@ -56,9 +68,11 @@ struct CareeListRowView: View {
         }
         .padding(.vertical, 4)
         .task {
-            // Check if this caree has a share (is shared with others)
+            // Only check sync status for owned carees
             if !isShared {
-                hasShare = await sharingService.isShared(caree, in: modelContext)
+                isCheckingSync = true
+                isSyncedToCloudKit = await syncService.isSynced(caree: caree)
+                isCheckingSync = false
             }
         }
     }
