@@ -5,9 +5,17 @@ struct CareeDetailView: View {
     @Environment(\.modelContext) private var modelContext
 
     let careeID: UUID
-    @Query private var allCarees: [Caree]
+    @Query private var myCarees: [Caree]  // Only private database records
 
-    // Computed property to get the specific caree
+    // Service for fetching shared records
+    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    
+    // Combined list of all carees (private + shared)
+    private var allCarees: [Caree] {
+        return myCarees + sharedRecordsService.sharedCarees
+    }
+
+    // Computed property to get the specific caree from both databases
     private var caree: Caree? {
         allCarees.first { $0.id == careeID }
     }
@@ -110,7 +118,26 @@ struct CareeDetailView: View {
                     await checkSyncStatus(for: caree)
                 }
                 .task {
-                    await checkSyncStatus(for: caree)
+                    sharedRecordsService.setModelContext(modelContext)
+
+                    // Only fetch shared carees if this caree is not in myCarees
+                    // This prevents unnecessary CloudKit queries when viewing owned carees
+                    if !myCarees.contains(where: { $0.id == careeID }) {
+                        await sharedRecordsService.fetchSharedCarees()
+                    }
+
+                    if let caree = self.caree {
+                        await checkSyncStatus(for: caree)
+                    }
+                }
+                .task(id: careeID) {
+                    // Refresh when caree ID changes
+                    sharedRecordsService.setModelContext(modelContext)
+
+                    // Only fetch shared carees if this caree is not in myCarees
+                    if !myCarees.contains(where: { $0.id == careeID }) {
+                        await sharedRecordsService.fetchSharedCarees()
+                    }
                 }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {

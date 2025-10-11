@@ -2,18 +2,39 @@ import SwiftUI
 import SwiftData
 
 struct CareeListView: View {
-    @Query(sort: \Caree.listOrder) private var carees: [Caree]
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \Caree.listOrder) private var myCarees: [Caree]  // Only private database records
+    
+    // Service for fetching shared records
+    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    
+    @State private var error: Error?
+    
+    // Combined list of all carees (private + shared)
+    private var allCarees: [Caree] {
+        return myCarees + sharedRecordsService.sharedCarees
+    }
 
     var body: some View {
         NavigationStack {
             Group {
-                if carees.isEmpty {
+                if allCarees.isEmpty {
                     emptyStateView
                 } else {
                     careeListView
                 }
             }
             .navigationTitle(NSLocalizedString("Carees", comment: "Navigation title for carees list"))
+            .task {
+                sharedRecordsService.setModelContext(modelContext)
+                await sharedRecordsService.fetchSharedCarees()
+            }
+            .onReceive(sharedRecordsService.$error) { newError in
+                if let newError = newError {
+                    error = newError
+                }
+            }
+            .errorAlert($error)
         }
     }
 
@@ -26,33 +47,59 @@ struct CareeListView: View {
             Text(NSLocalizedString("No Carees", comment: "Empty state title"))
                 .font(.headline)
 
-            Text(NSLocalizedString("Add carees on iPhone", comment: "Empty state description"))
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
+            if sharedRecordsService.isLoading {
+                ProgressView()
+                    .scaleEffect(0.8)
+                Text(NSLocalizedString("Loading shared carees...", comment: "Loading shared carees message"))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            } else {
+                Text(NSLocalizedString("Add carees on iPhone or accept shared ones", comment: "Empty state description"))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
         }
         .padding()
     }
 
     private var careeListView: some View {
-        List(carees) { caree in
+        List(allCarees) { caree in
             NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
-                CareeRowView(caree: caree)
+                CareeRowView(
+                    caree: caree, 
+                    isShared: sharedRecordsService.sharedCarees.contains { $0.id == caree.id }
+                )
             }
+        }
+        .refreshable {
+            sharedRecordsService.setModelContext(modelContext)
+            await sharedRecordsService.fetchSharedCarees()
         }
     }
 }
 
 struct CareeRowView: View {
     let caree: Caree
+    let isShared: Bool
 
     var body: some View {
         HStack {
             ProfileImageView(caree: caree)
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(caree.name)
-                    .font(.headline)
+                HStack {
+                    Text(caree.name)
+                        .font(.headline)
+                    
+                    if isShared {
+                        Image(systemName: "person.2.fill")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Spacer()
+                }
 
                 Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) Activity Types", comment: "Activity Types count"))
                     .font(.caption2)

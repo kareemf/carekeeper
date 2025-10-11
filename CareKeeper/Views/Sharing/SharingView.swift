@@ -4,8 +4,10 @@ import CloudKit
 
 struct SharingView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Caree.listOrder) private var carees: [Caree]
-
+    
+    // Query private database (my own records)
+    @Query(sort: \Caree.listOrder) private var myCarees: [Caree]
+    
     @State private var careeToStopSharing: Caree?
     @State private var showingStopSharingConfirmation = false
     @State private var error: Error?
@@ -14,6 +16,14 @@ struct SharingView: View {
     @State private var sharesByCareeID: [UUID: CKShare] = [:]
 
     private let sharingService = CloudKitSharingService()
+    
+    // Service for fetching shared records
+    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    
+    // Combined list of all carees (private + shared)
+    private var allCarees: [Caree] {
+        return myCarees + sharedRecordsService.sharedCarees
+    }
 
     var body: some View {
         NavigationView {
@@ -97,10 +107,21 @@ struct SharingView: View {
             }
         }
         .task {
+            sharedRecordsService.setModelContext(modelContext)
+            await sharedRecordsService.fetchSharedCarees()
             await refreshShares()
         }
-        .onChange(of: carees) {
-            Task { await refreshShares() }
+        .onChange(of: myCarees) {
+            Task { 
+                sharedRecordsService.setModelContext(modelContext)
+                await sharedRecordsService.fetchSharedCarees()
+                await refreshShares() 
+            }
+        }
+        .onReceive(sharedRecordsService.$error) { newError in
+            if let newError = newError {
+                error = newError
+            }
         }
         .errorAlert($error)
     }
@@ -108,14 +129,14 @@ struct SharingView: View {
     // MARK: - Computed Properties
 
     private var sharedByMe: [Caree] {
-        carees.filter { caree in
+        allCarees.filter { caree in
             guard let share = sharesByCareeID[caree.id] else { return false }
             return sharingService.isOwner(of: share)
         }
     }
 
     private var sharedWithMe: [Caree] {
-        carees.filter { caree in
+        allCarees.filter { caree in
             guard let share = sharesByCareeID[caree.id] else { return false }
             return !sharingService.isOwner(of: share)
         }
@@ -146,7 +167,7 @@ struct SharingView: View {
 
     private func refreshShares() async {
         var next: [UUID: CKShare] = [:]
-        for caree in carees {
+        for caree in allCarees {
             do {
                 if let share = try await sharingService.getShare(for: caree, in: modelContext) {
                     next[caree.id] = share

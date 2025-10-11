@@ -9,12 +9,15 @@ struct CareKeeperApp: App {
     @UIApplicationDelegateAdaptor var appDelegate: AppDelegate
 
     @StateObject private var shareNotifier = ShareAcceptanceNotifier()
+    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    @StateObject private var notificationService = CloudKitNotificationService()
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Caree.self,
             ActivityType.self,
-            Activity.self
+            Activity.self,
+            AcceptedShare.self
         ])
 
         // Check if running UI tests
@@ -124,6 +127,7 @@ struct CareKeeperApp: App {
             ContentView()
                 .onAppear {
                     checkCloudKitStatus()
+                    setupNotificationService()
                 }
                 // App-wide alert to surface share acceptance/failure from SceneDelegate notifications.
                 .alert(shareNotifier.alertTitle, isPresented: $shareNotifier.isPresentingAlert) {
@@ -160,6 +164,17 @@ struct CareKeeperApp: App {
             } catch {
                 print("❌ Failed to check iCloud account status: \(error)")
             }
+        }
+    }
+    
+    private func setupNotificationService() {
+        // Set the model context on the shared records service
+        sharedRecordsService.setModelContext(sharedModelContainer.mainContext)
+        
+        Task {
+            // Setup CloudKit notifications
+            await notificationService.setupNotifications(sharedRecordsService: sharedRecordsService)
+            print("✅ CloudKit notification service setup complete")
         }
     }
 }
