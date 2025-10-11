@@ -38,19 +38,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             logger.info("📨 Received CloudKit notification: \(notification.notificationType.rawValue)")
 
             // Post notification for CloudKitSharedRecordsService to observe
-            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-               let window = windowScene.windows.first,
-               let contentView = window.rootViewController?.view {
+            NotificationCenter.default.post(
+                name: NSNotification.Name("CloudKitNotificationReceived"),
+                object: notification
+            )
 
-                NotificationCenter.default.post(
-                    name: NSNotification.Name("CloudKitNotificationReceived"),
-                    object: notification
-                )
-
-                completionHandler(.newData)
-            } else {
-                completionHandler(.noData)
-            }
+            completionHandler(.newData)
         } else {
             completionHandler(.noData)
         }
