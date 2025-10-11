@@ -20,6 +20,11 @@ struct CareeDetailView: View {
         allCarees.first { $0.id == careeID }
     }
 
+    // Check if this is one of my owned carees (vs shared)
+    private var isMyCaree: Bool {
+        myCarees.contains(where: { $0.id == careeID })
+    }
+
     @State private var showingEditCaree = false
     @State private var showingAddActivityType = false
     @State private var showingTrackActivity = false
@@ -131,7 +136,8 @@ struct CareeDetailView: View {
                             #if os(iOS)
                             CareeShareButton(
                                 caree: caree,
-                                isSynced: isSyncedToCloudKit ?? false
+                                isSynced: isSyncedToCloudKit ?? false,
+                                isMyCaree: isMyCaree
                             )
 
                             Button {
@@ -202,8 +208,6 @@ struct CareeDetailView: View {
         .task {
             // Only fetch shared carees if this caree is not in myCarees
             // This prevents unnecessary CloudKit queries when viewing owned carees
-            let isMyCaree = myCarees.contains(where: { $0.id == careeID })
-
             if !isMyCaree {
                 isLoadingSharedCaree = true
                 await sharedRecordsService.fetchSharedCarees()
@@ -217,8 +221,6 @@ struct CareeDetailView: View {
         .task(id: careeID) {
             // Refresh when caree ID changes
             // Only fetch shared carees if this caree is not in myCarees
-            let isMyCaree = myCarees.contains(where: { $0.id == careeID })
-
             if !isMyCaree {
                 isLoadingSharedCaree = true
                 await sharedRecordsService.fetchSharedCarees()

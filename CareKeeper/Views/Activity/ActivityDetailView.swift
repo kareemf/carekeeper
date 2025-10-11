@@ -7,11 +7,33 @@ struct ActivityDetailView: View {
     @Environment(\.modelContext) private var modelContext
 
     let activityID: UUID
-    @Query private var allActivities: [Activity]
+    @Query private var myActivities: [Activity]  // Only private database records
+
+    // Services for shared records
+    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    @StateObject private var sharedDataService = CloudKitSharedDataService()
+
+    // Combined list of all activities (private + shared)
+    private var allActivities: [Activity] {
+        var activities = myActivities
+        // Add activities from shared carees
+        for caree in sharedRecordsService.sharedCarees {
+            if let careeActivities = caree.activities {
+                activities.append(contentsOf: careeActivities)
+            }
+        }
+        return activities
+    }
 
     // Computed property to get the specific activity
     private var activity: Activity? {
         allActivities.first { $0.id == activityID }
+    }
+
+    // Check if this activity belongs to a shared caree
+    private var isSharedActivity: Bool {
+        guard let activity = activity, let caree = activity.caree else { return false }
+        return sharedRecordsService.sharedCarees.contains { $0.id == caree.id }
     }
 
     @State private var isEditing = false
@@ -20,6 +42,7 @@ struct ActivityDetailView: View {
     @State private var editingDateTime: Date = Date()
     @State private var showingDeleteConfirmation = false
     @State private var error: Error?
+    @State private var isSaving = false
 
     init(activityID: UUID) {
         self.activityID = activityID
@@ -52,8 +75,14 @@ struct ActivityDetailView: View {
                         ToolbarItem(placement: .navigationBarTrailing) {
                             HStack {
                                 if isEditing {
-                                    Button(NSLocalizedString("Save", comment: "Save button")) {
-                                        saveChanges(for: activity)
+                                    if isSaving {
+                                        ProgressView()
+                                            .progressViewStyle(.circular)
+                                            .scaleEffect(0.8)
+                                    } else {
+                                        Button(NSLocalizedString("Save", comment: "Save button")) {
+                                            saveChanges(for: activity)
+                                        }
                                     }
                                 } else {
                                     Menu {
@@ -91,6 +120,9 @@ struct ActivityDetailView: View {
                 }
                 .onAppear {
                     setupEditingValues(for: activity)
+                }
+                .task {
+                    await sharedRecordsService.fetchSharedCarees()
                 }
             } else {
                 Text(NSLocalizedString("Activity not found", comment: "Activity not found message"))
@@ -237,11 +269,46 @@ struct ActivityDetailView: View {
     }
 
     private func saveChanges(for activity: Activity) {
+        guard let caree = activity.caree else {
+            error = AppError.invalidInput("Activity has no associated caree")
+            return
+        }
+
+        // Update local values
         activity.notes = editingNotes.isEmpty ? nil : editingNotes
         activity.quantity = Double(editingQuantity)
         activity.dateTime = editingDateTime
 
-        isEditing = false
+        if isSharedActivity {
+            // Handle shared activity - use CloudKit service
+            isSaving = true
+            Task {
+                do {
+                    try await sharedDataService.updateActivity(activity, caree: caree)
+
+                    // Refresh shared carees to reflect changes
+                    await sharedRecordsService.fetchSharedCarees()
+
+                    await MainActor.run {
+                        isSaving = false
+                        isEditing = false
+                    }
+                } catch {
+                    await MainActor.run {
+                        self.error = AppError.saveFailed(error.localizedDescription)
+                        isSaving = false
+                    }
+                }
+            }
+        } else {
+            // Handle owned activity - use SwiftData
+            do {
+                try modelContext.save()
+                isEditing = false
+            } catch {
+                self.error = AppError.saveFailed(error.localizedDescription)
+            }
+        }
     }
 
     private func openInMaps(for activity: Activity) {
@@ -254,13 +321,39 @@ struct ActivityDetailView: View {
     }
 
     private func deleteActivity(_ activity: Activity) {
-        modelContext.delete(activity)
+        guard let caree = activity.caree else {
+            error = AppError.invalidInput("Activity has no associated caree")
+            return
+        }
 
-        do {
-            try modelContext.save()
-            dismiss()
-        } catch {
-            self.error = AppError.deleteFailed(error.localizedDescription)
+        if isSharedActivity {
+            // Handle shared activity - use CloudKit service
+            Task {
+                do {
+                    try await sharedDataService.deleteActivity(activity, caree: caree)
+
+                    // Refresh shared carees to reflect changes
+                    await sharedRecordsService.fetchSharedCarees()
+
+                    await MainActor.run {
+                        dismiss()
+                    }
+                } catch {
+                    await MainActor.run {
+                        self.error = AppError.deleteFailed(error.localizedDescription)
+                    }
+                }
+            }
+        } else {
+            // Handle owned activity - use SwiftData
+            modelContext.delete(activity)
+
+            do {
+                try modelContext.save()
+                dismiss()
+            } catch {
+                self.error = AppError.deleteFailed(error.localizedDescription)
+            }
         }
     }
 }

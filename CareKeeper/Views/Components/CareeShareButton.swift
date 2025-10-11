@@ -6,6 +6,7 @@ import CloudKit
 struct CareeShareButton: View {
     let caree: Caree
     let isSynced: Bool
+    let isMyCaree: Bool
 
     @Environment(\.modelContext) private var modelContext
 
@@ -17,12 +18,17 @@ struct CareeShareButton: View {
     @State private var isShared = false
 
     private let sharingService = CloudKitSharingService()
+    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
     private let container = CKContainer(identifier: CloudKitConfig.containerID)
 
     var body: some View {
         Button {
             // Pre-share validation
-            if !isSynced {
+            if !isMyCaree {
+               Task {
+                    await prepareNonOwnedShare()
+                } 
+            } else if !isSynced {
                 showingSyncAlert = true
             } else {
                 Task {
@@ -84,10 +90,27 @@ struct CareeShareButton: View {
             self.error = error
         }
     }
+
+    private func prepareNonOwnedShare() async {
+        isLoading = true
+        defer { isLoading = false }
+
+        // Fetch shared carees to get the share
+        await sharedRecordsService.fetchSharedCarees()
+
+        // Get the share for this caree
+        if let finalShare = sharedRecordsService.sharesByCareeID[caree.id] {
+            self.share = finalShare
+            self.isShared = true
+            self.showingShareSheet = true
+        } else {
+            self.error = AppError.invalidInput("Could not find share for this caree")
+        }
+    }
 }
 
 #Preview {
-    CareeShareButton(caree: PreviewData.sampleCaree, isSynced: true)
+    CareeShareButton(caree: PreviewData.sampleCaree, isSynced: true, isMyCaree: true)
         .modelContainer(PreviewContainer.shared)
 }
 #endif
