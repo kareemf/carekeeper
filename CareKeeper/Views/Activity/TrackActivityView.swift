@@ -20,6 +20,7 @@ struct TrackActivityView: View {
 
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
     @StateObject private var sharedDataService = CloudKitSharedDataService()
+    @StateObject private var sharingService = CloudKitSharingService()
 
     private var isSharedCaree: Bool {
         sharedRecordsService.sharedCarees.contains { $0.id == caree.id }
@@ -260,6 +261,12 @@ struct TrackActivityView: View {
                     modelContext.insert(newActivity)
                     do {
                         try modelContext.save()
+
+                        // If caree is shared, ensure parent references are set for the new child record
+                        Task {
+                            await sharingService.ensureParentReferencesIfShared(for: caree, in: modelContext)
+                        }
+
                         WidgetCenter.shared.reloadAllTimelines()
                     } catch {
                         self.error = AppError.saveFailed(error.localizedDescription)

@@ -181,6 +181,29 @@ class CloudKitSharingService: ObservableObject {
         return share.url
     }
 
+    // MARK: - Auto Parent Reference Handling
+
+    /// Ensure parent references for newly created child records if Caree is shared
+    /// Call this after creating new ActivityTypes or Activities in SwiftData
+    /// This handles the edge case where the owner creates new child records after sharing
+    func ensureParentReferencesIfShared(for caree: Caree, in modelContext: ModelContext) async {
+        // Only run if Caree is shared
+        guard await isShared(caree, in: modelContext) else {
+            logger.debug("Caree not shared, skipping parent reference check")
+            return
+        }
+
+        logger.info("📝 Caree is shared, ensuring parent references for newly created child records...")
+
+        // Fix parent references for any new child records
+        do {
+            try await parentReferenceService.ensureParentReferences(for: caree)
+            logger.info("✅ Parent references ensured for newly created child records")
+        } catch {
+            logger.error("Failed to ensure parent references for newly created child records: \(error.localizedDescription)")
+        }
+    }
+
     // MARK: - Private Helpers
 
     /// Log child records for diagnostics

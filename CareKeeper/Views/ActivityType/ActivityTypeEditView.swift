@@ -18,6 +18,7 @@ struct ActivityTypeEditView: View {
 
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
     @StateObject private var sharedDataService = CloudKitSharedDataService()
+    @StateObject private var sharingService = CloudKitSharingService()
 
     private var isEditing: Bool { activityType != nil }
 
@@ -179,6 +180,12 @@ struct ActivityTypeEditView: View {
 
             do {
                 try modelContext.save()
+
+                // If caree is shared, ensure parent references are set for the new child record
+                Task {
+                    await sharingService.ensureParentReferencesIfShared(for: caree, in: modelContext)
+                }
+
                 isSaving = false
                 dismiss()
             } catch {
