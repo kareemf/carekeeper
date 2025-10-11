@@ -125,36 +125,6 @@ struct CareeDetailView: View {
                 .refreshable {
                     await checkSyncStatus(for: caree)
                 }
-                .task {
-                    // Only fetch shared carees if this caree is not in myCarees
-                    // This prevents unnecessary CloudKit queries when viewing owned carees
-                    let isMyCaree = myCarees.contains(where: { $0.id == careeID })
-
-                    if !isMyCaree {
-                        isLoadingSharedCaree = true
-                        await sharedRecordsService.fetchSharedCarees()
-                        isLoadingSharedCaree = false
-                    }
-
-                    if let caree = self.caree {
-                        await checkSyncStatus(for: caree)
-                    }
-                }
-                .task(id: careeID) {
-                    // Refresh when caree ID changes
-                    // Only fetch shared carees if this caree is not in myCarees
-                    let isMyCaree = myCarees.contains(where: { $0.id == careeID })
-
-                    if !isMyCaree {
-                        isLoadingSharedCaree = true
-                        await sharedRecordsService.fetchSharedCarees()
-                        isLoadingSharedCaree = false
-                    }
-                }
-                .onChange(of: sharedRecordsService.sharedCarees) {
-                    // Trigger UI update when shared carees change
-                    isLoadingSharedCaree = false
-                }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         HStack(spacing: 16) {
@@ -228,6 +198,36 @@ struct CareeDetailView: View {
                 Text(NSLocalizedString("Caree not found", comment: "Caree not found message"))
                     .foregroundColor(.secondary)
             }
+        }
+        .task {
+            // Only fetch shared carees if this caree is not in myCarees
+            // This prevents unnecessary CloudKit queries when viewing owned carees
+            let isMyCaree = myCarees.contains(where: { $0.id == careeID })
+
+            if !isMyCaree {
+                isLoadingSharedCaree = true
+                await sharedRecordsService.fetchSharedCarees()
+                isLoadingSharedCaree = false
+            }
+
+            if let caree = self.caree {
+                await checkSyncStatus(for: caree)
+            }
+        }
+        .task(id: careeID) {
+            // Refresh when caree ID changes
+            // Only fetch shared carees if this caree is not in myCarees
+            let isMyCaree = myCarees.contains(where: { $0.id == careeID })
+
+            if !isMyCaree {
+                isLoadingSharedCaree = true
+                await sharedRecordsService.fetchSharedCarees()
+                isLoadingSharedCaree = false
+            }
+        }
+        .onChange(of: sharedRecordsService.sharedCarees) {
+            // Trigger UI update when shared carees change
+            isLoadingSharedCaree = false
         }
     }
 
