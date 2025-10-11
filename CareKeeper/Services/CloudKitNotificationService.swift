@@ -6,6 +6,7 @@ import SwiftData
 @MainActor
 class CloudKitNotificationService: ObservableObject {
     private let container = CKContainer(identifier: CloudKitConfig.containerID)
+    private let logger = AppLogger.cloudkit
 
     /// Set up CloudKit database subscriptions for notifications
     /// Note: Uses silent background notifications only - no user permission required
@@ -28,21 +29,21 @@ class CloudKitNotificationService: ObservableObject {
             // Check if subscription already exists
             let existingSubscriptions = try await sharedDatabase.allSubscriptions()
             if existingSubscriptions.contains(where: { $0.subscriptionID == subscriptionID }) {
-                print("✅ Shared database subscription already exists")
+                logger.info("✅ Shared database subscription already exists")
                 return
             }
-            
+
             // Create database subscription for shared database
             let subscription = CKDatabaseSubscription(subscriptionID: subscriptionID)
             subscription.notificationInfo = CKSubscription.NotificationInfo()
             subscription.notificationInfo?.shouldSendContentAvailable = true
             subscription.notificationInfo?.shouldBadge = false // Silent notification
-            
+
             let savedSubscription = try await sharedDatabase.save(subscription)
-            print("✅ Created shared database subscription: \(savedSubscription.subscriptionID)")
-            
+            logger.info("✅ Created shared database subscription: \(savedSubscription.subscriptionID)")
+
         } catch {
-            print("❌ Error setting up shared database subscription: \(error)")
+            logger.error("❌ Error setting up shared database subscription: \(error.localizedDescription)")
         }
     }
     
@@ -55,10 +56,10 @@ class CloudKitNotificationService: ObservableObject {
             // Check if subscription already exists
             let existingSubscriptions = try await privateDatabase.allSubscriptions()
             if existingSubscriptions.contains(where: { $0.subscriptionID == subscriptionID }) {
-                print("✅ Private database share subscription already exists")
+                logger.info("✅ Private database share subscription already exists")
                 return
             }
-            
+
             // Create query subscription for CKShare records in private database
             let predicate = NSPredicate(value: true)
             let subscription = CKQuerySubscription(
@@ -69,12 +70,12 @@ class CloudKitNotificationService: ObservableObject {
             subscription.notificationInfo = CKSubscription.NotificationInfo()
             subscription.notificationInfo?.shouldSendContentAvailable = true
             subscription.notificationInfo?.shouldBadge = false // Silent notification
-            
+
             let savedSubscription = try await privateDatabase.save(subscription)
-            print("✅ Created private share subscription: \(savedSubscription.subscriptionID)")
-            
+            logger.info("✅ Created private share subscription: \(savedSubscription.subscriptionID)")
+
         } catch {
-            print("❌ Error setting up private share subscription: \(error)")
+            logger.error("❌ Error setting up private share subscription: \(error.localizedDescription)")
         }
     }
 }

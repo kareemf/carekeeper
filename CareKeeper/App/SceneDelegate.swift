@@ -9,6 +9,7 @@ extension Notification.Name {
 }
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    private let logger = AppLogger.sharing
     // @see https://developer.apple.com/documentation/coredata/accepting-share-invitations-in-a-swiftui-app
     func windowScene(_ windowScene: UIWindowScene,
                      userDidAcceptCloudKitShareWith cloudKitShareMetadata: CKShare.Metadata) {
@@ -17,12 +18,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         Task {
             do {
                 let acceptedShare = try await acceptShare(with: cloudKitShareMetadata, in: container)
-                print("✅ Successfully accepted share: \(acceptedShare.recordID)")
+                logger.info("✅ Successfully accepted share: \(acceptedShare.recordID.recordName)")
 
                 // Notify SwiftUI to present an app-wide alert (see ShareAcceptanceNotifier)
                 NotificationCenter.default.post(name: .cloudKitShareAccepted, object: acceptedShare)
             } catch {
-                print("❌ Failed to accept share: \(error.localizedDescription)")
+                logger.error("❌ Failed to accept share: \(error.localizedDescription)")
 
                 // Notify SwiftUI to present an app-wide alert (see ShareAcceptanceNotifier)
                 NotificationCenter.default.post(name: .cloudKitShareAcceptanceFailed, object: error)

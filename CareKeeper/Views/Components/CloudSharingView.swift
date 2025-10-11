@@ -35,13 +35,14 @@ struct CloudSharingView: UIViewControllerRepresentable {
 
     class Coordinator: NSObject, UICloudSharingControllerDelegate {
         let onDismiss: () -> Void
+        private let logger = AppLogger.sharing
 
         init(onDismiss: @escaping () -> Void) {
             self.onDismiss = onDismiss
         }
 
         func cloudSharingController(_ csc: UICloudSharingController, failedToSaveShareWithError error: Error) {
-            Logger.logError("Failed to save share with error", error: error)
+            logger.error("Failed to save share: \(error.localizedDescription)")
             onDismiss()
         }
 

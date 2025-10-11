@@ -7,6 +7,7 @@ import CloudKit
 @MainActor
 class CloudKitSharedRecordsService: ObservableObject {
     private let container = CKContainer(identifier: CloudKitConfig.containerID)
+    private let logger = AppLogger.cloudkit
 
     @Published var sharedCarees: [Caree] = []
     @Published var isLoading = false
@@ -20,7 +21,7 @@ class CloudKitSharedRecordsService: ObservableObject {
             queue: .main
         ) { [weak self] notification in
             if let ckNotification = notification.object as? CKNotification {
-                print("🔔 CloudKit notification received - refreshing shared carees")
+                self?.logger.info("🔔 CloudKit notification received - refreshing shared carees")
                 Task {
                     await self?.handleCloudKitNotification(ckNotification)
                 }
@@ -30,7 +31,7 @@ class CloudKitSharedRecordsService: ObservableObject {
 
     /// Handle CloudKit notifications by refreshing the shared carees list
     private func handleCloudKitNotification(_ notification: CKNotification) async {
-        print("📨 Processing CloudKit notification: \(notification.notificationType)")
+        logger.info("📨 Processing CloudKit notification: \(notification.notificationType.rawValue)")
 
         // For any CloudKit change, refresh the shared carees
         // The zone-based query will automatically reflect the current state
@@ -53,7 +54,7 @@ class CloudKitSharedRecordsService: ObservableObject {
             // Step 1: Fetch all zones in the shared database
             // Each accepted share creates a zone with the owner's records
             let zones = try await sharedDatabase.allRecordZones()
-            print("📱 Found \(zones.count) shared zones")
+            logger.info("📱 Found \(zones.count) shared zones")
 
             if zones.isEmpty {
                 await MainActor.run {
@@ -72,7 +73,7 @@ class CloudKitSharedRecordsService: ObservableObject {
                     continue
                 }
 
-                print("🔍 Querying zone: \(zone.zoneID.zoneName)")
+                logger.info("🔍 Querying zone: \(zone.zoneID.zoneName)")
 
                 let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
 
@@ -87,13 +88,13 @@ class CloudKitSharedRecordsService: ObservableObject {
                         switch result {
                         case .success(let record):
                             allRecords.append(record)
-                            print("  ✅ Found caree: \(record["name"] as? String ?? "unknown")")
+                            logger.info("  ✅ Found caree: \(record["name"] as? String ?? "unknown")")
                         case .failure(let error):
-                            print("  ⚠️ Failed to fetch record: \(error)")
+                            logger.warning("  ⚠️ Failed to fetch record: \(error.localizedDescription)")
                         }
                     }
                 } catch {
-                    print("  ⚠️ Failed to query zone \(zone.zoneID.zoneName): \(error)")
+                    logger.warning("  ⚠️ Failed to query zone \(zone.zoneID.zoneName): \(error.localizedDescription)")
                     // Continue with other zones instead of failing completely
                 }
             }
@@ -104,14 +105,14 @@ class CloudKitSharedRecordsService: ObservableObject {
             await MainActor.run {
                 self.sharedCarees = carees
                 self.isLoading = false
-                print("✅ Successfully fetched \(carees.count) shared carees from \(zones.count - 1) zones")
+                logger.info("✅ Successfully fetched \(carees.count) shared carees from \(zones.count - 1) zones")
             }
 
         } catch {
             await MainActor.run {
                 self.error = error
                 self.isLoading = false
-                print("❌ Failed to fetch shared carees: \(error)")
+                logger.error("❌ Failed to fetch shared carees: \(error.localizedDescription)")
             }
         }
     }
@@ -126,7 +127,7 @@ class CloudKitSharedRecordsService: ObservableObject {
             guard let cdId = record["CD_id"] as? String,
                   let uuid = UUID(uuidString: cdId),
                   let name = record["name"] as? String else {
-                print("⚠️ Skipping record with missing required fields: \(record.recordID)")
+                logger.warning("⚠️ Skipping record with missing required fields: \(record.recordID.recordName)")
                 continue
             }
 

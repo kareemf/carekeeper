@@ -6,7 +6,8 @@ import CloudKit
 class CloudKitSharingService: ObservableObject {
     private let container: CKContainer
     private let zoneID: CKRecordZone.ID
-    
+    private let logger = AppLogger.sharing
+
     init(containerIdentifier: String = CloudKitConfig.containerID) {
         self.container = CKContainer(identifier: containerIdentifier)
         self.zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
@@ -32,7 +33,7 @@ class CloudKitSharingService: ObservableObject {
             let shareRecord = try await container.privateCloudDatabase.record(for: shareReference.recordID)
             return shareRecord as? CKShare
         } catch {
-            Logger.logError("Failed to fetch share record", error: error)
+            logger.error("Failed to fetch share record: \(error.localizedDescription)")
             throw error
         }
     }
@@ -41,7 +42,7 @@ class CloudKitSharingService: ObservableObject {
         do {
             return try await getShare(for: caree, in: modelContext) != nil
         } catch {
-            Logger.logError("Failed to check share status", error: error)
+            logger.error("Failed to check share status: \(error.localizedDescription)")
             return false
         }
     }
@@ -82,7 +83,7 @@ class CloudKitSharingService: ObservableObject {
                 throw AppError.invalidInput("Failed to save share to CloudKit")
             }
         } catch {
-            Logger.logError("Failed to create share", error: error)
+            logger.error("Failed to create share: \(error.localizedDescription)")
             throw error
         }
     }
@@ -101,7 +102,7 @@ class CloudKitSharingService: ObservableObject {
             }
             return isOwner(of: share)
         } catch {
-            Logger.logError("Failed to determine delete permission", error: error)
+            logger.error("Failed to determine delete permission: \(error.localizedDescription)")
             return false
         }
     }
@@ -122,7 +123,7 @@ class CloudKitSharingService: ObservableObject {
         do {
             try await container.privateCloudDatabase.deleteRecord(withID: share.recordID)
         } catch {
-            Logger.logError("Failed to delete share", error: error)
+            logger.error("Failed to delete share: \(error.localizedDescription)")
             throw error
         }
     }
@@ -139,7 +140,7 @@ class CloudKitSharingService: ObservableObject {
         do {
             _ = try await container.privateCloudDatabase.save(share)
         } catch {
-            Logger.logError("Failed to save share", error: error)
+            logger.error("Failed to save share: \(error.localizedDescription)")
             throw error
         }
     }
@@ -174,10 +175,10 @@ class CloudKitSharingService: ObservableObject {
                     throw error
                 }
             }
-            
+
             return nil
         } catch {
-            Logger.logError("Failed to find CloudKit record for caree", error: error)
+            logger.error("Failed to find CloudKit record for caree: \(error.localizedDescription)")
             throw error
         }
     }

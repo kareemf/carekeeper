@@ -36,9 +36,9 @@ struct CareKeeperApp: App {
                 )
             } else {
                 // Configure for CloudKit sync with local storage
-                print("🔧 Initializing ModelContainer with CloudKit sync")
-                print("   Container: \(CloudKitConfig.containerID)")
-                print("   App Group: \(CloudKitConfig.appGroupID)")
+                AppLogger.app.info("🔧 Initializing ModelContainer with CloudKit sync")
+                AppLogger.app.info("   Container: \(CloudKitConfig.containerID)")
+                AppLogger.app.info("   App Group: \(CloudKitConfig.appGroupID)")
 
                 // Configure for both local (iOS↔️watchOS) and cloud (iCloud) sync
                 let modelConfiguration = ModelConfiguration(
@@ -53,9 +53,9 @@ struct CareKeeperApp: App {
                     configurations: [modelConfiguration]
                 )
 
-                print("✅ ModelContainer created successfully")
+                AppLogger.app.info("✅ ModelContainer created successfully")
                 if let url = container.configurations.first?.url {
-                    print("   📦 Container URL: \(url.path)")
+                    AppLogger.app.info("   📦 Container URL: \(url.path)")
                 }
 
                 // Monitor for sync errors
@@ -64,7 +64,7 @@ struct CareKeeperApp: App {
                     object: nil,
                     queue: nil
                 ) { notification in
-                    print("📡 Persistent store remote change notification: \(notification)")
+                    AppLogger.cloudkit.info("📡 Persistent store remote change notification: \(String(describing: notification))")
                 }
 
                 // Monitor for delete operations and CloudKit export
@@ -75,24 +75,24 @@ struct CareKeeperApp: App {
                 ) { notification in
                     if let deleted = notification.userInfo?[NSDeletedObjectsKey] as? Set<NSManagedObject> {
                         if !deleted.isEmpty {
-                            print("⚠️ DELETE DETECTED: \(deleted.count) objects deleted")
+                            AppLogger.cloudkit.info("⚠️ DELETE DETECTED: \(deleted.count) objects deleted")
                             for obj in deleted {
-                                print("   - Deleted: \(type(of: obj)) - \(obj)")
+                                AppLogger.cloudkit.debug("   - Deleted: \(type(of: obj)) - \(String(describing: obj))")
                             }
                         }
                     }
                     if let inserted = notification.userInfo?[NSInsertedObjectsKey] as? Set<NSManagedObject> {
                         if !inserted.isEmpty {
-                            print("➕ INSERT DETECTED: \(inserted.count) objects inserted")
+                            AppLogger.cloudkit.info("➕ INSERT DETECTED: \(inserted.count) objects inserted")
                             for obj in inserted {
-                                print("   - Inserted: \(type(of: obj)) - \(obj)")
+                                AppLogger.cloudkit.debug("   - Inserted: \(type(of: obj)) - \(String(describing: obj))")
                             }
-                            print("   ⏳ Waiting for CloudKit export (should happen within 5-30 seconds)...")
+                            AppLogger.cloudkit.info("   ⏳ Waiting for CloudKit export (should happen within 5-30 seconds)...")
                         }
                     }
                     if let updated = notification.userInfo?[NSUpdatedObjectsKey] as? Set<NSManagedObject> {
                         if !updated.isEmpty {
-                            print("✏️ UPDATE DETECTED: \(updated.count) objects updated")
+                            AppLogger.cloudkit.info("✏️ UPDATE DETECTED: \(updated.count) objects updated")
                         }
                     }
                 }
@@ -103,19 +103,19 @@ struct CareKeeperApp: App {
                     object: nil,
                     queue: nil
                 ) { notification in
-                    print("☁️ CloudKit event notification: \(notification)")
+                    AppLogger.cloudkit.info("☁️ CloudKit event notification: \(String(describing: notification))")
                 }
 
                 return container
             }
         } catch {
-            print("❌ CRITICAL: Failed to create ModelContainer")
-            print("   Error: \(error)")
-            print("   Error details: \(String(describing: error))")
+            AppLogger.app.error("❌ CRITICAL: Failed to create ModelContainer")
+            AppLogger.app.error("   Error: \(error.localizedDescription)")
+            AppLogger.app.error("   Error details: \(String(describing: error))")
             if let nsError = error as NSError? {
-                print("   Domain: \(nsError.domain)")
-                print("   Code: \(nsError.code)")
-                print("   UserInfo: \(nsError.userInfo)")
+                AppLogger.app.error("   Domain: \(nsError.domain)")
+                AppLogger.app.error("   Code: \(nsError.code)")
+                AppLogger.app.error("   UserInfo: \(String(describing: nsError.userInfo))")
             }
             fatalError("Cannot create ModelContainer: \(error)")
         }
@@ -148,29 +148,29 @@ struct CareKeeperApp: App {
                 let status = try await container.accountStatus()
                 switch status {
                 case .available:
-                    print("✅ iCloud account: Available")
+                    AppLogger.cloudkit.info("✅ iCloud account: Available")
                 case .noAccount:
-                    print("❌ iCloud account: No account signed in")
+                    AppLogger.cloudkit.error("❌ iCloud account: No account signed in")
                 case .restricted:
-                    print("❌ iCloud account: Restricted")
+                    AppLogger.cloudkit.error("❌ iCloud account: Restricted")
                 case .couldNotDetermine:
-                    print("⚠️ iCloud account: Could not determine")
+                    AppLogger.cloudkit.warning("⚠️ iCloud account: Could not determine")
                 case .temporarilyUnavailable:
-                    print("⚠️ iCloud account: Temporarily unavailable")
+                    AppLogger.cloudkit.warning("⚠️ iCloud account: Temporarily unavailable")
                 @unknown default:
-                    print("⚠️ iCloud account: Unknown status")
+                    AppLogger.cloudkit.warning("⚠️ iCloud account: Unknown status")
                 }
             } catch {
-                print("❌ Failed to check iCloud account status: \(error)")
+                AppLogger.cloudkit.error("❌ Failed to check iCloud account status: \(error.localizedDescription)")
             }
         }
     }
-    
-    private func setupNotificationService() {        
+
+    private func setupNotificationService() {
         Task {
             // Setup CloudKit notifications
             await notificationService.setupNotifications(sharedRecordsService: sharedRecordsService)
-            print("✅ CloudKit notification service setup complete")
+            AppLogger.cloudkit.info("✅ CloudKit notification service setup complete")
         }
     }
 }

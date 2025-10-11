@@ -4,6 +4,7 @@ import UIKit
 import CloudKit
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    private let logger = AppLogger.cloudkit
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Register for remote notifications to receive CloudKit notifications
@@ -34,7 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Handle CloudKit notifications
         if let notification = CKNotification(fromRemoteNotificationDictionary: userInfo) {
-            print("📨 Received CloudKit notification: \(notification.notificationType)")
+            logger.info("📨 Received CloudKit notification: \(notification.notificationType.rawValue)")
 
             // Post notification for CloudKitSharedRecordsService to observe
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -45,7 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     name: NSNotification.Name("CloudKitNotificationReceived"),
                     object: notification
                 )
-                
+
                 completionHandler(.newData)
             } else {
                 completionHandler(.noData)
@@ -56,10 +57,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        print("❌ Failed to register for remote notifications: \(error)")
+        logger.error("❌ Failed to register for remote notifications: \(error.localizedDescription)")
     }
-    
+
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        print("✅ Successfully registered for remote notifications")
+        logger.info("✅ Successfully registered for remote notifications")
     }
 }
