@@ -18,37 +18,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             do {
                 let acceptedShare = try await acceptShare(with: cloudKitShareMetadata, in: container)
                 print("✅ Successfully accepted share: \(acceptedShare.recordID)")
-                
-                broadcastAcceptedShare(acceptedShare, metadata: cloudKitShareMetadata)
-                
+
                 // Notify SwiftUI to present an app-wide alert (see ShareAcceptanceNotifier)
                 NotificationCenter.default.post(name: .cloudKitShareAccepted, object: acceptedShare)
             } catch {
                 print("❌ Failed to accept share: \(error.localizedDescription)")
-                
+
                 // Notify SwiftUI to present an app-wide alert (see ShareAcceptanceNotifier)
                 NotificationCenter.default.post(name: .cloudKitShareAcceptanceFailed, object: error)
             }
         }
-    }
-    
-    /// Broad the accepted share so it appears in CloudKitSharedRecordsService to be tracked/persisted
-    private func broadcastAcceptedShare(_ share: CKShare, metadata: CKShare.Metadata) {
-        let rootRecordID = metadata.hierarchicalRootRecordID
-        
-        let shareTitle = share[CKShare.SystemFieldKey.title] as? String
-        print("📝 Tracking accepted share: \(rootRecordID?.recordName ?? "No root record ID") - '\(shareTitle ?? "No title")'")
-        
-        // Post notification that can be observed by CloudKitSharedRecordsService
-        NotificationCenter.default.post(
-            name: NSNotification.Name("ShareAcceptedForTracking"),
-            object: nil,
-            userInfo: [
-                "shareRecordID": share.recordID,
-                "rootRecordID": rootRecordID,
-                "shareTitle": shareTitle as Any
-            ]
-        )
     }
 
     // Wrap CKContainer.accept in async/await.

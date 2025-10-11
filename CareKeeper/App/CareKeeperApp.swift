@@ -16,8 +16,7 @@ struct CareKeeperApp: App {
         let schema = Schema([
             Caree.self,
             ActivityType.self,
-            Activity.self,
-            AcceptedShare.self
+            Activity.self
         ])
 
         // Check if running UI tests

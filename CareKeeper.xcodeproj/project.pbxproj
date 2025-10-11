@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		028EABF37E1C605E55B05623 /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5829D5A326A5D68626D7E483 /* ErrorAlert.swift */; };
-		07932A96BC9D83FF2AB0A4CA /* AcceptedShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FC05B3707621F44D1310EC7 /* AcceptedShare.swift */; };
 		07E476CC1FB5FA111AF2DA60 /* CareKeeperWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F6079C2D611AE02903EA9 /* CareKeeperWidgetBundle.swift */; };
 		0ACB1D1952F0107CEA77E2AB /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72711EB0C16E9E4851A2AF2C /* Caree.swift */; };
 		11E98B912697507A785E09A1 /* CloudKitSyncMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C72AD1FB3E583ECC8A97EB /* CloudKitSyncMonitor.swift */; };
@@ -50,12 +49,10 @@
 		65D95F8B097BAF0FE8E10C29 /* ShareAcceptanceNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA22DDD25B2FDC48AEF07C9 /* ShareAcceptanceNotifier.swift */; };
 		6897A307CA11300D86B247F9 /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E47FB3CDD0A1400A3E550B /* ActivityType.swift */; };
 		70C427674A7954E9DDC6CBC1 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D56064A0416085AD5C7749D0 /* Preview Assets.xcassets */; };
-		72954DE715A7832AC615621F /* AcceptedShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FC05B3707621F44D1310EC7 /* AcceptedShare.swift */; };
 		75595A31EB7E8AFC9DA52DF4 /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5829D5A326A5D68626D7E483 /* ErrorAlert.swift */; };
 		765FBB72C7AF33F9F532FF23 /* TrackActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A908972F0AB5024EB3BB819 /* TrackActivityView.swift */; };
 		770A4488C02071798279442F /* CloudKitSharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6CD974E62394F6A1ED007F /* CloudKitSharingService.swift */; };
 		77A0B826624E73B28E119403 /* ShareParticipantsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B72B65A1FDC34AE310BC5CA5 /* ShareParticipantsView.swift */; };
-		7808D8DD6A0F4B204AB4C9F8 /* AcceptedShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FC05B3707621F44D1310EC7 /* AcceptedShare.swift */; };
 		80559336FEFAFAC97106F9BC /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72711EB0C16E9E4851A2AF2C /* Caree.swift */; };
 		805AB8CA18C75280907BB24A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FD4EE14A1A83C8E2F7FC6687 /* Preview Assets.xcassets */; };
 		805FDC233580EBD9384D803E /* CloudSharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819A85BF80DD82661CF815BC /* CloudSharingView.swift */; };
@@ -80,7 +77,6 @@
 		B5559848F13F6B70E4352449 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9FDB6B1D732C3F073280581 /* ContentView.swift */; };
 		BBA446A86BED0760D51B5A84 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1845C1146E0E407D25D942AC /* Logger.swift */; };
 		BD5A2B58CF5E1912440D158C /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 258AEEC1B61C2ECD4857BD40 /* ShakeEffect.swift */; };
-		BFFCCB38BAF0CD57CF02FC7B /* AcceptedShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FC05B3707621F44D1310EC7 /* AcceptedShare.swift */; };
 		C1B750DAA7023A5564DA45E9 /* CloudKitSharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD6CD974E62394F6A1ED007F /* CloudKitSharingService.swift */; };
 		C2BA15E396C1AEA7B5E44629 /* CloudKitSharedRecordsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ED849B08BAEA65938EE5A41 /* CloudKitSharedRecordsService.swift */; };
 		C99A960973C3E61182243E0A /* CareeListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215FD04BA6F77AB5615011D9 /* CareeListRowView.swift */; };
@@ -198,7 +194,6 @@
 		84796E5CF92AEDF6DD4E92AA /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
 		88D9EC2B1F9A2FB0F13364A2 /* CareKeeper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CareKeeper.entitlements; sourceTree = "<group>"; };
 		8B8A9109CFC17794F75FB515 /* PreviewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewContainer.swift; sourceTree = "<group>"; };
-		8FC05B3707621F44D1310EC7 /* AcceptedShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AcceptedShare.swift; sourceTree = "<group>"; };
 		97C3E57DFB34FB3E1A7DDCFA /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
 		9A908972F0AB5024EB3BB819 /* TrackActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackActivityView.swift; sourceTree = "<group>"; };
 		9C3F6079C2D611AE02903EA9 /* CareKeeperWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWidgetBundle.swift; sourceTree = "<group>"; };
@@ -321,7 +316,6 @@
 		5E724EF99C343B475B10F3B8 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				8FC05B3707621F44D1310EC7 /* AcceptedShare.swift */,
 				4DCF1FB5B93A58A39C08B20E /* Activity.swift */,
 				83E47FB3CDD0A1400A3E550B /* ActivityType.swift */,
 				72711EB0C16E9E4851A2AF2C /* Caree.swift */,
@@ -660,7 +654,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BFFCCB38BAF0CD57CF02FC7B /* AcceptedShare.swift in Sources */,
 				ACA2F67C4D1E482F462ED518 /* Activity.swift in Sources */,
 				586ECFDC8FF2C4DF973040A4 /* ActivityDetailView.swift in Sources */,
 				3A782AFE4D02BACD6480493B /* ActivityListView.swift in Sources */,
@@ -707,7 +700,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7808D8DD6A0F4B204AB4C9F8 /* AcceptedShare.swift in Sources */,
 				DF4706E830236720AE485E58 /* Activity.swift in Sources */,
 				6897A307CA11300D86B247F9 /* ActivityType.swift in Sources */,
 				628D3C39DBA7D8652A8285D5 /* CareKeeperWidget.swift in Sources */,
@@ -721,7 +713,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				07932A96BC9D83FF2AB0A4CA /* AcceptedShare.swift in Sources */,
 				ACD19F7F12830E6D2DB5AB55 /* Activity.swift in Sources */,
 				406E8C951037236B6E9AE368 /* ActivityTests.swift in Sources */,
 				5D2E5A6E7C48E79961E156CB /* ActivityType.swift in Sources */,
@@ -735,7 +726,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72954DE715A7832AC615621F /* AcceptedShare.swift in Sources */,
 				3350CAF1AE029C3165492CAF /* Activity.swift in Sources */,
 				55BFB4F90A35463A9C34B7A2 /* ActivityDetailView.swift in Sources */,
 				A1074D868C422C77494D523B /* ActivityListView.swift in Sources */,
