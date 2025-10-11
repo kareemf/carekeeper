@@ -63,6 +63,11 @@ class CloudKitSharedRecordsService: ObservableObject {
             let zones = try await sharedDatabase.allRecordZones()
             logger.info("📱 Found \(zones.count, privacy: .public) shared zones")
 
+            // Log all zone names for diagnostics
+            for zone in zones {
+                logger.info("   Zone: \(zone.zoneID.zoneName, privacy: .public) (owner: \(zone.zoneID.ownerName, privacy: .public))")
+            }
+
             if zones.isEmpty {
                 await MainActor.run {
                     self.sharedCarees = []
