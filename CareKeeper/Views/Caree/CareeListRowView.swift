@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CareeListRowView: View {
     let caree: Caree
+    var isShared: Bool = false
 
     @State private var isCheckingSync = false
     @State private var isSyncedToCloudKit: Bool? = nil
@@ -12,8 +13,16 @@ struct CareeListRowView: View {
             profileImageView
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(caree.name)
-                    .font(.headline)
+                HStack {
+                    Text(caree.name)
+                        .font(.headline)
+
+                    if isShared {
+                        Image(systemName: "person.2.fill")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
 
                 HStack(spacing: 12) {
                     Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) Activity Types",

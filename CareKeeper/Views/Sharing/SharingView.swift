@@ -86,6 +86,10 @@ struct SharingView: View {
                     }
                 }
             }
+            .refreshable {
+                await sharedRecordsService.fetchSharedCarees()
+                await refreshShares()
+            }
             .navigationTitle(NSLocalizedString("Sharing", comment: "Sharing view title"))
             .confirmationDialog(
                 NSLocalizedString("Stop Sharing?", comment: "Stop sharing confirmation title"),
@@ -111,9 +115,14 @@ struct SharingView: View {
             await refreshShares()
         }
         .onChange(of: myCarees) {
-            Task { 
+            Task {
                 await sharedRecordsService.fetchSharedCarees()
-                await refreshShares() 
+                await refreshShares()
+            }
+        }
+        .onChange(of: sharedRecordsService.sharedCarees) {
+            Task {
+                await refreshShares()
             }
         }
         .onReceive(sharedRecordsService.$error) { newError in
@@ -127,15 +136,17 @@ struct SharingView: View {
     // MARK: - Computed Properties
 
     private var sharedByMe: [Caree] {
-        allCarees.filter { caree in
+        // Only my carees (from private database) that have shares
+        myCarees.filter { caree in
             guard let share = sharesByCareeID[caree.id] else { return false }
             return sharingService.isOwner(of: share)
         }
     }
 
     private var sharedWithMe: [Caree] {
-        allCarees.filter { caree in
-            guard let share = sharesByCareeID[caree.id] else { return false }
+        // Shared carees (from shared database) where I'm not the owner
+        sharedRecordsService.sharedCarees.filter { caree in
+            guard let share = sharedRecordsService.sharesByCareeID[caree.id] else { return false }
             return !sharingService.isOwner(of: share)
         }
     }
@@ -164,8 +175,10 @@ struct SharingView: View {
     // MARK: - Actions
 
     private func refreshShares() async {
+        // Only fetch shares for my carees (from private database)
+        // Shared carees' shares are already fetched by sharedRecordsService
         var next: [UUID: CKShare] = [:]
-        for caree in allCarees {
+        for caree in myCarees {
             do {
                 if let share = try await sharingService.getShare(for: caree, in: modelContext) {
                     next[caree.id] = share

@@ -3,17 +3,24 @@ import SwiftData
 
 struct CareeListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Caree.listOrder) private var carees: [Caree]
+    @Query(sort: \Caree.listOrder) private var myCarees: [Caree]  // Only private database records
     @State private var showingAddCaree = false
     @State private var careeToDelete: IndexSet?
     @State private var showingDeleteConfirmation = false
+    @State private var error: Error?
 
     @StateObject private var syncService = CloudKitSyncService()
+    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+
+    // Combined list of all carees (private + shared)
+    private var allCarees: [Caree] {
+        return myCarees + sharedRecordsService.sharedCarees
+    }
     
     var body: some View {
         NavigationView {
             Group {
-                if carees.isEmpty {
+                if allCarees.isEmpty {
                     emptyStateView
                         .transition(.opacity.combined(with: .scale(scale: 0.95)))
                 } else {
@@ -21,7 +28,7 @@ struct CareeListView: View {
                         .transition(.opacity)
                 }
             }
-            .animation(.easeInOut(duration: 0.3), value: carees.isEmpty)
+            .animation(.easeInOut(duration: 0.3), value: allCarees.isEmpty)
             .navigationTitle(NSLocalizedString("Carees", comment: "Navigation title for carees list"))
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -62,6 +69,18 @@ struct CareeListView: View {
             } message: {
                 Text(NSLocalizedString("This will delete all activity types and activities. This cannot be undone.", comment: "Delete caree confirmation message"))
             }
+            .task {
+                await sharedRecordsService.fetchSharedCarees()
+            }
+            .onChange(of: sharedRecordsService.sharedCarees) {
+                // Trigger UI update when shared carees change
+            }
+            .onReceive(sharedRecordsService.$error) { newError in
+                if let newError = newError {
+                    error = newError
+                }
+            }
+            .errorAlert($error)
         }
     }
     
@@ -70,7 +89,7 @@ struct CareeListView: View {
             Image(systemName: "person.crop.rectangle.stack")
                 .font(.system(size: 60))
                 .foregroundColor(.secondary)
-                .symbolEffect(.bounce, value: carees.isEmpty)
+                .symbolEffect(.bounce, value: allCarees.isEmpty)
 
             Text(NSLocalizedString("No Carees", comment: "Empty state title"))
                 .font(.title2)
@@ -94,9 +113,12 @@ struct CareeListView: View {
     
     private var careeListView: some View {
         List {
-            ForEach(carees) { caree in
+            ForEach(allCarees) { caree in
                 NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
-                    CareeListRowView(caree: caree)
+                    CareeListRowView(
+                        caree: caree,
+                        isShared: sharedRecordsService.sharedCarees.contains { $0.id == caree.id }
+                    )
                 }
                 .transition(.asymmetric(
                     insertion: .move(edge: .leading).combined(with: .opacity),
@@ -112,14 +134,17 @@ struct CareeListView: View {
         .refreshable {
             await refreshAllCarees()
         }
-        .animation(.easeInOut(duration: 0.3), value: carees.map { $0.id })
+        .animation(.easeInOut(duration: 0.3), value: allCarees.map { $0.id })
     }
 
     private func refreshAllCarees() async {
-        // Check sync status for all carees
+        // Fetch shared carees from CloudKit
+        await sharedRecordsService.fetchSharedCarees()
+
+        // Check sync status for my carees
         // This refreshes the general CloudKit state
         // Individual sync status is checked in CareeDetailView
-        for caree in carees {
+        for caree in myCarees {
             _ = await syncService.isSynced(caree: caree)
         }
     }
@@ -130,7 +155,7 @@ struct CareeListView: View {
 
         // Resolve indices to concrete Caree instances first
         let itemsToConsider = offsets.compactMap { index in
-            carees.indices.contains(index) ? carees[index] : nil
+            allCarees.indices.contains(index) ? allCarees[index] : nil
         }
 
         // Check permissions asynchronously (owner can delete)
@@ -153,8 +178,10 @@ struct CareeListView: View {
     }
     
     private func moveCarees(from source: IndexSet, to destination: Int) {
+        // Only allow reordering of my carees (not shared carees)
+        // Shared carees maintain the owner's listOrder
         withAnimation(.easeInOut(duration: 0.3)) {
-            var updatedCarees = carees
+            var updatedCarees = myCarees
             updatedCarees.move(fromOffsets: source, toOffset: destination)
 
             for (index, caree) in updatedCarees.enumerated() {

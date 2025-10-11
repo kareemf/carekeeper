@@ -10,8 +10,13 @@ class CloudKitSharedRecordsService: ObservableObject {
     private let logger = AppLogger.cloudkit
 
     @Published var sharedCarees: [Caree] = []
+    @Published var sharesByCareeID: [UUID: CKShare] = [:]
     @Published var isLoading = false
     @Published var error: Error?
+
+    init() {
+        setupNotificationObservers()
+    }
 
     /// Setup notification observers for automatic refresh on CloudKit changes
     private func setupNotificationObservers() {
@@ -64,8 +69,9 @@ class CloudKitSharedRecordsService: ObservableObject {
                 return
             }
 
-            // Step 2: Query each zone for CD_Caree records
+            // Step 2: Query each zone for CD_Caree records and their CKShare
             var allRecords: [CKRecord] = []
+            var shares: [UUID: CKShare] = [:]
 
             for zone in zones {
                 // Skip the default zone - only query custom zones (which are created for shares)
@@ -73,7 +79,7 @@ class CloudKitSharedRecordsService: ObservableObject {
                     continue
                 }
 
-                logger.info("🔍 Querying zone: \(zone.zoneID.zoneName)")
+                logger.info("🔍 Querying zone: \(zone.zoneID.zoneName, privacy: .public)")
 
                 let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
 
@@ -83,12 +89,27 @@ class CloudKitSharedRecordsService: ObservableObject {
                         inZoneWith: zone.zoneID
                     )
 
-                    // Extract successful records
+                    // Extract successful records and fetch their shares
                     for (_, result) in matchResults {
                         switch result {
                         case .success(let record):
                             allRecords.append(record)
-                            logger.info("  ✅ Found caree: \(record["name"] as? String ?? "unknown")")
+                            logger.info("  ✅ Found caree: \(record["CD_name"] as? String ?? "unknown")")
+
+                            // Fetch the CKShare for this record
+                            if let shareReference = record.share {
+                                do {
+                                    let shareRecord = try await sharedDatabase.record(for: shareReference.recordID)
+                                    if let share = shareRecord as? CKShare,
+                                       let cdId = record["CD_id"] as? String,
+                                       let uuid = UUID(uuidString: cdId) {
+                                        shares[uuid] = share
+                                        logger.info("    📎 Fetched share for caree: \(uuid)")
+                                    }
+                                } catch {
+                                    logger.warning("    ⚠️ Failed to fetch share: \(error.localizedDescription)")
+                                }
+                            }
                         case .failure(let error):
                             logger.warning("  ⚠️ Failed to fetch record: \(error.localizedDescription)")
                         }
@@ -104,8 +125,9 @@ class CloudKitSharedRecordsService: ObservableObject {
 
             await MainActor.run {
                 self.sharedCarees = carees
+                self.sharesByCareeID = shares
                 self.isLoading = false
-                logger.info("✅ Successfully fetched \(carees.count, privacy: .public) shared carees from \(zones.count - 1, privacy: .public) zones")
+                logger.info("✅ Successfully fetched \(carees.count, privacy: .public) shared carees with \(shares.count, privacy: .public) shares from \(zones.count - 1, privacy: .public) zones")
             }
 
         } catch {
@@ -128,7 +150,7 @@ class CloudKitSharedRecordsService: ObservableObject {
             guard let cdId = record["CD_id"] as? String,
                   let uuid = UUID(uuidString: cdId),
                   let name = record["CD_name"] as? String else {
-                logger.warning("⚠️ Skipping record with missing required fields: \(record.recordID.recordName, privacy: .public)")
+                logger.warning("⚠️ Skipping record with missing required fields: \(record.recordID.recordName)")
                 continue
             }
 
