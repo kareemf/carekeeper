@@ -18,6 +18,7 @@ class CloudKitNotificationService: ObservableObject {
     private func setupCloudKitSubscriptions() async {
         await setupSharedDatabaseSubscription()
         await setupPrivateDatabaseSubscription()
+        await setupActivityNotificationSubscription()
     }
     
     /// Subscribe to changes in the shared database (when shares are accepted)
@@ -76,6 +77,43 @@ class CloudKitNotificationService: ObservableObject {
 
         } catch {
             logger.error("❌ Error setting up private share subscription: \(error.localizedDescription)")
+        }
+    }
+
+    /// Subscribe to new Activity records in shared database for user-facing notifications
+    /// This subscription triggers when other users create activities on shared carees
+    private func setupActivityNotificationSubscription() async {
+        let subscriptionID = "shared-activity-alerts"
+        let sharedDatabase = container.sharedCloudDatabase
+
+        do {
+            // Check if subscription already exists
+            let existingSubscriptions = try await sharedDatabase.allSubscriptions()
+            if existingSubscriptions.contains(where: { $0.subscriptionID == subscriptionID }) {
+                logger.info("✅ Activity notification subscription already exists")
+                return
+            }
+
+            // Create query subscription for CD_Activity records
+            // This will trigger for ALL new activities - we filter by creator in the handler
+            let predicate = NSPredicate(value: true)
+            let subscription = CKQuerySubscription(
+                recordType: "CD_Activity",
+                predicate: predicate,
+                subscriptionID: subscriptionID
+            )
+
+            // Configure notification info for user-facing alerts
+            subscription.notificationInfo = CKSubscription.NotificationInfo()
+            subscription.notificationInfo?.shouldSendContentAvailable = true // For background processing
+            subscription.notificationInfo?.alertBody = "New activity logged" // Basic alert text
+            subscription.notificationInfo?.shouldBadge = false // We'll handle badging separately
+
+            let savedSubscription = try await sharedDatabase.save(subscription)
+            logger.info("✅ Created activity notification subscription: \(savedSubscription.subscriptionID)")
+
+        } catch {
+            logger.error("❌ Error setting up activity notification subscription: \(error.localizedDescription)")
         }
     }
 }

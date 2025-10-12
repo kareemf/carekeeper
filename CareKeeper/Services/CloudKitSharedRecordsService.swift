@@ -35,12 +35,101 @@ class CloudKitSharedRecordsService: ObservableObject {
     }
 
     /// Handle CloudKit notifications by refreshing the shared carees list
+    /// Also presents user-facing notifications for new activities from other users
     private func handleCloudKitNotification(_ notification: CKNotification) async {
         logger.info("📨 Processing CloudKit notification: \(notification.notificationType.rawValue)")
+
+        // Handle query notifications for new activities (user-facing alerts)
+        if let queryNotification = notification as? CKQueryNotification,
+           queryNotification.queryNotificationReason == .recordCreated {
+            await handleNewActivityNotification(queryNotification)
+        }
 
         // For any CloudKit change, refresh the shared carees
         // The zone-based query will automatically reflect the current state
         await fetchSharedCarees()
+    }
+
+    /// Handle query notifications for new activities
+    /// Presents a local notification if the activity was created by another user
+    private func handleNewActivityNotification(_ queryNotification: CKQueryNotification) async {
+        logger.info("🔔 New activity query notification received")
+
+        // Extract record ID from notification
+        guard let recordID = queryNotification.recordID,
+              recordID.recordName.hasPrefix("CD_Activity/") else {
+            logger.warning("⚠️ Query notification is not for a CD_Activity record")
+            return
+        }
+
+        // Fetch the activity record to get full details
+        do {
+            let sharedDatabase = container.sharedCloudDatabase
+            let record = try await sharedDatabase.record(for: recordID)
+
+            // Check if activity was created by current user
+            let creatorID = record["CD_creatorUserRecordID"] as? String
+            let currentUserID = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
+
+            if creatorID == currentUserID {
+                logger.info("🙅 Skipping notification - activity created by current user")
+                return
+            }
+
+            // Extract activity details
+            guard let careeIDString = record["CD_id"] as? String,
+                  let activityID = UUID(uuidString: careeIDString),
+                  let dateTime = record["CD_dateTime"] as? Date else {
+                logger.warning("⚠️ Activity record missing required fields")
+                return
+            }
+
+            // Get caree ID from reference
+            guard let careeReference = record["CD_caree"] as? CKRecord.Reference,
+                  let careeIDFromRef = careeReference.recordID.recordName.components(separatedBy: "/").last,
+                  let careeID = UUID(uuidString: careeIDFromRef) else {
+                logger.warning("⚠️ Could not extract caree ID from activity")
+                return
+            }
+
+            // Check user preferences
+            let prefs = UserNotificationPreferences.shared
+            guard prefs.isEnabled(for: careeID) else {
+                logger.info("🔕 Notifications disabled for this caree")
+                return
+            }
+
+            // Fetch caree and activity type names for notification content
+            // We need to fetch these from CloudKit since we don't have them in the notification
+            let careeRecord = try await sharedDatabase.record(for: careeReference.recordID)
+            let careeName = careeRecord["CD_name"] as? String ?? "Unknown"
+
+            var activityTypeName = "Activity"
+            if let activityTypeRef = record["CD_activityType"] as? CKRecord.Reference {
+                do {
+                    let activityTypeRecord = try await sharedDatabase.record(for: activityTypeRef.recordID)
+                    activityTypeName = activityTypeRecord["CD_name"] as? String ?? "Activity"
+                } catch {
+                    logger.warning("⚠️ Could not fetch activity type name: \(error.localizedDescription)")
+                }
+            }
+
+            // Present notification
+            let notificationService = UserNotificationService.shared
+            await notificationService.presentNewActivityNotification(
+                activityID: activityID,
+                careeID: careeID,
+                careeName: careeName,
+                activityTypeName: activityTypeName,
+                creatorName: "Another caregiver", // We can't easily get the creator's name
+                timestamp: dateTime
+            )
+
+            logger.info("✅ Presented notification for new activity on \(careeName)")
+
+        } catch {
+            logger.error("❌ Failed to handle activity notification: \(error.localizedDescription)")
+        }
     }
 
     /// Fetch shared Caree records with their ActivityTypes and Activities using zone-based discovery:
