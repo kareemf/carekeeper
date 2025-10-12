@@ -23,6 +23,9 @@ struct CareeDetailView: View {
     @State private var showingTrackActivity = false
     @State private var isLoadingSharedCaree = false
 
+    @StateObject private var notificationPrefs = UserNotificationPreferences.shared
+    @StateObject private var notificationService = UserNotificationService.shared
+
     init(careeID: UUID) {
         self.careeID = careeID
     }
@@ -54,6 +57,16 @@ struct CareeDetailView: View {
                     }
                     .tabViewStyle(.verticalPage)
                     .navigationTitle(caree.name)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                toggleNotifications(for: caree)
+                            } label: {
+                                Image(systemName: notificationPrefs.isEnabled(for: caree.id) ? "bell.fill" : "bell.slash")
+                                    .foregroundColor(notificationPrefs.isEnabled(for: caree.id) ? .blue : .gray)
+                            }
+                        }
+                    }
                     .sheet(isPresented: $showingTrackActivity) {
                         TrackActivityView(caree: caree)
                     }
@@ -62,6 +75,16 @@ struct CareeDetailView: View {
                         gettingStartedView
                     }
                     .navigationTitle(caree.name)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                toggleNotifications(for: caree)
+                            } label: {
+                                Image(systemName: notificationPrefs.isEnabled(for: caree.id) ? "bell.fill" : "bell.slash")
+                                    .foregroundColor(notificationPrefs.isEnabled(for: caree.id) ? .blue : .gray)
+                            }
+                        }
+                    }
                 }
             } else {
                 Text(NSLocalizedString("Caree not found", comment: "Caree not found message"))
@@ -187,6 +210,27 @@ struct CareeDetailView: View {
             }
         }
         .padding(.vertical, 4)
+    }
+
+    private func toggleNotifications(for caree: Caree) {
+        Task {
+            // Check current authorization status
+            await notificationService.checkAuthorizationStatus()
+
+            if notificationService.authorizationStatus == .notDetermined {
+                // Request permission if not yet determined
+                let granted = await notificationService.requestPermission()
+                if granted {
+                    // Enable notifications for this caree
+                    notificationPrefs.setEnabled(true, for: caree.id)
+                }
+            } else if notificationService.authorizationStatus == .authorized {
+                // Toggle the preference
+                notificationPrefs.toggle(for: caree.id)
+            }
+            // Note: watchOS doesn't have Settings deep linking like iOS,
+            // so we silently fail if permission is denied
+        }
     }
 }
 

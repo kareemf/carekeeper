@@ -39,8 +39,12 @@ struct CareeDetailView: View {
     @State private var isLoadingSharedCaree = false
 
     @StateObject private var syncService = CloudKitSyncService()
+    @StateObject private var notificationPrefs = UserNotificationPreferences.shared
+    @StateObject private var notificationService = UserNotificationService.shared
 
     private let exportService = CareeExportService()
+
+    @State private var showingPermissionAlert = false
 
     init(careeID: UUID) {
         self.careeID = careeID
@@ -134,6 +138,14 @@ struct CareeDetailView: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         HStack(spacing: 16) {
                             #if os(iOS)
+                            // Notification toggle button
+                            Button {
+                                toggleNotifications(for: caree)
+                            } label: {
+                                Image(systemName: notificationPrefs.isEnabled(for: caree.id) ? "bell.fill" : "bell.slash")
+                                    .foregroundColor(notificationPrefs.isEnabled(for: caree.id) ? .blue : .gray)
+                            }
+
                             CareeShareButton(
                                 caree: caree,
                                 isSynced: isSyncedToCloudKit ?? false,
@@ -199,6 +211,17 @@ struct CareeDetailView: View {
                     ShareSheet(items: [item.url])
                 }
                 .errorAlert($exportError)
+                .alert(
+                    NSLocalizedString("Notification Permission Required", comment: "Permission alert title"),
+                    isPresented: $showingPermissionAlert
+                ) {
+                    Button(NSLocalizedString("Open Settings", comment: "Open settings button")) {
+                        notificationService.openSettings()
+                    }
+                    Button(NSLocalizedString("Cancel", comment: "Cancel button"), role: .cancel) {}
+                } message: {
+                    Text(NSLocalizedString("Please enable notifications in Settings to receive activity alerts.", comment: "Permission alert message"))
+                }
                 #endif
             } else {
                 Text(NSLocalizedString("Caree not found", comment: "Caree not found message"))
@@ -423,6 +446,30 @@ struct CareeDetailView: View {
             exportItem = ExportItem(url: tempURL, filename: filename)
         } catch {
             exportError = error
+        }
+    }
+
+    private func toggleNotifications(for caree: Caree) {
+        Task {
+            // Check current authorization status
+            await notificationService.checkAuthorizationStatus()
+
+            if notificationService.authorizationStatus == .notDetermined {
+                // Request permission if not yet determined
+                let granted = await notificationService.requestPermission()
+                if granted {
+                    // Enable notifications for this caree
+                    notificationPrefs.setEnabled(true, for: caree.id)
+                } else {
+                    showingPermissionAlert = true
+                }
+            } else if notificationService.authorizationStatus == .authorized {
+                // Toggle the preference
+                notificationPrefs.toggle(for: caree.id)
+            } else {
+                // Permission denied - show alert to open settings
+                showingPermissionAlert = true
+            }
         }
     }
 }
