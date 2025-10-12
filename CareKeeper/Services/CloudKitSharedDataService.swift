@@ -339,6 +339,10 @@ class CloudKitSharedDataService: ObservableObject {
         record["CD_longitude"] = activity.longitude
         record["CD_dateCreated"] = activity.dateCreated
 
+        // Track the creator's CloudKit user record ID for notification filtering
+        // This allows us to identify who created the activity and avoid showing notifications for our own actions
+        record["CD_creatorUserRecordID"] = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
+
         // Create references
         let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
         record["CD_caree"] = CKRecord.Reference(recordID: careeRecordID, action: .deleteSelf)
