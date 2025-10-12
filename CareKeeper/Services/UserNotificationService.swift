@@ -1,5 +1,8 @@
 import Foundation
 import UserNotifications
+#if os(iOS)
+import UIKit
+#endif
 
 /// Service for managing user-facing push notifications
 @MainActor
