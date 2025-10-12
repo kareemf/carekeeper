@@ -60,6 +60,17 @@ The app uses SwiftData with three main model entities:
   - @Published properties for location, authorization, errors
   - Reactive permission handling with error propagation
 
+- **UserNotificationPreferences**: Manages notification preferences
+  - Global notification enable/disable toggle
+  - Per-caree notification settings
+  - Synced via app group UserDefaults for iOS/watchOS
+
+- **UserNotificationService**: Handles user-facing push notifications
+  - UNUserNotificationCenter wrapper
+  - Permission request and management
+  - Local notification presentation
+  - Notification tap handling for deep linking
+
 ### Key Patterns
 - SwiftUI with `@State`, `@StateObject`, `@Environment` for state management
 - SwiftData models shared between iOS and watchOS targets via project.yml
@@ -318,5 +329,17 @@ Enable multiple caregivers to track activities for the same caree(s) across thei
   - ✅ View routing: automatic detection and CloudKit vs SwiftData routing
   - ✅ Cross-platform: implemented on both iOS and watchOS
 
+- ✅ Push Notifications for Shared Activities
+  - ✅ UserNotificationPreferences service for notification settings
+  - ✅ UserNotificationService for UNUserNotificationCenter integration
+  - ✅ CloudKit query subscription for CD_Activity records with alerts
+  - ✅ Notification handling in CloudKitSharedRecordsService
+  - ✅ Creator tracking (CD_creatorUserRecordID) to filter own activities
+  - ✅ Per-caree notification toggles in CareeDetailView (iOS & watchOS)
+  - ✅ Permission request flow with Settings deep link (iOS)
+  - ✅ Notification tap handling for deep linking to activity detail
+  - ✅ Preferences synced via app group UserDefaults
+  - ⚠️ End-to-end testing requires physical devices and multiple iCloud accounts
+
 **Implementation Complete:**
-Phase 2.2 CloudKit Sharing is now fully functional with complete CRUD support for shared carees, activity types, and activities across both iOS and watchOS platforms.
+Phase 2.2 CloudKit Sharing is now fully functional with complete CRUD support for shared carees, activity types, and activities across both iOS and watchOS platforms. Push notifications enable real-time coordination between caregivers when activities are logged on shared carees.
