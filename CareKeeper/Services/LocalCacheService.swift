@@ -235,7 +235,7 @@ class LocalCacheService: ObservableObject {
             myCarees = allCarees.filter { $0.isOwned }
             sharedCarees = allCarees.filter { $0.isShared }
 
-            logger.info("Refreshed cache: \(myCarees.count) owned, \(sharedCarees.count) shared")
+            logger.info("Refreshed cache: \(self.myCarees.count) owned, \(self.sharedCarees.count) shared")
         } catch {
             logger.error("Failed to refresh published properties: \(error.localizedDescription)")
             syncError = error
@@ -283,10 +283,7 @@ class LocalCacheService: ObservableObject {
         // Find stale carees
         let staleFetchDescriptor = FetchDescriptor<Caree>(
             predicate: #Predicate { caree in
-                if let lastSyncedAt = caree.lastSyncedAt {
-                    return lastSyncedAt < staleThreshold
-                }
-                return false
+                caree.lastSyncedAt != nil && caree.lastSyncedAt! < staleThreshold
             }
         )
 

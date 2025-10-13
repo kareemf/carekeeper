@@ -596,8 +596,8 @@ class CloudKitDataService: ObservableObject {
             } catch let error as CKError where error.isRetryable {
                 lastError = error
                 attempt += 1
-                logger.warning("⚠️ Save failed (attempt \(attempt)/\(maxRetries)), retrying: \(error.localizedDescription)")
-                try await Task.sleep(nanoseconds: UInt64(retryDelay * Double(attempt) * 1_000_000_000))
+                logger.warning("⚠️ Save failed (attempt \(attempt)/\(self.maxRetries)), retrying: \(error.localizedDescription)")
+                try await Task.sleep(nanoseconds: UInt64(self.retryDelay * Double(attempt) * 1_000_000_000))
             } catch {
                 // Non-retryable error, throw immediately
                 throw error
@@ -623,8 +623,8 @@ class CloudKitDataService: ObservableObject {
             } catch let error as CKError where error.isRetryable {
                 lastError = error
                 attempt += 1
-                logger.warning("⚠️ Fetch failed (attempt \(attempt)/\(maxRetries)), retrying: \(error.localizedDescription)")
-                try await Task.sleep(nanoseconds: UInt64(retryDelay * Double(attempt) * 1_000_000_000))
+                logger.warning("⚠️ Fetch failed (attempt \(attempt)/\(self.maxRetries)), retrying: \(error.localizedDescription)")
+                try await Task.sleep(nanoseconds: UInt64(self.retryDelay * Double(attempt) * 1_000_000_000))
             } catch {
                 // Non-retryable error, throw immediately
                 throw error
@@ -650,8 +650,8 @@ class CloudKitDataService: ObservableObject {
             } catch let error as CKError where error.isRetryable {
                 lastError = error
                 attempt += 1
-                logger.warning("⚠️ Delete failed (attempt \(attempt)/\(maxRetries)), retrying: \(error.localizedDescription)")
-                try await Task.sleep(nanoseconds: UInt64(retryDelay * Double(attempt) * 1_000_000_000))
+                logger.warning("⚠️ Delete failed (attempt \(attempt)/\(self.maxRetries)), retrying: \(error.localizedDescription)")
+                try await Task.sleep(nanoseconds: UInt64(self.retryDelay * Double(attempt) * 1_000_000_000))
             } catch {
                 // Non-retryable error, throw immediately
                 throw error

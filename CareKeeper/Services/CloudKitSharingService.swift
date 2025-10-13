@@ -9,10 +9,10 @@ class CloudKitSharingService: ObservableObject {
     private let logger = AppLogger.sharing
     private let dataService: CloudKitDataService
 
-    init(containerIdentifier: String = CloudKitConfig.containerID, dataService: CloudKitDataService = CloudKitDataService()) {
+    init(containerIdentifier: String = CloudKitConfig.containerID, dataService: CloudKitDataService? = nil) {
         self.container = CKContainer(identifier: containerIdentifier)
         self.zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
-        self.dataService = dataService
+        self.dataService = dataService ?? CloudKitDataService()
     }
 
     // MARK: - Share Status
