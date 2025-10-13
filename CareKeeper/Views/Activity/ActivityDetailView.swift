@@ -7,33 +7,29 @@ struct ActivityDetailView: View {
     @Environment(\.modelContext) private var modelContext
 
     let activityID: UUID
-    @Query private var myActivities: [Activity]  // Only private database records
 
-    // Services for shared records
-    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    // Pure CloudKit architecture: Cache service as source of truth
+    @State private var cacheService: LocalCacheService?
+    @StateObject private var cloudKitService = CloudKitDataService()
     @StateObject private var sharedDataService = CloudKitSharedDataService()
 
-    // Combined list of all activities (private + shared)
-    private var allActivities: [Activity] {
-        var activities = myActivities
-        // Add activities from shared carees
-        for caree in sharedRecordsService.sharedCarees {
-            if let careeActivities = caree.activities {
-                activities.append(contentsOf: careeActivities)
+    // Get the specific activity from cache
+    private var activity: Activity? {
+        guard let cacheService = cacheService else { return nil }
+        // Search through all cached carees (owned + shared) for the activity
+        for caree in cacheService.myCarees + cacheService.sharedCarees {
+            if let activities = caree.activities,
+               let activity = activities.first(where: { $0.id == activityID }) {
+                return activity
             }
         }
-        return activities
-    }
-
-    // Computed property to get the specific activity
-    private var activity: Activity? {
-        allActivities.first { $0.id == activityID }
+        return nil
     }
 
     // Check if this activity belongs to a shared caree
     private var isSharedActivity: Bool {
         guard let activity = activity, let caree = activity.caree else { return false }
-        return sharedRecordsService.sharedCarees.contains { $0.id == caree.id }
+        return caree.isShared  // Use cache metadata
     }
 
     @State private var isEditing = false
@@ -122,7 +118,14 @@ struct ActivityDetailView: View {
                     setupEditingValues(for: activity)
                 }
                 .task {
-                    await sharedRecordsService.fetchSharedCarees()
+                    // Initialize cache service with model context
+                    if cacheService == nil {
+                        cacheService = LocalCacheService(modelContext: modelContext)
+                        cloudKitService.setCacheService(cacheService!)
+                    }
+
+                    // Refresh cache to load activities
+                    try? await cacheService?.refreshCache()
                 }
             } else {
                 Text(NSLocalizedString("Activity not found", comment: "Activity not found message"))
@@ -279,15 +282,13 @@ struct ActivityDetailView: View {
         activity.quantity = Double(editingQuantity)
         activity.dateTime = editingDateTime
 
+        isSaving = true
+
         if isSharedActivity {
             // Handle shared activity - use CloudKit service
-            isSaving = true
             Task {
                 do {
                     try await sharedDataService.updateActivity(activity, caree: caree)
-
-                    // Refresh shared carees to reflect changes
-                    await sharedRecordsService.fetchSharedCarees()
 
                     await MainActor.run {
                         isSaving = false
@@ -301,12 +302,28 @@ struct ActivityDetailView: View {
                 }
             }
         } else {
-            // Handle owned activity - use SwiftData
-            do {
-                try modelContext.save()
-                isEditing = false
-            } catch {
-                self.error = AppError.saveFailed(error.localizedDescription)
+            // Handle owned activity - use Pure CloudKit
+            Task {
+                do {
+                    try await cloudKitService.updateActivity(
+                        activity,
+                        caree: caree,
+                        dateTime: editingDateTime,
+                        notes: editingNotes.isEmpty ? nil : editingNotes,
+                        quantity: Double(editingQuantity),
+                        isShared: false
+                    )
+
+                    await MainActor.run {
+                        isSaving = false
+                        isEditing = false
+                    }
+                } catch {
+                    await MainActor.run {
+                        self.error = AppError.saveFailed(error.localizedDescription)
+                        isSaving = false
+                    }
+                }
             }
         }
     }
@@ -326,33 +343,24 @@ struct ActivityDetailView: View {
             return
         }
 
-        if isSharedActivity {
-            // Handle shared activity - use CloudKit service
-            Task {
-                do {
-                    try await sharedDataService.deleteActivity(activity, caree: caree)
-
-                    // Refresh shared carees to reflect changes
-                    await sharedRecordsService.fetchSharedCarees()
-
-                    await MainActor.run {
-                        dismiss()
-                    }
-                } catch {
-                    await MainActor.run {
-                        self.error = AppError.deleteFailed(error.localizedDescription)
-                    }
-                }
-            }
-        } else {
-            // Handle owned activity - use SwiftData
-            modelContext.delete(activity)
-
+        Task {
             do {
-                try modelContext.save()
-                dismiss()
+                if isSharedActivity {
+                    // Handle shared activity - use CloudKit service
+                    try await sharedDataService.deleteActivity(activity, caree: caree)
+                } else {
+                    // Handle owned activity - use Pure CloudKit
+                    try await cloudKitService.deleteActivity(activity, isShared: false)
+                }
+
+                // Cache is automatically updated by CloudKitDataService
+                await MainActor.run {
+                    dismiss()
+                }
             } catch {
-                self.error = AppError.deleteFailed(error.localizedDescription)
+                await MainActor.run {
+                    self.error = AppError.deleteFailed(error.localizedDescription)
+                }
             }
         }
     }
