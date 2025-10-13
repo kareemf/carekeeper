@@ -4,15 +4,19 @@ import PhotosUI
 struct CareeEditView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    
+
     let caree: Caree?
-    
+
     @State private var name: String = ""
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var imageData: Data?
     @State private var error: Error?
     @State private var shakeField: Bool = false
+    @State private var isSaving = false
     @FocusState private var isNameFieldFocused: Bool
+
+    // Pure CloudKit architecture services
+    @StateObject private var cloudKitService = CloudKitDataService()
 
     private var isEditing: Bool { caree != nil }
     
@@ -55,10 +59,16 @@ struct CareeEditView: View {
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(NSLocalizedString("Save", comment: "Save button")) {
-                        saveCaree()
+                    if isSaving {
+                        ProgressView()
+                    } else {
+                        Button(NSLocalizedString("Save", comment: "Save button")) {
+                            Task {
+                                await saveCaree()
+                            }
+                        }
+                        .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     }
-                    .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
         }
@@ -132,7 +142,7 @@ struct CareeEditView: View {
         }
     }
     
-    private func saveCaree() {
+    private func saveCaree() async {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedName.isEmpty else {
             withAnimation(.default) {
@@ -144,27 +154,38 @@ struct CareeEditView: View {
             return
         }
 
-        if let existingCaree = caree {
-            // Update existing caree
-            print("📝 Updating caree: \(trimmedName) (ID: \(existingCaree.id.uuidString))")
-            existingCaree.name = trimmedName
-            existingCaree.image = imageData
-        } else {
-            // Create new caree
-            let newCaree = Caree(
-                name: trimmedName,
-                image: imageData,
-                listOrder: 0 // Will be updated based on list position
-            )
-            print("➕ Creating new caree: \(trimmedName) (ID: \(newCaree.id.uuidString))")
-            modelContext.insert(newCaree)
-        }
+        isSaving = true
+        defer { isSaving = false }
 
         do {
-            print("💾 Saving to SwiftData...")
-            try modelContext.save()
-            print("✅ Save successful - SwiftData will sync to CloudKit automatically")
-            print("⏳ CloudKit sync typically takes 5-15 seconds")
+            if let existingCaree = caree {
+                // Pure CloudKit: Update existing caree via CloudKitDataService
+                print("📝 Updating caree via CloudKit: \(trimmedName) (ID: \(existingCaree.id.uuidString))")
+
+                // Determine if this is a shared caree
+                let isShared = existingCaree.isShared
+
+                try await cloudKitService.updateCaree(
+                    existingCaree,
+                    name: trimmedName,
+                    imageData: imageData,
+                    isShared: isShared
+                )
+
+                print("✅ Caree updated successfully in CloudKit")
+            } else {
+                // Pure CloudKit: Create new caree via CloudKitDataService
+                print("➕ Creating new caree via CloudKit: \(trimmedName)")
+
+                _ = try await cloudKitService.createCaree(
+                    name: trimmedName,
+                    imageData: imageData,
+                    listOrder: 0
+                )
+
+                print("✅ Caree created successfully in CloudKit and cached locally")
+            }
+
             dismiss()
         } catch {
             print("❌ Save failed: \(error.localizedDescription)")
