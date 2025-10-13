@@ -16,14 +16,14 @@ struct ActivityTypeEditView: View {
     @State private var isSaving: Bool = false
     @FocusState private var isNameFieldFocused: Bool
 
-    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    // Pure CloudKit architecture services
+    @StateObject private var cloudKitService = CloudKitDataService()
     @StateObject private var sharedDataService = CloudKitSharedDataService()
-    @StateObject private var sharingService = CloudKitSharingService()
 
     private var isEditing: Bool { activityType != nil }
 
     private var isSharedCaree: Bool {
-        sharedRecordsService.sharedCarees.contains { $0.id == caree.id }
+        caree.isShared  // Use cache metadata
     }
     
     init(caree: Caree, activityType: ActivityType? = nil) {
@@ -98,9 +98,6 @@ struct ActivityTypeEditView: View {
                 }
             }
         }
-        .task {
-            await sharedRecordsService.fetchSharedCarees()
-        }
         .errorAlert($error)
     }
     
@@ -141,9 +138,6 @@ struct ActivityTypeEditView: View {
                         )
                     }
 
-                    // Refresh shared carees to reflect changes
-                    await sharedRecordsService.fetchSharedCarees()
-
                     await MainActor.run {
                         isSaving = false
                         dismiss()
@@ -156,41 +150,42 @@ struct ActivityTypeEditView: View {
                 }
             }
         } else {
-            // Handle owned caree - use SwiftData
-            if let existingActivityType = activityType {
-                // Update existing activity type
-                existingActivityType.name = trimmedName
-                existingActivityType.icon = icon.isEmpty ? nil : icon
-                existingActivityType.hasQuantity = hasQuantity
-                existingActivityType.quantityUnit = hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil
-                existingActivityType.hasLocation = hasLocation
-            } else {
-                // Create new activity type
-                let newActivityType = ActivityType(
-                    name: trimmedName,
-                    icon: icon.isEmpty ? nil : icon,
-                    hasQuantity: hasQuantity,
-                    quantityUnit: hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil,
-                    hasLocation: hasLocation,
-                    listOrder: caree.activityTypes?.count ?? 0,
-                    caree: caree
-                )
-                modelContext.insert(newActivityType)
-            }
+            // Handle owned caree - use Pure CloudKit
+            Task {
+                do {
+                    if let existingActivityType = activityType {
+                        // Pure CloudKit: Update existing activity type
+                        try await cloudKitService.updateActivityType(
+                            existingActivityType,
+                            caree: caree,
+                            name: trimmedName,
+                            icon: icon.isEmpty ? nil : icon,
+                            isShared: false
+                        )
+                    } else {
+                        // Pure CloudKit: Create new activity type
+                        _ = try await cloudKitService.createActivityType(
+                            for: caree,
+                            name: trimmedName,
+                            icon: icon.isEmpty ? nil : icon,
+                            hasQuantity: hasQuantity,
+                            quantityUnit: hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil,
+                            hasLocation: hasLocation,
+                            listOrder: caree.activityTypes?.count ?? 0,
+                            isShared: false
+                        )
+                    }
 
-            do {
-                try modelContext.save()
-
-                // If caree is shared, ensure parent references are set for the new child record
-                Task {
-                    await sharingService.ensureParentReferencesIfShared(for: caree, in: modelContext)
+                    await MainActor.run {
+                        isSaving = false
+                        dismiss()
+                    }
+                } catch {
+                    await MainActor.run {
+                        self.error = AppError.saveFailed(error.localizedDescription)
+                        isSaving = false
+                    }
                 }
-
-                isSaving = false
-                dismiss()
-            } catch {
-                self.error = AppError.saveFailed(error.localizedDescription)
-                isSaving = false
             }
         }
     }
