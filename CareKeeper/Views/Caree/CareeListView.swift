@@ -1,20 +1,23 @@
 import SwiftUI
 import SwiftData
+import Combine
 
 struct CareeListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Caree.listOrder) private var myCarees: [Caree]  // Only private database records
     @State private var showingAddCaree = false
     @State private var careeToDelete: IndexSet?
     @State private var showingDeleteConfirmation = false
     @State private var error: Error?
 
-    @StateObject private var syncService = CloudKitSyncService()
+    // Pure CloudKit architecture: Cache service as source of truth
+    @State private var cacheService: LocalCacheService?
+    @StateObject private var cloudKitService = CloudKitDataService()
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
 
-    // Combined list of all carees (private + shared)
+    // Combined list of all carees from cache
     private var allCarees: [Caree] {
-        return myCarees + sharedRecordsService.sharedCarees
+        guard let cacheService = cacheService else { return [] }
+        return cacheService.myCarees + cacheService.sharedCarees
     }
     
     var body: some View {
@@ -70,15 +73,22 @@ struct CareeListView: View {
                 Text(NSLocalizedString("This will delete all activity types and activities. This cannot be undone.", comment: "Delete caree confirmation message"))
             }
             .task {
-                await sharedRecordsService.fetchSharedCarees()
-            }
-            .onChange(of: sharedRecordsService.sharedCarees) {
-                // Trigger UI update when shared carees change
+                // Initialize cache service with model context
+                if cacheService == nil {
+                    cacheService = LocalCacheService(modelContext: modelContext)
+                    cloudKitService.setCacheService(cacheService!)
+                }
+
+                // Initial data load
+                await refreshAllCarees()
             }
             .onReceive(sharedRecordsService.$error) { newError in
                 if let newError = newError {
                     error = newError
                 }
+            }
+            .onReceive(cacheService?.objectWillChange ?? Just(()).eraseToAnyPublisher()) { _ in
+                // Trigger UI update when cache changes
             }
             .errorAlert($error)
         }
@@ -117,7 +127,7 @@ struct CareeListView: View {
                 NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
                     CareeListRowView(
                         caree: caree,
-                        isShared: sharedRecordsService.sharedCarees.contains { $0.id == caree.id }
+                        isShared: caree.isShared  // Use cache metadata
                     )
                 }
                 .transition(.asymmetric(
@@ -138,15 +148,22 @@ struct CareeListView: View {
     }
 
     private func refreshAllCarees() async {
-        // Fetch shared carees from CloudKit
+        guard let cacheService = cacheService else { return }
+
+        // Fetch shared carees from CloudKit and update cache
         await sharedRecordsService.fetchSharedCarees()
 
-        // Check sync status for my carees
-        // This refreshes the general CloudKit state
-        // Individual sync status is checked in CareeDetailView
-        for caree in myCarees {
-            _ = await syncService.isSynced(caree: caree)
+        // Cache shared carees
+        for sharedCaree in sharedRecordsService.sharedCarees {
+            do {
+                try await cacheService.cacheCaree(sharedCaree, isShared: true)
+            } catch {
+                self.error = error
+            }
         }
+
+        // Refresh cache to update published properties
+        try? await cacheService.refreshCache()
     }
     
     @MainActor
@@ -165,14 +182,27 @@ struct CareeListView: View {
             if allowed {
                 deletable.append(caree)
             } else {
-                // Optionally surface a user-facing message here
+                // Show error - user doesn't have permission to delete
+                error = AppError.invalidInput("You don't have permission to delete this caree")
             }
         }
 
-        // Perform deletions with animation on the main actor
+        // Pure CloudKit: Delete from CloudKit first, then cache
         withAnimation(.easeInOut(duration: 0.3)) {
             for caree in deletable {
-                modelContext.delete(caree)
+                Task {
+                    do {
+                        // Determine if this is a shared caree
+                        let isShared = caree.isShared
+
+                        // Delete from CloudKit
+                        try await cloudKitService.deleteCaree(caree, isShared: isShared)
+
+                        // Cache is automatically updated by CloudKitDataService
+                    } catch {
+                        self.error = error
+                    }
+                }
             }
         }
     }
