@@ -321,7 +321,8 @@ class CloudKitSharedDataService: ObservableObject {
         let record = CKRecord(recordType: "CD_ActivityType", recordID: recordID)
 
         // CRITICAL: Set parent reference for CloudKit sharing hierarchy
-        record.parent = CKRecord.Reference(record: parentCareeRecord, action: .deleteSelf)
+        // Parent references must use .none action (CloudKit requirement for sharing)
+        record.parent = CKRecord.Reference(record: parentCareeRecord, action: .none)
 
         // Copy fields from converter output
         record["CD_id"] = tempRecord["CD_id"]
@@ -360,7 +361,8 @@ class CloudKitSharedDataService: ObservableObject {
         let record = CKRecord(recordType: "CD_Activity", recordID: recordID)
 
         // CRITICAL: Set parent reference for CloudKit sharing hierarchy
-        record.parent = CKRecord.Reference(record: parentCareeRecord, action: .deleteSelf)
+        // Parent references must use .none action (CloudKit requirement for sharing)
+        record.parent = CKRecord.Reference(record: parentCareeRecord, action: .none)
 
         // Copy fields from converter output
         record["CD_id"] = tempRecord["CD_id"]

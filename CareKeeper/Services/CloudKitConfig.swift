@@ -8,7 +8,7 @@ enum CloudKitConfig {
     static let zoneName = "com.apple.coredata.cloudkit.zone"
 
     /// The CloudKit container identifier for this app
-    static let containerID = "iCloud.com.kareemf.CareKeeperCloudKit"
+    static let containerID = "iCloud.com.kareemf.CareKeeper2"
 
     /// The app group identifier for local data sharing between iOS and watchOS
     static let appGroupID = "group.com.kareemf.CareKeeper"

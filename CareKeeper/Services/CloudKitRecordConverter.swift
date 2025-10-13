@@ -32,19 +32,19 @@ class CloudKitRecordConverter {
         record["CD_listOrder"] = caree.listOrder as CKRecordValue
         record["CD_dateCreated"] = caree.dateCreated as CKRecordValue
 
-        // Handle image as CKAsset
+        // Handle image as CKAsset (using CD_image_ckAsset field to avoid BYTES/Asset type conflict)
         if let imageData = imageData {
             do {
                 let asset = try createImageAsset(from: imageData)
-                record["CD_image"] = asset
+                record["CD_image_ckAsset"] = asset
                 logger.info("Created CKAsset for caree image: \(caree.id)")
             } catch {
                 logger.error("Failed to create image asset for caree \(caree.id): \(error.localizedDescription)")
                 throw error
             }
-        } else if existingRecord?["CD_image"] == nil {
+        } else if existingRecord?["CD_image_ckAsset"] == nil {
             // Explicitly set to nil if no image and no existing image
-            record["CD_image"] = nil
+            record["CD_image_ckAsset"] = nil
         }
         // If existingRecord has image and we don't provide new data, keep existing
 
@@ -68,7 +68,8 @@ class CloudKitRecordConverter {
         let record = CKRecord(recordType: "CD_ActivityType", recordID: recordID)
 
         // CRITICAL: Set parent reference for CloudKit sharing hierarchy
-        record.parent = CKRecord.Reference(record: parentCaree, action: .deleteSelf)
+        // Parent references must use .none action (CloudKit requirement for sharing)
+        record.parent = CKRecord.Reference(record: parentCaree, action: .none)
 
         // Map fields
         record["CD_id"] = activityType.id.uuidString as CKRecordValue
@@ -110,7 +111,8 @@ class CloudKitRecordConverter {
         let record = CKRecord(recordType: "CD_Activity", recordID: recordID)
 
         // CRITICAL: Set parent reference for CloudKit sharing hierarchy
-        record.parent = CKRecord.Reference(record: parentCaree, action: .deleteSelf)
+        // Parent references must use .none action (CloudKit requirement for sharing)
+        record.parent = CKRecord.Reference(record: parentCaree, action: .none)
 
         // Map required fields
         record["CD_id"] = activity.id.uuidString as CKRecordValue
@@ -158,7 +160,7 @@ class CloudKitRecordConverter {
         caree.id = uuid
 
         // Load image from CKAsset if present
-        if let imageAsset = record["CD_image"] as? CKAsset {
+        if let imageAsset = record["CD_image_ckAsset"] as? CKAsset {
             do {
                 let imageData = try await loadImageData(from: imageAsset)
                 caree.image = imageData

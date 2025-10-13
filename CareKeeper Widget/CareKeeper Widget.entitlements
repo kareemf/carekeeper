@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
-		<string>iCloud.com.kareemf.CareKeeperCloudKit</string>
+		<string>iCloud.com.kareemf.CareKeeper2</string>
 	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>

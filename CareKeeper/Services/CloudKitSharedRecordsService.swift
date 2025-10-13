@@ -307,7 +307,7 @@ class CloudKitSharedRecordsService: ObservableObject {
             )
             caree.id = uuid
 
-            if let imageAsset = record["CD_image"] as? CKAsset,
+            if let imageAsset = record["CD_image_ckAsset"] as? CKAsset,
                let imageURL = imageAsset.fileURL,
                let imageData = try? Data(contentsOf: imageURL) {
                 caree.image = imageData

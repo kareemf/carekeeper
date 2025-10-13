@@ -124,7 +124,7 @@ class CloudKitDataService: ObservableObject {
 
             if let imageData = imageData {
                 let asset = try converter.createImageAsset(from: imageData)
-                existingRecord["CD_image"] = asset
+                existingRecord["CD_image_ckAsset"] = asset
             }
 
             // Save updated record

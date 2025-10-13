@@ -14,12 +14,6 @@ struct CareeListView: View {
     @StateObject private var cloudKitService = CloudKitDataService()
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
 
-    // Data migration (iOS only)
-    #if os(iOS)
-    @State private var migrationCoordinator: DataMigrationCoordinator?
-    @State private var showingMigration = false
-    #endif
-
     // Backup/Restore (iOS only)
     #if os(iOS)
     @State private var showingExport = false
@@ -89,16 +83,6 @@ struct CareeListView: View {
                     .presentationDragIndicator(.visible)
             }
             #if os(iOS)
-            .sheet(isPresented: $showingMigration, onDismiss: {
-                // Reload data after migration completes
-                Task {
-                    await refreshAllCarees()
-                }
-            }) {
-                if let migrationCoordinator = migrationCoordinator {
-                    DataMigrationView(coordinator: migrationCoordinator, isPresented: $showingMigration)
-                }
-            }
             .sheet(isPresented: $showingExport) {
                 if let exportFileURL = exportFileURL {
                     ShareSheet(items: [exportFileURL])
@@ -140,23 +124,6 @@ struct CareeListView: View {
                     cacheService = LocalCacheService(modelContext: modelContext)
                     cloudKitService.setCacheService(cacheService!)
                 }
-
-                #if os(iOS)
-                // Initialize migration coordinator (iOS only)
-                if migrationCoordinator == nil, let cacheService = cacheService {
-                    migrationCoordinator = DataMigrationCoordinator(
-                        modelContext: modelContext,
-                        cloudKitService: cloudKitService,
-                        cacheService: cacheService
-                    )
-                }
-
-                // Check if migration is needed
-                if let coordinator = migrationCoordinator, coordinator.needsMigration() {
-                    showingMigration = true
-                    return // Don't load data until migration is complete
-                }
-                #endif
 
                 // Initial data load
                 await refreshAllCarees()

@@ -93,7 +93,7 @@ class CloudKitSyncMonitor {
 
         Task {
             do {
-                let container = CKContainer(identifier: "iCloud.com.kareemf.CareKeeperCloudKit")
+                let container = CKContainer(identifier: CloudKitConfig.containerID)
                 let accountStatus = try await container.accountStatus()
 
                 await MainActor.run {

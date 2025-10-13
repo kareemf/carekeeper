@@ -60,7 +60,7 @@ targets:
       path: CareKeeper/CareKeeper.entitlements
       properties:
         com.apple.developer.icloud-container-identifiers:
-          - iCloud.com.kareemf.CareKeeperCloudKit
+          - iCloud.com.kareemf.CareKeeper2
         com.apple.developer.icloud-services:
           - CloudKit
           - CloudDocuments
@@ -92,7 +92,7 @@ targets:
         com.apple.security.application-groups:
           - group.com.kareemf.CareKeeper
         com.apple.developer.icloud-container-identifiers:
-          - iCloud.com.kareemf.CareKeeperCloudKit
+          - iCloud.com.kareemf.CareKeeper2
 
   CareKeeper Watch App:
     type: application
@@ -135,7 +135,7 @@ targets:
       path: "CareKeeper Watch App/CareKeeper Watch App.entitlements"
       properties:
         com.apple.developer.icloud-container-identifiers:
-          - iCloud.com.kareemf.CareKeeperCloudKit
+          - iCloud.com.kareemf.CareKeeper2
         com.apple.developer.icloud-services:
           - CloudKit
           - CloudDocuments
