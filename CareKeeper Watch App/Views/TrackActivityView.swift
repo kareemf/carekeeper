@@ -19,12 +19,12 @@ struct TrackActivityView: View {
     @State private var useCustomTime: Bool = false
     @State private var customTime: Date = Date()
 
-    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    // Pure CloudKit architecture services
+    @StateObject private var cloudKitService = CloudKitDataService()
     @StateObject private var sharedDataService = CloudKitSharedDataService()
-    @StateObject private var sharingService = CloudKitSharingService()
 
     private var isSharedCaree: Bool {
-        sharedRecordsService.sharedCarees.contains { $0.id == caree.id }
+        caree.isShared  // Use cache metadata
     }
 
     var body: some View {
@@ -34,9 +34,6 @@ struct TrackActivityView: View {
             } else if let activityType = selectedActivityType {
                 activityDetailsForm(for: activityType)
             }
-        }
-        .task {
-            await sharedRecordsService.fetchSharedCarees()
         }
         .onChange(of: locationManager.error != nil) { _, hasError in
             if hasError {
@@ -226,9 +223,6 @@ struct TrackActivityView: View {
                         longitude: location?.coordinate.longitude
                     )
 
-                    // Refresh shared carees to reflect changes
-                    await sharedRecordsService.fetchSharedCarees()
-
                     await MainActor.run {
                         locationManager.stopUpdating()
                         WidgetCenter.shared.reloadAllTimelines()
@@ -242,32 +236,31 @@ struct TrackActivityView: View {
                 }
             }
         } else {
-            // Handle owned caree - use SwiftData
-            let activity = Activity(
-                dateTime: finalDateTime,
-                notes: notes.isEmpty ? nil : notes,
-                quantity: activityType.hasQuantity && quantity > 0 ? quantity : nil,
-                latitude: location?.coordinate.latitude,
-                longitude: location?.coordinate.longitude,
-                activityType: activityType,
-                caree: caree
-            )
+            // Handle owned caree - use Pure CloudKit
+            Task {
+                do {
+                    _ = try await cloudKitService.createActivity(
+                        for: caree,
+                        activityType: activityType,
+                        dateTime: finalDateTime,
+                        notes: notes.isEmpty ? nil : notes,
+                        quantity: activityType.hasQuantity && quantity > 0 ? quantity : nil,
+                        latitude: location?.coordinate.latitude,
+                        longitude: location?.coordinate.longitude,
+                        isShared: false
+                    )
 
-            modelContext.insert(activity)
-
-            do {
-                try modelContext.save()
-
-                // If caree is shared, ensure parent references are set for the new child record
-                Task {
-                    await sharingService.ensureParentReferencesIfShared(for: caree, in: modelContext)
+                    await MainActor.run {
+                        locationManager.stopUpdating()
+                        WidgetCenter.shared.reloadAllTimelines()
+                        dismiss()
+                    }
+                } catch {
+                    await MainActor.run {
+                        self.error = AppError.saveFailed(error.localizedDescription)
+                        locationManager.stopUpdating()
+                    }
                 }
-
-                locationManager.stopUpdating()
-                WidgetCenter.shared.reloadAllTimelines()
-                dismiss()
-            } catch {
-                self.error = AppError.saveFailed(error.localizedDescription)
             }
         }
     }

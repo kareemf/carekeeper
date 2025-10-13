@@ -5,11 +5,14 @@ struct ActivityListView: View {
     @Environment(\.modelContext) private var modelContext
 
     let careeID: UUID
-    @Query private var allCarees: [Caree]
 
-    // Computed property to get the specific caree
+    // Pure CloudKit architecture: Cache service as source of truth
+    @State private var cacheService: LocalCacheService?
+    @StateObject private var cloudKitService = CloudKitDataService()
+
+    // Get the specific caree from cache
     private var caree: Caree? {
-        allCarees.first { $0.id == careeID }
+        cacheService?.getCachedCaree(id: careeID)
     }
 
     @State private var selectedActivityType: ActivityType?
@@ -76,6 +79,16 @@ struct ActivityListView: View {
             }
         } message: {
             Text(NSLocalizedString("This cannot be undone.", comment: "Delete confirmation message"))
+        }
+        .task {
+            // Initialize cache service with model context
+            if cacheService == nil {
+                cacheService = LocalCacheService(modelContext: modelContext)
+                cloudKitService.setCacheService(cacheService!)
+            }
+
+            // Refresh cache to load caree and activities
+            try? await cacheService?.refreshCache()
         }
     }
 
@@ -149,13 +162,27 @@ struct ActivityListView: View {
     }
 
     private func deleteActivity(_ activity: Activity) {
-        modelContext.delete(activity)
+        guard let caree = activity.caree else {
+            self.error = AppError.invalidInput("Activity has no associated caree")
+            return
+        }
 
-        do {
-            try modelContext.save()
-            activityToDelete = nil
-        } catch {
-            self.error = AppError.deleteFailed(error.localizedDescription)
+        let isShared = caree.isShared  // Use cache metadata
+
+        Task {
+            do {
+                // Pure CloudKit: Delete via CloudKitDataService
+                try await cloudKitService.deleteActivity(activity, isShared: isShared)
+
+                // Cache is automatically updated by CloudKitDataService
+                await MainActor.run {
+                    activityToDelete = nil
+                }
+            } catch {
+                await MainActor.run {
+                    self.error = AppError.deleteFailed(error.localizedDescription)
+                }
+            }
         }
     }
 

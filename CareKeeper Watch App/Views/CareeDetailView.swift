@@ -5,19 +5,15 @@ struct CareeDetailView: View {
     @Environment(\.modelContext) private var modelContext
 
     let careeID: UUID
-    @Query private var myCarees: [Caree]  // Only private database records
 
-    // Service for fetching shared records
+    // Pure CloudKit architecture: Cache service as source of truth
+    @State private var cacheService: LocalCacheService?
+    @StateObject private var cloudKitService = CloudKitDataService()
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
 
-    // Combined list of all carees (private + shared)
-    private var allCarees: [Caree] {
-        return myCarees + sharedRecordsService.sharedCarees
-    }
-
-    // Computed property to get the specific caree
+    // Get the specific caree from cache
     private var caree: Caree? {
-        allCarees.first { $0.id == careeID }
+        cacheService?.getCachedCaree(id: careeID)
     }
 
     @State private var showingTrackActivity = false
@@ -92,12 +88,25 @@ struct CareeDetailView: View {
             }
         }
         .task {
-            // Only fetch shared carees if this caree is not in myCarees
-            let isMyCaree = myCarees.contains(where: { $0.id == careeID })
+            // Initialize cache service with model context
+            if cacheService == nil {
+                cacheService = LocalCacheService(modelContext: modelContext)
+                cloudKitService.setCacheService(cacheService!)
+            }
 
-            if !isMyCaree {
+            // Refresh cache to load caree
+            try? await cacheService?.refreshCache()
+
+            // Only fetch shared carees if this caree is not in cache yet or is shared
+            if caree == nil || caree?.isShared == true {
                 isLoadingSharedCaree = true
                 await sharedRecordsService.fetchSharedCarees()
+
+                // Cache shared carees
+                for sharedCaree in sharedRecordsService.sharedCarees {
+                    try? await cacheService?.cacheCaree(sharedCaree, isShared: true)
+                }
+
                 isLoadingSharedCaree = false
             }
         }

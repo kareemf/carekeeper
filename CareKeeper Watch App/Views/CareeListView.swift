@@ -3,16 +3,18 @@ import SwiftData
 
 struct CareeListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Caree.listOrder) private var myCarees: [Caree]  // Only private database records
-    
-    // Service for fetching shared records
+
+    // Pure CloudKit architecture: Cache service as source of truth
+    @State private var cacheService: LocalCacheService?
+    @StateObject private var cloudKitService = CloudKitDataService()
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
-    
+
     @State private var error: Error?
-    
-    // Combined list of all carees (private + shared)
+
+    // Combined list of all carees from cache
     private var allCarees: [Caree] {
-        return myCarees + sharedRecordsService.sharedCarees
+        guard let cacheService = cacheService else { return [] }
+        return cacheService.myCarees + cacheService.sharedCarees
     }
 
     var body: some View {
@@ -26,7 +28,22 @@ struct CareeListView: View {
             }
             .navigationTitle(NSLocalizedString("Carees", comment: "Navigation title for carees list"))
             .task {
+                // Initialize cache service with model context
+                if cacheService == nil {
+                    cacheService = LocalCacheService(modelContext: modelContext)
+                    cloudKitService.setCacheService(cacheService!)
+                }
+
+                // Fetch shared carees and update cache
                 await sharedRecordsService.fetchSharedCarees()
+
+                // Cache shared carees
+                for sharedCaree in sharedRecordsService.sharedCarees {
+                    try? await cacheService?.cacheCaree(sharedCaree, isShared: true)
+                }
+
+                // Refresh cache to update published properties
+                try? await cacheService?.refreshCache()
             }
             .onReceive(sharedRecordsService.$error) { newError in
                 if let newError = newError {
@@ -66,13 +83,20 @@ struct CareeListView: View {
         List(allCarees) { caree in
             NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
                 CareeRowView(
-                    caree: caree, 
-                    isShared: sharedRecordsService.sharedCarees.contains { $0.id == caree.id }
+                    caree: caree,
+                    isShared: caree.isShared  // Use cache metadata
                 )
             }
         }
         .refreshable {
+            // Refresh shared carees and update cache
             await sharedRecordsService.fetchSharedCarees()
+
+            for sharedCaree in sharedRecordsService.sharedCarees {
+                try? await cacheService?.cacheCaree(sharedCaree, isShared: true)
+            }
+
+            try? await cacheService?.refreshCache()
         }
     }
 }
