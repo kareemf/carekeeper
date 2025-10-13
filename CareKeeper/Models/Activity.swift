@@ -12,6 +12,10 @@ final class Activity {
     var longitude: Double?
     var dateCreated: Date = Date()
 
+    // Cache metadata (for Pure CloudKit migration)
+    var lastSyncedAt: Date?      // Last time this record was synced from CloudKit
+    var cloudKitRecordID: String? // CloudKit record ID for tracking
+
     // Relationships
     var activityType: ActivityType?
     var caree: Caree?
@@ -34,6 +38,8 @@ final class Activity {
         self.dateCreated = Date()
         self.activityType = activityType
         self.caree = caree
+        self.lastSyncedAt = nil
+        self.cloudKitRecordID = nil
     }
 }
 

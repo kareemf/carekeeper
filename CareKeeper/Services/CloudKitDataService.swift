@@ -20,6 +20,15 @@ class CloudKitDataService: ObservableObject {
     private let logger = AppLogger.cloudkit
     private let maxRetries = 3
     private let retryDelay: TimeInterval = 2.0
+    private var cacheService: LocalCacheService?
+
+    // MARK: - Cache Integration
+
+    /// Set the cache service for automatic caching of CloudKit operations
+    func setCacheService(_ cacheService: LocalCacheService) {
+        self.cacheService = cacheService
+        logger.info("Cache service integrated with CloudKitDataService")
+    }
 
     // MARK: - Sync Status
 
@@ -73,6 +82,12 @@ class CloudKitDataService: ObservableObject {
 
             // Convert back to domain model with any CloudKit modifications
             let syncedCaree = try await converter.recordToCaree(savedRecord)
+
+            // Cache the caree if cache service is available
+            if let cacheService = cacheService {
+                try await cacheService.cacheCaree(syncedCaree, isShared: false)
+                logger.info("✅ Caree cached locally")
+            }
 
             logger.info("✅ Caree created and verified: \(syncedCaree.id)")
             syncStatus = .synced
@@ -139,6 +154,13 @@ class CloudKitDataService: ObservableObject {
 
             // Delete from CloudKit (child records cascade via .deleteSelf action)
             try await deleteWithRetry(recordID: recordID, from: db)
+
+            // Remove from cache if cache service is available
+            if let cacheService = cacheService,
+               let cachedCaree = cacheService.getCachedCaree(id: caree.id) {
+                try await cacheService.removeCachedCaree(cachedCaree)
+                logger.info("✅ Caree removed from cache")
+            }
 
             logger.info("✅ Caree deleted: \(caree.id)")
             syncStatus = .synced
@@ -261,6 +283,13 @@ class CloudKitDataService: ObservableObject {
 
             // Convert back to domain model
             let syncedActivityType = try converter.recordToActivityType(savedRecord)
+
+            // Cache the activity type if cache service is available
+            if let cacheService = cacheService,
+               let cachedCaree = cacheService.getCachedCaree(id: caree.id) {
+                try await cacheService.cacheActivityType(syncedActivityType, for: cachedCaree)
+                logger.info("✅ ActivityType cached locally")
+            }
 
             logger.info("✅ ActivityType created and verified: \(syncedActivityType.id)")
             syncStatus = .synced
@@ -405,6 +434,17 @@ class CloudKitDataService: ObservableObject {
 
             // Convert back to domain model
             let syncedActivity = try converter.recordToActivity(savedRecord)
+
+            // Cache the activity if cache service is available
+            if let cacheService = cacheService,
+               let cachedCaree = cacheService.getCachedCaree(id: caree.id) {
+                // Find cached activity type
+                let cachedActivityTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
+                if let cachedActivityType = cachedActivityTypes.first(where: { $0.id == activityType.id }) {
+                    try await cacheService.cacheActivity(syncedActivity, for: cachedCaree, activityType: cachedActivityType)
+                    logger.info("✅ Activity cached locally")
+                }
+            }
 
             logger.info("✅ Activity created and verified: \(syncedActivity.id)")
             syncStatus = .synced

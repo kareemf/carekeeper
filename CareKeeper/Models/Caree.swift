@@ -9,6 +9,12 @@ final class Caree {
     var listOrder: Int = 0
     var dateCreated: Date = Date()
 
+    // Cache metadata (for Pure CloudKit migration)
+    var isShared: Bool = false  // True if this is a shared caree (not owned by user)
+    var isOwned: Bool = true     // True if this caree is owned by user
+    var lastSyncedAt: Date?      // Last time this record was synced from CloudKit
+    var cloudKitRecordID: String? // CloudKit record ID for tracking
+
     // Relationships
     @Relationship(deleteRule: .cascade, inverse: \ActivityType.caree)
     var activityTypes: [ActivityType]? = []
@@ -22,6 +28,10 @@ final class Caree {
         self.image = image
         self.listOrder = listOrder
         self.dateCreated = Date()
+        self.isShared = false
+        self.isOwned = true
+        self.lastSyncedAt = nil
+        self.cloudKitRecordID = nil
     }
 }
 

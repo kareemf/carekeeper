@@ -12,6 +12,10 @@ final class ActivityType {
     var listOrder: Int = 0
     var dateCreated: Date = Date()
 
+    // Cache metadata (for Pure CloudKit migration)
+    var lastSyncedAt: Date?      // Last time this record was synced from CloudKit
+    var cloudKitRecordID: String? // CloudKit record ID for tracking
+
     // Relationships
     var caree: Caree?
 
@@ -36,6 +40,8 @@ final class ActivityType {
         self.listOrder = listOrder
         self.dateCreated = Date()
         self.caree = caree
+        self.lastSyncedAt = nil
+        self.cloudKitRecordID = nil
     }
 }
 

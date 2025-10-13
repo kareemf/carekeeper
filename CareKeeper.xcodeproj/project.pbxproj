@@ -19,6 +19,7 @@
 		1C40B2F36B2FEF8D200C1D6A /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F445F3809EAF0F93A2583BD1 /* LocationManager.swift */; };
 		2AE6F0B5667E58000BF31695 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A8D35563F0827622269172EA /* Assets.xcassets */; };
 		2DC6ED05DA7EE5485FFE7312 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B487DA5E1F85ECB1C6B6FA7 /* AppLogger.swift */; };
+		32264FE6CCB02AB8753A9ED0 /* LocalCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B75FFD77DA56F8E53AF30E4 /* LocalCacheService.swift */; };
 		331480192628E58BC1A5FE92 /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8A9109CFC17794F75FB515 /* PreviewContainer.swift */; };
 		3350CAF1AE029C3165492CAF /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF1FB5B93A58A39C08B20E /* Activity.swift */; };
 		36E0A774A306A89F50588425 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D48AF5D29BE95FF4982D277 /* AppError.swift */; };
@@ -73,6 +74,7 @@
 		9D010F7548E98EAC6C29ED89 /* UserNotificationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C405DB2464630975084B93 /* UserNotificationPreferences.swift */; };
 		9EED98DBD69AB6AEE2D56D16 /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 258AEEC1B61C2ECD4857BD40 /* ShakeEffect.swift */; };
 		A1074D868C422C77494D523B /* ActivityListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D3B0237A1629CAD6628A7E /* ActivityListView.swift */; };
+		A38735BE5393EB7F25C92B55 /* LocalCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B75FFD77DA56F8E53AF30E4 /* LocalCacheService.swift */; };
 		A424BB5045DBA45B28B6BA34 /* SyncStatusIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E796C238D68EB0869513BD1 /* SyncStatusIndicator.swift */; };
 		A4912D2B4DD4DA471EACBE92 /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F1C6113D31E7FBED78498C0 /* CloudKitConfig.swift */; };
 		A7E024A5B00557BC8A73D316 /* CareKeeperWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF8AB3750E092280F6B93E1 /* CareKeeperWatchApp.swift */; };
@@ -184,6 +186,7 @@
 		31F045A407E5D82FE3B07CC3 /* ActivityRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRowView.swift; sourceTree = "<group>"; };
 		3506093819653D2432F0A945 /* ActivityTypeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeRowView.swift; sourceTree = "<group>"; };
 		41782EA520212480E5BCFE74 /* CareKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperApp.swift; sourceTree = "<group>"; };
+		4B75FFD77DA56F8E53AF30E4 /* LocalCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalCacheService.swift; sourceTree = "<group>"; };
 		4D48AF5D29BE95FF4982D277 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		4DCF1FB5B93A58A39C08B20E /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
 		4F1C6113D31E7FBED78498C0 /* CloudKitConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitConfig.swift; sourceTree = "<group>"; };
@@ -471,6 +474,7 @@
 				AD6CD974E62394F6A1ED007F /* CloudKitSharingService.swift */,
 				B2C72AD1FB3E583ECC8A97EB /* CloudKitSyncMonitor.swift */,
 				1691E9BC2E13D39D27D6AAD1 /* CloudKitSyncService.swift */,
+				4B75FFD77DA56F8E53AF30E4 /* LocalCacheService.swift */,
 				F445F3809EAF0F93A2583BD1 /* LocationManager.swift */,
 				81C405DB2464630975084B93 /* UserNotificationPreferences.swift */,
 				20310D1AE3F1BF7D930C2709 /* UserNotificationService.swift */,
@@ -710,6 +714,7 @@
 				805FDC233580EBD9384D803E /* CloudSharingView.swift in Sources */,
 				B5559848F13F6B70E4352449 /* ContentView.swift in Sources */,
 				028EABF37E1C605E55B05623 /* ErrorAlert.swift in Sources */,
+				32264FE6CCB02AB8753A9ED0 /* LocalCacheService.swift in Sources */,
 				1C40B2F36B2FEF8D200C1D6A /* LocationManager.swift in Sources */,
 				ABB4713F42E2FAE30CE7564A /* PreviewContainer.swift in Sources */,
 				39F58B5C38E814CB5204F1C2 /* PreviewData.swift in Sources */,
@@ -781,6 +786,7 @@
 				42B90386A09ED9F1D5FECC34 /* CloudKitSyncStatusView.swift in Sources */,
 				3B70776BE3E3FE9FB5FFB249 /* CloudSharingView.swift in Sources */,
 				75595A31EB7E8AFC9DA52DF4 /* ErrorAlert.swift in Sources */,
+				A38735BE5393EB7F25C92B55 /* LocalCacheService.swift in Sources */,
 				F7B1CB49BDB2377419B9808B /* LocationManager.swift in Sources */,
 				331480192628E58BC1A5FE92 /* PreviewContainer.swift in Sources */,
 				DC9BF3EF522F3C23831403DA /* PreviewData.swift in Sources */,
