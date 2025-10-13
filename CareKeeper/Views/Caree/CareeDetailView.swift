@@ -5,24 +5,20 @@ struct CareeDetailView: View {
     @Environment(\.modelContext) private var modelContext
 
     let careeID: UUID
-    @Query private var myCarees: [Caree]  // Only private database records
 
-    // Service for fetching shared records
+    // Pure CloudKit architecture: Cache service as source of truth
+    @State private var cacheService: LocalCacheService?
+    @StateObject private var cloudKitService = CloudKitDataService()
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
-    
-    // Combined list of all carees (private + shared)
-    private var allCarees: [Caree] {
-        return myCarees + sharedRecordsService.sharedCarees
-    }
 
-    // Computed property to get the specific caree from both databases
+    // Get the specific caree from cache
     private var caree: Caree? {
-        allCarees.first { $0.id == careeID }
+        cacheService?.getCachedCaree(id: careeID)
     }
 
     // Check if this is one of my owned carees (vs shared)
     private var isMyCaree: Bool {
-        myCarees.contains(where: { $0.id == careeID })
+        caree?.isOwned ?? true
     }
 
     @State private var showingEditCaree = false
@@ -229,11 +225,25 @@ struct CareeDetailView: View {
             }
         }
         .task {
-            // Only fetch shared carees if this caree is not in myCarees
-            // This prevents unnecessary CloudKit queries when viewing owned carees
-            if !isMyCaree {
+            // Initialize cache service with model context
+            if cacheService == nil {
+                cacheService = LocalCacheService(modelContext: modelContext)
+                cloudKitService.setCacheService(cacheService!)
+            }
+
+            // Refresh cache to load caree
+            try? await cacheService?.refreshCache()
+
+            // Only fetch shared carees if this caree is not in cache yet or is shared
+            if caree == nil || caree?.isShared == true {
                 isLoadingSharedCaree = true
                 await sharedRecordsService.fetchSharedCarees()
+
+                // Cache shared carees
+                for sharedCaree in sharedRecordsService.sharedCarees {
+                    try? await cacheService?.cacheCaree(sharedCaree, isShared: true)
+                }
+
                 isLoadingSharedCaree = false
             }
 
@@ -243,27 +253,56 @@ struct CareeDetailView: View {
         }
         .task(id: careeID) {
             // Refresh when caree ID changes
-            // Only fetch shared carees if this caree is not in myCarees
-            if !isMyCaree {
+            try? await cacheService?.refreshCache()
+
+            if caree == nil || caree?.isShared == true {
                 isLoadingSharedCaree = true
                 await sharedRecordsService.fetchSharedCarees()
+
+                // Cache shared carees
+                for sharedCaree in sharedRecordsService.sharedCarees {
+                    try? await cacheService?.cacheCaree(sharedCaree, isShared: true)
+                }
+
                 isLoadingSharedCaree = false
             }
-        }
-        .onChange(of: sharedRecordsService.sharedCarees) {
-            // Trigger UI update when shared carees change
-            isLoadingSharedCaree = false
         }
     }
 
     private func deleteActivityType(_ activityType: ActivityType) {
-        modelContext.delete(activityType)
-        activityTypeToDelete = nil
+        guard let caree = caree else { return }
+
+        Task {
+            do {
+                // Pure CloudKit: Delete via CloudKitDataService
+                let isShared = caree.isShared
+                try await cloudKitService.deleteActivityType(activityType, isShared: isShared)
+
+                // Cache is automatically updated by CloudKitDataService
+                activityTypeToDelete = nil
+            } catch {
+                // Handle error - could show alert
+                print("❌ Failed to delete activity type: \(error.localizedDescription)")
+            }
+        }
     }
 
     private func deleteActivity(_ activity: Activity) {
-        modelContext.delete(activity)
-        activityToDelete = nil
+        guard let caree = caree else { return }
+
+        Task {
+            do {
+                // Pure CloudKit: Delete via CloudKitDataService
+                let isShared = caree.isShared
+                try await cloudKitService.deleteActivity(activity, isShared: isShared)
+
+                // Cache is automatically updated by CloudKitDataService
+                activityToDelete = nil
+            } catch {
+                // Handle error - could show alert
+                print("❌ Failed to delete activity: \(error.localizedDescription)")
+            }
+        }
     }
 
     private func moveActivityTypes(from source: IndexSet, to destination: Int) {
