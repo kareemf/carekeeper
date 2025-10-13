@@ -7,12 +7,12 @@ class CloudKitSharingService: ObservableObject {
     private let container: CKContainer
     private let zoneID: CKRecordZone.ID
     private let logger = AppLogger.sharing
-    private let parentReferenceService: CloudKitParentReferenceService
+    private let dataService: CloudKitDataService
 
-    init(containerIdentifier: String = CloudKitConfig.containerID) {
+    init(containerIdentifier: String = CloudKitConfig.containerID, dataService: CloudKitDataService = CloudKitDataService()) {
         self.container = CKContainer(identifier: containerIdentifier)
         self.zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
-        self.parentReferenceService = CloudKitParentReferenceService(containerIdentifier: containerIdentifier)
+        self.dataService = dataService
     }
 
     // MARK: - Share Status
@@ -52,46 +52,70 @@ class CloudKitSharingService: ObservableObject {
     // MARK: - Create Share
 
     /// Create a new CKShare for the Caree's CloudKit record
+    /// Verifies all child records exist with proper parent references before creating share
     func createOrGetShare(for caree: Caree, in modelContext: ModelContext) async throws -> CKShare {
         // Check if share already exists
         if let existingShare = try await getShare(for: caree, in: modelContext) {
             return existingShare
         }
-        
-        // Find the CloudKit record for this Caree
+
+        logger.info("🔍 Preparing to create share for Caree: \(caree.name)")
+
+        // Step 1: Verify Caree exists in CloudKit
         guard let careeCKRecord = try await findCKRecord(for: caree) else {
-            throw AppError.invalidInput("Caree not found in CloudKit. Make sure it's synced first.")
+            logger.error("❌ Caree not found in CloudKit")
+            throw AppError.invalidInput("Caree not found in CloudKit. Please wait for sync to complete and try again.")
         }
 
-        // Log record details for diagnostics
-        logger.info("🔍 Creating share for Caree record:")
+        logger.info("✅ Caree record verified in CloudKit")
         logger.info("   RecordID: \(careeCKRecord.recordID.recordName)")
-        logger.info("   Parent: \(String(describing: careeCKRecord.parent?.recordID.recordName ?? "nil"))")
-        logger.info("   Share: \(String(describing: careeCKRecord.share?.recordID.recordName ?? "nil"))")
-        logger.info("   Record type: \(careeCKRecord.recordType)")
 
-        // Query for child records to verify they exist
-        await logChildRecords(for: caree)
+        // Step 2: Verify all ActivityTypes exist with parent references
+        let activityTypeCount = caree.activityTypes?.count ?? 0
+        if activityTypeCount > 0 {
+            logger.info("🔍 Verifying \(activityTypeCount) ActivityTypes...")
+            let (verifiedCount, missingParents) = try await verifyActivityTypes(for: caree)
 
-        // CRITICAL FIX: Ensure parent references are set before creating share
-        // SwiftData doesn't automatically set CKRecord.parent for cascade relationships
-        // Without parent references, child records won't be included in the share
-        logger.info("🔧 Fixing parent references before creating share...")
-        try await parentReferenceService.ensureParentReferences(for: caree)
+            if verifiedCount < activityTypeCount {
+                logger.error("❌ Only \(verifiedCount)/\(activityTypeCount) ActivityTypes found in CloudKit")
+                throw AppError.invalidInput("Some activity types haven't synced to CloudKit yet. Please wait and try again.")
+            }
 
-        // Verify fix was successful
-        let (activityTypes, activities, missing) = try await parentReferenceService.verifyParentReferences(for: caree)
-        if missing > 0 {
-            logger.warning("⚠️ Warning: \(missing) child records still missing parent references")
-        } else {
-            logger.info("✅ All \(activityTypes + activities) child records have correct parent references")
+            if missingParents > 0 {
+                logger.warning("⚠️ Warning: \(missingParents) ActivityTypes missing parent references")
+                // This shouldn't happen with CloudKitDataService, but log it for diagnostics
+            }
+
+            logger.info("✅ All \(verifiedCount) ActivityTypes verified")
         }
+
+        // Step 3: Verify all Activities exist with parent references
+        let activityCount = caree.activities?.count ?? 0
+        if activityCount > 0 {
+            logger.info("🔍 Verifying \(activityCount) Activities...")
+            let (verifiedCount, missingParents) = try await verifyActivities(for: caree)
+
+            if verifiedCount < activityCount {
+                logger.error("❌ Only \(verifiedCount)/\(activityCount) Activities found in CloudKit")
+                throw AppError.invalidInput("Some activities haven't synced to CloudKit yet. Please wait and try again.")
+            }
+
+            if missingParents > 0 {
+                logger.warning("⚠️ Warning: \(missingParents) Activities missing parent references")
+                // This shouldn't happen with CloudKitDataService, but log it for diagnostics
+            }
+
+            logger.info("✅ All \(verifiedCount) Activities verified")
+        }
+
+        // Step 4: All records verified - safe to create share
+        logger.info("✅ All records verified, creating share...")
 
         // Create a new share
         let share = CKShare(rootRecord: careeCKRecord)
         share[CKShare.SystemFieldKey.title] = caree.name
         share.publicPermission = .none
-        
+
         do {
             // Save both the updated root record and the share
             let recordsToSave = [careeCKRecord, share]
@@ -99,17 +123,18 @@ class CloudKitSharingService: ObservableObject {
                 saving: recordsToSave,
                 deleting: []
             )
-            
+
             // Check if save was successful
             if let shareResult = saveResults.saveResults[share.recordID],
                case .success(let savedShare) = shareResult,
                let finalShare = savedShare as? CKShare {
+                logger.info("✅ Share created successfully")
                 return finalShare
             } else {
                 throw AppError.invalidInput("Failed to save share to CloudKit")
             }
         } catch {
-            logger.error("Failed to create share: \(error.localizedDescription)")
+            logger.error("❌ Failed to create share: \(error.localizedDescription)")
             throw error
         }
     }
@@ -181,71 +206,62 @@ class CloudKitSharingService: ObservableObject {
         return share.url
     }
 
-    // MARK: - Auto Parent Reference Handling
+    // MARK: - Verification Helpers
 
-    /// Ensure parent references for newly created child records if Caree is shared
-    /// Call this after creating new ActivityTypes or Activities in SwiftData
-    /// This handles the edge case where the owner creates new child records after sharing
-    func ensureParentReferencesIfShared(for caree: Caree, in modelContext: ModelContext) async {
-        // Only run if Caree is shared
-        guard await isShared(caree, in: modelContext) else {
-            logger.debug("Caree not shared, skipping parent reference check")
-            return
+    /// Verify all ActivityTypes for a Caree exist in CloudKit with parent references
+    /// - Returns: (verifiedCount, missingParentCount)
+    private func verifyActivityTypes(for caree: Caree) async throws -> (Int, Int) {
+        let predicate = NSPredicate(format: "CD_caree == %@", caree.id.uuidString)
+        let query = CKQuery(recordType: "CD_ActivityType", predicate: predicate)
+
+        let (results, _) = try await container.privateCloudDatabase.records(matching: query, inZoneWith: zoneID)
+
+        var verifiedCount = 0
+        var missingParentCount = 0
+
+        for (_, result) in results {
+            if case .success(let record) = result {
+                verifiedCount += 1
+
+                // Check parent reference
+                if record.parent == nil {
+                    missingParentCount += 1
+                    logger.warning("⚠️ ActivityType missing parent: \(record["CD_name"] as? String ?? "Unknown")")
+                }
+            }
         }
 
-        logger.info("📝 Caree is shared, ensuring parent references for newly created child records...")
+        return (verifiedCount, missingParentCount)
+    }
 
-        // Fix parent references for any new child records
-        do {
-            try await parentReferenceService.ensureParentReferences(for: caree)
-            logger.info("✅ Parent references ensured for newly created child records")
-        } catch {
-            logger.error("Failed to ensure parent references for newly created child records: \(error.localizedDescription)")
+    /// Verify all Activities for a Caree exist in CloudKit with parent references
+    /// - Returns: (verifiedCount, missingParentCount)
+    private func verifyActivities(for caree: Caree) async throws -> (Int, Int) {
+        let predicate = NSPredicate(format: "CD_caree == %@", caree.id.uuidString)
+        let query = CKQuery(recordType: "CD_Activity", predicate: predicate)
+
+        let (results, _) = try await container.privateCloudDatabase.records(matching: query, inZoneWith: zoneID)
+
+        var verifiedCount = 0
+        var missingParentCount = 0
+
+        for (_, result) in results {
+            if case .success(let record) = result {
+                verifiedCount += 1
+
+                // Check parent reference
+                if record.parent == nil {
+                    missingParentCount += 1
+                    let dateTime = record["CD_dateTime"] as? Date ?? Date()
+                    logger.warning("⚠️ Activity missing parent: \(dateTime)")
+                }
+            }
         }
+
+        return (verifiedCount, missingParentCount)
     }
 
     // MARK: - Private Helpers
-
-    /// Log child records for diagnostics
-    private func logChildRecords(for caree: Caree) async {
-        logger.info("🔍 Checking for child records:")
-
-        // Query for ActivityTypes
-        let activityTypePredicate = NSPredicate(format: "CD_caree == %@", caree.id.uuidString)
-        let activityTypeQuery = CKQuery(recordType: "CD_ActivityType", predicate: activityTypePredicate)
-
-        do {
-            let (results, _) = try await container.privateCloudDatabase.records(matching: activityTypeQuery, inZoneWith: zoneID)
-            logger.info("   Found \(results.count) ActivityType records")
-
-            for (_, result) in results {
-                if case .success(let record) = result {
-                    logger.info("     - \(record["CD_name"] as? String ?? "Unknown")")
-                    logger.info("       Parent: \(String(describing: record.parent?.recordID.recordName ?? "nil"))")
-                }
-            }
-        } catch {
-            logger.error("   Failed to query ActivityTypes: \(error.localizedDescription)")
-        }
-
-        // Query for Activities
-        let activityPredicate = NSPredicate(format: "CD_caree == %@", caree.id.uuidString)
-        let activityQuery = CKQuery(recordType: "CD_Activity", predicate: activityPredicate)
-
-        do {
-            let (results, _) = try await container.privateCloudDatabase.records(matching: activityQuery, inZoneWith: zoneID)
-            logger.info("   Found \(results.count) Activity records")
-
-            for (_, result) in results {
-                if case .success(let record) = result {
-                    logger.info("     - \(record["CD_dateTime"] as? Date ?? Date())")
-                    logger.info("       Parent: \(String(describing: record.parent?.recordID.recordName ?? "nil"))")
-                }
-            }
-        } catch {
-            logger.error("   Failed to query Activities: \(error.localizedDescription)")
-        }
-    }
 
     /// Find the CloudKit record for a SwiftData Caree
     /// This uses the same approach as your CloudKitSyncService

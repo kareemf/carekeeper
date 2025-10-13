@@ -8,6 +8,7 @@ import CloudKit
 class CloudKitSharedDataService: ObservableObject {
     private let container: CKContainer
     private let logger = AppLogger.cloudkit
+    private let converter = CloudKitRecordConverter()
 
     init(containerIdentifier: String = CloudKitConfig.containerID) {
         self.container = CKContainer(identifier: containerIdentifier)
@@ -303,53 +304,77 @@ class CloudKitSharedDataService: ObservableObject {
         return nil
     }
 
-    /// Convert ActivityType to CKRecord
+    /// Convert ActivityType to CKRecord with parent reference (CRITICAL for sharing)
     private func convertActivityTypeToRecord(_ activityType: ActivityType, caree: Caree, zoneID: CKRecordZone.ID) async throws -> CKRecord {
+        // Fetch the parent Caree record from shared database (needed for parent reference)
+        let sharedDatabase = container.sharedCloudDatabase
+        let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
+
+        let parentCareeRecord = try await sharedDatabase.record(for: careeRecordID)
+
+        // Use converter to create record with proper parent reference
+        // Note: converter doesn't handle zoneID, so we need to create record with zone then update fields
+        let tempRecord = try converter.activityTypeToRecord(activityType, parentCaree: parentCareeRecord)
+
+        // Create new record with correct zoneID
         let recordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)", zoneID: zoneID)
         let record = CKRecord(recordType: "CD_ActivityType", recordID: recordID)
 
-        // Set all fields with CD_ prefix
-        record["CD_id"] = activityType.id.uuidString
-        record["CD_name"] = activityType.name
-        record["CD_icon"] = activityType.icon
-        record["CD_hasQuantity"] = activityType.hasQuantity
-        record["CD_quantityUnit"] = activityType.quantityUnit
-        record["CD_hasLocation"] = activityType.hasLocation
-        record["CD_listOrder"] = activityType.listOrder
-        record["CD_dateCreated"] = activityType.dateCreated
+        // CRITICAL: Set parent reference for CloudKit sharing hierarchy
+        record.parent = CKRecord.Reference(record: parentCareeRecord, action: .deleteSelf)
 
-        // Create reference to caree
-        let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
-        record["CD_caree"] = CKRecord.Reference(recordID: careeRecordID, action: .deleteSelf)
+        // Copy fields from converter output
+        record["CD_id"] = tempRecord["CD_id"]
+        record["CD_name"] = tempRecord["CD_name"]
+        record["CD_icon"] = tempRecord["CD_icon"]
+        record["CD_hasQuantity"] = tempRecord["CD_hasQuantity"]
+        record["CD_quantityUnit"] = tempRecord["CD_quantityUnit"]
+        record["CD_hasLocation"] = tempRecord["CD_hasLocation"]
+        record["CD_listOrder"] = tempRecord["CD_listOrder"]
+        record["CD_dateCreated"] = tempRecord["CD_dateCreated"]
+        record["CD_caree"] = tempRecord["CD_caree"]
 
+        logger.info("✅ Created ActivityType record with parent for shared database: \(activityType.name)")
         return record
     }
 
-    /// Convert Activity to CKRecord
+    /// Convert Activity to CKRecord with parent reference (CRITICAL for sharing)
     private func convertActivityToRecord(_ activity: Activity, caree: Caree, activityType: ActivityType, zoneID: CKRecordZone.ID) async throws -> CKRecord {
+        // Fetch parent records from shared database (needed for parent references)
+        let sharedDatabase = container.sharedCloudDatabase
+        let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
+        let activityTypeRecordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)", zoneID: zoneID)
+
+        let parentCareeRecord = try await sharedDatabase.record(for: careeRecordID)
+        let activityTypeRecord = try await sharedDatabase.record(for: activityTypeRecordID)
+
+        // Use converter to create record with proper parent reference
+        let tempRecord = try converter.activityToRecord(
+            activity,
+            parentCaree: parentCareeRecord,
+            activityTypeRecord: activityTypeRecord
+        )
+
+        // Create new record with correct zoneID
         let recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)", zoneID: zoneID)
         let record = CKRecord(recordType: "CD_Activity", recordID: recordID)
 
-        // Set all fields with CD_ prefix
-        record["CD_id"] = activity.id.uuidString
-        record["CD_dateTime"] = activity.dateTime
-        record["CD_notes"] = activity.notes
-        record["CD_quantity"] = activity.quantity
-        record["CD_latitude"] = activity.latitude
-        record["CD_longitude"] = activity.longitude
-        record["CD_dateCreated"] = activity.dateCreated
+        // CRITICAL: Set parent reference for CloudKit sharing hierarchy
+        record.parent = CKRecord.Reference(record: parentCareeRecord, action: .deleteSelf)
 
-        // Track the creator's CloudKit user record ID for notification filtering
-        // This allows us to identify who created the activity and avoid showing notifications for our own actions
-        record["CD_creatorUserRecordID"] = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
+        // Copy fields from converter output
+        record["CD_id"] = tempRecord["CD_id"]
+        record["CD_dateTime"] = tempRecord["CD_dateTime"]
+        record["CD_notes"] = tempRecord["CD_notes"]
+        record["CD_quantity"] = tempRecord["CD_quantity"]
+        record["CD_latitude"] = tempRecord["CD_latitude"]
+        record["CD_longitude"] = tempRecord["CD_longitude"]
+        record["CD_dateCreated"] = tempRecord["CD_dateCreated"]
+        record["CD_creatorUserRecordID"] = tempRecord["CD_creatorUserRecordID"]
+        record["CD_caree"] = tempRecord["CD_caree"]
+        record["CD_activityType"] = tempRecord["CD_activityType"]
 
-        // Create references
-        let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
-        record["CD_caree"] = CKRecord.Reference(recordID: careeRecordID, action: .deleteSelf)
-
-        let activityTypeRecordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)", zoneID: zoneID)
-        record["CD_activityType"] = CKRecord.Reference(recordID: activityTypeRecordID, action: .deleteSelf)
-
+        logger.info("✅ Created Activity record with parent for shared database at: \(activity.dateTime)")
         return record
     }
 }
