@@ -18,12 +18,12 @@ struct TrackActivityView: View {
     @State private var error: Error?
     @State private var isSaving: Bool = false
 
-    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    // Pure CloudKit architecture services
+    @StateObject private var cloudKitService = CloudKitDataService()
     @StateObject private var sharedDataService = CloudKitSharedDataService()
-    @StateObject private var sharingService = CloudKitSharingService()
 
     private var isSharedCaree: Bool {
-        sharedRecordsService.sharedCarees.contains { $0.id == caree.id }
+        caree.isShared  // Use cache metadata
     }
     
     private var sortedActivityTypes: [ActivityType] {
@@ -72,9 +72,6 @@ struct TrackActivityView: View {
         }
         .onAppear {
             requestLocationIfNeeded()
-        }
-        .task {
-            await sharedRecordsService.fetchSharedCarees()
         }
         .onChange(of: locationManager.error != nil) { _, hasError in
             if hasError {
@@ -226,9 +223,6 @@ struct TrackActivityView: View {
                         longitude: longitude
                     )
 
-                    // Refresh shared carees to reflect changes
-                    await sharedRecordsService.fetchSharedCarees()
-
                     await MainActor.run {
                         locationManager.stopUpdating()
                         WidgetCenter.shared.reloadAllTimelines()
@@ -244,40 +238,32 @@ struct TrackActivityView: View {
                 }
             }
         } else {
-            // Handle owned caree - use SwiftData
-            // Add slight delay for visual feedback
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                let newActivity = Activity(
-                    dateTime: activityDateTime,
-                    notes: notes.isEmpty ? nil : notes,
-                    quantity: quantityValue,
-                    latitude: latitude,
-                    longitude: longitude,
-                    activityType: activityType,
-                    caree: caree
-                )
+            // Handle owned caree - use Pure CloudKit
+            Task {
+                do {
+                    _ = try await cloudKitService.createActivity(
+                        for: caree,
+                        activityType: activityType,
+                        dateTime: activityDateTime,
+                        notes: notes.isEmpty ? nil : notes,
+                        quantity: quantityValue,
+                        latitude: latitude,
+                        longitude: longitude,
+                        isShared: false
+                    )
 
-                withAnimation(.easeOut(duration: 0.2)) {
-                    modelContext.insert(newActivity)
-                    do {
-                        try modelContext.save()
-
-                        // If caree is shared, ensure parent references are set for the new child record
-                        Task {
-                            await sharingService.ensureParentReferencesIfShared(for: caree, in: modelContext)
-                        }
-
+                    await MainActor.run {
+                        locationManager.stopUpdating()
                         WidgetCenter.shared.reloadAllTimelines()
-                    } catch {
-                        self.error = AppError.saveFailed(error.localizedDescription)
+                        isSaving = false
+                        dismiss()
                     }
-                    locationManager.stopUpdating()
-                    isSaving = false
-                }
-
-                // Dismiss with slight delay for smoother transition
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    dismiss()
+                } catch {
+                    await MainActor.run {
+                        self.error = AppError.saveFailed(error.localizedDescription)
+                        locationManager.stopUpdating()
+                        isSaving = false
+                    }
                 }
             }
         }
