@@ -285,6 +285,11 @@ struct ActivityDetailView: View {
             return
         }
 
+        guard let activityType = activity.activityType else {
+            error = AppError.invalidInput("Activity has no associated activity type")
+            return
+        }
+
         // Update local values
         activity.notes = editingNotes.isEmpty ? nil : editingNotes
         activity.quantity = Double(editingQuantity)
@@ -322,6 +327,7 @@ struct ActivityDetailView: View {
                     try await cloudKitService.updateActivity(
                         activity,
                         caree: caree,
+                        activityType: activityType,
                         dateTime: finalDateTime,
                         notes: editingNotes.isEmpty ? nil : editingNotes,
                         quantity: Double(editingQuantity),

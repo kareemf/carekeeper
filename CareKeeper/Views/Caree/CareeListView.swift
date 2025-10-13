@@ -14,6 +14,21 @@ struct CareeListView: View {
     @StateObject private var cloudKitService = CloudKitDataService()
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
 
+    // Data migration (iOS only)
+    #if os(iOS)
+    @State private var migrationCoordinator: DataMigrationCoordinator?
+    @State private var showingMigration = false
+    #endif
+
+    // Backup/Restore (iOS only)
+    #if os(iOS)
+    @State private var showingExport = false
+    @State private var exportFileURL: URL?
+    @State private var showingImport = false
+    @State private var isImporting = false
+    @State private var importProgress: ImportProgress = .idle
+    #endif
+
     // Combined list of all carees from cache
     private var allCarees: [Caree] {
         guard let cacheService = cacheService else { return [] }
@@ -38,6 +53,26 @@ struct CareeListView: View {
                     SyncStatusIndicator()
                 }
 
+                #if os(iOS)
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button(action: {
+                            exportAllCarees()
+                        }) {
+                            Label("Export Backup", systemImage: "square.and.arrow.up")
+                        }
+
+                        Button(action: {
+                            showingImport = true
+                        }) {
+                            Label("Import Backup", systemImage: "square.and.arrow.down")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
+                #endif
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -53,6 +88,33 @@ struct CareeListView: View {
                 CareeEditView()
                     .presentationDragIndicator(.visible)
             }
+            #if os(iOS)
+            .sheet(isPresented: $showingMigration, onDismiss: {
+                // Reload data after migration completes
+                Task {
+                    await refreshAllCarees()
+                }
+            }) {
+                if let migrationCoordinator = migrationCoordinator {
+                    DataMigrationView(coordinator: migrationCoordinator, isPresented: $showingMigration)
+                }
+            }
+            .sheet(isPresented: $showingExport) {
+                if let exportFileURL = exportFileURL {
+                    ShareSheet(items: [exportFileURL])
+                }
+            }
+            .fileImporter(
+                isPresented: $showingImport,
+                allowedContentTypes: [.json],
+                onCompletion: { result in
+                    handleImport(result: result)
+                }
+            )
+            .sheet(isPresented: $isImporting) {
+                ImportProgressView(progress: importProgress)
+            }
+            #endif
             .confirmationDialog(
                 NSLocalizedString("Delete Caree?", comment: "Delete caree confirmation title"),
                 isPresented: $showingDeleteConfirmation,
@@ -79,6 +141,23 @@ struct CareeListView: View {
                     cloudKitService.setCacheService(cacheService!)
                 }
 
+                #if os(iOS)
+                // Initialize migration coordinator (iOS only)
+                if migrationCoordinator == nil, let cacheService = cacheService {
+                    migrationCoordinator = DataMigrationCoordinator(
+                        modelContext: modelContext,
+                        cloudKitService: cloudKitService,
+                        cacheService: cacheService
+                    )
+                }
+
+                // Check if migration is needed
+                if let coordinator = migrationCoordinator, coordinator.needsMigration() {
+                    showingMigration = true
+                    return // Don't load data until migration is complete
+                }
+                #endif
+
                 // Initial data load
                 await refreshAllCarees()
             }
@@ -86,9 +165,6 @@ struct CareeListView: View {
                 if let newError = newError {
                     error = newError
                 }
-            }
-            .onReceive(cacheService?.objectWillChange ?? Just(()).eraseToAnyPublisher()) { _ in
-                // Trigger UI update when cache changes
             }
             .errorAlert($error)
         }
@@ -210,8 +286,10 @@ struct CareeListView: View {
     private func moveCarees(from source: IndexSet, to destination: Int) {
         // Only allow reordering of my carees (not shared carees)
         // Shared carees maintain the owner's listOrder
+        guard let cacheService = cacheService else { return }
+
         withAnimation(.easeInOut(duration: 0.3)) {
-            var updatedCarees = myCarees
+            var updatedCarees = cacheService.myCarees
             updatedCarees.move(fromOffsets: source, toOffset: destination)
 
             for (index, caree) in updatedCarees.enumerated() {
@@ -219,6 +297,63 @@ struct CareeListView: View {
             }
         }
     }
+
+    // MARK: - Backup/Restore
+
+    #if os(iOS)
+    private func exportAllCarees() {
+        do {
+            let exportService = CareeExportService()
+            let filename = exportService.generateFilename(careeCount: allCarees.count)
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
+
+            try exportService.exportAllCarees(to: tempURL, modelContext: modelContext)
+
+            exportFileURL = tempURL
+            showingExport = true
+        } catch {
+            self.error = AppError.saveFailed("Export failed: \(error.localizedDescription)")
+        }
+    }
+
+    private func handleImport(result: Result<URL, Error>) {
+        switch result {
+        case .success(let url):
+            importProgress = .reading
+            isImporting = true
+
+            Task {
+                do {
+                    // Start accessing security-scoped resource
+                    guard url.startAccessingSecurityScopedResource() else {
+                        throw AppError.invalidInput("Unable to access file")
+                    }
+                    defer { url.stopAccessingSecurityScopedResource() }
+
+                    let importService = CareeImportService(cloudKitService: cloudKitService)
+                    try await importService.importFromJSON(at: url)
+
+                    // Refresh UI
+                    await refreshAllCarees()
+
+                    await MainActor.run {
+                        isImporting = false
+                        importProgress = .idle
+                    }
+                } catch {
+                    await MainActor.run {
+                        self.error = AppError.saveFailed("Import failed: \(error.localizedDescription)")
+                        isImporting = false
+                        importProgress = .idle
+                    }
+                }
+            }
+
+        case .failure(let error):
+            self.error = AppError.saveFailed("Failed to select file: \(error.localizedDescription)")
+        }
+    }
+    #endif
 }
 
 #Preview {

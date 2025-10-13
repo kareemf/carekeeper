@@ -36,8 +36,9 @@ class LocalCacheService: ObservableObject {
         logger.info("Caching caree: \(caree.name) (isShared: \(isShared))")
 
         // Check if caree already exists in cache
+        let careeId = caree.id
         let fetchDescriptor = FetchDescriptor<Caree>(
-            predicate: #Predicate { $0.id == caree.id }
+            predicate: #Predicate { $0.id == careeId }
         )
 
         let existingCarees = try modelContext.fetch(fetchDescriptor)
@@ -99,8 +100,9 @@ class LocalCacheService: ObservableObject {
         logger.info("Caching activity type: \(activityType.name)")
 
         // Check if already exists
+        let activityTypeId = activityType.id
         let fetchDescriptor = FetchDescriptor<ActivityType>(
-            predicate: #Predicate { $0.id == activityType.id }
+            predicate: #Predicate { $0.id == activityTypeId }
         )
 
         let existing = try modelContext.fetch(fetchDescriptor)
@@ -141,8 +143,9 @@ class LocalCacheService: ObservableObject {
         logger.info("Caching activity at: \(activity.dateTime)")
 
         // Check if already exists
+        let activityId = activity.id
         let fetchDescriptor = FetchDescriptor<Activity>(
-            predicate: #Predicate { $0.id == activity.id }
+            predicate: #Predicate { $0.id == activityId }
         )
 
         let existing = try modelContext.fetch(fetchDescriptor)
@@ -181,8 +184,9 @@ class LocalCacheService: ObservableObject {
     /// - Parameter id: Caree UUID
     /// - Returns: Cached Caree if found
     func getCachedCaree(id: UUID) -> Caree? {
+        let careeId = id
         let fetchDescriptor = FetchDescriptor<Caree>(
-            predicate: #Predicate { $0.id == id }
+            predicate: #Predicate { $0.id == careeId }
         )
 
         do {

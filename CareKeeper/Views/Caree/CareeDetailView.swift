@@ -472,11 +472,11 @@ struct CareeDetailView: View {
 
     private func exportCaree(_ caree: Caree) {
         do {
-            // Generate JSON data
-            let jsonData = try exportService.exportToJSON(caree: caree)
+            // Generate JSON data (v2.0 format with full fidelity)
+            let jsonData = try exportService.exportCaree(caree)
 
             // Create temporary file
-            let filename = exportService.generateFilename(for: caree)
+            let filename = exportService.generateFilename(careeCount: 1)
             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
 
             try jsonData.write(to: tempURL)

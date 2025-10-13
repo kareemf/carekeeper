@@ -533,6 +533,45 @@ class CloudKitDataService: ObservableObject {
         }
     }
 
+    // MARK: - Zone Management (for Migration)
+
+    /// Delete the custom CloudKit zone (destroys all records)
+    /// WARNING: This permanently deletes all data in the zone
+    func deleteCustomZone() async throws {
+        logger.warning("⚠️ Deleting custom CloudKit zone - all data will be destroyed")
+
+        let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
+
+        do {
+            _ = try await container.privateCloudDatabase.deleteRecordZone(withID: zoneID)
+            logger.info("✅ Custom zone deleted: \(CloudKitConfig.zoneName)")
+        } catch let error as CKError where error.code == .zoneNotFound {
+            logger.info("Zone already deleted or doesn't exist")
+        } catch {
+            logger.error("❌ Failed to delete zone: \(error.localizedDescription)")
+            throw error
+        }
+    }
+
+    /// Recreate the custom CloudKit zone
+    func recreateCustomZone() async throws {
+        logger.info("Creating custom CloudKit zone: \(CloudKitConfig.zoneName)")
+
+        let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
+        let zone = CKRecordZone(zoneID: zoneID)
+
+        do {
+            _ = try await container.privateCloudDatabase.save(zone)
+            logger.info("✅ Custom zone created: \(CloudKitConfig.zoneName)")
+        } catch let error as CKError where error.code == .serverRecordChanged {
+            // Zone already exists, which is fine
+            logger.info("Zone already exists, continuing")
+        } catch {
+            logger.error("❌ Failed to create zone: \(error.localizedDescription)")
+            throw error
+        }
+    }
+
     // MARK: - Sync Verification
 
     /// Verify that a record exists in CloudKit
