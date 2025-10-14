@@ -5,8 +5,14 @@ import SwiftData
 struct CareKeeperWatchApp: App {
     @StateObject private var cloudKitService = CloudKitDataService()
     @State private var cacheService: LocalCacheService?
+    
+    private let logger = AppLogger.cloudkit
 
-    var sharedModelContainer: ModelContainer = {
+    let sharedModelContainer: ModelContainer
+
+    init() {
+        let logger = AppLogger.cloudkit
+
         let schema = Schema([
             Caree.self,
             ActivityType.self,
@@ -23,11 +29,11 @@ struct CareKeeperWatchApp: App {
         )
 
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            sharedModelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
             // Log the error and fall back to in-memory storage
-            print("⚠️ Failed to create CloudKit-enabled ModelContainer: \(error.localizedDescription)")
-            print("   Falling back to in-memory storage (data will not persist)")
+            logger.info("⚠️ Failed to create CloudKit-enabled ModelContainer: \(error.localizedDescription)")
+            logger.info("   Falling back to in-memory storage (data will not persist)")
 
             // Fallback to in-memory store for development
             let fallbackConfig = ModelConfiguration(
@@ -36,12 +42,12 @@ struct CareKeeperWatchApp: App {
             )
 
             do {
-                return try ModelContainer(for: schema, configurations: [fallbackConfig])
+                sharedModelContainer = try ModelContainer(for: schema, configurations: [fallbackConfig])
             } catch {
                 fatalError("Could not create ModelContainer: \(error)")
             }
         }
-    }()
+    }
 
     var body: some Scene {
         WindowGroup {

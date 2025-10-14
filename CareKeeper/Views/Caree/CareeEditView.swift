@@ -14,6 +14,8 @@ struct CareeEditView: View {
     @State private var shakeField: Bool = false
     @State private var isSaving = false
     @FocusState private var isNameFieldFocused: Bool
+    
+    private let logger = AppLogger.cloudkit
 
     // Use shared service from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
@@ -160,7 +162,7 @@ struct CareeEditView: View {
         do {
             if let existingCaree = caree {
                 // Pure CloudKit: Update existing caree via CloudKitDataService
-                print("📝 Updating caree via CloudKit: \(trimmedName) (ID: \(existingCaree.id.uuidString))")
+                logger.info("📝 Updating caree via CloudKit: \(trimmedName) (ID: \(existingCaree.id.uuidString))")
 
                 // Determine if this is a shared caree
                 let isShared = existingCaree.isShared
@@ -172,10 +174,10 @@ struct CareeEditView: View {
                     isShared: isShared
                 )
 
-                print("✅ Caree updated successfully in CloudKit")
+                logger.info("✅ Caree updated successfully in CloudKit")
             } else {
                 // Pure CloudKit: Create new caree via CloudKitDataService
-                print("➕ Creating new caree via CloudKit: \(trimmedName)")
+                logger.info("➕ Creating new caree via CloudKit: \(trimmedName)")
 
                 _ = try await cloudKitService.createCaree(
                     name: trimmedName,
@@ -183,12 +185,12 @@ struct CareeEditView: View {
                     listOrder: 0
                 )
 
-                print("✅ Caree created successfully in CloudKit and cached locally")
+                logger.info("✅ Caree created successfully in CloudKit and cached locally")
             }
 
             dismiss()
         } catch {
-            print("❌ Save failed: \(error.localizedDescription)")
+            logger.error("❌ Save failed: \(error.localizedDescription)")
             self.error = AppError.saveFailed(error.localizedDescription)
         }
     }
