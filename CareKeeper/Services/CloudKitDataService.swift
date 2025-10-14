@@ -163,8 +163,15 @@ class CloudKitDataService: ObservableObject {
     ///   - caree: Caree to update
     ///   - name: New name (optional)
     ///   - imageData: New image data (optional)
+    ///   - listOrder: New display order (optional)
     ///   - isShared: Whether this is a shared caree
-    func updateCaree(_ caree: Caree, name: String? = nil, imageData: Data? = nil, isShared: Bool = false) async throws {
+    func updateCaree(
+        _ caree: Caree,
+        name: String? = nil,
+        imageData: Data? = nil,
+        listOrder: Int? = nil,
+        isShared: Bool = false
+    ) async throws {
         logger.info("Updating Caree: \(caree.id)")
         syncStatus = .syncing
 
@@ -188,8 +195,12 @@ class CloudKitDataService: ObservableObject {
                 existingRecord["CD_image_ckAsset"] = asset
             }
 
+            if let listOrder = listOrder {
+                existingRecord["CD_listOrder"] = listOrder as CKRecordValue
+            }
+
             // Save updated record
-            let savedRecord = try await saveWithRetry(existingRecord, to: db)
+            _ = try await saveWithRetry(existingRecord, to: db)
 
             // Update the caree object with new values
             if let name = name {
@@ -197,6 +208,9 @@ class CloudKitDataService: ObservableObject {
             }
             if let imageData = imageData {
                 caree.image = imageData
+            }
+            if let listOrder = listOrder {
+                caree.listOrder = listOrder
             }
 
             // Update cache if available
@@ -460,6 +474,10 @@ class CloudKitDataService: ObservableObject {
         caree: Caree,
         name: String? = nil,
         icon: String? = nil,
+        hasQuantity: Bool? = nil,
+        quantityUnit: String? = nil,
+        hasLocation: Bool? = nil,
+        listOrder: Int? = nil,
         isShared: Bool = false
     ) async throws {
         logger.info("Updating ActivityType: \(activityType.id)")
@@ -482,6 +500,18 @@ class CloudKitDataService: ObservableObject {
             if let icon = icon {
                 existingRecord["CD_icon"] = icon as CKRecordValue
             }
+            if let hasQuantity = hasQuantity {
+                existingRecord["CD_hasQuantity"] = (hasQuantity ? 1 : 0) as CKRecordValue
+            }
+            if let quantityUnit = quantityUnit {
+                existingRecord["CD_quantityUnit"] = quantityUnit as CKRecordValue
+            }
+            if let hasLocation = hasLocation {
+                existingRecord["CD_hasLocation"] = (hasLocation ? 1 : 0) as CKRecordValue
+            }
+            if let listOrder = listOrder {
+                existingRecord["CD_listOrder"] = listOrder as CKRecordValue
+            }
 
             // Save updated record
             _ = try await saveWithRetry(existingRecord, to: db)
@@ -492,6 +522,18 @@ class CloudKitDataService: ObservableObject {
             }
             if let icon = icon {
                 activityType.icon = icon
+            }
+            if let hasQuantity = hasQuantity {
+                activityType.hasQuantity = hasQuantity
+            }
+            if let quantityUnit = quantityUnit {
+                activityType.quantityUnit = quantityUnit
+            }
+            if let hasLocation = hasLocation {
+                activityType.hasLocation = hasLocation
+            }
+            if let listOrder = listOrder {
+                activityType.listOrder = listOrder
             }
 
             // Update cache if available - first get the cached caree
@@ -630,6 +672,8 @@ class CloudKitDataService: ObservableObject {
         dateTime: Date? = nil,
         notes: String? = nil,
         quantity: Double? = nil,
+        latitude: Double? = nil,
+        longitude: Double? = nil,
         isShared: Bool = false
     ) async throws {
         logger.info("Updating Activity: \(activity.id)")
@@ -655,6 +699,12 @@ class CloudKitDataService: ObservableObject {
             if let quantity = quantity {
                 existingRecord["CD_quantity"] = quantity as CKRecordValue
             }
+            if let latitude = latitude {
+                existingRecord["CD_latitude"] = latitude as CKRecordValue
+            }
+            if let longitude = longitude {
+                existingRecord["CD_longitude"] = longitude as CKRecordValue
+            }
 
             // Save updated record
             _ = try await saveWithRetry(existingRecord, to: db)
@@ -668,6 +718,12 @@ class CloudKitDataService: ObservableObject {
             }
             if let quantity = quantity {
                 activity.quantity = quantity
+            }
+            if let latitude = latitude {
+                activity.latitude = latitude
+            }
+            if let longitude = longitude {
+                activity.longitude = longitude
             }
 
             // Update cache if available
