@@ -4,7 +4,7 @@ import SwiftData
 /// Service to import Carees from JSON and create CloudKit records
 /// Used for data migration and backup/restore functionality
 @MainActor
-class CareeImportService {
+class CareeImportService: ObservableObject {
     private let cloudKitService: CloudKitDataService
     private let logger = AppLogger.cloudkit
 

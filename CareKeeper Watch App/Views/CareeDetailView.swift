@@ -6,10 +6,14 @@ struct CareeDetailView: View {
 
     let careeID: UUID
 
-    // Pure CloudKit architecture: Cache service as source of truth
-    @State private var cacheService: LocalCacheService?
-    @StateObject private var cloudKitService = CloudKitDataService()
+    // Use shared services from environment
+    @EnvironmentObject private var cloudKitService: CloudKitDataService
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+
+    // Get cache service from shared CloudKitDataService
+    private var cacheService: LocalCacheService? {
+        cloudKitService.cacheService
+    }
 
     // Get the specific caree from cache
     private var caree: Caree? {
@@ -88,12 +92,6 @@ struct CareeDetailView: View {
             }
         }
         .task {
-            // Initialize cache service with model context
-            if cacheService == nil {
-                cacheService = LocalCacheService(modelContext: modelContext)
-                cloudKitService.setCacheService(cacheService!)
-            }
-
             // Refresh cache to load caree
             try? await cacheService?.refreshCache()
 

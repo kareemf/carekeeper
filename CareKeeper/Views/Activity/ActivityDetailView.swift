@@ -8,10 +8,14 @@ struct ActivityDetailView: View {
 
     let activityID: UUID
 
-    // Pure CloudKit architecture: Cache service as source of truth
-    @State private var cacheService: LocalCacheService?
-    @StateObject private var cloudKitService = CloudKitDataService()
+    // Use shared services from environment
+    @EnvironmentObject private var cloudKitService: CloudKitDataService
     @StateObject private var sharedDataService = CloudKitSharedDataService()
+
+    // Get cache service from shared CloudKitDataService
+    private var cacheService: LocalCacheService? {
+        cloudKitService.cacheService
+    }
 
     // Get the specific activity from cache
     private var activity: Activity? {
@@ -118,12 +122,6 @@ struct ActivityDetailView: View {
                     setupEditingValues(for: activity)
                 }
                 .task {
-                    // Initialize cache service with model context
-                    if cacheService == nil {
-                        cacheService = LocalCacheService(modelContext: modelContext)
-                        cloudKitService.setCacheService(cacheService!)
-                    }
-
                     // Refresh cache to load activities
                     try? await cacheService?.refreshCache()
                 }

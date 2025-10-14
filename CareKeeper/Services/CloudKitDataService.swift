@@ -12,6 +12,7 @@ class CloudKitDataService: ObservableObject {
     @Published var isSyncing = false
     @Published var lastSyncError: Error?
     @Published var syncStatus: SyncStatus = .idle
+    @Published var deletionProgress: DeletionProgress = .idle
 
     // MARK: - Private Properties
 
@@ -20,7 +21,10 @@ class CloudKitDataService: ObservableObject {
     private let logger = AppLogger.cloudkit
     private let maxRetries = 3
     private let retryDelay: TimeInterval = 2.0
-    private var cacheService: LocalCacheService?
+
+    // MARK: - Public Cache Service (for view observation)
+
+    private(set) var cacheService: LocalCacheService?
 
     // MARK: - Cache Integration
 
@@ -40,6 +44,25 @@ class CloudKitDataService: ObservableObject {
 
         var isError: Bool {
             if case .failed = self { return true }
+            return false
+        }
+    }
+
+    enum DeletionProgress: Equatable {
+        case idle
+        case deleting(Double)  // Progress from 0.0 to 1.0
+
+        var progress: Double {
+            switch self {
+            case .idle:
+                return 0.0
+            case .deleting(let value):
+                return value
+            }
+        }
+
+        var isDeleting: Bool {
+            if case .deleting = self { return true }
             return false
         }
     }
@@ -130,6 +153,20 @@ class CloudKitDataService: ObservableObject {
             // Save updated record
             let savedRecord = try await saveWithRetry(existingRecord, to: db)
 
+            // Update the caree object with new values
+            if let name = name {
+                caree.name = name
+            }
+            if let imageData = imageData {
+                caree.image = imageData
+            }
+
+            // Update cache if available
+            if let cacheService = cacheService {
+                try await cacheService.updateCachedCaree(caree)
+                logger.info("✅ Caree cache updated")
+            }
+
             logger.info("✅ Caree updated: \(caree.id)")
             syncStatus = .synced
 
@@ -140,33 +177,112 @@ class CloudKitDataService: ObservableObject {
         }
     }
 
-    /// Delete a Caree from CloudKit (cascades to children via parent references)
+    /// Delete a Caree from CloudKit with manual cascade deletion
+    /// Since parent references use .none action, we must manually delete children first
     /// - Parameters:
     ///   - caree: Caree to delete
     ///   - isShared: Whether this is a shared caree
     func deleteCaree(_ caree: Caree, isShared: Bool = false) async throws {
         logger.info("Deleting Caree: \(caree.id)")
         syncStatus = .syncing
+        deletionProgress = .deleting(0.0)
 
         do {
             let db = database(for: isShared)
-            let recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
 
-            // Delete from CloudKit (child records cascade via .deleteSelf action)
-            try await deleteWithRetry(recordID: recordID, from: db)
+            // Step 1: Query for all ActivityTypes belonging to this Caree
+            deletionProgress = .deleting(0.1)
+            let activityTypeQuery = CKQuery(
+                recordType: "CD_ActivityType",
+                predicate: NSPredicate(format: "CD_caree == %@", CKRecord.Reference(
+                    recordID: CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)"),
+                    action: .none
+                ))
+            )
+
+            let (activityTypeResults, _) = try await db.records(matching: activityTypeQuery)
+            var activityTypeIDs: [CKRecord.ID] = []
+            var allActivityIDs: [CKRecord.ID] = []
+
+            deletionProgress = .deleting(0.2)
+
+            // Collect all activities across all activity types
+            for (_, result) in activityTypeResults {
+                if case .success(let record) = result {
+                    activityTypeIDs.append(record.recordID)
+
+                    // Step 2: Query for all Activities belonging to this ActivityType
+                    let activityQuery = CKQuery(
+                        recordType: "CD_Activity",
+                        predicate: NSPredicate(format: "CD_activityType == %@", CKRecord.Reference(
+                            recordID: record.recordID,
+                            action: .none
+                        ))
+                    )
+
+                    let (activityResults, _) = try await db.records(matching: activityQuery)
+
+                    for (_, activityResult) in activityResults {
+                        if case .success(let activityRecord) = activityResult {
+                            allActivityIDs.append(activityRecord.recordID)
+                        }
+                    }
+                }
+            }
+
+            // Step 3: Delete all Activities with progress tracking
+            deletionProgress = .deleting(0.3)
+            let totalActivities = allActivityIDs.count
+            if totalActivities > 0 {
+                for (index, activityID) in allActivityIDs.enumerated() {
+                    try await deleteWithRetry(recordID: activityID, from: db)
+                    logger.info("  Deleted Activity: \(activityID.recordName)")
+
+                    // Update progress: activities take 0.3 to 0.6 of total progress
+                    let activityProgress = 0.3 + (0.3 * Double(index + 1) / Double(totalActivities))
+                    deletionProgress = .deleting(activityProgress)
+                }
+            }
+
+            // Step 4: Delete all ActivityTypes with progress tracking
+            deletionProgress = .deleting(0.6)
+            let totalActivityTypes = activityTypeIDs.count
+            if totalActivityTypes > 0 {
+                for (index, activityTypeID) in activityTypeIDs.enumerated() {
+                    try await deleteWithRetry(recordID: activityTypeID, from: db)
+                    logger.info("  Deleted ActivityType: \(activityTypeID.recordName)")
+
+                    // Update progress: activity types take 0.6 to 0.8 of total progress
+                    let activityTypeProgress = 0.6 + (0.2 * Double(index + 1) / Double(totalActivityTypes))
+                    deletionProgress = .deleting(activityTypeProgress)
+                }
+            }
+
+            // Step 5: Finally delete the Caree
+            deletionProgress = .deleting(0.8)
+            let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
+            try await deleteWithRetry(recordID: careeRecordID, from: db)
 
             // Remove from cache if cache service is available
+            deletionProgress = .deleting(0.9)
             if let cacheService = cacheService,
                let cachedCaree = cacheService.getCachedCaree(id: caree.id) {
                 try await cacheService.removeCachedCaree(cachedCaree)
                 logger.info("✅ Caree removed from cache")
             }
 
-            logger.info("✅ Caree deleted: \(caree.id)")
+            logger.info("✅ Caree deleted with cascade: \(caree.id)")
+            deletionProgress = .deleting(1.0)
+
+            // Small delay to show completion before resetting
+            try await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+
+            deletionProgress = .idle
             syncStatus = .synced
 
         } catch {
             logger.error("❌ Failed to delete Caree: \(error.localizedDescription)")
+            deletionProgress = .idle
             syncStatus = .failed(error)
             throw error
         }
@@ -337,6 +453,21 @@ class CloudKitDataService: ObservableObject {
             // Save updated record
             _ = try await saveWithRetry(existingRecord, to: db)
 
+            // Update the activityType object with new values
+            if let name = name {
+                activityType.name = name
+            }
+            if let icon = icon {
+                activityType.icon = icon
+            }
+
+            // Update cache if available - first get the cached caree
+            if let cacheService = cacheService,
+               let cachedCaree = cacheService.getCachedCaree(id: caree.id) {
+                try await cacheService.cacheActivityType(activityType, for: cachedCaree)
+                logger.info("✅ ActivityType cache updated")
+            }
+
             logger.info("✅ ActivityType updated: \(activityType.id)")
             syncStatus = .synced
 
@@ -360,6 +491,12 @@ class CloudKitDataService: ObservableObject {
             let recordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)")
 
             try await deleteWithRetry(recordID: recordID, from: db)
+
+            // Remove from cache if cache service is available
+            if let cacheService = cacheService {
+                try await cacheService.removeCachedActivityType(activityType)
+                logger.info("✅ ActivityType removed from cache")
+            }
 
             logger.info("✅ ActivityType deleted: \(activityType.id)")
             syncStatus = .synced
@@ -499,6 +636,27 @@ class CloudKitDataService: ObservableObject {
             // Save updated record
             _ = try await saveWithRetry(existingRecord, to: db)
 
+            // Update the activity object with new values
+            if let dateTime = dateTime {
+                activity.dateTime = dateTime
+            }
+            if let notes = notes {
+                activity.notes = notes
+            }
+            if let quantity = quantity {
+                activity.quantity = quantity
+            }
+
+            // Update cache if available
+            if let cacheService = cacheService,
+               let cachedCaree = cacheService.getCachedCaree(id: caree.id) {
+                let cachedActivityTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
+                if let cachedActivityType = cachedActivityTypes.first(where: { $0.id == activityType.id }) {
+                    try await cacheService.cacheActivity(activity, for: cachedCaree, activityType: cachedActivityType)
+                    logger.info("✅ Activity cache updated")
+                }
+            }
+
             logger.info("✅ Activity updated: \(activity.id)")
             syncStatus = .synced
 
@@ -522,6 +680,12 @@ class CloudKitDataService: ObservableObject {
             let recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)")
 
             try await deleteWithRetry(recordID: recordID, from: db)
+
+            // Remove from cache if cache service is available
+            if let cacheService = cacheService {
+                try await cacheService.removeCachedActivity(activity)
+                logger.info("✅ Activity removed from cache")
+            }
 
             logger.info("✅ Activity deleted: \(activity.id)")
             syncStatus = .synced

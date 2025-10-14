@@ -1,20 +1,41 @@
 import SwiftUI
+import Combine
 import SwiftData
 
 struct CareeListView: View {
     @Environment(\.modelContext) private var modelContext
 
-    // Pure CloudKit architecture: Cache service as source of truth
-    @State private var cacheService: LocalCacheService?
-    @StateObject private var cloudKitService = CloudKitDataService()
+    // Use shared services from environment
+    @EnvironmentObject private var cloudKitService: CloudKitDataService
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
 
-    @State private var error: Error?
+    // Get cache service from shared CloudKitDataService
+    private var cacheService: LocalCacheService? {
+        cloudKitService.cacheService
+    }
 
-    // Combined list of all carees from cache
-    private var allCarees: [Caree] {
-        guard let cacheService = cacheService else { return [] }
-        return cacheService.myCarees + cacheService.sharedCarees
+    @State private var error: Error?
+    @State private var deletionProgress: Double = 0.0
+    @State private var isDeleting = false
+
+    // Combined list of all carees - updated when cache changes
+    @State private var allCarees: [Caree] = []
+
+    // Helper publishers to unify types and provide safe fallbacks
+    private var myCareesPublisher: AnyPublisher<[Caree], Never> {
+        if let cacheService = cacheService {
+            return cacheService.$myCarees.eraseToAnyPublisher()
+        } else {
+            return Just([]).eraseToAnyPublisher()
+        }
+    }
+
+    private var sharedCareesPublisher: AnyPublisher<[Caree], Never> {
+        if let cacheService = cacheService {
+            return cacheService.$sharedCarees.eraseToAnyPublisher()
+        } else {
+            return Just([]).eraseToAnyPublisher()
+        }
     }
 
     var body: some View {
@@ -28,11 +49,12 @@ struct CareeListView: View {
             }
             .navigationTitle(NSLocalizedString("Carees", comment: "Navigation title for carees list"))
             .task {
+                //
                 // Initialize cache service with model context
-                if cacheService == nil {
-                    cacheService = LocalCacheService(modelContext: modelContext)
-                    cloudKitService.setCacheService(cacheService!)
-                }
+//                if cacheService == nil {
+//                    cacheService = LocalCacheService(modelContext: modelContext)
+//                    cloudKitService.setCacheService(cacheService!)
+//                }
 
                 // Fetch shared carees and update cache
                 await sharedRecordsService.fetchSharedCarees()
@@ -44,10 +66,47 @@ struct CareeListView: View {
 
                 // Refresh cache to update published properties
                 try? await cacheService?.refreshCache()
+
+                // Update combined list
+                updateAllCarees()
             }
             .onReceive(sharedRecordsService.$error) { newError in
                 if let newError = newError {
                     error = newError
+                }
+            }
+            .onReceive(myCareesPublisher) { _ in
+                updateAllCarees()
+            }
+            .onReceive(sharedCareesPublisher) { _ in
+                updateAllCarees()
+            }
+            .onReceive(cloudKitService.$deletionProgress) { progress in
+                isDeleting = progress.isDeleting
+                deletionProgress = progress.progress
+            }
+            .overlay {
+                if isDeleting {
+                    ZStack {
+                        Color.black.opacity(0.6)
+                            .ignoresSafeArea()
+
+                        VStack(spacing: 8) {
+                            ProgressView(value: deletionProgress) {
+                                Text(NSLocalizedString("Deleting...", comment: "Deletion progress title"))
+                                    .font(.caption)
+                            }
+                            .progressViewStyle(.linear)
+                            .tint(.white)
+
+                            Text("\(Int(deletionProgress * 100))%")
+                                .font(.caption2)
+                                .foregroundColor(.white)
+                        }
+                        .padding()
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(8)
+                    }
                 }
             }
             .errorAlert($error)
@@ -79,6 +138,14 @@ struct CareeListView: View {
         .padding()
     }
 
+    private func updateAllCarees() {
+        guard let cacheService = cacheService else {
+            allCarees = []
+            return
+        }
+        allCarees = cacheService.myCarees + cacheService.sharedCarees
+    }
+
     private var careeListView: some View {
         List(allCarees) { caree in
             NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
@@ -96,7 +163,11 @@ struct CareeListView: View {
                 try? await cacheService?.cacheCaree(sharedCaree, isShared: true)
             }
 
-            try? await cacheService?.refreshCache()
+            // Invalidate and refresh cache to ensure latest data
+            try? await cacheService?.invalidateAndRefresh()
+
+            // Update combined list
+            updateAllCarees()
         }
     }
 }

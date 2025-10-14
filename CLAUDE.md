@@ -60,6 +60,33 @@ The app uses SwiftData with three main model entities:
   - @Published properties for location, authorization, errors
   - Reactive permission handling with error propagation
 
+- **CloudKitDataService**: Pure CloudKit CRUD operations (@MainActor ObservableObject)
+  - Single source of truth for CloudKit operations
+  - @Published properties: `syncStatus`, `deletionProgress`
+  - Manual cascade deletion with progress tracking (0.0 to 1.0)
+  - Automatic retry logic for network failures
+  - Cache service integration for local persistence
+
+- **CloudKitSharingService**: Manages CloudKit sharing and permissions
+  - Share creation and participant management
+  - Permission checks (owner-only caree deletion)
+  - Share acceptance flow
+
+- **CloudKitSharedRecordsService**: Fetches and monitors shared records
+  - Queries shared database for carees, activity types, activities
+  - Notification handling and filtering
+  - Creator tracking to exclude own activities from notifications
+
+- **LocalCacheService**: SwiftData cache for CloudKit records
+  - @Published properties for `myCarees` and `sharedCarees`
+  - Metadata tracking (isShared, lastSyncedAt)
+  - Reactive updates via Combine publishers
+
+- **CareeImportService**: Import from JSON backup (@MainActor ObservableObject)
+  - @Published `progress` property with states: idle, reading, importing, completed, failed
+  - Creates CloudKit records from exported JSON
+  - Real-time progress updates for UI observability
+
 - **UserNotificationPreferences**: Manages notification preferences
   - Global notification enable/disable toggle
   - Per-caree notification settings
@@ -70,6 +97,11 @@ The app uses SwiftData with three main model entities:
   - Permission request and management
   - Local notification presentation
   - Notification tap handling for deep linking
+
+- **CloudKitNotificationService**: Sets up CloudKit subscriptions
+  - Database subscriptions for private and shared databases
+  - Silent notifications for sync coordination
+  - Filters activity records for user-facing notifications
 
 ### Key Patterns
 - SwiftUI with `@State`, `@StateObject`, `@Environment` for state management
@@ -93,7 +125,7 @@ The app uses SwiftData with three main model entities:
   - Shares Models, Services, Components from iOS via project.yml
 
 ### Development Notes
-- Uses CloudKit container identifier: `iCloud.com.kareemf.CareKeeperCloudKit`
+- Uses CloudKit container identifier: `iCloud.com.kareemf.CareKeeper2`
 - Both iOS and watchOS apps share the same SwiftData models
 - Location services integrated for activities when ActivityType.hasLocation == true
 - XcodeGen project generation from `project.yml`
@@ -225,7 +257,7 @@ Enable multiple caregivers to track activities for the same caree(s) across thei
 
 #### Technical Details
 
-**CloudKit Container**: `iCloud.com.kareemf.CareKeeperCloudKit`
+**CloudKit Container**: `iCloud.com.kareemf.CareKeeper2`
 
 **SwiftData Configuration**:
 - Add CloudKit option to ModelConfiguration
@@ -242,6 +274,72 @@ Enable multiple caregivers to track activities for the same caree(s) across thei
 - Caree is the sharable root entity
 - ActivityType and Activity cascade from Caree
 - Sharing a Caree includes all its ActivityTypes and Activities
+
+#### CloudKit Parent Reference Constraints
+
+**Critical Requirement**: CloudKit requires parent references in sharing hierarchies to use `CKRecord.ReferenceAction.none` instead of `.deleteSelf`. This is a CloudKit constraint for records that participate in sharing.
+
+**Implementation**:
+```swift
+// In CloudKitRecordConverter.swift
+record.parent = CKRecord.Reference(record: parentCaree, action: .none)
+```
+
+**Consequences**:
+- Manual cascade deletion is required when deleting a Caree
+- CloudKit will not automatically delete child records (ActivityTypes and Activities)
+- Must query and delete children explicitly in correct order:
+  1. Query and delete all Activities for each ActivityType
+  2. Delete all ActivityTypes for the Caree
+  3. Finally delete the Caree record
+
+**Progress Tracking**:
+- `CloudKitDataService.deletionProgress` provides real-time progress (0.0 to 1.0)
+- UI displays progress overlay during deletion
+- Progress breakdown:
+  - 0.0-0.2: Querying ActivityTypes
+  - 0.2-0.6: Deleting Activities
+  - 0.6-0.8: Deleting ActivityTypes
+  - 0.8-0.9: Deleting Caree
+  - 0.9-1.0: Cache cleanup
+
+**Error**: "Record delete would violate validating reference"
+- Occurs when trying to delete parent before children
+- Solution: Implemented manual cascade deletion in `CloudKitDataService.deleteCaree()`
+
+#### Push Notifications Configuration
+
+**Entitlements Required**:
+- `aps-environment` must be set in entitlements file
+- Values: `development` (for development builds) or `production` (for App Store)
+- Location: `CareKeeper.entitlements` and `CareKeeper Watch App.entitlements`
+
+```xml
+<key>aps-environment</key>
+<string>development</string>
+```
+
+**Error**: "no valid 'aps-environment' entitlement string found for application"
+- Occurs when registering for remote notifications without proper entitlement
+- Solution: Add aps-environment key to entitlements file
+
+**CloudKit Subscriptions**:
+- **Database Subscriptions**: Monitor all changes in a database (private or shared)
+  - Used for: General database change notifications
+  - Silent notifications only (no user permission required)
+  - Implementation: `CKDatabaseSubscription`
+
+- **Query Subscriptions**: Monitor specific record types with predicates
+  - **NOT allowed in shared database** (CloudKit limitation)
+  - Used for: Activity notifications in private database
+  - Can trigger user-facing notifications (requires permission)
+  - Implementation: `CKQuerySubscription`
+
+**Notification Strategy**:
+1. Database subscription for shared database (catches all changes)
+2. Filter for CD_Activity records in notification handler
+3. Check `CD_creatorUserRecordID` to exclude own activities
+4. Respect per-caree notification preferences
 
 #### Out of Scope (CloudKit)
 - Granular permissions (read-only access)
@@ -343,3 +441,138 @@ Enable multiple caregivers to track activities for the same caree(s) across thei
 
 **Implementation Complete:**
 Phase 2.2 CloudKit Sharing is now fully functional with complete CRUD support for shared carees, activity types, and activities across both iOS and watchOS platforms. Push notifications enable real-time coordination between caregivers when activities are logged on shared carees.
+
+## Troubleshooting Guide
+
+### CloudKit Issues
+
+#### "Parent references must be CKReferenceActionNone"
+**Cause**: Using `.deleteSelf` action for parent references in sharing hierarchies
+**Solution**: Change all parent references to use `.none` action
+**Files**: `CloudKitRecordConverter.swift`
+```swift
+// Incorrect
+record.parent = CKRecord.Reference(record: parentCaree, action: .deleteSelf)
+
+// Correct
+record.parent = CKRecord.Reference(record: parentCaree, action: .none)
+```
+
+#### "Record delete would violate validating reference"
+**Cause**: Attempting to delete parent record before children when using `.none` action
+**Solution**: Implement manual cascade deletion
+**Files**: `CloudKitDataService.swift` - `deleteCaree()` method
+**Order**: Delete Activities → Delete ActivityTypes → Delete Caree
+
+#### "Did not find record type: cloudkit.share"
+**Cause**: Trying to create query subscription for system record types
+**Solution**: Use `CKDatabaseSubscription` instead of `CKQuerySubscription`
+**Files**: `CloudKitNotificationService.swift`
+
+#### "Subscription evaluation type not allowed in shared database"
+**Cause**: Query subscriptions are not supported in shared CloudKit databases
+**Solution**: Use database subscription and filter in notification handler
+**Files**: `CloudKitNotificationService.swift`, `CloudKitSharedRecordsService.swift`
+
+#### "invalid attempt to set value type ASSETID for field 'CD_image'"
+**Cause**: Schema field type mismatch (BYTES vs ASSETID/CKAsset)
+**Solution**: Use separate field for asset type (e.g., `CD_image_ckAsset`)
+**Note**: CloudKit schema field types cannot be changed after deployment
+
+### Push Notification Issues
+
+#### "no valid 'aps-environment' entitlement string found"
+**Cause**: Missing aps-environment key in entitlements
+**Solution**: Add to both iOS and watchOS entitlements files
+```xml
+<key>aps-environment</key>
+<string>development</string>
+```
+**Files**: `CareKeeper.entitlements`, `CareKeeper Watch App.entitlements`
+
+#### Notifications not appearing for shared activities
+**Checklist**:
+1. Verify user has granted notification permissions
+2. Check per-caree notification settings in `UserNotificationPreferences`
+3. Verify `CD_creatorUserRecordID` is set correctly (filters own activities)
+4. Confirm database subscription is active in shared database
+5. Check notification handler filtering logic in `CloudKitSharedRecordsService`
+
+### Data Sync Issues
+
+#### CareeList not updating after creation
+**Cause**: View using computed property instead of observable state
+**Solution**: Use `@State` with publisher observation
+**Pattern**:
+```swift
+@State private var allCarees: [Caree] = []
+
+.onReceive(cacheService?.$myCarees ?? Just([]).eraseToAnyPublisher()) { _ in
+    updateAllCarees()
+}
+```
+**Files**: `CareeListView.swift` (iOS and watchOS)
+
+#### Import progress stuck at "Reading file..."
+**Cause**: `CareeImportService` not observable, progress not updating view
+**Solution**:
+1. Make service conform to `ObservableObject`
+2. Create as `@State` property in view
+3. Observe service's `$progress` publisher
+**Files**: `CareeImportService.swift`, `CareeListView.swift`
+
+### Provisioning Issues
+
+#### "Provisioning profile doesn't match entitlements"
+**Cause**: New CloudKit container not synced with Xcode/Apple servers
+**Solution**:
+1. Toggle automatic signing off and on in Xcode
+2. Download manual provisioning profiles
+3. Clean build folder (Cmd+Shift+K)
+4. Restart Xcode if needed
+
+### Performance Considerations
+
+#### Slow Caree deletion
+**Expected**: Manual cascade deletion takes time for carees with many activities
+**UX Solution**: Progress indicator shows real-time progress
+**Optimization**: Deletions happen in batches where possible
+
+#### Import taking long time
+**Expected**: Creating CloudKit records individually with verification
+**UX Solution**: `ImportProgressView` shows current/total records
+**Pattern**: Import progress tracked via `CareeImportService.$progress`
+
+### Testing Notes
+
+#### CloudKit sharing requires real devices
+**Limitation**: CloudKit sharing cannot be fully tested in simulator
+**Requirements**:
+- Two physical devices with different iCloud accounts
+- Both devices signed into iCloud
+- App installed with valid provisioning profile
+
+#### UI test flakiness
+**Known Issue**: Some XCTest UI tests have timing issues
+**Workaround**: Increase wait times, add explicit synchronization
+**Files**: `CareeManagementUITests.swift`, `ActivityTrackingUITests.swift`
+
+### Debugging Tools
+
+#### CloudKit Dashboard
+**URL**: https://icloud.developer.apple.com/dashboard
+**Use cases**:
+- Verify record schema
+- Check subscription status
+- Query records directly
+- Monitor API usage
+
+#### Console.app Logging
+**Filter**: Process: CareKeeper or CareKeeper Watch App
+**Categories**: CloudKit, Notifications
+**Pattern**: All logs use `AppLogger` with consistent prefixes
+
+#### Network Link Conditioner
+**Use**: Test offline behavior and sync retries
+**Location**: Additional Tools for Xcode
+**Test scenarios**: No network, slow network, packet loss

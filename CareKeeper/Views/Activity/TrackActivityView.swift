@@ -18,8 +18,8 @@ struct TrackActivityView: View {
     @State private var error: Error?
     @State private var isSaving: Bool = false
 
-    // Pure CloudKit architecture services
-    @StateObject private var cloudKitService = CloudKitDataService()
+    // Use shared services from environment
+    @EnvironmentObject private var cloudKitService: CloudKitDataService
     @StateObject private var sharedDataService = CloudKitSharedDataService()
 
     private var isSharedCaree: Bool {

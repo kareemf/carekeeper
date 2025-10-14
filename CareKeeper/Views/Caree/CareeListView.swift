@@ -8,11 +8,20 @@ struct CareeListView: View {
     @State private var careeToDelete: IndexSet?
     @State private var showingDeleteConfirmation = false
     @State private var error: Error?
+    @State private var deletionProgress: Double = 0.0
+    @State private var isDeleting = false
 
     // Pure CloudKit architecture: Cache service as source of truth
-    @State private var cacheService: LocalCacheService?
-    @StateObject private var cloudKitService = CloudKitDataService()
+    @EnvironmentObject private var cloudKitService: CloudKitDataService
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+
+    // Cache service from cloudKitService (already initialized at app level)
+    private var cacheService: LocalCacheService? {
+        cloudKitService.cacheService
+    }
+
+    // Combined list of all carees - updated when cache changes
+    @State private var allCarees: [Caree] = []
 
     // Backup/Restore (iOS only)
     #if os(iOS)
@@ -21,119 +30,169 @@ struct CareeListView: View {
     @State private var showingImport = false
     @State private var isImporting = false
     @State private var importProgress: ImportProgress = .idle
+    @State private var importService: CareeImportService?
     #endif
-
-    // Combined list of all carees from cache
-    private var allCarees: [Caree] {
-        guard let cacheService = cacheService else { return [] }
-        return cacheService.myCarees + cacheService.sharedCarees
-    }
     
     var body: some View {
         NavigationView {
-            Group {
-                if allCarees.isEmpty {
-                    emptyStateView
-                        .transition(.opacity.combined(with: .scale(scale: 0.95)))
-                } else {
-                    careeListView
-                        .transition(.opacity)
-                }
-            }
-            .animation(.easeInOut(duration: 0.3), value: allCarees.isEmpty)
+            mainContent
+        }
+    }
+
+    private var mainContent: some View {
+        contentView
             .navigationTitle(NSLocalizedString("Carees", comment: "Navigation title for carees list"))
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    SyncStatusIndicator()
-                }
-
-                #if os(iOS)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Button(action: {
-                            exportAllCarees()
-                        }) {
-                            Label("Export Backup", systemImage: "square.and.arrow.up")
-                        }
-
-                        Button(action: {
-                            showingImport = true
-                        }) {
-                            Label("Import Backup", systemImage: "square.and.arrow.down")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
-                }
-                #endif
-
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            showingAddCaree = true
-                        }
-                    }) {
-                        Image(systemName: "plus")
-                            .font(.body.weight(.semibold))
-                    }
-                }
-            }
+            .toolbar { toolbarContent }
             .sheet(isPresented: $showingAddCaree) {
                 CareeEditView()
                     .presentationDragIndicator(.visible)
             }
-            #if os(iOS)
-            .sheet(isPresented: $showingExport) {
-                if let exportFileURL = exportFileURL {
-                    ShareSheet(items: [exportFileURL])
-                }
-            }
-            .fileImporter(
-                isPresented: $showingImport,
-                allowedContentTypes: [.json],
-                onCompletion: { result in
-                    handleImport(result: result)
-                }
-            )
-            .sheet(isPresented: $isImporting) {
-                ImportProgressView(progress: importProgress)
-            }
-            #endif
             .confirmationDialog(
                 NSLocalizedString("Delete Caree?", comment: "Delete caree confirmation title"),
                 isPresented: $showingDeleteConfirmation,
                 titleVisibility: .visible
             ) {
-                Button(NSLocalizedString("Delete", comment: "Delete button"), role: .destructive) {
-                    if let offsets = careeToDelete {
-                        Task { @MainActor in
-                            await deleteCarees(offsets: offsets)
-                            careeToDelete = nil
-                        }
+                deleteConfirmationButtons
+            } message: {
+                deleteConfirmationMessage
+            }
+            .modifier(BackupRestoreSheets(
+                showingExport: $showingExport,
+                exportFileURL: exportFileURL,
+                showingImport: $showingImport,
+                isImporting: $isImporting,
+                importProgress: importProgress,
+                handleImport: handleImport
+            ))
+            .task(initializeTask)
+            .modifier(DataObservers(
+                sharedRecordsService: sharedRecordsService,
+                cacheService: cacheService,
+                cloudKitService: cloudKitService,
+                importService: importService,
+                onError: { error = $0 },
+                onDeletionProgress: { isDeleting = $0; deletionProgress = $1 },
+                onImportProgress: { importProgress = $0 },
+                onUpdate: updateAllCarees
+            ))
+            .overlay { deletionProgressOverlay }
+            .errorAlert($error)
+    }
+
+    private var contentView: some View {
+        Group {
+            if allCarees.isEmpty {
+                emptyStateView
+                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
+            } else {
+                careeListView
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.3), value: allCarees.isEmpty)
+    }
+
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarLeading) {
+            SyncStatusIndicator()
+        }
+
+        #if os(iOS)
+        ToolbarItem(placement: .navigationBarTrailing) {
+            backupRestoreMenu
+        }
+        #endif
+
+        ToolbarItem(placement: .navigationBarTrailing) {
+            addButton
+        }
+    }
+
+    #if os(iOS)
+    private var backupRestoreMenu: some View {
+        Menu {
+            Button(action: exportAllCarees) {
+                Label("Export Data", systemImage: "square.and.arrow.up")
+            }
+
+            Button(action: { showingImport = true }) {
+                Label("Import Data", systemImage: "square.and.arrow.down")
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle")
+        }
+    }
+    #endif
+
+    private var addButton: some View {
+        Button(action: {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                showingAddCaree = true
+            }
+        }) {
+            Image(systemName: "plus")
+                .font(.body.weight(.semibold))
+        }
+    }
+
+    private var deleteConfirmationButtons: some View {
+        Group {
+            Button(NSLocalizedString("Delete", comment: "Delete button"), role: .destructive) {
+                if let offsets = careeToDelete {
+                    Task { @MainActor in
+                        await deleteCarees(offsets: offsets)
+                        careeToDelete = nil
                     }
                 }
-                Button(NSLocalizedString("Cancel", comment: "Cancel button"), role: .cancel) {
-                    careeToDelete = nil
-                }
-            } message: {
-                Text(NSLocalizedString("This will delete all activity types and activities. This cannot be undone.", comment: "Delete caree confirmation message"))
             }
-            .task {
-                // Initialize cache service with model context
-                if cacheService == nil {
-                    cacheService = LocalCacheService(modelContext: modelContext)
-                    cloudKitService.setCacheService(cacheService!)
-                }
+            Button(NSLocalizedString("Cancel", comment: "Cancel button"), role: .cancel) {
+                careeToDelete = nil
+            }
+        }
+    }
 
-                // Initial data load
-                await refreshAllCarees()
-            }
-            .onReceive(sharedRecordsService.$error) { newError in
-                if let newError = newError {
-                    error = newError
+    private var deleteConfirmationMessage: some View {
+        Text(NSLocalizedString("This will delete all activity types and activities. This cannot be undone.", comment: "Delete caree confirmation message"))
+    }
+
+    @Sendable
+    private func initializeTask() async {
+        // Initialize import service
+        #if os(iOS)
+        if importService == nil {
+            importService = CareeImportService(cloudKitService: cloudKitService)
+        }
+        #endif
+
+        // Initial data load
+        await refreshAllCarees()
+    }
+
+    @ViewBuilder
+    private var deletionProgressOverlay: some View {
+        if isDeleting {
+            ZStack {
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+
+                VStack(spacing: 16) {
+                    ProgressView(value: deletionProgress) {
+                        Text(NSLocalizedString("Deleting Caree...", comment: "Deletion progress title"))
+                            .font(.headline)
+                    }
+                    .progressViewStyle(.linear)
+                    .tint(.white)
+                    .frame(width: 200)
+
+                    Text("\(Int(deletionProgress * 100))%")
+                        .font(.caption)
+                        .foregroundColor(.white)
                 }
+                .padding()
+                .background(.ultraThinMaterial)
+                .cornerRadius(12)
             }
-            .errorAlert($error)
         }
     }
     
@@ -190,6 +249,14 @@ struct CareeListView: View {
         .animation(.easeInOut(duration: 0.3), value: allCarees.map { $0.id })
     }
 
+    private func updateAllCarees() {
+        guard let cacheService = cacheService else {
+            allCarees = []
+            return
+        }
+        allCarees = cacheService.myCarees + cacheService.sharedCarees
+    }
+
     private func refreshAllCarees() async {
         guard let cacheService = cacheService else { return }
 
@@ -205,8 +272,11 @@ struct CareeListView: View {
             }
         }
 
-        // Refresh cache to update published properties
-        try? await cacheService.refreshCache()
+        // Invalidate and refresh cache to ensure latest data
+        try? await cacheService.invalidateAndRefresh()
+
+        // Update combined list
+        updateAllCarees()
     }
     
     @MainActor
@@ -286,7 +356,11 @@ struct CareeListView: View {
     private func handleImport(result: Result<URL, Error>) {
         switch result {
         case .success(let url):
-            importProgress = .reading
+            guard let importService = importService else {
+                error = AppError.saveFailed("Import service not initialized")
+                return
+            }
+
             isImporting = true
 
             Task {
@@ -297,7 +371,6 @@ struct CareeListView: View {
                     }
                     defer { url.stopAccessingSecurityScopedResource() }
 
-                    let importService = CareeImportService(cloudKitService: cloudKitService)
                     try await importService.importFromJSON(at: url)
 
                     // Refresh UI
@@ -305,13 +378,12 @@ struct CareeListView: View {
 
                     await MainActor.run {
                         isImporting = false
-                        importProgress = .idle
                     }
                 } catch {
                     await MainActor.run {
                         self.error = AppError.saveFailed("Import failed: \(error.localizedDescription)")
                         isImporting = false
-                        importProgress = .idle
+                        importService.progress = .idle
                     }
                 }
             }
@@ -321,6 +393,122 @@ struct CareeListView: View {
         }
     }
     #endif
+}
+
+// MARK: - View Modifiers
+
+#if os(iOS)
+struct BackupRestoreSheets: ViewModifier {
+    @Binding var showingExport: Bool
+    let exportFileURL: URL?
+    @Binding var showingImport: Bool
+    @Binding var isImporting: Bool
+    let importProgress: ImportProgress
+    let handleImport: (Result<URL, Error>) -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .sheet(isPresented: $showingExport) {
+                if let exportFileURL = exportFileURL {
+                    ShareSheet(items: [exportFileURL])
+                }
+            }
+            .fileImporter(
+                isPresented: $showingImport,
+                allowedContentTypes: [.json],
+                onCompletion: handleImport
+            )
+            .sheet(isPresented: $isImporting) {
+                ImportProgressView(progress: importProgress)
+            }
+    }
+}
+#else
+struct BackupRestoreSheets: ViewModifier {
+    @Binding var showingExport: Bool
+    let exportFileURL: URL?
+    @Binding var showingImport: Bool
+    @Binding var isImporting: Bool
+    let importProgress: ImportProgress
+    let handleImport: (Result<URL, Error>) -> Void
+
+    func body(content: Content) -> some View {
+        content
+    }
+}
+#endif
+
+struct DataObservers: ViewModifier {
+    let sharedRecordsService: CloudKitSharedRecordsService
+    let cacheService: LocalCacheService?
+    let cloudKitService: CloudKitDataService
+    let importService: CareeImportService?
+    let onError: (Error) -> Void
+    let onDeletionProgress: (Bool, Double) -> Void
+    let onImportProgress: (ImportProgress) -> Void
+    let onUpdate: () -> Void
+
+    private var myCareesPublisher: AnyPublisher<[Caree], Never> {
+        if let cacheService = cacheService {
+            return cacheService.$myCarees.eraseToAnyPublisher()
+        } else {
+            return Just([]).eraseToAnyPublisher()
+        }
+    }
+
+    private var sharedCareesPublisher: AnyPublisher<[Caree], Never> {
+        if let cacheService = cacheService {
+            return cacheService.$sharedCarees.eraseToAnyPublisher()
+        } else {
+            return Just([]).eraseToAnyPublisher()
+        }
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .onReceive(sharedRecordsService.$error) { newError in
+                if let newError = newError {
+                    onError(newError)
+                }
+            }
+            .onReceive(myCareesPublisher) { _ in
+                onUpdate()
+            }
+            .onReceive(sharedCareesPublisher) { _ in
+                onUpdate()
+            }
+            .onReceive(cloudKitService.$deletionProgress) { progress in
+                onDeletionProgress(progress.isDeleting, progress.progress)
+            }
+            .modifier(ImportProgressObserver(
+                importService: importService,
+                onImportProgress: onImportProgress
+            ))
+    }
+}
+
+struct ImportProgressObserver: ViewModifier {
+    let importService: CareeImportService?
+    let onImportProgress: (ImportProgress) -> Void
+
+    private var importProgressPublisher: AnyPublisher<ImportProgress, Never> {
+        if let importService = importService {
+            return importService.$progress.eraseToAnyPublisher()
+        } else {
+            return Just(.idle).eraseToAnyPublisher()
+        }
+    }
+
+    func body(content: Content) -> some View {
+        #if os(iOS)
+        content
+            .onReceive(importProgressPublisher) { progress in
+                onImportProgress(progress)
+            }
+        #else
+        content
+        #endif
+    }
 }
 
 #Preview {

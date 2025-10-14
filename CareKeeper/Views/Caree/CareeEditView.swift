@@ -15,11 +15,11 @@ struct CareeEditView: View {
     @State private var isSaving = false
     @FocusState private var isNameFieldFocused: Bool
 
-    // Pure CloudKit architecture services
-    @StateObject private var cloudKitService = CloudKitDataService()
+    // Use shared service from environment
+    @EnvironmentObject private var cloudKitService: CloudKitDataService
 
     private var isEditing: Bool { caree != nil }
-    
+
     init(caree: Caree? = nil) {
         self.caree = caree
         if let caree = caree {
@@ -27,7 +27,7 @@ struct CareeEditView: View {
             _imageData = State(initialValue: caree.image)
         }
     }
-    
+
     var body: some View {
         NavigationView {
             Form {

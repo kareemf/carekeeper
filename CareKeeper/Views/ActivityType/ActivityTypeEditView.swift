@@ -16,8 +16,8 @@ struct ActivityTypeEditView: View {
     @State private var isSaving: Bool = false
     @FocusState private var isNameFieldFocused: Bool
 
-    // Pure CloudKit architecture services
-    @StateObject private var cloudKitService = CloudKitDataService()
+    // Use shared service from environment
+    @EnvironmentObject private var cloudKitService: CloudKitDataService
     @StateObject private var sharedDataService = CloudKitSharedDataService()
 
     private var isEditing: Bool { activityType != nil }
@@ -25,11 +25,11 @@ struct ActivityTypeEditView: View {
     private var isSharedCaree: Bool {
         caree.isShared  // Use cache metadata
     }
-    
+
     init(caree: Caree, activityType: ActivityType? = nil) {
         self.caree = caree
         self.activityType = activityType
-        
+
         if let activityType = activityType {
             _name = State(initialValue: activityType.name)
             _icon = State(initialValue: activityType.icon ?? "")

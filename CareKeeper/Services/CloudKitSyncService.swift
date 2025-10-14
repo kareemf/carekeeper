@@ -7,49 +7,37 @@ class CloudKitSyncService: ObservableObject {
     private let container = CKContainer(identifier: CloudKitConfig.containerID)
 
     /// Check if a caree has been synced to CloudKit
+    /// Uses Pure CloudKit approach - checks for record by ID
     func isSynced(caree: Caree) async -> Bool {
         do {
-            // SwiftData uses a specific zone for CloudKit sync
-            let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
-            let database = container.privateCloudDatabase
+            // Pure CloudKit: Record ID is CD_Caree/{UUID}
+            let recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
 
-            print("🔍 Checking CloudKit for Caree with CD_id: \(caree.id.uuidString)")
-            print("   Zone: \(CloudKitConfig.zoneName)")
+            print("🔍 Checking CloudKit for Caree record: \(recordID.recordName)")
 
-            // Query by CD_id field instead of record name
-            // (CloudKit record name is different from SwiftData model ID)
-            let predicate = NSPredicate(format: "CD_id == %@", caree.id.uuidString)
-            let query = CKQuery(recordType: "CD_Caree", predicate: predicate)
+            // Check if this is a shared caree - they live in shared database
+            let isShared = caree.isShared
+            let database = isShared ? container.sharedCloudDatabase : container.privateCloudDatabase
 
-            let (matchResults, _) = try await database.records(matching: query, inZoneWith: zoneID)
+            print("   Database: \(isShared ? "Shared" : "Private")")
 
-            if let firstMatch = matchResults.first {
-                let (_, result) = firstMatch
-                switch result {
-                case .success(let record):
-                    print("✅ Record found in CloudKit!")
-                    print("   CloudKit record ID: \(record.recordID.recordName)")
-                    print("   CD_id field: \(record["CD_id"] as? String ?? "unknown")")
-                    print("   Record type: \(record.recordType)")
-                    print("   Fields: \(record.allKeys())")
-                    return true
-                case .failure(let error):
-                    print("❌ Error fetching record: \(error.localizedDescription)")
-                    return false
-                }
-            }
+            // Try to fetch the record directly
+            let record = try await database.record(for: recordID)
 
-            print("⚠️ Record not found with CD_id: \(caree.id.uuidString)")
-            return false
+            print("✅ Record found in CloudKit!")
+            print("   CloudKit record ID: \(record.recordID.recordName)")
+            print("   Record type: \(record.recordType)")
+            print("   Name: \(record["CD_name"] as? String ?? "unknown")")
+
+            return true
+
         } catch let error as CKError {
             if error.code == .unknownItem {
                 print("⚠️ Record not found in CloudKit (not synced yet)")
-                print("   Tried zone: com.apple.coredata.cloudkit.zone")
-                print("   Record ID: \(caree.id.uuidString)")
+                print("   Record ID: CD_Caree/\(caree.id.uuidString)")
             } else {
                 print("❌ CloudKit error: \(error.localizedDescription)")
                 print("   Error code: \(error.code.rawValue)")
-                print("   Error domain: CKError.errorDomain")
                 if let underlyingError = error.userInfo[NSUnderlyingErrorKey] {
                     print("   Underlying error: \(underlyingError)")
                 }
@@ -58,7 +46,6 @@ class CloudKitSyncService: ObservableObject {
         } catch {
             print("❌ Unexpected error checking sync: \(error.localizedDescription)")
             print("   Error type: \(type(of: error))")
-            print("   Full error: \(error)")
             return false
         }
     }

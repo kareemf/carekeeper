@@ -11,6 +11,8 @@ struct CareKeeperApp: App {
     @StateObject private var shareNotifier = ShareAcceptanceNotifier()
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
     @StateObject private var notificationService = CloudKitNotificationService()
+    @StateObject private var cloudKitService = CloudKitDataService()
+    @State private var cacheService: LocalCacheService?
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -124,6 +126,15 @@ struct CareKeeperApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(cloudKitService)
+                .task {
+                    // Initialize cache service with modelContainer's mainContext
+                    if cacheService == nil {
+                        cacheService = LocalCacheService(modelContext: sharedModelContainer.mainContext)
+                        cloudKitService.setCacheService(cacheService!)
+                        AppLogger.app.info("✅ Shared CloudKitDataService and LocalCacheService initialized")
+                    }
+                }
                 .onAppear {
                     checkCloudKitStatus()
                     setupNotificationService()

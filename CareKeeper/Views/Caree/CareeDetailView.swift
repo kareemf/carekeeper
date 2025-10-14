@@ -6,10 +6,14 @@ struct CareeDetailView: View {
 
     let careeID: UUID
 
-    // Pure CloudKit architecture: Cache service as source of truth
-    @State private var cacheService: LocalCacheService?
-    @StateObject private var cloudKitService = CloudKitDataService()
+    // Use shared services from environment
+    @EnvironmentObject private var cloudKitService: CloudKitDataService
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+
+    // Get cache service from shared CloudKitDataService
+    private var cacheService: LocalCacheService? {
+        cloudKitService.cacheService
+    }
 
     // Get the specific caree from cache
     private var caree: Caree? {
@@ -128,7 +132,7 @@ struct CareeDetailView: View {
                 .navigationTitle(caree.name)
                 .navigationBarTitleDisplayMode(.large)
                 .refreshable {
-                    await checkSyncStatus(for: caree)
+                    await refreshCareeData(for: caree)
                 }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
@@ -225,12 +229,6 @@ struct CareeDetailView: View {
             }
         }
         .task {
-            // Initialize cache service with model context
-            if cacheService == nil {
-                cacheService = LocalCacheService(modelContext: modelContext)
-                cloudKitService.setCacheService(cacheService!)
-            }
-
             // Refresh cache to load caree
             try? await cacheService?.refreshCache()
 
@@ -463,11 +461,33 @@ struct CareeDetailView: View {
     }
 
     private func checkSyncStatus(for caree: Caree) async {
-        print("🔄 Pull-to-refresh: Checking sync status for caree: \(caree.name)")
+        print("🔄 Checking sync status for caree: \(caree.name)")
         isCheckingSync = true
         isSyncedToCloudKit = await syncService.isSynced(caree: caree)
-        print("🔄 Pull-to-refresh complete: Sync status = \(isSyncedToCloudKit == true ? "✅ Synced" : "❌ Not synced")")
+        print("🔄 Sync status check complete: \(isSyncedToCloudKit == true ? "✅ Synced" : "❌ Not synced")")
         isCheckingSync = false
+    }
+
+    private func refreshCareeData(for caree: Caree) async {
+        print("🔄 Pull-to-refresh: Refreshing data for caree: \(caree.name)")
+
+        // If this is a shared caree, fetch shared data from CloudKit
+        if caree.isShared {
+            await sharedRecordsService.fetchSharedCarees()
+
+            // Update cache with shared carees
+            for sharedCaree in sharedRecordsService.sharedCarees {
+                try? await cacheService?.cacheCaree(sharedCaree, isShared: true)
+            }
+        }
+
+        // Invalidate and refresh the cache to get latest data
+        try? await cacheService?.invalidateAndRefresh()
+
+        // Check sync status
+        await checkSyncStatus(for: caree)
+
+        print("🔄 Pull-to-refresh complete")
     }
 
     private func exportCaree(_ caree: Caree) {

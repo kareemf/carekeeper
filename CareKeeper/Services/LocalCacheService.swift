@@ -92,6 +92,28 @@ class LocalCacheService: ObservableObject {
         await refreshPublishedProperties()
     }
 
+    /// Remove an ActivityType from cache
+    /// - Parameter activityType: ActivityType to remove
+    func removeCachedActivityType(_ activityType: ActivityType) async throws {
+        logger.info("Removing activity type from cache: \(activityType.name)")
+
+        modelContext.delete(activityType)
+        try modelContext.save()
+
+        await refreshPublishedProperties()
+    }
+
+    /// Remove an Activity from cache
+    /// - Parameter activity: Activity to remove
+    func removeCachedActivity(_ activity: Activity) async throws {
+        logger.info("Removing activity from cache: \(activity.id)")
+
+        modelContext.delete(activity)
+        try modelContext.save()
+
+        await refreshPublishedProperties()
+    }
+
     /// Cache an ActivityType in SwiftData
     /// - Parameters:
     ///   - activityType: ActivityType to cache
@@ -132,6 +154,7 @@ class LocalCacheService: ObservableObject {
         }
 
         try modelContext.save()
+        await refreshPublishedProperties()
     }
 
     /// Cache an Activity in SwiftData
@@ -176,6 +199,7 @@ class LocalCacheService: ObservableObject {
         }
 
         try modelContext.save()
+        await refreshPublishedProperties()
     }
 
     // MARK: - Cache Read Operations
@@ -253,6 +277,18 @@ class LocalCacheService: ObservableObject {
         defer { isLoading = false }
 
         await refreshPublishedProperties()
+    }
+
+    /// Invalidate and refresh the entire cache from SwiftData
+    /// This forces a complete refresh of all published properties
+    func invalidateAndRefresh() async throws {
+        logger.info("Invalidating and refreshing cache")
+        isLoading = true
+        defer { isLoading = false }
+
+        await refreshPublishedProperties()
+
+        logger.info("Cache invalidated and refreshed")
     }
 
     // MARK: - Cache Invalidation

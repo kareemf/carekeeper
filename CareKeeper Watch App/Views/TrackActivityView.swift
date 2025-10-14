@@ -19,8 +19,8 @@ struct TrackActivityView: View {
     @State private var useCustomTime: Bool = false
     @State private var customTime: Date = Date()
 
-    // Pure CloudKit architecture services
-    @StateObject private var cloudKitService = CloudKitDataService()
+    // Use shared services from environment
+    @EnvironmentObject private var cloudKitService: CloudKitDataService
     @StateObject private var sharedDataService = CloudKitSharedDataService()
 
     private var isSharedCaree: Bool {

@@ -3,6 +3,9 @@ import SwiftData
 
 @main
 struct CareKeeperWatchApp: App {
+    @StateObject private var cloudKitService = CloudKitDataService()
+    @State private var cacheService: LocalCacheService?
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Caree.self,
@@ -43,6 +46,15 @@ struct CareKeeperWatchApp: App {
     var body: some Scene {
         WindowGroup {
             CareeListView()
+                .environmentObject(cloudKitService)
+                .task {
+                    // Initialize cache service with modelContainer's mainContext
+                    if cacheService == nil {
+                        cacheService = LocalCacheService(modelContext: sharedModelContainer.mainContext)
+                        cloudKitService.setCacheService(cacheService!)
+                        AppLogger.app.info("✅ Shared CloudKitDataService and LocalCacheService initialized (watchOS)")
+                    }
+                }
         }
         .modelContainer(sharedModelContainer)
     }
