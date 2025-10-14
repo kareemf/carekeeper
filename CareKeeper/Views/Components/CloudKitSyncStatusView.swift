@@ -32,7 +32,7 @@ struct CloudKitSyncStatusView: View {
                     .scaleEffect(size.scale)
             } else if let isSynced = isSynced {
                 Image(systemName: isSynced ? "icloud.and.arrow.up.fill" : "icloud.slash")
-                    .foregroundColor(isSynced ? .green : .gray.opacity(0.3))
+                    .foregroundColor(isSynced ? .white : .gray.opacity(0.3))
                     .font(size.font)
                     .help(isSynced ? "Synced to iCloud" : "Not synced to iCloud")
             }
