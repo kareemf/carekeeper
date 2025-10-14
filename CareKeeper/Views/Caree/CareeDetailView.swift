@@ -143,7 +143,6 @@ struct CareeDetailView: View {
                                 toggleNotifications(for: caree)
                             } label: {
                                 Image(systemName: notificationPrefs.isEnabled(for: caree.id) ? "bell.fill" : "bell.slash")
-                                    .foregroundColor(notificationPrefs.isEnabled(for: caree.id) ? .blue : .gray)
                             }
 
                             CareeShareButton(

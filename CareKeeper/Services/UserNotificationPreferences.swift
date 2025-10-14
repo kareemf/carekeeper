@@ -71,6 +71,12 @@ class UserNotificationPreferences: ObservableObject {
         var preferences = careePreferences
         preferences[careeID.uuidString] = enabled
         careePreferences = preferences
+
+        // If enabling a caree, ensure global notifications are enabled
+        if enabled && !notificationsEnabled {
+            notificationsEnabled = true
+        }
+
         objectWillChange.send()
     }
 
