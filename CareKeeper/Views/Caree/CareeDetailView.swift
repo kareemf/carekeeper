@@ -9,6 +9,9 @@ struct CareeDetailView: View {
     // Use shared services from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    @StateObject private var sharedDataService = CloudKitSharedDataService()
+    
+    private let logger = AppLogger.cloudkit
 
     // Get cache service from shared CloudKitDataService
     private var cacheService: LocalCacheService? {
@@ -35,7 +38,7 @@ struct CareeDetailView: View {
     @State private var isSyncedToCloudKit: Bool? = nil
     @State private var isCheckingSync = false
     @State private var exportItem: ExportItem?
-    @State private var exportError: Error?
+    @State private var error: Error?
     @State private var isLoadingSharedCaree = false
 
     @StateObject private var syncService = CloudKitSyncService()
@@ -170,7 +173,14 @@ struct CareeDetailView: View {
                 .sheet(isPresented: $showingAddActivityType) {
                     ActivityTypeEditView(caree: caree)
                 }
-                .sheet(isPresented: $showingTrackActivity) {
+                .sheet(isPresented: $showingTrackActivity, onDismiss: {
+                    // After adding an activity, refresh shared caree data to update the recent list
+                    if caree.isShared {
+                        Task {
+                            await refreshCareeData(for: caree)
+                        }
+                    }
+                }) {
                     TrackActivityView(caree: caree)
                 }
                 .confirmationDialog(
@@ -209,7 +219,6 @@ struct CareeDetailView: View {
                 .sheet(item: $exportItem) { item in
                     ShareSheet(items: [item.url])
                 }
-                .errorAlert($exportError)
                 .alert(
                     NSLocalizedString("Notification Permission Required", comment: "Permission alert title"),
                     isPresented: $showingPermissionAlert
@@ -264,22 +273,26 @@ struct CareeDetailView: View {
                 isLoadingSharedCaree = false
             }
         }
+        .errorAlert($error)
     }
-
+    
     private func deleteActivityType(_ activityType: ActivityType) {
         guard let caree = caree else { return }
 
         Task {
             do {
-                // Pure CloudKit: Delete via CloudKitDataService
-                let isShared = caree.isShared
-                try await cloudKitService.deleteActivityType(activityType, isShared: isShared)
+                if caree.isShared {
+                    try await sharedDataService.deleteActivityType(activityType, caree: caree)
+                    await refreshCareeData(for: caree)
+                } else {
+                    try await cloudKitService.deleteActivityType(activityType, isShared: false)
+                    // Cache is automatically updated by CloudKitDataService for owned records
+                }
 
-                // Cache is automatically updated by CloudKitDataService
                 activityTypeToDelete = nil
             } catch {
-                // Handle error - could show alert
-                print("❌ Failed to delete activity type: \(error.localizedDescription)")
+                logger.error("❌ Failed to delete activity type: \(error.localizedDescription)")
+                self.error = AppError.saveFailed(error.localizedDescription)
             }
         }
     }
@@ -289,15 +302,18 @@ struct CareeDetailView: View {
 
         Task {
             do {
-                // Pure CloudKit: Delete via CloudKitDataService
-                let isShared = caree.isShared
-                try await cloudKitService.deleteActivity(activity, isShared: isShared)
+                if caree.isShared {
+                    try await sharedDataService.deleteActivity(activity, caree: caree)
+                    await refreshCareeData(for: caree)
+                } else {
+                    try await cloudKitService.deleteActivity(activity, isShared: false)
+                    // Cache is automatically updated by CloudKitDataService for owned records
+                }
 
-                // Cache is automatically updated by CloudKitDataService
                 activityToDelete = nil
             } catch {
-                // Handle error - could show alert
-                print("❌ Failed to delete activity: \(error.localizedDescription)")
+                logger.error("❌ Failed to delete activity: \(error.localizedDescription)")
+                self.error = AppError.deleteFailed(error.localizedDescription)
             }
         }
     }
@@ -332,8 +348,17 @@ struct CareeDetailView: View {
             Spacer()
 
             #if os(iOS)
-            // Sync status indicator
-            syncStatusIndicator
+            // Indicator on the right:
+            if isMyCaree {
+                // Owned: show CloudKit sync status indicator
+                syncStatusIndicator
+            } else {
+                // Shared: show shared icon (matches CareeListView behavior)
+                Image(systemName: "person.2.fill")
+                    .font(.title3)
+                    .foregroundColor(.secondary)
+                    .accessibilityLabel(Text(NSLocalizedString("Shared Caree", comment: "Shared caree indicator")))
+            }
             #endif
         }
     }
@@ -460,15 +485,15 @@ struct CareeDetailView: View {
     }
 
     private func checkSyncStatus(for caree: Caree) async {
-        print("🔄 Checking sync status for caree: \(caree.name)")
+        logger.info("🔄 Checking sync status for caree: \(caree.name)")
         isCheckingSync = true
         isSyncedToCloudKit = await syncService.isSynced(caree: caree)
-        print("🔄 Sync status check complete: \(isSyncedToCloudKit == true ? "✅ Synced" : "❌ Not synced")")
+        logger.info("🔄 Sync status check complete: \(isSyncedToCloudKit == true ? "✅ Synced" : "❌ Not synced")")
         isCheckingSync = false
     }
 
     private func refreshCareeData(for caree: Caree) async {
-        print("🔄 Pull-to-refresh: Refreshing data for caree: \(caree.name)")
+        logger.info("🔄 Pull-to-refresh: Refreshing data for caree: \(caree.name)")
 
         // If this is a shared caree, fetch shared data from CloudKit
         if caree.isShared {
@@ -483,10 +508,10 @@ struct CareeDetailView: View {
         // Invalidate and refresh the cache to get latest data
         try? await cacheService?.invalidateAndRefresh()
 
-        // Check sync status
+        // Check sync status (only relevant for owned carees; harmless for shared)
         await checkSyncStatus(for: caree)
 
-        print("🔄 Pull-to-refresh complete")
+        logger.info("🔄 Pull-to-refresh complete")
     }
 
     private func exportCaree(_ caree: Caree) {
@@ -503,7 +528,7 @@ struct CareeDetailView: View {
             // Set export item to trigger share sheet
             exportItem = ExportItem(url: tempURL, filename: filename)
         } catch {
-            exportError = error
+            self.error = error
         }
     }
 

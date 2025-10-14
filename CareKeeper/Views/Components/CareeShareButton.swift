@@ -25,6 +25,7 @@ struct CareeShareButton: View {
         Button {
             // Pre-share validation
             if !isMyCaree {
+                isShared = true
                Task {
                     await prepareNonOwnedShare()
                 } 
