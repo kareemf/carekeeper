@@ -23,6 +23,15 @@ struct CareeListView: View {
     // Combined list of all carees - updated when cache changes
     @State private var allCarees: [Caree] = []
 
+    // Loading coordination
+    @State private var initialLoading = true
+
+    // Keeps the list in a loading state during the very first on-appear fetch, before either of the two services has had a chance to flip their own isLoading flags or publish any data (after rendered but before tasks run).
+    private var isLoadingCombined: Bool {
+        let cacheLoading = cacheService?.isLoading ?? false
+        return initialLoading || sharedRecordsService.isLoading || cacheLoading
+    }
+
     // Backup/Restore (iOS only)
     #if os(iOS)
     @State private var showingExport = false
@@ -81,7 +90,17 @@ struct CareeListView: View {
 
     private var contentView: some View {
         Group {
-            if allCarees.isEmpty {
+            if isLoadingCombined {
+                // Unified loading state while owned and shared sources are being fetched
+                VStack(spacing: 16) {
+                    ProgressView()
+                    Text(NSLocalizedString("Loading carees...", comment: "Loading owned and shared carees message"))
+                        .foregroundColor(.secondary)
+                        .font(.subheadline)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .transition(.opacity)
+            } else if allCarees.isEmpty {
                 emptyStateView
                     .transition(.opacity.combined(with: .scale(scale: 0.95)))
             } else {
@@ -89,6 +108,7 @@ struct CareeListView: View {
                     .transition(.opacity)
             }
         }
+        .animation(.easeInOut(duration: 0.25), value: isLoadingCombined)
         .animation(.easeInOut(duration: 0.3), value: allCarees.isEmpty)
     }
 
@@ -165,8 +185,8 @@ struct CareeListView: View {
         }
         #endif
 
-        // Initial data load
-        await refreshAllCarees()
+        // Initial data load (unified)
+        await refreshAllCarees(initial: true)
     }
 
     @ViewBuilder
@@ -257,8 +277,12 @@ struct CareeListView: View {
         allCarees = cacheService.myCarees + cacheService.sharedCarees
     }
 
-    private func refreshAllCarees() async {
+    private func refreshAllCarees(initial: Bool = false) async {
         guard let cacheService = cacheService else { return }
+
+        if initial {
+            await MainActor.run { initialLoading = true }
+        }
 
         // Fetch shared carees from CloudKit and update cache
         await sharedRecordsService.fetchSharedCarees()
@@ -268,7 +292,7 @@ struct CareeListView: View {
             do {
                 try await cacheService.cacheCaree(sharedCaree, isShared: true)
             } catch {
-                self.error = error
+                await MainActor.run { self.error = error }
             }
         }
 
@@ -276,7 +300,12 @@ struct CareeListView: View {
         try? await cacheService.invalidateAndRefresh()
 
         // Update combined list
-        updateAllCarees()
+        await MainActor.run {
+            updateAllCarees()
+            if initial {
+                initialLoading = false
+            }
+        }
     }
     
     @MainActor
@@ -313,7 +342,7 @@ struct CareeListView: View {
 
                         // Cache is automatically updated by CloudKitDataService
                     } catch {
-                        self.error = error
+                        await MainActor.run { self.error = error }
                     }
                 }
             }
