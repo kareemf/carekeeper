@@ -71,3 +71,37 @@ extension ActivityType {
         // - other fields: standard encryption
     }
 }
+
+// MARK: - Property Update Helpers
+private protocol PropertyUpdatable: AnyObject {
+    associatedtype ModelType = Self
+    static func makeUpdater<T>(_ keyPath: ReferenceWritableKeyPath<Self, T>) -> (Self, Self) -> Void
+}
+
+private extension PropertyUpdatable {
+    static func makeUpdater<T>(_ keyPath: ReferenceWritableKeyPath<Self, T>) -> (Self, Self) -> Void {
+        { dest, src in
+            dest[keyPath: keyPath] = src[keyPath: keyPath]
+        }
+    }
+}
+
+extension ActivityType: PropertyUpdatable {
+    // Only include scalar fields you want to copy during a sync/update.
+    // Exclude identity, relationships, and cache metadata.
+    static let scalarUpdaters: [(ActivityType, ActivityType) -> Void] = [
+        makeUpdater(\.name),
+        makeUpdater(\.icon),
+        makeUpdater(\.hasQuantity),
+        makeUpdater(\.quantityUnit),
+        makeUpdater(\.hasLocation),
+        makeUpdater(\.listOrder),
+        makeUpdater(\.dateCreated)
+    ]
+
+    func applyScalarUpdates(from other: ActivityType) {
+        for updater in Self.scalarUpdaters {
+            updater(self, other)
+        }
+    }
+}

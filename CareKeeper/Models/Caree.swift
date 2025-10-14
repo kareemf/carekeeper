@@ -56,3 +56,34 @@ extension Caree {
         // - other fields: standard encryption
     }
 }
+
+// MARK: - Property Update Helpers
+private protocol PropertyUpdatable: AnyObject {
+    associatedtype ModelType = Self
+    static func makeUpdater<T>(_ keyPath: ReferenceWritableKeyPath<Self, T>) -> (Self, Self) -> Void
+}
+
+private extension PropertyUpdatable {
+    static func makeUpdater<T>(_ keyPath: ReferenceWritableKeyPath<Self, T>) -> (Self, Self) -> Void {
+        { dest, src in
+            dest[keyPath: keyPath] = src[keyPath: keyPath]
+        }
+    }
+}
+
+extension Caree: PropertyUpdatable {
+    // Only include scalar fields you want to copy during a sync/update.
+    // Exclude identity, relationships, and cache metadata (isShared/isOwned set by caller).
+    static let scalarUpdaters: [(Caree, Caree) -> Void] = [
+        makeUpdater(\.name),
+        makeUpdater(\.image),
+        makeUpdater(\.listOrder),
+        makeUpdater(\.dateCreated)
+    ]
+
+    func applyScalarUpdates(from other: Caree) {
+        for updater in Self.scalarUpdaters {
+            updater(self, other)
+        }
+    }
+}

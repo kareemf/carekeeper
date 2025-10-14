@@ -45,10 +45,7 @@ class LocalCacheService: ObservableObject {
 
         if let existingCaree = existingCarees.first {
             // Update existing caree
-            existingCaree.name = caree.name
-            existingCaree.image = caree.image
-            existingCaree.listOrder = caree.listOrder
-            existingCaree.dateCreated = caree.dateCreated
+            existingCaree.applyScalarUpdates(from: caree)
             existingCaree.isShared = isShared
             existingCaree.isOwned = !isShared
             existingCaree.lastSyncedAt = Date()
@@ -131,13 +128,7 @@ class LocalCacheService: ObservableObject {
 
         if let existingActivityType = existing.first {
             // Update existing
-            existingActivityType.name = activityType.name
-            existingActivityType.icon = activityType.icon
-            existingActivityType.hasQuantity = activityType.hasQuantity
-            existingActivityType.quantityUnit = activityType.quantityUnit
-            existingActivityType.hasLocation = activityType.hasLocation
-            existingActivityType.listOrder = activityType.listOrder
-            existingActivityType.dateCreated = activityType.dateCreated
+            existingActivityType.applyScalarUpdates(from: activityType)
             existingActivityType.lastSyncedAt = Date()
             existingActivityType.cloudKitRecordID = "CD_ActivityType/\(activityType.id.uuidString)"
             existingActivityType.caree = caree
@@ -175,12 +166,7 @@ class LocalCacheService: ObservableObject {
 
         if let existingActivity = existing.first {
             // Update existing
-            existingActivity.dateTime = activity.dateTime
-            existingActivity.notes = activity.notes
-            existingActivity.quantity = activity.quantity
-            existingActivity.latitude = activity.latitude
-            existingActivity.longitude = activity.longitude
-            existingActivity.dateCreated = activity.dateCreated
+            existingActivity.applyScalarUpdates(from: activity)
             existingActivity.lastSyncedAt = Date()
             existingActivity.cloudKitRecordID = "CD_Activity/\(activity.id.uuidString)"
             existingActivity.caree = caree

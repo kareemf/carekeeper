@@ -200,18 +200,11 @@ class CloudKitDataService: ObservableObject {
             }
 
             // Save updated record
-            _ = try await saveWithRetry(existingRecord, to: db)
+            let savedRecord = try await saveWithRetry(existingRecord, to: db)
 
-            // Update the caree object with new values
-            if let name = name {
-                caree.name = name
-            }
-            if let imageData = imageData {
-                caree.image = imageData
-            }
-            if let listOrder = listOrder {
-                caree.listOrder = listOrder
-            }
+            // Convert saved record back and apply updates to in-memory model
+            let updatedCaree = try await converter.recordToCaree(savedRecord)
+            caree.applyScalarUpdates(from: updatedCaree)
 
             // Update cache if available
             if let cacheService = cacheService {
@@ -514,27 +507,11 @@ class CloudKitDataService: ObservableObject {
             }
 
             // Save updated record
-            _ = try await saveWithRetry(existingRecord, to: db)
+            let savedRecord = try await saveWithRetry(existingRecord, to: db)
 
-            // Update the activityType object with new values
-            if let name = name {
-                activityType.name = name
-            }
-            if let icon = icon {
-                activityType.icon = icon
-            }
-            if let hasQuantity = hasQuantity {
-                activityType.hasQuantity = hasQuantity
-            }
-            if let quantityUnit = quantityUnit {
-                activityType.quantityUnit = quantityUnit
-            }
-            if let hasLocation = hasLocation {
-                activityType.hasLocation = hasLocation
-            }
-            if let listOrder = listOrder {
-                activityType.listOrder = listOrder
-            }
+            // Convert saved record back and apply updates to in-memory model
+            let updatedActivityType = try converter.recordToActivityType(savedRecord)
+            activityType.applyScalarUpdates(from: updatedActivityType)
 
             // Update cache if available - first get the cached caree
             if let cacheService = cacheService,
@@ -707,24 +684,11 @@ class CloudKitDataService: ObservableObject {
             }
 
             // Save updated record
-            _ = try await saveWithRetry(existingRecord, to: db)
+            let savedRecord = try await saveWithRetry(existingRecord, to: db)
 
-            // Update the activity object with new values
-            if let dateTime = dateTime {
-                activity.dateTime = dateTime
-            }
-            if let notes = notes {
-                activity.notes = notes
-            }
-            if let quantity = quantity {
-                activity.quantity = quantity
-            }
-            if let latitude = latitude {
-                activity.latitude = latitude
-            }
-            if let longitude = longitude {
-                activity.longitude = longitude
-            }
+            // Convert saved record back and apply updates to in-memory model
+            let updatedActivity = try converter.recordToActivity(savedRecord)
+            activity.applyScalarUpdates(from: updatedActivity)
 
             // Update cache if available
             if let cacheService = cacheService,
