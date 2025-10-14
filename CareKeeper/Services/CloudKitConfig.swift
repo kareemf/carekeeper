@@ -10,7 +10,9 @@ enum CloudKitConfig {
     /// Legacy zone name used by SwiftData/CoreData CloudKit integration
     /// Pure CloudKit uses the default zone instead of this custom zone
     /// Kept for reference and legacy zone cleanup utilities
-    static let zoneName = "com.apple.coredata.cloudkit.zone"
+    static let swiftDataZoneName = "com.apple.coredata.cloudkit.zone"
+    
+    static let zoneName = "com.kareemf.carekeeper.cloudkit.zone"
 
     /// The CloudKit container identifier for this app
     static let containerID = "iCloud.com.kareemf.CareKeeper2"

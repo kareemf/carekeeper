@@ -14,14 +14,24 @@ class CloudKitRecordConverter {
     /// - Parameters:
     ///   - caree: The Caree domain model
     ///   - imageData: Optional image data to convert to CKAsset
+    ///   - zoneID: Optional zoneID to place the record in (required for sharing)
     ///   - existingRecord: Optional existing record to update (preserves recordID)
     /// - Returns: CKRecord for CD_Caree
-    func careeToRecord(_ caree: Caree, imageData: Data?, existingRecord: CKRecord? = nil) async throws -> CKRecord {
+    func careeToRecord(
+        _ caree: Caree,
+        imageData: Data?,
+        zoneID: CKRecordZone.ID? = nil,
+        existingRecord: CKRecord? = nil
+    ) async throws -> CKRecord {
         let recordID: CKRecord.ID
         if let existing = existingRecord {
             recordID = existing.recordID
         } else {
-            recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
+            if let zoneID = zoneID {
+                recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
+            } else {
+                recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
+            }
         }
 
         let record = CKRecord(recordType: "CD_Caree", recordID: recordID)
@@ -55,14 +65,24 @@ class CloudKitRecordConverter {
     /// - Parameters:
     ///   - activityType: The ActivityType domain model
     ///   - parentCaree: The parent Caree record (for parent reference)
+    ///   - zoneID: Optional zoneID to place the record in (required for sharing)
     ///   - existingRecord: Optional existing record to update
     /// - Returns: CKRecord for CD_ActivityType with parent set
-    func activityTypeToRecord(_ activityType: ActivityType, parentCaree: CKRecord, existingRecord: CKRecord? = nil) throws -> CKRecord {
+    func activityTypeToRecord(
+        _ activityType: ActivityType,
+        parentCaree: CKRecord,
+        zoneID: CKRecordZone.ID? = nil,
+        existingRecord: CKRecord? = nil
+    ) throws -> CKRecord {
         let recordID: CKRecord.ID
         if let existing = existingRecord {
             recordID = existing.recordID
         } else {
-            recordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)")
+            if let zoneID = zoneID {
+                recordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)", zoneID: zoneID)
+            } else {
+                recordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)")
+            }
         }
 
         let record = CKRecord(recordType: "CD_ActivityType", recordID: recordID)
@@ -93,19 +113,25 @@ class CloudKitRecordConverter {
     ///   - activity: The Activity domain model
     ///   - parentCaree: The parent Caree record
     ///   - activityTypeRecord: The ActivityType record for reference
+    ///   - zoneID: Optional zoneID to place the record in (required for sharing)
     ///   - existingRecord: Optional existing record to update
     /// - Returns: CKRecord for CD_Activity with parent set
     func activityToRecord(
         _ activity: Activity,
         parentCaree: CKRecord,
         activityTypeRecord: CKRecord,
+        zoneID: CKRecordZone.ID? = nil,
         existingRecord: CKRecord? = nil
     ) throws -> CKRecord {
         let recordID: CKRecord.ID
         if let existing = existingRecord {
             recordID = existing.recordID
         } else {
-            recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)")
+            if let zoneID = zoneID {
+                recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)", zoneID: zoneID)
+            } else {
+                recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)")
+            }
         }
 
         let record = CKRecord(recordType: "CD_Activity", recordID: recordID)

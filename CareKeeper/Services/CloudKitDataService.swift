@@ -14,6 +14,12 @@ class CloudKitDataService: ObservableObject {
     @Published var syncStatus: SyncStatus = .idle
     @Published var deletionProgress: DeletionProgress = .idle
 
+    // MARK: - Zone Configuration (Pure CloudKit)
+
+    /// Use a custom zone for owner records to enable CloudKit sharing.
+    private static let zoneName = CloudKitConfig.zoneName
+    private let zoneID = CKRecordZone.ID(zoneName: CloudKitDataService.zoneName)
+
     // MARK: - Private Properties
 
     private let container = CKContainer(identifier: CloudKitConfig.containerID)
@@ -74,6 +80,32 @@ class CloudKitDataService: ObservableObject {
         return isShared ? container.sharedCloudDatabase : container.privateCloudDatabase
     }
 
+    // MARK: - Zone Management
+
+    /// Ensure the custom zone exists in the private database
+    private func ensureCustomZoneExists() async throws {
+        do {
+            let zones = try await container.privateCloudDatabase.allRecordZones()
+            if zones.contains(where: { $0.zoneID == self.zoneID }) {
+                return
+            }
+        } catch {
+            // If fetching zones fails, attempt to create zone anyway
+            logger.warning("Failed to list zones, attempting to create: \(error.localizedDescription)")
+        }
+
+        let zone = CKRecordZone(zoneID: zoneID)
+        do {
+            _ = try await container.privateCloudDatabase.save(zone)
+            logger.info("✅ Created custom zone: \(self.zoneID.zoneName)")
+        } catch let error as CKError where error.code == .serverRecordChanged {
+            logger.info("Custom zone already exists")
+        } catch {
+            logger.error("❌ Failed to create custom zone: \(error.localizedDescription)")
+            throw error
+        }
+    }
+
     // MARK: - Caree Operations
 
     /// Create a new Caree in CloudKit
@@ -87,12 +119,15 @@ class CloudKitDataService: ObservableObject {
         syncStatus = .syncing
 
         do {
+            // Ensure zone exists (required for sharing)
+            try await ensureCustomZoneExists()
+
             // Create domain model
             let caree = Caree(name: name, listOrder: listOrder)
             caree.image = imageData
 
-            // Convert to CKRecord
-            let record = try await converter.careeToRecord(caree, imageData: imageData)
+            // Convert to CKRecord in custom zone
+            let record = try await converter.careeToRecord(caree, imageData: imageData, zoneID: zoneID)
 
             // Save to CloudKit private database
             let savedRecord = try await saveWithRetry(record, to: container.privateCloudDatabase)
@@ -134,10 +169,13 @@ class CloudKitDataService: ObservableObject {
         syncStatus = .syncing
 
         do {
+            if isShared {
+                throw AppError.invalidInput("updateCaree for shared records is not supported here. Use CloudKitSharedDataService.")
+            }
             let db = database(for: isShared)
 
             // Fetch existing record
-            let recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
+            let recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
             let existingRecord = try await fetchWithRetry(recordID: recordID, from: db)
 
             // Update fields
@@ -188,19 +226,23 @@ class CloudKitDataService: ObservableObject {
         deletionProgress = .deleting(0.0)
 
         do {
+            if isShared {
+                throw AppError.invalidInput("deleteCaree for shared records is not supported here. Use CloudKitSharedDataService.")
+            }
             let db = database(for: isShared)
 
             // Step 1: Query for all ActivityTypes belonging to this Caree
             deletionProgress = .deleting(0.1)
+            let careeRef = CKRecord.Reference(
+                recordID: CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID),
+                action: .none
+            )
             let activityTypeQuery = CKQuery(
                 recordType: "CD_ActivityType",
-                predicate: NSPredicate(format: "CD_caree == %@", CKRecord.Reference(
-                    recordID: CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)"),
-                    action: .none
-                ))
+                predicate: NSPredicate(format: "CD_caree == %@", careeRef)
             )
 
-            let (activityTypeResults, _) = try await db.records(matching: activityTypeQuery)
+            let (activityTypeResults, _) = try await db.records(matching: activityTypeQuery, inZoneWith: zoneID)
             var activityTypeIDs: [CKRecord.ID] = []
             var allActivityIDs: [CKRecord.ID] = []
 
@@ -212,15 +254,13 @@ class CloudKitDataService: ObservableObject {
                     activityTypeIDs.append(record.recordID)
 
                     // Step 2: Query for all Activities belonging to this ActivityType
+                    let activityTypeRef = CKRecord.Reference(recordID: record.recordID, action: .none)
                     let activityQuery = CKQuery(
                         recordType: "CD_Activity",
-                        predicate: NSPredicate(format: "CD_activityType == %@", CKRecord.Reference(
-                            recordID: record.recordID,
-                            action: .none
-                        ))
+                        predicate: NSPredicate(format: "CD_activityType == %@", activityTypeRef)
                     )
 
-                    let (activityResults, _) = try await db.records(matching: activityQuery)
+                    let (activityResults, _) = try await db.records(matching: activityQuery, inZoneWith: zoneID)
 
                     for (_, activityResult) in activityResults {
                         if case .success(let activityRecord) = activityResult {
@@ -260,7 +300,7 @@ class CloudKitDataService: ObservableObject {
 
             // Step 5: Finally delete the Caree
             deletionProgress = .deleting(0.8)
-            let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
+            let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
             try await deleteWithRetry(recordID: careeRecordID, from: db)
 
             // Remove from cache if cache service is available
@@ -297,7 +337,9 @@ class CloudKitDataService: ObservableObject {
         logger.info("Fetching Caree: \(id)")
 
         let db = database(for: isShared)
-        let recordID = CKRecord.ID(recordName: "CD_Caree/\(id.uuidString)")
+        let recordID = isShared
+            ? CKRecord.ID(recordName: "CD_Caree/\(id.uuidString)") // shared path handled elsewhere
+            : CKRecord.ID(recordName: "CD_Caree/\(id.uuidString)", zoneID: zoneID)
 
         do {
             let record = try await fetchWithRetry(recordID: recordID, from: db)
@@ -321,7 +363,7 @@ class CloudKitDataService: ObservableObject {
         let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
         query.sortDescriptors = [NSSortDescriptor(key: "CD_listOrder", ascending: true)]
 
-        let (matchResults, _) = try await container.privateCloudDatabase.records(matching: query)
+        let (matchResults, _) = try await container.privateCloudDatabase.records(matching: query, inZoneWith: zoneID)
 
         var carees: [Caree] = []
         for (_, result) in matchResults {
@@ -345,15 +387,6 @@ class CloudKitDataService: ObservableObject {
     // MARK: - ActivityType Operations
 
     /// Create a new ActivityType for a Caree
-    /// - Parameters:
-    ///   - caree: Parent Caree
-    ///   - name: ActivityType name
-    ///   - icon: Optional icon string
-    ///   - hasQuantity: Whether quantity tracking is enabled
-    ///   - quantityUnit: Optional quantity unit
-    ///   - hasLocation: Whether location tracking is enabled
-    ///   - listOrder: Display order
-    ///   - isShared: Whether parent caree is shared
     /// - Returns: Created ActivityType
     func createActivityType(
         for caree: Caree,
@@ -369,10 +402,13 @@ class CloudKitDataService: ObservableObject {
         syncStatus = .syncing
 
         do {
+            if isShared {
+                throw AppError.invalidInput("createActivityType for shared records is not supported here. Use CloudKitSharedDataService.")
+            }
             let db = database(for: isShared)
 
             // Fetch parent Caree record (needed for parent reference)
-            let parentRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
+            let parentRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
             let parentRecord = try await fetchWithRetry(recordID: parentRecordID, from: db)
 
             // Create domain model
@@ -385,8 +421,8 @@ class CloudKitDataService: ObservableObject {
                 listOrder: listOrder
             )
 
-            // Convert to CKRecord with parent reference
-            let record = try converter.activityTypeToRecord(activityType, parentCaree: parentRecord)
+            // Convert to CKRecord with parent reference in custom zone
+            let record = try converter.activityTypeToRecord(activityType, parentCaree: parentRecord, zoneID: zoneID)
 
             // Save to CloudKit
             let savedRecord = try await saveWithRetry(record, to: db)
@@ -419,12 +455,6 @@ class CloudKitDataService: ObservableObject {
     }
 
     /// Update an existing ActivityType
-    /// - Parameters:
-    ///   - activityType: ActivityType to update
-    ///   - caree: Parent Caree (for parent reference)
-    ///   - name: New name (optional)
-    ///   - icon: New icon (optional)
-    ///   - isShared: Whether parent caree is shared
     func updateActivityType(
         _ activityType: ActivityType,
         caree: Caree,
@@ -436,10 +466,13 @@ class CloudKitDataService: ObservableObject {
         syncStatus = .syncing
 
         do {
+            if isShared {
+                throw AppError.invalidInput("updateActivityType for shared records is not supported here. Use CloudKitSharedDataService.")
+            }
             let db = database(for: isShared)
 
             // Fetch existing record
-            let recordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)")
+            let recordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)", zoneID: zoneID)
             let existingRecord = try await fetchWithRetry(recordID: recordID, from: db)
 
             // Update fields
@@ -479,16 +512,16 @@ class CloudKitDataService: ObservableObject {
     }
 
     /// Delete an ActivityType from CloudKit
-    /// - Parameters:
-    ///   - activityType: ActivityType to delete
-    ///   - isShared: Whether parent caree is shared
     func deleteActivityType(_ activityType: ActivityType, isShared: Bool = false) async throws {
         logger.info("Deleting ActivityType: \(activityType.id)")
         syncStatus = .syncing
 
         do {
+            if isShared {
+                throw AppError.invalidInput("deleteActivityType for shared records is not supported here. Use CloudKitSharedDataService.")
+            }
             let db = database(for: isShared)
-            let recordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)")
+            let recordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)", zoneID: zoneID)
 
             try await deleteWithRetry(recordID: recordID, from: db)
 
@@ -511,15 +544,6 @@ class CloudKitDataService: ObservableObject {
     // MARK: - Activity Operations
 
     /// Create a new Activity
-    /// - Parameters:
-    ///   - caree: Parent Caree
-    ///   - activityType: Associated ActivityType
-    ///   - dateTime: When the activity occurred
-    ///   - notes: Optional notes
-    ///   - quantity: Optional quantity value
-    ///   - latitude: Optional latitude
-    ///   - longitude: Optional longitude
-    ///   - isShared: Whether parent caree is shared
     /// - Returns: Created Activity
     func createActivity(
         for caree: Caree,
@@ -535,13 +559,16 @@ class CloudKitDataService: ObservableObject {
         syncStatus = .syncing
 
         do {
+            if isShared {
+                throw AppError.invalidInput("createActivity for shared records is not supported here. Use CloudKitSharedDataService.")
+            }
             let db = database(for: isShared)
 
             // Fetch parent records
-            let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
+            let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
             let careeRecord = try await fetchWithRetry(recordID: careeRecordID, from: db)
 
-            let activityTypeRecordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)")
+            let activityTypeRecordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)", zoneID: zoneID)
             let activityTypeRecord = try await fetchWithRetry(recordID: activityTypeRecordID, from: db)
 
             // Create domain model
@@ -553,11 +580,12 @@ class CloudKitDataService: ObservableObject {
                 longitude: longitude
             )
 
-            // Convert to CKRecord with parent references
+            // Convert to CKRecord with parent references in custom zone
             let record = try converter.activityToRecord(
                 activity,
                 parentCaree: careeRecord,
-                activityTypeRecord: activityTypeRecord
+                activityTypeRecord: activityTypeRecord,
+                zoneID: zoneID
             )
 
             // Save to CloudKit
@@ -595,14 +623,6 @@ class CloudKitDataService: ObservableObject {
     }
 
     /// Update an existing Activity
-    /// - Parameters:
-    ///   - activity: Activity to update
-    ///   - caree: Parent Caree
-    ///   - activityType: Associated ActivityType
-    ///   - dateTime: New dateTime (optional)
-    ///   - notes: New notes (optional)
-    ///   - quantity: New quantity (optional)
-    ///   - isShared: Whether parent caree is shared
     func updateActivity(
         _ activity: Activity,
         caree: Caree,
@@ -616,10 +636,13 @@ class CloudKitDataService: ObservableObject {
         syncStatus = .syncing
 
         do {
+            if isShared {
+                throw AppError.invalidInput("updateActivity for shared records is not supported here. Use CloudKitSharedDataService.")
+            }
             let db = database(for: isShared)
 
             // Fetch existing record
-            let recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)")
+            let recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)", zoneID: zoneID)
             let existingRecord = try await fetchWithRetry(recordID: recordID, from: db)
 
             // Update fields
@@ -668,16 +691,16 @@ class CloudKitDataService: ObservableObject {
     }
 
     /// Delete an Activity from CloudKit
-    /// - Parameters:
-    ///   - activity: Activity to delete
-    ///   - isShared: Whether parent caree is shared
     func deleteActivity(_ activity: Activity, isShared: Bool = false) async throws {
         logger.info("Deleting Activity: \(activity.id)")
         syncStatus = .syncing
 
         do {
+            if isShared {
+                throw AppError.invalidInput("deleteActivity for shared records is not supported here. Use CloudKitSharedDataService.")
+            }
             let db = database(for: isShared)
-            let recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)")
+            let recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)", zoneID: zoneID)
 
             try await deleteWithRetry(recordID: recordID, from: db)
 
@@ -704,11 +727,9 @@ class CloudKitDataService: ObservableObject {
     func deleteCustomZone() async throws {
         logger.warning("⚠️ Deleting custom CloudKit zone - all data will be destroyed")
 
-        let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
-
         do {
-            _ = try await container.privateCloudDatabase.deleteRecordZone(withID: zoneID)
-            logger.info("✅ Custom zone deleted: \(CloudKitConfig.zoneName)")
+            _ = try await container.privateCloudDatabase.deleteRecordZone(withID: self.zoneID)
+            logger.info("✅ Custom zone deleted: \(Self.zoneName)")
         } catch let error as CKError where error.code == .zoneNotFound {
             logger.info("Zone already deleted or doesn't exist")
         } catch {
@@ -719,14 +740,13 @@ class CloudKitDataService: ObservableObject {
 
     /// Recreate the custom CloudKit zone
     func recreateCustomZone() async throws {
-        logger.info("Creating custom CloudKit zone: \(CloudKitConfig.zoneName)")
+        logger.info("Creating custom CloudKit zone: \(Self.zoneName)")
 
-        let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
         let zone = CKRecordZone(zoneID: zoneID)
 
         do {
             _ = try await container.privateCloudDatabase.save(zone)
-            logger.info("✅ Custom zone created: \(CloudKitConfig.zoneName)")
+            logger.info("✅ Custom zone created: \(Self.zoneName)")
         } catch let error as CKError where error.code == .serverRecordChanged {
             // Zone already exists, which is fine
             logger.info("Zone already exists, continuing")
@@ -739,9 +759,6 @@ class CloudKitDataService: ObservableObject {
     // MARK: - Sync Verification
 
     /// Verify that a record exists in CloudKit
-    /// - Parameters:
-    ///   - recordID: CKRecord.ID to verify
-    ///   - database: Database to query
     /// - Returns: true if record exists
     func verifySynced(recordID: CKRecord.ID, in database: CKDatabase) async throws -> Bool {
         do {
@@ -755,11 +772,6 @@ class CloudKitDataService: ObservableObject {
     }
 
     /// Wait for a record to sync to CloudKit with timeout
-    /// - Parameters:
-    ///   - recordID: CKRecord.ID to wait for
-    ///   - database: Database to query
-    ///   - timeout: Maximum wait time in seconds
-    ///   - pollInterval: How often to check (default 0.5s)
     /// - Returns: true if record found before timeout
     func waitForSync(
         recordID: CKRecord.ID,

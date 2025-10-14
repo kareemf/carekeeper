@@ -7,6 +7,7 @@ class CloudKitSharingService: ObservableObject {
     private let container: CKContainer
     private let logger = AppLogger.sharing
     private let dataService: CloudKitDataService
+    private let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
 
     init(containerIdentifier: String = CloudKitConfig.containerID, dataService: CloudKitDataService? = nil) {
         self.container = CKContainer(identifier: containerIdentifier)
@@ -59,7 +60,10 @@ class CloudKitSharingService: ObservableObject {
 
         logger.info("🔍 Preparing to create share for Caree: \(caree.name)")
 
-        // Step 1: Verify Caree exists in CloudKit
+        // Ensure zone exists (owner's private database)
+        try await dataService.recreateCustomZone()
+
+        // Step 1: Verify Caree exists in CloudKit (in custom zone)
         guard let careeCKRecord = try await findCKRecord(for: caree) else {
             logger.error("❌ Caree not found in CloudKit")
             throw AppError.invalidInput("Caree not found in CloudKit. Please wait for sync to complete and try again.")
@@ -81,7 +85,6 @@ class CloudKitSharingService: ObservableObject {
 
             if missingParents > 0 {
                 logger.warning("⚠️ Warning: \(missingParents) ActivityTypes missing parent references")
-                // This shouldn't happen with CloudKitDataService, but log it for diagnostics
             }
 
             logger.info("✅ All \(verifiedCount) ActivityTypes verified")
@@ -100,7 +103,6 @@ class CloudKitSharingService: ObservableObject {
 
             if missingParents > 0 {
                 logger.warning("⚠️ Warning: \(missingParents) Activities missing parent references")
-                // This shouldn't happen with CloudKitDataService, but log it for diagnostics
             }
 
             logger.info("✅ All \(verifiedCount) Activities verified")
@@ -209,14 +211,12 @@ class CloudKitSharingService: ObservableObject {
     /// Verify all ActivityTypes for a Caree exist in CloudKit with parent references
     /// - Returns: (verifiedCount, missingParentCount)
     private func verifyActivityTypes(for caree: Caree) async throws -> (Int, Int) {
-        // Pure CloudKit: Query by parent reference to Caree record
-        let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
+        let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
         let parentReference = CKRecord.Reference(recordID: careeRecordID, action: .deleteSelf)
         let predicate = NSPredicate(format: "CD_caree == %@", parentReference)
         let query = CKQuery(recordType: "CD_ActivityType", predicate: predicate)
 
-        // Pure CloudKit: No zone specification (uses default zone)
-        let (results, _) = try await container.privateCloudDatabase.records(matching: query)
+        let (results, _) = try await container.privateCloudDatabase.records(matching: query, inZoneWith: zoneID)
 
         var verifiedCount = 0
         var missingParentCount = 0
@@ -224,8 +224,6 @@ class CloudKitSharingService: ObservableObject {
         for (_, result) in results {
             if case .success(let record) = result {
                 verifiedCount += 1
-
-                // Check parent reference
                 if record.parent == nil {
                     missingParentCount += 1
                     logger.warning("⚠️ ActivityType missing parent: \(record["CD_name"] as? String ?? "Unknown")")
@@ -239,14 +237,12 @@ class CloudKitSharingService: ObservableObject {
     /// Verify all Activities for a Caree exist in CloudKit with parent references
     /// - Returns: (verifiedCount, missingParentCount)
     private func verifyActivities(for caree: Caree) async throws -> (Int, Int) {
-        // Pure CloudKit: Query by parent reference to Caree record
-        let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
+        let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
         let parentReference = CKRecord.Reference(recordID: careeRecordID, action: .deleteSelf)
         let predicate = NSPredicate(format: "CD_caree == %@", parentReference)
         let query = CKQuery(recordType: "CD_Activity", predicate: predicate)
 
-        // Pure CloudKit: No zone specification (uses default zone)
-        let (results, _) = try await container.privateCloudDatabase.records(matching: query)
+        let (results, _) = try await container.privateCloudDatabase.records(matching: query, inZoneWith: zoneID)
 
         var verifiedCount = 0
         var missingParentCount = 0
@@ -254,8 +250,6 @@ class CloudKitSharingService: ObservableObject {
         for (_, result) in results {
             if case .success(let record) = result {
                 verifiedCount += 1
-
-                // Check parent reference
                 if record.parent == nil {
                     missingParentCount += 1
                     let dateTime = record["CD_dateTime"] as? Date ?? Date()
@@ -269,16 +263,13 @@ class CloudKitSharingService: ObservableObject {
 
     // MARK: - Private Helpers
 
-    /// Find the CloudKit record for a SwiftData Caree
-    /// Uses Pure CloudKit approach - direct record fetch by ID
+    /// Find the CloudKit record for a SwiftData Caree (in owner's custom zone)
     private func findCKRecord(for caree: Caree) async throws -> CKRecord? {
-        // Pure CloudKit: Record ID is CD_Caree/{UUID}
-        let recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
+        let recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
 
-        logger.info("🔍 Looking for CloudKit record: \(recordID.recordName)")
+        logger.info("🔍 Looking for CloudKit record: \(recordID.recordName) [zone: \(self.zoneID.zoneName)]")
 
         do {
-            // Carees being shared are always in the owner's private database
             let record = try await container.privateCloudDatabase.record(for: recordID)
 
             logger.info("✅ Found CloudKit record")

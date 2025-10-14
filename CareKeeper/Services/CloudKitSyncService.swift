@@ -5,23 +5,27 @@ import SwiftData
 @MainActor
 class CloudKitSyncService: ObservableObject {
     private let container = CKContainer(identifier: CloudKitConfig.containerID)
+    private let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
 
     /// Check if a caree has been synced to CloudKit
     /// Uses Pure CloudKit approach - checks for record by ID
     func isSynced(caree: Caree) async -> Bool {
         do {
             // Pure CloudKit: Record ID is CD_Caree/{UUID}
-            let recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
+            let recordID: CKRecord.ID
+            let isShared = caree.isShared
+
+            if isShared {
+                // Shared records live in shared database, zone unknown (varies per share)
+                recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
+            } else {
+                // Owner records live in custom zone in private database
+                recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
+            }
 
             print("🔍 Checking CloudKit for Caree record: \(recordID.recordName)")
 
-            // Check if this is a shared caree - they live in shared database
-            let isShared = caree.isShared
             let database = isShared ? container.sharedCloudDatabase : container.privateCloudDatabase
-
-            print("   Database: \(isShared ? "Shared" : "Private")")
-
-            // Try to fetch the record directly
             let record = try await database.record(for: recordID)
 
             print("✅ Record found in CloudKit!")
