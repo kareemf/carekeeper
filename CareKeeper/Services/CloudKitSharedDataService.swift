@@ -312,28 +312,13 @@ class CloudKitSharedDataService: ObservableObject {
 
         let parentCareeRecord = try await sharedDatabase.record(for: careeRecordID)
 
-        // Use converter to create record with proper parent reference
-        // Note: converter doesn't handle zoneID, so we need to create record with zone then update fields
-        let tempRecord = try converter.activityTypeToRecord(activityType, parentCaree: parentCareeRecord)
-
-        // Create new record with correct zoneID
-        let recordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)", zoneID: zoneID)
-        let record = CKRecord(recordType: "CD_ActivityType", recordID: recordID)
-
-        // CRITICAL: Set parent reference for CloudKit sharing hierarchy
-        // Parent references must use .none action (CloudKit requirement for sharing)
-        record.parent = CKRecord.Reference(record: parentCareeRecord, action: .none)
-
-        // Copy fields from converter output
-        record["CD_id"] = tempRecord["CD_id"]
-        record["CD_name"] = tempRecord["CD_name"]
-        record["CD_icon"] = tempRecord["CD_icon"]
-        record["CD_hasQuantity"] = tempRecord["CD_hasQuantity"]
-        record["CD_quantityUnit"] = tempRecord["CD_quantityUnit"]
-        record["CD_hasLocation"] = tempRecord["CD_hasLocation"]
-        record["CD_listOrder"] = tempRecord["CD_listOrder"]
-        record["CD_dateCreated"] = tempRecord["CD_dateCreated"]
-        record["CD_caree"] = tempRecord["CD_caree"]
+        // Build the record directly in the correct zone via the converter
+        let record = try converter.activityTypeToRecord(
+            activityType,
+            parentCaree: parentCareeRecord,
+            zoneID: zoneID,
+            existingRecord: nil
+        )
 
         logger.info("✅ Created ActivityType record with parent for shared database: \(activityType.name)")
         return record
@@ -349,32 +334,14 @@ class CloudKitSharedDataService: ObservableObject {
         let parentCareeRecord = try await sharedDatabase.record(for: careeRecordID)
         let activityTypeRecord = try await sharedDatabase.record(for: activityTypeRecordID)
 
-        // Use converter to create record with proper parent reference
-        let tempRecord = try converter.activityToRecord(
+        // Build the record directly in the correct zone via the converter
+        let record = try converter.activityToRecord(
             activity,
             parentCaree: parentCareeRecord,
-            activityTypeRecord: activityTypeRecord
+            activityTypeRecord: activityTypeRecord,
+            zoneID: zoneID,
+            existingRecord: nil
         )
-
-        // Create new record with correct zoneID
-        let recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)", zoneID: zoneID)
-        let record = CKRecord(recordType: "CD_Activity", recordID: recordID)
-
-        // CRITICAL: Set parent reference for CloudKit sharing hierarchy
-        // Parent references must use .none action (CloudKit requirement for sharing)
-        record.parent = CKRecord.Reference(record: parentCareeRecord, action: .none)
-
-        // Copy fields from converter output
-        record["CD_id"] = tempRecord["CD_id"]
-        record["CD_dateTime"] = tempRecord["CD_dateTime"]
-        record["CD_notes"] = tempRecord["CD_notes"]
-        record["CD_quantity"] = tempRecord["CD_quantity"]
-        record["CD_latitude"] = tempRecord["CD_latitude"]
-        record["CD_longitude"] = tempRecord["CD_longitude"]
-        record["CD_dateCreated"] = tempRecord["CD_dateCreated"]
-        record["CD_creatorUserRecordID"] = tempRecord["CD_creatorUserRecordID"]
-        record["CD_caree"] = tempRecord["CD_caree"]
-        record["CD_activityType"] = tempRecord["CD_activityType"]
 
         logger.info("✅ Created Activity record with parent for shared database at: \(activity.dateTime)")
         return record
