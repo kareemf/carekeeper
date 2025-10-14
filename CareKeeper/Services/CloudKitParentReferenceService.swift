@@ -45,28 +45,23 @@ class CloudKitParentReferenceService: ObservableObject {
 
     /// Find the CKRecord for a Caree
     private func findCareeRecord(_ caree: Caree) async throws -> CKRecord? {
-        let predicate = NSPredicate(format: "CD_id == %@", caree.id.uuidString)
-        let query = CKQuery(recordType: "CD_Caree", predicate: predicate)
-
-        let (results, _) = try await container.privateCloudDatabase.records(matching: query, inZoneWith: zoneID)
-
-        if let first = results.first {
-            let (_, result) = first
-            switch result {
-            case .success(let record):
-                return record
-            case .failure(let error):
-                throw error
+        let recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
+        do {
+            return try await container.privateCloudDatabase.record(for: recordID)
+        } catch let error as CKError {
+            if error.code == .unknownItem {
+                return nil
             }
+            throw error
         }
-
-        return nil
     }
 
     /// Fix parent references for all ActivityTypes belonging to a Caree
     private func fixActivityTypeParents(caree: Caree, parentRecord: CKRecord) async throws -> Int {
-        // Query for ActivityTypes that belong to this Caree
-        let predicate = NSPredicate(format: "CD_caree == %@", caree.id.uuidString)
+        // Query for ActivityTypes that belong to this Caree using a reference
+        // Use .none here for consistency with sharing constraints (predicate ignores action, but this avoids confusion)
+        let parentReference = CKRecord.Reference(recordID: parentRecord.recordID, action: .none)
+        let predicate = NSPredicate(format: "CD_caree == %@", parentReference)
         let query = CKQuery(recordType: "CD_ActivityType", predicate: predicate)
 
         let (results, _) = try await container.privateCloudDatabase.records(matching: query, inZoneWith: zoneID)
@@ -80,8 +75,8 @@ class CloudKitParentReferenceService: ObservableObject {
                 if record.parent?.recordID != parentRecord.recordID {
                     logger.info("     Setting parent for ActivityType: \(record["CD_name"] as? String ?? "Unknown")")
 
-                    // Set the parent reference
-                    record.setParent(parentRecord)
+                    // Explicitly set the parent reference with .none (required for sharing)
+                    record.parent = CKRecord.Reference(record: parentRecord, action: .none)
                     recordsToSave.append(record)
                 } else {
                     logger.info("     ActivityType already has correct parent: \(record["CD_name"] as? String ?? "Unknown")")
@@ -114,8 +109,10 @@ class CloudKitParentReferenceService: ObservableObject {
 
     /// Fix parent references for all Activities belonging to a Caree
     private func fixActivityParents(caree: Caree, parentRecord: CKRecord) async throws -> Int {
-        // Query for Activities that belong to this Caree
-        let predicate = NSPredicate(format: "CD_caree == %@", caree.id.uuidString)
+        // Query for Activities that belong to this Caree using a reference
+        // Use .none here for consistency with sharing constraints (predicate ignores action, but this avoids confusion)
+        let parentReference = CKRecord.Reference(recordID: parentRecord.recordID, action: .none)
+        let predicate = NSPredicate(format: "CD_caree == %@", parentReference)
         let query = CKQuery(recordType: "CD_Activity", predicate: predicate)
 
         let (results, _) = try await container.privateCloudDatabase.records(matching: query, inZoneWith: zoneID)
@@ -129,8 +126,8 @@ class CloudKitParentReferenceService: ObservableObject {
                 if record.parent?.recordID != parentRecord.recordID {
                     logger.info("     Setting parent for Activity: \(record["CD_dateTime"] as? Date ?? Date())")
 
-                    // Set the parent reference
-                    record.setParent(parentRecord)
+                    // Explicitly set the parent reference with .none (required for sharing)
+                    record.parent = CKRecord.Reference(record: parentRecord, action: .none)
                     recordsToSave.append(record)
                 } else {
                     logger.info("     Activity already has correct parent: \(record["CD_dateTime"] as? Date ?? Date())")
@@ -175,7 +172,8 @@ class CloudKitParentReferenceService: ObservableObject {
         var missingParents = 0
 
         // Check ActivityTypes
-        let activityTypePredicate = NSPredicate(format: "CD_caree == %@", caree.id.uuidString)
+        let activityTypePredicateRef = CKRecord.Reference(recordID: parentRecord.recordID, action: .none)
+        let activityTypePredicate = NSPredicate(format: "CD_caree == %@", activityTypePredicateRef)
         let activityTypeQuery = CKQuery(recordType: "CD_ActivityType", predicate: activityTypePredicate)
         let (activityTypeResults, _) = try await container.privateCloudDatabase.records(matching: activityTypeQuery, inZoneWith: zoneID)
 
@@ -190,7 +188,8 @@ class CloudKitParentReferenceService: ObservableObject {
         }
 
         // Check Activities
-        let activityPredicate = NSPredicate(format: "CD_caree == %@", caree.id.uuidString)
+        let activityPredicateRef = CKRecord.Reference(recordID: parentRecord.recordID, action: .none)
+        let activityPredicate = NSPredicate(format: "CD_caree == %@", activityPredicateRef)
         let activityQuery = CKQuery(recordType: "CD_Activity", predicate: activityPredicate)
         let (activityResults, _) = try await container.privateCloudDatabase.records(matching: activityQuery, inZoneWith: zoneID)
 
