@@ -13,7 +13,7 @@ struct CareeListView: View {
 
     // Pure CloudKit architecture: Cache service as source of truth
     @EnvironmentObject private var cloudKitService: CloudKitDataService
-    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    @EnvironmentObject private var sharedRecordsService: CloudKitSharedRecordsService
 
     // Cache service from cloudKitService (already initialized at app level)
     private var cacheService: LocalCacheService? {

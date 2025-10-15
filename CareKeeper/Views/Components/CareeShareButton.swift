@@ -9,6 +9,7 @@ struct CareeShareButton: View {
     let isMyCaree: Bool
 
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var sharedRecordsService: CloudKitSharedRecordsService
 
     @State private var showingShareSheet = false
     @State private var share: CKShare?
@@ -18,7 +19,6 @@ struct CareeShareButton: View {
     @State private var isShared = false
 
     private let sharingService = CloudKitSharingService()
-    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
     private let container = CKContainer(identifier: CloudKitConfig.containerID)
 
     var body: some View {

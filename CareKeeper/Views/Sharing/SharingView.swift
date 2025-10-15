@@ -20,7 +20,7 @@ struct SharingView: View {
     private let sharingService = CloudKitSharingService()
     
     // Service for fetching shared records
-    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    @EnvironmentObject private var sharedRecordsService: CloudKitSharedRecordsService
     
     // Combined list of all carees (private + shared)
     private var allCarees: [Caree] {

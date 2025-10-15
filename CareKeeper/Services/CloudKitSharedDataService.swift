@@ -75,12 +75,12 @@ class CloudKitSharedDataService: ObservableObject {
             throw AppError.invalidInput("Could not find ActivityType record in shared database")
         }
 
-        // Update record fields
+        // Update record fields (normalize Int 0/1 for hasQuantity/hasLocation to match schema)
         record["CD_name"] = activityType.name
         record["CD_icon"] = activityType.icon
-        record["CD_hasQuantity"] = activityType.hasQuantity
+        record["CD_hasQuantity"] = (activityType.hasQuantity ? 1 : 0) as CKRecordValue
         record["CD_quantityUnit"] = activityType.quantityUnit
-        record["CD_hasLocation"] = activityType.hasLocation
+        record["CD_hasLocation"] = (activityType.hasLocation ? 1 : 0) as CKRecordValue
         record["CD_listOrder"] = activityType.listOrder
 
         // Save updated record

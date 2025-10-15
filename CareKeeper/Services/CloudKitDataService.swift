@@ -32,6 +32,26 @@ class CloudKitDataService: ObservableObject {
 
     private(set) var cacheService: LocalCacheService?
 
+    // MARK: - Initialization
+
+    init() {
+        // Observe CloudKit push notifications and refresh owned data (private DB) reactively.
+        NotificationCenter.default.addObserver(
+            forName: NSNotification.Name("CloudKitNotificationReceived"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            Task { @MainActor in
+                do {
+                    try await self.refreshOwnedCareesFromCloudKit()
+                } catch {
+                    self.logger.warning("⚠️ Owned refresh failed after push: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
     // MARK: - Cache Integration
 
     /// Set the cache service for automatic caching of CloudKit operations
@@ -109,11 +129,6 @@ class CloudKitDataService: ObservableObject {
     // MARK: - Caree Operations
 
     /// Create a new Caree in CloudKit
-    /// - Parameters:
-    ///   - name: Caree name
-    ///   - imageData: Optional profile image
-    ///   - listOrder: Display order
-    /// - Returns: Created Caree with CloudKit sync confirmed
     func createCaree(name: String, imageData: Data?, listOrder: Int) async throws -> Caree {
         logger.info("Creating Caree: \(name)")
         syncStatus = .syncing
@@ -159,12 +174,6 @@ class CloudKitDataService: ObservableObject {
     }
 
     /// Update an existing Caree in CloudKit
-    /// - Parameters:
-    ///   - caree: Caree to update
-    ///   - name: New name (optional)
-    ///   - imageData: New image data (optional)
-    ///   - listOrder: New display order (optional)
-    ///   - isShared: Whether this is a shared caree
     func updateCaree(
         _ caree: Caree,
         name: String? = nil,
@@ -223,10 +232,6 @@ class CloudKitDataService: ObservableObject {
     }
 
     /// Delete a Caree from CloudKit with manual cascade deletion
-    /// Since parent references use .none action, we must manually delete children first
-    /// - Parameters:
-    ///   - caree: Caree to delete
-    ///   - isShared: Whether this is a shared caree
     func deleteCaree(_ caree: Caree, isShared: Bool = false) async throws {
         logger.info("Deleting Caree: \(caree.id)")
         syncStatus = .syncing
@@ -336,10 +341,6 @@ class CloudKitDataService: ObservableObject {
     }
 
     /// Fetch a specific Caree from CloudKit
-    /// - Parameters:
-    ///   - id: Caree UUID
-    ///   - isShared: Whether to query shared database
-    /// - Returns: Caree if found
     func fetchCaree(id: UUID, isShared: Bool = false) async throws -> Caree? {
         logger.info("Fetching Caree: \(id)")
 
@@ -363,7 +364,6 @@ class CloudKitDataService: ObservableObject {
     }
 
     /// Fetch all Carees from private database
-    /// - Returns: Array of Carees
     func fetchAllCarees() async throws -> [Caree] {
         logger.info("Fetching all Carees from private database")
 
@@ -393,8 +393,6 @@ class CloudKitDataService: ObservableObject {
 
     // MARK: - ActivityType Operations
 
-    /// Create a new ActivityType for a Caree
-    /// - Returns: Created ActivityType
     func createActivityType(
         for caree: Caree,
         name: String,
@@ -461,7 +459,6 @@ class CloudKitDataService: ObservableObject {
         }
     }
 
-    /// Update an existing ActivityType
     func updateActivityType(
         _ activityType: ActivityType,
         caree: Caree,
@@ -530,7 +527,6 @@ class CloudKitDataService: ObservableObject {
         }
     }
 
-    /// Delete an ActivityType from CloudKit
     func deleteActivityType(_ activityType: ActivityType, isShared: Bool = false) async throws {
         logger.info("Deleting ActivityType: \(activityType.id)")
         syncStatus = .syncing
@@ -562,8 +558,6 @@ class CloudKitDataService: ObservableObject {
 
     // MARK: - Activity Operations
 
-    /// Create a new Activity
-    /// - Returns: Created Activity
     func createActivity(
         for caree: Caree,
         activityType: ActivityType,
@@ -641,7 +635,6 @@ class CloudKitDataService: ObservableObject {
         }
     }
 
-    /// Update an existing Activity
     func updateActivity(
         _ activity: Activity,
         caree: Caree,
@@ -710,7 +703,6 @@ class CloudKitDataService: ObservableObject {
         }
     }
 
-    /// Delete an Activity from CloudKit
     func deleteActivity(_ activity: Activity, isShared: Bool = false) async throws {
         logger.info("Deleting Activity: \(activity.id)")
         syncStatus = .syncing
@@ -740,10 +732,156 @@ class CloudKitDataService: ObservableObject {
         }
     }
 
+    // MARK: - Reactive owned refresh (private DB)
+
+    /// Fetch all owned (private DB) carees, activity types, and activities and update LocalCacheService.
+    /// Posts "CloudKitBackgroundRefreshFinished" when done so AppDelegate can finish the background task.
+    func refreshOwnedCareesFromCloudKit() async throws {
+        logger.info("🔄 Refreshing owned records from private database (reactive)")
+
+        // Ensure zone exists
+        try? await ensureCustomZoneExists()
+
+        // Query all three record types in the custom zone
+        let privateDB = container.privateCloudDatabase
+
+        // Carees
+        let careeQuery = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
+        let (careeResults, _) = try await privateDB.records(matching: careeQuery, inZoneWith: zoneID)
+        var careeRecords: [CKRecord] = []
+        for (_, result) in careeResults {
+            switch result {
+            case .success(let record): careeRecords.append(record)
+            case .failure(let error): logger.warning("⚠️ Failed caree record fetch: \(error.localizedDescription)")
+            }
+        }
+
+        // ActivityTypes
+        let atQuery = CKQuery(recordType: "CD_ActivityType", predicate: NSPredicate(value: true))
+        let (atResults, _) = try await privateDB.records(matching: atQuery, inZoneWith: zoneID)
+        var atRecords: [CKRecord] = []
+        for (_, result) in atResults {
+            switch result {
+            case .success(let record): atRecords.append(record)
+            case .failure(let error): logger.warning("⚠️ Failed activity type record fetch: \(error.localizedDescription)")
+            }
+        }
+
+        // Activities
+        let aQuery = CKQuery(recordType: "CD_Activity", predicate: NSPredicate(value: true))
+        let (aResults, _) = try await privateDB.records(matching: aQuery, inZoneWith: zoneID)
+        var aRecords: [CKRecord] = []
+        for (_, result) in aResults {
+            switch result {
+            case .success(let record): aRecords.append(record)
+            case .failure(let error): logger.warning("⚠️ Failed activity record fetch: \(error.localizedDescription)")
+            }
+        }
+
+        // Convert and cache
+        guard let cacheService = cacheService else {
+            logger.info("ℹ️ No cacheService; skipping cache update")
+            NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
+            return
+        }
+
+        // Convert carees first
+        var careesByID: [UUID: Caree] = [:]
+        for record in careeRecords {
+            do {
+                let caree = try await converter.recordToCaree(record)
+                careesByID[caree.id] = caree
+            } catch {
+                logger.warning("⚠️ Convert caree failed: \(error.localizedDescription)")
+            }
+        }
+
+        // Convert activity types and attach to carees
+        var activityTypesByID: [UUID: ActivityType] = [:]
+        for record in atRecords {
+            do {
+                let at = try converter.recordToActivityType(record)
+                activityTypesByID[at.id] = at
+
+                // Attach to parent via CD_caree reference
+                if let careeRef = record["CD_caree"] as? CKRecord.Reference,
+                   let careeIDStr = careeRef.recordID.recordName.split(separator: "/").last,
+                   let careeID = UUID(uuidString: String(careeIDStr)),
+                   let parentCaree = careesByID[careeID] {
+                    if parentCaree.activityTypes == nil { parentCaree.activityTypes = [] }
+                    at.caree = parentCaree
+                    parentCaree.activityTypes?.append(at)
+                }
+            } catch {
+                logger.warning("⚠️ Convert activity type failed: \(error.localizedDescription)")
+            }
+        }
+
+        // Convert activities and attach to both
+        for record in aRecords {
+            do {
+                let activity = try converter.recordToActivity(record)
+
+                // Attach to activity type
+                if let atRef = record["CD_activityType"] as? CKRecord.Reference,
+                   let atIDStr = atRef.recordID.recordName.split(separator: "/").last,
+                   let atID = UUID(uuidString: String(atIDStr)),
+                   let at = activityTypesByID[atID] {
+                    if at.activities == nil { at.activities = [] }
+                    activity.activityType = at
+                    at.activities?.append(activity)
+                }
+
+                // Attach to caree
+                if let careeRef = record["CD_caree"] as? CKRecord.Reference,
+                   let careeIDStr = careeRef.recordID.recordName.split(separator: "/").last,
+                   let careeID = UUID(uuidString: String(careeIDStr)),
+                   let parentCaree = careesByID[careeID] {
+                    if parentCaree.activities == nil { parentCaree.activities = [] }
+                    activity.caree = parentCaree
+                    parentCaree.activities?.append(activity)
+                }
+            } catch {
+                logger.warning("⚠️ Convert activity failed: \(error.localizedDescription)")
+            }
+        }
+
+        // Remove owned carees from cache that no longer exist remotely
+        let fetchedOwnedIDs = Set(careesByID.keys)
+        let existingOwned = cacheService.myCarees
+        for cached in existingOwned where !fetchedOwnedIDs.contains(cached.id) {
+            do {
+                logger.info("🧹 Removing deleted owned caree from cache: \(cached.name)")
+                try await cacheService.removeCachedCaree(cached)
+            } catch {
+                logger.warning("⚠️ Failed removing cached owned caree: \(error.localizedDescription)")
+            }
+        }
+
+        // Upsert everything into cache
+        for caree in careesByID.values.sorted(by: { $0.listOrder < $1.listOrder }) {
+            do {
+                try await cacheService.cacheCaree(caree, isShared: false)
+                for at in (caree.activityTypes ?? []) {
+                    try await cacheService.cacheActivityType(at, for: caree)
+                }
+                for activity in (caree.activities ?? []) {
+                    if let at = activity.activityType {
+                        try await cacheService.cacheActivity(activity, for: caree, activityType: at)
+                    }
+                }
+            } catch {
+                logger.warning("⚠️ Failed caching owned records: \(error.localizedDescription)")
+            }
+        }
+
+        await cacheService.refreshPublishedProperties()
+        NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
+        logger.info("✅ Owned records refreshed and cache updated")
+    }
+
     // MARK: - Zone Management (for Migration)
 
-    /// Delete the custom CloudKit zone (destroys all records)
-    /// WARNING: This permanently deletes all data in the zone
     func deleteCustomZone() async throws {
         logger.warning("⚠️ Deleting custom CloudKit zone - all data will be destroyed")
 
@@ -758,7 +896,6 @@ class CloudKitDataService: ObservableObject {
         }
     }
 
-    /// Recreate the custom CloudKit zone
     func recreateCustomZone() async throws {
         logger.info("Creating custom CloudKit zone: \(Self.zoneName)")
 
@@ -768,7 +905,6 @@ class CloudKitDataService: ObservableObject {
             _ = try await container.privateCloudDatabase.save(zone)
             logger.info("✅ Custom zone created: \(Self.zoneName)")
         } catch let error as CKError where error.code == .serverRecordChanged {
-            // Zone already exists, which is fine
             logger.info("Zone already exists, continuing")
         } catch {
             logger.error("❌ Failed to create zone: \(error.localizedDescription)")
@@ -778,8 +914,6 @@ class CloudKitDataService: ObservableObject {
 
     // MARK: - Sync Verification
 
-    /// Verify that a record exists in CloudKit
-    /// - Returns: true if record exists
     func verifySynced(recordID: CKRecord.ID, in database: CKDatabase) async throws -> Bool {
         do {
             _ = try await database.record(for: recordID)
@@ -791,8 +925,6 @@ class CloudKitDataService: ObservableObject {
         }
     }
 
-    /// Wait for a record to sync to CloudKit with timeout
-    /// - Returns: true if record found before timeout
     func waitForSync(
         recordID: CKRecord.ID,
         in database: CKDatabase,
@@ -816,7 +948,6 @@ class CloudKitDataService: ObservableObject {
 
     // MARK: - Retry Logic
 
-    /// Save a record with automatic retry on network failures
     private func saveWithRetry(_ record: CKRecord, to database: CKDatabase) async throws -> CKRecord {
         var attempt = 0
         var lastError: Error?
@@ -834,16 +965,14 @@ class CloudKitDataService: ObservableObject {
                 logger.warning("⚠️ Save failed (attempt \(attempt)/\(self.maxRetries)), retrying: \(error.localizedDescription)")
                 try await Task.sleep(nanoseconds: UInt64(self.retryDelay * Double(attempt) * 1_000_000_000))
             } catch {
-                // Non-retryable error, throw immediately
+                logger.error("Save failed with non-retryable error: \(error, privacy: .public)")
                 throw error
             }
         }
 
-        // Max retries exceeded
         throw lastError ?? DataServiceError.maxRetriesExceeded
     }
 
-    /// Fetch a record with automatic retry on network failures
     private func fetchWithRetry(recordID: CKRecord.ID, from database: CKDatabase) async throws -> CKRecord {
         var attempt = 0
         var lastError: Error?
@@ -861,16 +990,14 @@ class CloudKitDataService: ObservableObject {
                 logger.warning("⚠️ Fetch failed (attempt \(attempt)/\(self.maxRetries)), retrying: \(error.localizedDescription)")
                 try await Task.sleep(nanoseconds: UInt64(self.retryDelay * Double(attempt) * 1_000_000_000))
             } catch {
-                // Non-retryable error, throw immediately
+                logger.error("Fetch failed with non-retryable error: \(error, privacy: .public)")
                 throw error
             }
         }
 
-        // Max retries exceeded
         throw lastError ?? DataServiceError.maxRetriesExceeded
     }
 
-    /// Delete a record with automatic retry on network failures
     private func deleteWithRetry(recordID: CKRecord.ID, from database: CKDatabase) async throws {
         var attempt = 0
         var lastError: Error?
@@ -888,12 +1015,11 @@ class CloudKitDataService: ObservableObject {
                 logger.warning("⚠️ Delete failed (attempt \(attempt)/\(self.maxRetries)), retrying: \(error.localizedDescription)")
                 try await Task.sleep(nanoseconds: UInt64(self.retryDelay * Double(attempt) * 1_000_000_000))
             } catch {
-                // Non-retryable error, throw immediately
+                logger.error("Delete failed with non-retryable error: \(error, privacy: .public)")
                 throw error
             }
         }
 
-        // Max retries exceeded
         throw lastError ?? DataServiceError.maxRetriesExceeded
     }
 }

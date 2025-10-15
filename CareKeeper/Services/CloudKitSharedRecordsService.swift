@@ -9,6 +9,8 @@ class CloudKitSharedRecordsService: ObservableObject {
     private let container = CKContainer(identifier: CloudKitConfig.containerID)
     private let logger = AppLogger.cloudkit
 
+    var cacheService: LocalCacheService?
+
     @Published var sharedCarees: [Caree] = []
     @Published var sharesByCareeID: [UUID: CKShare] = [:]
     @Published var isLoading = false
@@ -16,6 +18,10 @@ class CloudKitSharedRecordsService: ObservableObject {
 
     init() {
         setupNotificationObservers()
+    }
+
+    func setCacheService(_ cacheService: LocalCacheService) {
+        self.cacheService = cacheService
     }
 
     /// Setup notification observers for automatic refresh on CloudKit changes
@@ -46,45 +52,34 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
 
         // For any CloudKit change, refresh the shared carees
-        // The zone-based query will automatically reflect the current state
         await fetchSharedCarees()
     }
 
     /// Handle query notifications for new activities
-    /// Presents a local notification if the activity was created by another user
     private func handleNewActivityNotification(_ queryNotification: CKQueryNotification) async {
         logger.info("🔔 New activity query notification received")
 
-        // Extract record ID from notification
         guard let recordID = queryNotification.recordID,
               recordID.recordName.hasPrefix("CD_Activity/") else {
             logger.warning("⚠️ Query notification is not for a CD_Activity record")
             return
         }
 
-        // Fetch the activity record to get full details
         do {
             let sharedDatabase = container.sharedCloudDatabase
             let record = try await sharedDatabase.record(for: recordID)
 
-            // Check if activity was created by current user
             let creatorID = record["CD_creatorUserRecordID"] as? String
             let currentUserID = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
+            if creatorID == currentUserID { return }
 
-            if creatorID == currentUserID {
-                logger.info("🙅 Skipping notification - activity created by current user")
-                return
-            }
-
-            // Extract activity details
-            guard let careeIDString = record["CD_id"] as? String,
-                  let activityID = UUID(uuidString: careeIDString),
+            guard let cdId = record["CD_id"] as? String,
+                  let activityID = UUID(uuidString: cdId),
                   let dateTime = record["CD_dateTime"] as? Date else {
                 logger.warning("⚠️ Activity record missing required fields")
                 return
             }
 
-            // Get caree ID from reference
             guard let careeReference = record["CD_caree"] as? CKRecord.Reference,
                   let careeIDFromRef = careeReference.recordID.recordName.components(separatedBy: "/").last,
                   let careeID = UUID(uuidString: careeIDFromRef) else {
@@ -92,52 +87,35 @@ class CloudKitSharedRecordsService: ObservableObject {
                 return
             }
 
-            // Check user preferences
             let prefs = UserNotificationPreferences.shared
-            guard prefs.isEnabled(for: careeID) else {
-                logger.info("🔕 Notifications disabled for this caree")
-                return
-            }
+            guard prefs.isEnabled(for: careeID) else { return }
 
-            // Fetch caree and activity type names for notification content
-            // We need to fetch these from CloudKit since we don't have them in the notification
             let careeRecord = try await sharedDatabase.record(for: careeReference.recordID)
             let careeName = careeRecord["CD_name"] as? String ?? "Unknown"
 
             var activityTypeName = "Activity"
             if let activityTypeRef = record["CD_activityType"] as? CKRecord.Reference {
-                do {
-                    let activityTypeRecord = try await sharedDatabase.record(for: activityTypeRef.recordID)
+                if let activityTypeRecord = try? await sharedDatabase.record(for: activityTypeRef.recordID) {
                     activityTypeName = activityTypeRecord["CD_name"] as? String ?? "Activity"
-                } catch {
-                    logger.warning("⚠️ Could not fetch activity type name: \(error.localizedDescription)")
                 }
             }
 
-            // Present notification
             let notificationService = UserNotificationService.shared
             await notificationService.presentNewActivityNotification(
                 activityID: activityID,
                 careeID: careeID,
                 careeName: careeName,
                 activityTypeName: activityTypeName,
-                creatorName: "Another caregiver", // We can't easily get the creator's name
+                creatorName: "Another caregiver",
                 timestamp: dateTime
             )
-
-            logger.info("✅ Presented notification for new activity on \(careeName)")
 
         } catch {
             logger.error("❌ Failed to handle activity notification: \(error.localizedDescription)")
         }
     }
 
-    /// Fetch shared Caree records with their ActivityTypes and Activities using zone-based discovery:
-    /// 1. Fetch all zones from the shared database
-    /// 2. Query each zone for CD_Caree records
-    /// 3. Query each zone for CD_ActivityType records
-    /// 4. Query each zone for CD_Activity records
-    /// 5. Convert CloudKit records to temporary objects with relationships populated
+    /// Fetch shared Caree records with their ActivityTypes and Activities using zone-based discovery
     func fetchSharedCarees() async {
         await MainActor.run {
             isLoading = true
@@ -148,11 +126,9 @@ class CloudKitSharedRecordsService: ObservableObject {
             let sharedDatabase = container.sharedCloudDatabase
 
             // Step 1: Fetch all zones in the shared database
-            // Each accepted share creates a zone with the owner's records
             let zones = try await sharedDatabase.allRecordZones()
             logger.info("📱 Found \(zones.count, privacy: .public) shared zones")
 
-            // Log all zone names for diagnostics
             for zone in zones {
                 logger.info("   Zone: \(zone.zoneID.zoneName, privacy: .public) (owner: \(zone.zoneID.ownerName, privacy: .public))")
             }
@@ -160,41 +136,34 @@ class CloudKitSharedRecordsService: ObservableObject {
             if zones.isEmpty {
                 await MainActor.run {
                     self.sharedCarees = []
+                    self.sharesByCareeID = [:]
                     self.isLoading = false
                 }
+                await applySharedResultsToCache([])
+                NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
                 return
             }
 
-            // Step 2: Query each zone for CD_Caree, CD_ActivityType, and CD_Activity records
+            // Step 2: Query each zone
             var allCareeRecords: [CKRecord] = []
             var allActivityTypeRecords: [CKRecord] = []
             var allActivityRecords: [CKRecord] = []
             var shares: [UUID: CKShare] = [:]
 
             for zone in zones {
-                // Skip the default zone - only query custom zones (which are created for shares)
-                if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName {
-                    continue
-                }
+                if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
 
                 logger.info("🔍 Querying zone: \(zone.zoneID.zoneName, privacy: .public)")
 
-                // Query for Carees
-                let careeQuery = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
+                // Carees
                 do {
-                    let (matchResults, _) = try await sharedDatabase.records(
-                        matching: careeQuery,
-                        inZoneWith: zone.zoneID
-                    )
-
-                    // Extract successful records and fetch their shares
+                    let careeQuery = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
+                    let (matchResults, _) = try await sharedDatabase.records(matching: careeQuery, inZoneWith: zone.zoneID)
                     for (_, result) in matchResults {
                         switch result {
                         case .success(let record):
                             allCareeRecords.append(record)
                             logger.info("  ✅ Found caree: \(record["CD_name"] as? String ?? "unknown")")
-
-                            // Fetch the CKShare for this record
                             if let shareReference = record.share {
                                 do {
                                     let shareRecord = try await sharedDatabase.record(for: shareReference.recordID)
@@ -216,14 +185,10 @@ class CloudKitSharedRecordsService: ObservableObject {
                     logger.warning("  ⚠️ Failed to query carees in zone \(zone.zoneID.zoneName): \(error.localizedDescription)")
                 }
 
-                // Query for ActivityTypes
-                let activityTypeQuery = CKQuery(recordType: "CD_ActivityType", predicate: NSPredicate(value: true))
+                // ActivityTypes
                 do {
-                    let (matchResults, _) = try await sharedDatabase.records(
-                        matching: activityTypeQuery,
-                        inZoneWith: zone.zoneID
-                    )
-
+                    let activityTypeQuery = CKQuery(recordType: "CD_ActivityType", predicate: NSPredicate(value: true))
+                    let (matchResults, _) = try await sharedDatabase.records(matching: activityTypeQuery, inZoneWith: zone.zoneID)
                     for (_, result) in matchResults {
                         switch result {
                         case .success(let record):
@@ -237,14 +202,10 @@ class CloudKitSharedRecordsService: ObservableObject {
                     logger.warning("  ⚠️ Failed to query activity types in zone \(zone.zoneID.zoneName): \(error.localizedDescription)")
                 }
 
-                // Query for Activities
-                let activityQuery = CKQuery(recordType: "CD_Activity", predicate: NSPredicate(value: true))
+                // Activities
                 do {
-                    let (matchResults, _) = try await sharedDatabase.records(
-                        matching: activityQuery,
-                        inZoneWith: zone.zoneID
-                    )
-
+                    let activityQuery = CKQuery(recordType: "CD_Activity", predicate: NSPredicate(value: true))
+                    let (matchResults, _) = try await sharedDatabase.records(matching: activityQuery, inZoneWith: zone.zoneID)
                     for (_, result) in matchResults {
                         switch result {
                         case .success(let record):
@@ -270,8 +231,12 @@ class CloudKitSharedRecordsService: ObservableObject {
                 self.sharedCarees = carees
                 self.sharesByCareeID = shares
                 self.isLoading = false
-                logger.info("✅ Successfully fetched \(carees.count, privacy: .public) shared carees with \(shares.count, privacy: .public) shares from \(zones.count - 1, privacy: .public) zones")
+                logger.info("✅ Successfully fetched \(carees.count, privacy: .public) shared carees with \(shares.count, privacy: .public) shares")
             }
+
+            // Step 4: Push results into LocalCacheService so UI updates automatically
+            await applySharedResultsToCache(carees)
+            NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
 
         } catch {
             await MainActor.run {
@@ -279,11 +244,10 @@ class CloudKitSharedRecordsService: ObservableObject {
                 self.isLoading = false
                 logger.error("❌ Failed to fetch shared carees: \(error.localizedDescription)")
             }
+            NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
         }
     }
 
-    /// Convert CloudKit records to temporary objects for display with relationships populated
-    /// These are not persisted in SwiftData - they're ephemeral representations of shared data
     private func convertRecordsToCarees(
         _ careeRecords: [CKRecord],
         activityTypeRecords: [CKRecord],
@@ -292,7 +256,6 @@ class CloudKitSharedRecordsService: ObservableObject {
         var careesByID: [UUID: Caree] = [:]
         var activityTypesByID: [UUID: ActivityType] = [:]
 
-        // Step 1: Create Caree objects
         for record in careeRecords {
             guard let cdId = record["CD_id"] as? String,
                   let uuid = UUID(uuidString: cdId),
@@ -301,10 +264,7 @@ class CloudKitSharedRecordsService: ObservableObject {
                 continue
             }
 
-            let caree = Caree(
-                name: name,
-                listOrder: record["CD_listOrder"] as? Int ?? 0
-            )
+            let caree = Caree(name: name, listOrder: record["CD_listOrder"] as? Int ?? 0)
             caree.id = uuid
 
             if let imageAsset = record["CD_image_ckAsset"] as? CKAsset,
@@ -320,7 +280,6 @@ class CloudKitSharedRecordsService: ObservableObject {
             careesByID[uuid] = caree
         }
 
-        // Step 2: Create ActivityType objects and link to Carees
         for record in activityTypeRecords {
             guard let cdId = record["CD_id"] as? String,
                   let uuid = UUID(uuidString: cdId),
@@ -329,12 +288,15 @@ class CloudKitSharedRecordsService: ObservableObject {
                 continue
             }
 
+            let hasQuantityInt = record["CD_hasQuantity"] as? Int ?? 0
+            let hasLocationInt = record["CD_hasLocation"] as? Int ?? 0
+
             let activityType = ActivityType(
                 name: name,
                 icon: record["CD_icon"] as? String,
-                hasQuantity: record["CD_hasQuantity"] as? Bool ?? false,
+                hasQuantity: hasQuantityInt != 0,
                 quantityUnit: record["CD_quantityUnit"] as? String,
-                hasLocation: record["CD_hasLocation"] as? Bool ?? false,
+                hasLocation: hasLocationInt != 0,
                 listOrder: record["CD_listOrder"] as? Int ?? 0
             )
             activityType.id = uuid
@@ -343,22 +305,18 @@ class CloudKitSharedRecordsService: ObservableObject {
                 activityType.dateCreated = dateCreated
             }
 
-            // Link to caree via CD_caree reference
             if let careeReference = record["CD_caree"] as? CKRecord.Reference,
                let careeIDString = careeReference.recordID.recordName.components(separatedBy: "/").last,
                let careeUUID = UUID(uuidString: careeIDString),
                let caree = careesByID[careeUUID] {
                 activityType.caree = caree
-                if caree.activityTypes == nil {
-                    caree.activityTypes = []
-                }
+                if caree.activityTypes == nil { caree.activityTypes = [] }
                 caree.activityTypes?.append(activityType)
             }
 
             activityTypesByID[uuid] = activityType
         }
 
-        // Step 3: Create Activity objects and link to ActivityTypes and Carees
         for record in activityRecords {
             guard let cdId = record["CD_id"] as? String,
                   let uuid = UUID(uuidString: cdId),
@@ -380,31 +338,61 @@ class CloudKitSharedRecordsService: ObservableObject {
                 activity.dateCreated = dateCreated
             }
 
-            // Link to activity type via CD_activityType reference
             if let activityTypeReference = record["CD_activityType"] as? CKRecord.Reference,
                let activityTypeIDString = activityTypeReference.recordID.recordName.components(separatedBy: "/").last,
                let activityTypeUUID = UUID(uuidString: activityTypeIDString),
                let activityType = activityTypesByID[activityTypeUUID] {
                 activity.activityType = activityType
-                if activityType.activities == nil {
-                    activityType.activities = []
-                }
+                if activityType.activities == nil { activityType.activities = [] }
                 activityType.activities?.append(activity)
             }
 
-            // Link to caree via CD_caree reference
             if let careeReference = record["CD_caree"] as? CKRecord.Reference,
                let careeIDString = careeReference.recordID.recordName.components(separatedBy: "/").last,
                let careeUUID = UUID(uuidString: careeIDString),
                let caree = careesByID[careeUUID] {
                 activity.caree = caree
-                if caree.activities == nil {
-                    caree.activities = []
-                }
+                if caree.activities == nil { caree.activities = [] }
                 caree.activities?.append(activity)
             }
         }
 
         return Array(careesByID.values).sorted { $0.listOrder < $1.listOrder }
+    }
+
+    private func applySharedResultsToCache(_ carees: [Caree]) async {
+        guard let cacheService = cacheService else {
+            logger.info("ℹ️ No cacheService injected; skipping cache update.")
+            return
+        }
+
+        let fetchedIDs = Set(carees.map { $0.id })
+        let existingShared = cacheService.sharedCarees
+        for cached in existingShared where !fetchedIDs.contains(cached.id) {
+            do {
+                logger.info("🧹 Removing unshared/deleted caree from cache: \(cached.name)")
+                try await cacheService.removeCachedCaree(cached)
+            } catch {
+                logger.warning("⚠️ Failed removing cached caree: \(error.localizedDescription)")
+            }
+        }
+
+        for caree in carees {
+            do {
+                try await cacheService.cacheCaree(caree, isShared: true)
+                for activityType in (caree.activityTypes ?? []) {
+                    try await cacheService.cacheActivityType(activityType, for: caree)
+                }
+                for activity in (caree.activities ?? []) {
+                    if let activityType = activity.activityType {
+                        try await cacheService.cacheActivity(activity, for: caree, activityType: activityType)
+                    }
+                }
+            } catch {
+                logger.warning("⚠️ Failed caching shared records: \(error.localizedDescription)")
+            }
+        }
+
+        await cacheService.refreshPublishedProperties()
     }
 }

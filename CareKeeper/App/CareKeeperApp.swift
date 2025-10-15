@@ -127,11 +127,13 @@ struct CareKeeperApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(cloudKitService)
+                .environmentObject(sharedRecordsService)
                 .task {
                     // Initialize cache service with modelContainer's mainContext
                     if cacheService == nil {
                         cacheService = LocalCacheService(modelContext: sharedModelContainer.mainContext)
                         cloudKitService.setCacheService(cacheService!)
+                        sharedRecordsService.setCacheService(cacheService!)
                         AppLogger.app.info("✅ Shared CloudKitDataService and LocalCacheService initialized")
                     }
                 }
