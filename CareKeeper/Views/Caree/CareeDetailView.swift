@@ -18,14 +18,16 @@ struct CareeDetailView: View {
         cloudKitService.cacheService
     }
 
-    // Get the specific caree from cache
-    private var caree: Caree? {
+    // Keep a resilient, last-known reference to the Caree while refreshes occur
+    @State private var resolvedCaree: Caree?
+    // Fast accessor to try resolving from cache
+    private func resolveCareeFromCache() -> Caree? {
         cacheService?.getCachedCaree(id: careeID)
     }
 
     // Check if this is one of my owned carees (vs shared)
     private var isMyCaree: Bool {
-        caree?.isOwned ?? true
+        (resolvedCaree?.isOwned) ?? true
     }
 
     @State private var showingEditCaree = false
@@ -62,7 +64,7 @@ struct CareeDetailView: View {
                     Text(NSLocalizedString("Loading...", comment: "Loading shared caree message"))
                         .foregroundColor(.secondary)
                 }
-            } else if let caree = caree {
+            } else if let caree = resolvedCaree {
                 List {
                     Section {
                         headerSection(for: caree)
@@ -237,35 +239,52 @@ struct CareeDetailView: View {
             }
         }
         .task {
-            // Refresh cache to load caree
+            // Initial resolve
+            resolvedCaree = resolveCareeFromCache()
+
+            // Light-weight cache refresh (debounced/coalesced)
             try? await cacheService?.refreshCache()
 
-            // Only fetch shared carees if this caree is not in cache yet or is shared
-            if caree == nil || caree?.isShared == true {
+            // If this caree is missing or shared, fetch shared carees (service will update cache in batch)
+            if resolvedCaree == nil || resolvedCaree?.isShared == true {
                 isLoadingSharedCaree = true
                 await sharedRecordsService.fetchSharedCarees()
+                // Re-resolve after fetch completes
+                resolvedCaree = resolveCareeFromCache()
                 isLoadingSharedCaree = false
             }
 
-            if let caree = self.caree {
+            if let caree = self.resolvedCaree {
                 await checkSyncStatus(for: caree)
             }
         }
         .task(id: careeID) {
             // Refresh when caree ID changes
+            resolvedCaree = resolveCareeFromCache()
             try? await cacheService?.refreshCache()
 
-            if caree == nil || caree?.isShared == true {
+            if resolvedCaree == nil || resolvedCaree?.isShared == true {
                 isLoadingSharedCaree = true
                 await sharedRecordsService.fetchSharedCarees()
+                resolvedCaree = resolveCareeFromCache()
                 isLoadingSharedCaree = false
             }
+        }
+        // Re-resolve after any shared refresh completes (both services post this)
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CloudKitBackgroundRefreshFinished"))) { _ in
+            resolvedCaree = resolveCareeFromCache()
+            isLoadingSharedCaree = false
+        }
+        // Also re-resolve when the in-memory shared list changes
+        .onChange(of: sharedRecordsService.sharedCarees) { _ in
+            resolvedCaree = resolveCareeFromCache()
+            isLoadingSharedCaree = false
         }
         .errorAlert($error)
     }
     
     private func deleteActivityType(_ activityType: ActivityType) {
-        guard let caree = caree else { return }
+        guard let caree = resolvedCaree else { return }
 
         Task {
             do {
@@ -286,7 +305,7 @@ struct CareeDetailView: View {
     }
 
     private func deleteActivity(_ activity: Activity) {
-        guard let caree = caree else { return }
+        guard let caree = resolvedCaree else { return }
 
         Task {
             do {
@@ -307,7 +326,7 @@ struct CareeDetailView: View {
     }
 
     private func moveActivityTypes(from source: IndexSet, to destination: Int) {
-        guard let caree = caree else { return }
+        guard let caree = resolvedCaree else { return }
 
         var updatedActivityTypes = caree.sortedActivityTypes
         updatedActivityTypes.move(fromOffsets: source, toOffset: destination)
@@ -485,7 +504,10 @@ struct CareeDetailView: View {
 
         // If this is a shared caree, fetch shared data from CloudKit (service will update cache)
         if caree.isShared {
+            isLoadingSharedCaree = true
             await sharedRecordsService.fetchSharedCarees()
+            resolvedCaree = resolveCareeFromCache()
+            isLoadingSharedCaree = false
         }
 
         // Invalidate and refresh the cache to get latest data
@@ -554,3 +576,4 @@ struct ExportItem: Identifiable {
     }
     .modelContainer(PreviewContainer.shared)
 }
+

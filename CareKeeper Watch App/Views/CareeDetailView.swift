@@ -15,8 +15,11 @@ struct CareeDetailView: View {
         cloudKitService.cacheService
     }
 
-    // Get the specific caree from cache
-    private var caree: Caree? {
+    // Keep a resilient, last-known reference to the Caree while refreshes occur
+    @State private var resolvedCaree: Caree?
+
+    // Fast accessor to try resolving from cache
+    private func resolveCareeFromCache() -> Caree? {
         cacheService?.getCachedCaree(id: careeID)
     }
 
@@ -40,7 +43,7 @@ struct CareeDetailView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-            } else if let caree = caree {
+            } else if let caree = resolvedCaree {
                 if !caree.sortedActivityTypes.isEmpty {
                     TabView {
                         // Track tab
@@ -87,23 +90,51 @@ struct CareeDetailView: View {
                     }
                 }
             } else {
-                Text(NSLocalizedString("Caree not found", comment: "Caree not found message"))
-                    .foregroundColor(.secondary)
+                // Keep a benign placeholder instead of an empty view to avoid navigation pop
+                VStack(spacing: 8) {
+                    ProgressView()
+                    Text(NSLocalizedString("Preparing...", comment: "Placeholder while resolving caree"))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
         }
         .task {
+            // Initial resolve
+            resolvedCaree = resolveCareeFromCache()
+
             // Light-weight cache refresh (debounced/coalesced)
             try? await cacheService?.refreshCache()
 
             // If this caree is missing or shared, fetch shared carees (service will update cache in batch)
-            if caree == nil || caree?.isShared == true {
+            if resolvedCaree == nil || resolvedCaree?.isShared == true {
                 isLoadingSharedCaree = true
                 await sharedRecordsService.fetchSharedCarees()
+                // Re-resolve after fetch completes
+                resolvedCaree = resolveCareeFromCache()
                 isLoadingSharedCaree = false
             }
         }
-        .onChange(of: sharedRecordsService.sharedCarees) {
-            // Trigger UI update when shared carees change
+        .task(id: careeID) {
+            // Refresh when caree ID changes
+            resolvedCaree = resolveCareeFromCache()
+            try? await cacheService?.refreshCache()
+
+            if resolvedCaree == nil || resolvedCaree?.isShared == true {
+                isLoadingSharedCaree = true
+                await sharedRecordsService.fetchSharedCarees()
+                resolvedCaree = resolveCareeFromCache()
+                isLoadingSharedCaree = false
+            }
+        }
+        // Re-resolve after any shared refresh completes (both services post this)
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CloudKitBackgroundRefreshFinished"))) { _ in
+            resolvedCaree = resolveCareeFromCache()
+            isLoadingSharedCaree = false
+        }
+        // Also re-resolve when the in-memory shared list changes
+        .onChange(of: sharedRecordsService.sharedCarees) { _ in
+            resolvedCaree = resolveCareeFromCache()
             isLoadingSharedCaree = false
         }
     }
