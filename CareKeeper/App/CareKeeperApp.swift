@@ -123,7 +123,7 @@ struct CareKeeperApp: App {
         }
     }()
 
-    // Separate, non-synced in-memory container dedicated to LocalCacheService
+    // Separate, local-only cache container that persists across launches (no CloudKit mirroring)
     private var cacheModelContainer: ModelContainer = {
         let schema = Schema([
             Caree.self,
@@ -132,19 +132,24 @@ struct CareKeeperApp: App {
         ])
 
         do {
+            // Persisted on disk so cache survives relaunch; no cloudKitDatabase means local-only.
             let config = ModelConfiguration(
                 schema: schema,
-                isStoredInMemoryOnly: true // Ensure cache never mirrors to CloudKit
-                // No groupContainer, no cloudKitDatabase
+                isStoredInMemoryOnly: false,
+                groupContainer: .identifier(CloudKitConfig.appGroupID)
+                // Intentionally omit cloudKitDatabase to keep this store local-only.
             )
             let container = try ModelContainer(
                 for: schema,
                 configurations: [config]
             )
-            AppLogger.app.info("🧠 Initialized in-memory ModelContainer for LocalCacheService")
+            AppLogger.app.info("🧠 Initialized persisted ModelContainer for LocalCacheService (local-only)")
+            if let url = container.configurations.first?.url {
+                AppLogger.app.info("   🗂️ Cache Container URL: \(url.path)")
+            }
             return container
         } catch {
-            AppLogger.app.error("❌ Failed to create in-memory cache ModelContainer: \(error.localizedDescription)")
+            AppLogger.app.error("❌ Failed to create persisted cache ModelContainer: \(error.localizedDescription)")
             fatalError("Cannot create cache ModelContainer: \(error)")
         }
     }()
@@ -155,12 +160,12 @@ struct CareKeeperApp: App {
                 .environmentObject(cloudKitService)
                 .environmentObject(sharedRecordsService)
                 .task {
-                    // Initialize cache service with its own in-memory ModelContainer
+                    // Initialize cache service with its own persisted ModelContainer
                     if cacheService == nil {
                         let cacheContext = cacheModelContainer.mainContext
                         let newCacheService = LocalCacheService(modelContext: cacheContext)
 
-                        // Wire services to the non-optional instance
+                        // Wire services to the cache
                         cloudKitService.setCacheService(newCacheService)
                         sharedRecordsService.setCacheService(newCacheService)
 
@@ -168,6 +173,15 @@ struct CareKeeperApp: App {
                         cacheService = newCacheService
 
                         AppLogger.app.info("✅ Shared CloudKitDataService and LocalCacheService initialized")
+
+                        // Initial owned refresh to seed cache on first launch
+                        do {
+                            try await cloudKitService.refreshOwnedCareesFromCloudKit()
+                            try await newCacheService.invalidateAndRefresh()
+                            AppLogger.app.info("✅ Initial owned records loaded into cache")
+                        } catch {
+                            AppLogger.app.warning("⚠️ Initial owned refresh failed: \(error.localizedDescription)")
+                        }
                     }
                 }
                 .onAppear {

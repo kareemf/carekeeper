@@ -287,6 +287,13 @@ struct CareeListView: View {
         // Fetch shared carees from CloudKit; this will push results into cache internally
         await sharedRecordsService.fetchSharedCarees()
 
+        // Fetch owned carees from CloudKit and update LocalCacheService
+        do {
+            try await cloudKitService.refreshOwnedCareesFromCloudKit()
+        } catch {
+            AppLogger.cloudkit.warning("⚠️ Owned refresh failed: \(error.localizedDescription)")
+        }
+
         // Refresh cache to update published properties
         try? await cacheService.invalidateAndRefresh()
 
