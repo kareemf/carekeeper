@@ -10,8 +10,15 @@ class CloudKitSharedDataService: ObservableObject {
     private let logger = AppLogger.cloudkit
     private let converter = CloudKitRecordConverter()
 
+    // Optional local cache for immediate UI updates after successful mutations
+    private var cacheService: LocalCacheService?
+
     init(containerIdentifier: String = CloudKitConfig.containerID) {
         self.container = CKContainer(identifier: containerIdentifier)
+    }
+
+    func setCacheService(_ cacheService: LocalCacheService) {
+        self.cacheService = cacheService
     }
 
     // MARK: - ActivityType Operations
@@ -51,6 +58,14 @@ class CloudKitSharedDataService: ObservableObject {
         do {
             _ = try await sharedDatabase.save(record)
             logger.info("✅ Created ActivityType in shared database: \(name)")
+
+            // Optimistically update local cache (coalesced refresh)
+            if let cache = cacheService {
+                try? await cache.withBatch {
+                    try await cache.cacheActivityType(activityType, for: caree)
+                }
+            }
+
             return activityType
         } catch {
             logger.error("❌ Failed to create ActivityType: \(error.localizedDescription)")
@@ -87,6 +102,13 @@ class CloudKitSharedDataService: ObservableObject {
         do {
             _ = try await sharedDatabase.save(record)
             logger.info("✅ Updated ActivityType in shared database: \(activityType.name)")
+
+            // Optimistically update local cache
+            if let cache = cacheService {
+                try? await cache.withBatch {
+                    try await cache.cacheActivityType(activityType, for: caree)
+                }
+            }
         } catch {
             logger.error("❌ Failed to update ActivityType: \(error.localizedDescription)")
             throw error
@@ -111,6 +133,13 @@ class CloudKitSharedDataService: ObservableObject {
         do {
             _ = try await sharedDatabase.deleteRecord(withID: record.recordID)
             logger.info("✅ Deleted ActivityType from shared database: \(activityType.name)")
+
+            // Remove from local cache
+            if let cache = cacheService {
+                try? await cache.withBatch {
+                    try await cache.removeCachedActivityType(activityType)
+                }
+            }
         } catch {
             logger.error("❌ Failed to delete ActivityType: \(error.localizedDescription)")
             throw error
@@ -154,6 +183,14 @@ class CloudKitSharedDataService: ObservableObject {
         do {
             _ = try await sharedDatabase.save(record)
             logger.info("✅ Created Activity in shared database at: \(dateTime)")
+
+            // Optimistically update local cache
+            if let cache = cacheService {
+                try? await cache.withBatch {
+                    try await cache.cacheActivity(activity, for: caree, activityType: activityType)
+                }
+            }
+
             return activity
         } catch {
             logger.error("❌ Failed to create Activity: \(error.localizedDescription)")
@@ -189,6 +226,13 @@ class CloudKitSharedDataService: ObservableObject {
         do {
             _ = try await sharedDatabase.save(record)
             logger.info("✅ Updated Activity in shared database at: \(activity.dateTime)")
+
+            // Optimistically update local cache
+            if let cache = cacheService, let activityType = activity.activityType {
+                try? await cache.withBatch {
+                    try await cache.cacheActivity(activity, for: caree, activityType: activityType)
+                }
+            }
         } catch {
             logger.error("❌ Failed to update Activity: \(error.localizedDescription)")
             throw error
@@ -213,6 +257,13 @@ class CloudKitSharedDataService: ObservableObject {
         do {
             _ = try await sharedDatabase.deleteRecord(withID: record.recordID)
             logger.info("✅ Deleted Activity from shared database at: \(activity.dateTime)")
+
+            // Remove from local cache
+            if let cache = cacheService {
+                try? await cache.withBatch {
+                    try await cache.removeCachedActivity(activity)
+                }
+            }
         } catch {
             logger.error("❌ Failed to delete Activity: \(error.localizedDescription)")
             throw error

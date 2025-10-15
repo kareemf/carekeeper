@@ -10,7 +10,7 @@ struct ActivityDetailView: View {
 
     // Use shared services from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
-    @StateObject private var sharedDataService = CloudKitSharedDataService()
+    @EnvironmentObject private var sharedDataService: CloudKitSharedDataService
 
     // Get cache service from shared CloudKitDataService
     private var cacheService: LocalCacheService? {

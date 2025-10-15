@@ -366,33 +366,37 @@ class CloudKitSharedRecordsService: ObservableObject {
             return
         }
 
-        let fetchedIDs = Set(carees.map { $0.id })
-        let existingShared = cacheService.sharedCarees
-        for cached in existingShared where !fetchedIDs.contains(cached.id) {
-            do {
-                logger.info("🧹 Removing unshared/deleted caree from cache: \(cached.name)")
-                try await cacheService.removeCachedCaree(cached)
-            } catch {
-                logger.warning("⚠️ Failed removing cached caree: \(error.localizedDescription)")
-            }
-        }
-
-        for caree in carees {
-            do {
-                try await cacheService.cacheCaree(caree, isShared: true)
-                for activityType in (caree.activityTypes ?? []) {
-                    try await cacheService.cacheActivityType(activityType, for: caree)
+        await cacheService.withBatch {
+            // Remove any previously cached shared carees that are no longer present.
+            let fetchedIDs = Set(carees.map { $0.id })
+            let existingShared = cacheService.sharedCarees
+            for cached in existingShared where !fetchedIDs.contains(cached.id) {
+                do {
+                    logger.info("🧹 Removing unshared/deleted caree from cache: \(cached.name)")
+                    try await cacheService.removeCachedCaree(cached)
+                } catch {
+                    logger.warning("⚠️ Failed removing cached caree: \(error.localizedDescription)")
                 }
-                for activity in (caree.activities ?? []) {
-                    if let activityType = activity.activityType {
-                        try await cacheService.cacheActivity(activity, for: caree, activityType: activityType)
+            }
+
+            // Upsert fetched carees and their children.
+            for caree in carees {
+                do {
+                    try await cacheService.cacheCaree(caree, isShared: true)
+                    for activityType in (caree.activityTypes ?? []) {
+                        try await cacheService.cacheActivityType(activityType, for: caree)
                     }
+                    for activity in (caree.activities ?? []) {
+                        if let activityType = activity.activityType {
+                            try await cacheService.cacheActivity(activity, for: caree, activityType: activityType)
+                        }
+                    }
+                } catch {
+                    logger.warning("⚠️ Failed caching shared records: \(error.localizedDescription)")
                 }
-            } catch {
-                logger.warning("⚠️ Failed caching shared records: \(error.localizedDescription)")
             }
         }
 
-        await cacheService.refreshPublishedProperties()
+        // No direct refreshPublishedProperties() here; the batch will coalesce refresh.
     }
 }

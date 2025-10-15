@@ -20,7 +20,7 @@ struct TrackActivityView: View {
 
     // Use shared services from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
-    @StateObject private var sharedDataService = CloudKitSharedDataService()
+    @EnvironmentObject private var sharedDataService: CloudKitSharedDataService
 
     private var isSharedCaree: Bool {
         caree.isShared  // Use cache metadata

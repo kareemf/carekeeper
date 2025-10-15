@@ -846,36 +846,39 @@ class CloudKitDataService: ObservableObject {
             }
         }
 
-        // Remove owned carees from cache that no longer exist remotely
-        let fetchedOwnedIDs = Set(careesByID.keys)
-        let existingOwned = cacheService.myCarees
-        for cached in existingOwned where !fetchedOwnedIDs.contains(cached.id) {
-            do {
-                logger.info("🧹 Removing deleted owned caree from cache: \(cached.name)")
-                try await cacheService.removeCachedCaree(cached)
-            } catch {
-                logger.warning("⚠️ Failed removing cached owned caree: \(error.localizedDescription)")
-            }
-        }
-
-        // Upsert everything into cache
-        for caree in careesByID.values.sorted(by: { $0.listOrder < $1.listOrder }) {
-            do {
-                try await cacheService.cacheCaree(caree, isShared: false)
-                for at in (caree.activityTypes ?? []) {
-                    try await cacheService.cacheActivityType(at, for: caree)
+        // Perform cache mutations in a single coalesced batch to avoid per-write refreshes.
+        await cacheService.withBatch {
+            // Remove owned carees from cache that no longer exist remotely
+            let fetchedOwnedIDs = Set(careesByID.keys)
+            let existingOwned = cacheService.myCarees
+            for cached in existingOwned where !fetchedOwnedIDs.contains(cached.id) {
+                do {
+                    logger.info("🧹 Removing deleted owned caree from cache: \(cached.name)")
+                    try await cacheService.removeCachedCaree(cached)
+                } catch {
+                    logger.warning("⚠️ Failed removing cached owned caree: \(error.localizedDescription)")
                 }
-                for activity in (caree.activities ?? []) {
-                    if let at = activity.activityType {
-                        try await cacheService.cacheActivity(activity, for: caree, activityType: at)
+            }
+
+            // Upsert everything into cache
+            for caree in careesByID.values.sorted(by: { $0.listOrder < $1.listOrder }) {
+                do {
+                    try await cacheService.cacheCaree(caree, isShared: false)
+                    for at in (caree.activityTypes ?? []) {
+                        try await cacheService.cacheActivityType(at, for: caree)
                     }
+                    for activity in (caree.activities ?? []) {
+                        if let at = activity.activityType {
+                            try await cacheService.cacheActivity(activity, for: caree, activityType: at)
+                        }
+                    }
+                } catch {
+                    logger.warning("⚠️ Failed caching owned records: \(error.localizedDescription)")
                 }
-            } catch {
-                logger.warning("⚠️ Failed caching owned records: \(error.localizedDescription)")
             }
         }
 
-        await cacheService.refreshPublishedProperties()
+        // No explicit refreshPublishedProperties call needed; the batch coalesces a single refresh.
         NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
         logger.info("✅ Owned records refreshed and cache updated")
     }

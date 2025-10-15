@@ -18,7 +18,7 @@ struct ActivityTypeEditView: View {
 
     // Use shared service from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
-    @StateObject private var sharedDataService = CloudKitSharedDataService()
+    @EnvironmentObject private var sharedDataService: CloudKitSharedDataService
 
     private var isEditing: Bool { activityType != nil }
 

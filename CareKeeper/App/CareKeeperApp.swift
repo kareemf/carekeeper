@@ -10,8 +10,9 @@ struct CareKeeperApp: App {
 
     @StateObject private var shareNotifier = ShareAcceptanceNotifier()
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
-    @StateObject private var notificationService = CloudKitNotificationService()
+    @StateObject private var sharedDataService = CloudKitSharedDataService()
     @StateObject private var cloudKitService = CloudKitDataService()
+    @StateObject private var notificationService = CloudKitNotificationService()
     @State private var cacheService: LocalCacheService?
 
     var sharedModelContainer: ModelContainer = {
@@ -159,6 +160,7 @@ struct CareKeeperApp: App {
             ContentView()
                 .environmentObject(cloudKitService)
                 .environmentObject(sharedRecordsService)
+                .environmentObject(sharedDataService)
                 .task {
                     // Initialize cache service with its own persisted ModelContainer
                     if cacheService == nil {
@@ -168,6 +170,7 @@ struct CareKeeperApp: App {
                         // Wire services to the cache
                         cloudKitService.setCacheService(newCacheService)
                         sharedRecordsService.setCacheService(newCacheService)
+                        sharedDataService.setCacheService(newCacheService)
 
                         // Store on @State
                         cacheService = newCacheService
@@ -177,7 +180,6 @@ struct CareKeeperApp: App {
                         // Initial owned refresh to seed cache on first launch
                         do {
                             try await cloudKitService.refreshOwnedCareesFromCloudKit()
-                            try await newCacheService.invalidateAndRefresh()
                             AppLogger.app.info("✅ Initial owned records loaded into cache")
                         } catch {
                             AppLogger.app.warning("⚠️ Initial owned refresh failed: \(error.localizedDescription)")

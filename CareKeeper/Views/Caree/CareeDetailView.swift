@@ -9,7 +9,7 @@ struct CareeDetailView: View {
     // Use shared services from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
     @EnvironmentObject private var sharedRecordsService: CloudKitSharedRecordsService
-    @StateObject private var sharedDataService = CloudKitSharedDataService()
+    @EnvironmentObject private var sharedDataService: CloudKitSharedDataService
     
     private let logger = AppLogger.cloudkit
 

@@ -20,6 +20,15 @@ class LocalCacheService: ObservableObject {
     private let logger = AppLogger.cloudkit
     private let cacheTTL: TimeInterval = 300 // 5 minutes
 
+    // Debounce/coalescing state
+    private var refreshTask: Task<Void, Never>?
+    private var isRefreshing = false
+    private var pendingRefresh = false
+    private let refreshDebounceInterval: TimeInterval = 0.25
+
+    // Batching state
+    private var batchDepth: Int = 0
+
     // MARK: - Initialization
 
     init(modelContext: ModelContext) {
@@ -63,7 +72,7 @@ class LocalCacheService: ObservableObject {
         }
 
         try modelContext.save()
-        await refreshPublishedProperties()
+        scheduleRefresh(reason: "cacheCaree")
     }
 
     /// Update a cached Caree
@@ -73,7 +82,7 @@ class LocalCacheService: ObservableObject {
         caree.lastSyncedAt = Date()
         try modelContext.save()
 
-        await refreshPublishedProperties()
+        scheduleRefresh(reason: "updateCachedCaree")
     }
 
     /// Remove a Caree from cache
@@ -83,7 +92,7 @@ class LocalCacheService: ObservableObject {
         modelContext.delete(caree)
         try modelContext.save()
 
-        await refreshPublishedProperties()
+        scheduleRefresh(reason: "removeCachedCaree")
     }
 
     /// Remove an ActivityType from cache
@@ -93,7 +102,7 @@ class LocalCacheService: ObservableObject {
         modelContext.delete(activityType)
         try modelContext.save()
 
-        await refreshPublishedProperties()
+        scheduleRefresh(reason: "removeCachedActivityType")
     }
 
     /// Remove an Activity from cache
@@ -103,7 +112,7 @@ class LocalCacheService: ObservableObject {
         modelContext.delete(activity)
         try modelContext.save()
 
-        await refreshPublishedProperties()
+        scheduleRefresh(reason: "removeCachedActivity")
     }
 
     /// Cache an ActivityType in SwiftData
@@ -150,7 +159,7 @@ class LocalCacheService: ObservableObject {
         }
 
         try modelContext.save()
-        await refreshPublishedProperties()
+        scheduleRefresh(reason: "cacheActivityType")
     }
 
     /// Cache an Activity in SwiftData
@@ -213,7 +222,7 @@ class LocalCacheService: ObservableObject {
         }
 
         try modelContext.save()
-        await refreshPublishedProperties()
+        scheduleRefresh(reason: "cacheActivity")
     }
 
     // MARK: - Cache Read Operations
@@ -257,20 +266,77 @@ class LocalCacheService: ObservableObject {
         return age > cacheTTL
     }
 
+    // MARK: - Debounced refresh
+
+    /// Coalesce refresh requests and avoid overlapping refresh runs.
+    func scheduleRefresh(reason: String? = nil) {
+        // If we're in a batch, just mark pending and return.
+        if batchDepth > 0 {
+            pendingRefresh = true
+            return
+        }
+
+        // Cancel any scheduled-but-not-started refresh task.
+        refreshTask?.cancel()
+
+        let label = reason ?? "unknown"
+        refreshTask = Task { [weak self] in
+            guard let self = self else { return }
+            do {
+                try await Task.sleep(nanoseconds: UInt64(self.refreshDebounceInterval * 1_000_000_000))
+            } catch {
+                return // task was cancelled
+            }
+            await self.runRefreshIfNeeded(reason: label)
+        }
+    }
+
+    private func runRefreshIfNeeded(reason: String) async {
+        if isRefreshing {
+            // Another refresh is running; mark pending and return.
+            pendingRefresh = true
+            return
+        }
+
+        isRefreshing = true
+        defer { isRefreshing = false }
+
+        await refreshPublishedProperties()
+        logger.info("🔁 Coalesced refresh executed (\(reason, privacy: .public))")
+
+        // If another refresh was requested during the run, perform one more pass.
+        if pendingRefresh {
+            pendingRefresh = false
+            await refreshPublishedProperties()
+            logger.info("🔁 Follow-up coalesced refresh executed")
+        }
+    }
+
     // MARK: - Cache Refresh
 
     /// Refresh the @Published properties from SwiftData
     func refreshPublishedProperties() async {
         do {
-            // Fetch all carees
-            let allCareesFetchDescriptor = FetchDescriptor<Caree>(
+            // Fetch owned and shared separately to avoid in-memory filtering.
+            let ownedFetch = FetchDescriptor<Caree>(
+                predicate: #Predicate { $0.isOwned == true },
                 sortBy: [SortDescriptor(\.listOrder)]
             )
-            let allCarees = try modelContext.fetch(allCareesFetchDescriptor)
+            let sharedFetch = FetchDescriptor<Caree>(
+                predicate: #Predicate { $0.isShared == true },
+                sortBy: [SortDescriptor(\.listOrder)]
+            )
 
-            // Separate into owned and shared
-            myCarees = allCarees.filter { $0.isOwned }
-            sharedCarees = allCarees.filter { $0.isShared }
+            let newOwned = try modelContext.fetch(ownedFetch)
+            let newShared = try modelContext.fetch(sharedFetch)
+
+            // Only assign when changed (by identity + order) to avoid redundant SwiftUI updates.
+            if !arraysEqualByID(lhs: myCarees, rhs: newOwned) {
+                myCarees = newOwned
+            }
+            if !arraysEqualByID(lhs: sharedCarees, rhs: newShared) {
+                sharedCarees = newShared
+            }
 
             logger.info("Refreshed cache: \(self.myCarees.count) owned, \(self.sharedCarees.count) shared")
         } catch {
@@ -282,7 +348,7 @@ class LocalCacheService: ObservableObject {
     func refreshCache() async throws {
         isLoading = true
         defer { isLoading = false }
-        await refreshPublishedProperties()
+        scheduleRefresh(reason: "refreshCache")
     }
 
     /// This forces a complete refresh of all published properties
@@ -291,9 +357,9 @@ class LocalCacheService: ObservableObject {
         isLoading = true
         defer { isLoading = false }
 
-        await refreshPublishedProperties()
+        scheduleRefresh(reason: "invalidateAndRefresh")
 
-        logger.info("Cache invalidated and refreshed")
+        logger.info("Cache invalidated and refresh scheduled")
     }
 
     // MARK: - Cache Invalidation
@@ -339,7 +405,7 @@ class LocalCacheService: ObservableObject {
         }
 
         try modelContext.save()
-        await refreshPublishedProperties()
+        scheduleRefresh(reason: "removeStaleRecords")
 
         logger.info("Removed \(staleCarees.count) stale records")
     }
@@ -363,6 +429,47 @@ class LocalCacheService: ObservableObject {
             totalActivities: activityCount
         )
     }
+
+    // MARK: - Helpers
+
+    private func arraysEqualByID<T: AnyObject>(lhs: [T], rhs: [T]) -> Bool {
+        // All three models have a stable UUID id; cast dynamically
+        func id(of obj: AnyObject) -> UUID? {
+            if let c = obj as? Caree { return c.id }
+            if let a = obj as? Activity { return a.id }
+            if let t = obj as? ActivityType { return t.id }
+            return nil
+        }
+        guard lhs.count == rhs.count else { return false }
+        for (l, r) in zip(lhs, rhs) {
+            if id(of: l) != id(of: r) { return false }
+        }
+        return true
+    }
+
+    // MARK: - Batching
+
+    /// Begin a batch of cache mutations. Suppresses refresh until the batch ends.
+    func beginBatch() {
+        batchDepth += 1
+    }
+
+    /// End a batch of cache mutations. Triggers a single coalesced refresh if needed.
+    func endBatch() {
+        guard batchDepth > 0 else { return }
+        batchDepth -= 1
+        if batchDepth == 0, pendingRefresh {
+            pendingRefresh = false
+            scheduleRefresh(reason: "endBatch")
+        }
+    }
+
+    /// Perform a set of operations as a batch, ensuring a single refresh at the end.
+    func withBatch<R>(_ operation: () async throws -> R) async rethrows -> R {
+        beginBatch()
+        defer { endBatch() }
+        return try await operation()
+    }
 }
 
 // MARK: - Cache Statistics
@@ -383,3 +490,4 @@ struct CacheStats {
         """
     }
 }
+
