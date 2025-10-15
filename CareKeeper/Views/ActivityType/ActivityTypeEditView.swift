@@ -160,7 +160,10 @@ struct ActivityTypeEditView: View {
                             caree: caree,
                             name: trimmedName,
                             icon: icon.isEmpty ? nil : icon,
-                            isShared: false
+                            hasQuantity: hasQuantity,
+                            quantityUnit: hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil,
+                            hasLocation: hasLocation,
+                            isShared: false,
                         )
                     } else {
                         // Pure CloudKit: Create new activity type
