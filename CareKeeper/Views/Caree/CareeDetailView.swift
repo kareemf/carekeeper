@@ -244,12 +244,6 @@ struct CareeDetailView: View {
             if caree == nil || caree?.isShared == true {
                 isLoadingSharedCaree = true
                 await sharedRecordsService.fetchSharedCarees()
-
-                // Cache shared carees
-                for sharedCaree in sharedRecordsService.sharedCarees {
-                    try? await cacheService?.cacheCaree(sharedCaree, isShared: true)
-                }
-
                 isLoadingSharedCaree = false
             }
 
@@ -264,12 +258,6 @@ struct CareeDetailView: View {
             if caree == nil || caree?.isShared == true {
                 isLoadingSharedCaree = true
                 await sharedRecordsService.fetchSharedCarees()
-
-                // Cache shared carees
-                for sharedCaree in sharedRecordsService.sharedCarees {
-                    try? await cacheService?.cacheCaree(sharedCaree, isShared: true)
-                }
-
                 isLoadingSharedCaree = false
             }
         }
@@ -495,14 +483,9 @@ struct CareeDetailView: View {
     private func refreshCareeData(for caree: Caree) async {
         logger.info("🔄 Pull-to-refresh: Refreshing data for caree: \(caree.name)")
 
-        // If this is a shared caree, fetch shared data from CloudKit
+        // If this is a shared caree, fetch shared data from CloudKit (service will update cache)
         if caree.isShared {
             await sharedRecordsService.fetchSharedCarees()
-
-            // Update cache with shared carees
-            for sharedCaree in sharedRecordsService.sharedCarees {
-                try? await cacheService?.cacheCaree(sharedCaree, isShared: true)
-            }
         }
 
         // Invalidate and refresh the cache to get latest data

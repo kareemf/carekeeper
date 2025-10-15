@@ -284,19 +284,10 @@ struct CareeListView: View {
             await MainActor.run { initialLoading = true }
         }
 
-        // Fetch shared carees from CloudKit and update cache
+        // Fetch shared carees from CloudKit; this will push results into cache internally
         await sharedRecordsService.fetchSharedCarees()
 
-        // Cache shared carees
-        for sharedCaree in sharedRecordsService.sharedCarees {
-            do {
-                try await cacheService.cacheCaree(sharedCaree, isShared: true)
-            } catch {
-                await MainActor.run { self.error = error }
-            }
-        }
-
-        // Invalidate and refresh cache to ensure latest data
+        // Refresh cache to update published properties
         try? await cacheService.invalidateAndRefresh()
 
         // Update combined list

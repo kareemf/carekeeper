@@ -30,21 +30,20 @@ class LocalCacheService: ObservableObject {
 
     /// Cache a Caree in SwiftData
     /// - Parameters:
-    ///   - caree: Caree to cache
+    ///   - caree: Caree to cache (may be a transient object)
     ///   - isShared: Whether this is a shared caree
     func cacheCaree(_ caree: Caree, isShared: Bool) async throws {
         logger.info("Caching caree: \(caree.name) (isShared: \(isShared))")
 
-        // Check if caree already exists in cache
+        // Upsert by id
         let careeId = caree.id
         let fetchDescriptor = FetchDescriptor<Caree>(
             predicate: #Predicate { $0.id == careeId }
         )
-
         let existingCarees = try modelContext.fetch(fetchDescriptor)
 
         if let existingCaree = existingCarees.first {
-            // Update existing caree
+            // Update existing managed instance
             existingCaree.applyScalarUpdates(from: caree)
             existingCaree.isShared = isShared
             existingCaree.isOwned = !isShared
@@ -53,7 +52,7 @@ class LocalCacheService: ObservableObject {
 
             logger.info("Updated existing caree in cache: \(caree.name)")
         } else {
-            // Insert new caree
+            // Insert new managed instance (use the incoming object is fine)
             caree.isShared = isShared
             caree.isOwned = !isShared
             caree.lastSyncedAt = Date()
@@ -68,7 +67,6 @@ class LocalCacheService: ObservableObject {
     }
 
     /// Update a cached Caree
-    /// - Parameter caree: Caree to update (must already exist in cache)
     func updateCachedCaree(_ caree: Caree) async throws {
         logger.info("Updating cached caree: \(caree.name)")
 
@@ -79,7 +77,6 @@ class LocalCacheService: ObservableObject {
     }
 
     /// Remove a Caree from cache
-    /// - Parameter caree: Caree to remove
     func removeCachedCaree(_ caree: Caree) async throws {
         logger.info("Removing caree from cache: \(caree.name)")
 
@@ -90,7 +87,6 @@ class LocalCacheService: ObservableObject {
     }
 
     /// Remove an ActivityType from cache
-    /// - Parameter activityType: ActivityType to remove
     func removeCachedActivityType(_ activityType: ActivityType) async throws {
         logger.info("Removing activity type from cache: \(activityType.name)")
 
@@ -101,7 +97,6 @@ class LocalCacheService: ObservableObject {
     }
 
     /// Remove an Activity from cache
-    /// - Parameter activity: Activity to remove
     func removeCachedActivity(_ activity: Activity) async throws {
         logger.info("Removing activity from cache: \(activity.id)")
 
@@ -113,32 +108,42 @@ class LocalCacheService: ObservableObject {
 
     /// Cache an ActivityType in SwiftData
     /// - Parameters:
-    ///   - activityType: ActivityType to cache
-    ///   - caree: Parent Caree (must already be cached)
+    ///   - activityType: ActivityType to cache (may be transient)
+    ///   - caree: Parent Caree (may be transient) — will be resolved to the managed instance
     func cacheActivityType(_ activityType: ActivityType, for caree: Caree) async throws {
         logger.info("Caching activity type: \(activityType.name)")
 
-        // Check if already exists
+        // Resolve managed parent Caree
+        guard let managedCaree = getCachedCaree(id: caree.id) else {
+            logger.warning("Parent caree not found in cache; caching it first to avoid implicit insert")
+            try await cacheCaree(caree, isShared: caree.isShared)
+            guard let managedCaree2 = getCachedCaree(id: caree.id) else {
+                logger.error("Failed to resolve parent caree after caching; aborting ActivityType cache")
+                return
+            }
+            try await cacheActivityType(activityType, for: managedCaree2)
+            return
+        }
+
+        // Upsert ActivityType by id
         let activityTypeId = activityType.id
         let fetchDescriptor = FetchDescriptor<ActivityType>(
             predicate: #Predicate { $0.id == activityTypeId }
         )
-
         let existing = try modelContext.fetch(fetchDescriptor)
 
         if let existingActivityType = existing.first {
-            // Update existing
             existingActivityType.applyScalarUpdates(from: activityType)
             existingActivityType.lastSyncedAt = Date()
             existingActivityType.cloudKitRecordID = "CD_ActivityType/\(activityType.id.uuidString)"
-            existingActivityType.caree = caree
+            existingActivityType.caree = managedCaree
 
             logger.info("Updated existing activity type in cache: \(activityType.name)")
         } else {
-            // Insert new
+            // Insert new managed instance, attach to managedCaree
             activityType.lastSyncedAt = Date()
             activityType.cloudKitRecordID = "CD_ActivityType/\(activityType.id.uuidString)"
-            activityType.caree = caree
+            activityType.caree = managedCaree
 
             modelContext.insert(activityType)
             logger.info("Inserted new activity type into cache: \(activityType.name)")
@@ -150,35 +155,58 @@ class LocalCacheService: ObservableObject {
 
     /// Cache an Activity in SwiftData
     /// - Parameters:
-    ///   - activity: Activity to cache
-    ///   - caree: Parent Caree (must already be cached)
-    ///   - activityType: ActivityType (must already be cached)
+    ///   - activity: Activity to cache (may be transient)
+    ///   - caree: Parent Caree (may be transient) — will be resolved to the managed instance
+    ///   - activityType: ActivityType (may be transient) — will be resolved to the managed instance
     func cacheActivity(_ activity: Activity, for caree: Caree, activityType: ActivityType) async throws {
         logger.info("Caching activity at: \(activity.dateTime)")
 
-        // Check if already exists
+        // Resolve managed parent Caree and ActivityType
+        guard let managedCaree = getCachedCaree(id: caree.id) else {
+            logger.warning("Parent caree not found in cache; caching it first to avoid implicit insert")
+            try await cacheCaree(caree, isShared: caree.isShared)
+            try await cacheActivity(activity, for: caree, activityType: activityType)
+            return
+        }
+
+        let managedActivityType: ActivityType
+        do {
+            if let at = try fetchActivityType(id: activityType.id) {
+                managedActivityType = at
+            } else {
+                logger.warning("Parent activity type not found; caching it first to avoid implicit insert")
+                try await cacheActivityType(activityType, for: managedCaree)
+                guard let at2 = try fetchActivityType(id: activityType.id) else {
+                    logger.error("Failed to resolve activity type after caching; aborting Activity cache")
+                    return
+                }
+                managedActivityType = at2
+            }
+        } catch {
+            logger.error("Failed to fetch activity type: \(error.localizedDescription)")
+            return
+        }
+
+        // Upsert Activity by id
         let activityId = activity.id
         let fetchDescriptor = FetchDescriptor<Activity>(
             predicate: #Predicate { $0.id == activityId }
         )
-
         let existing = try modelContext.fetch(fetchDescriptor)
 
         if let existingActivity = existing.first {
-            // Update existing
             existingActivity.applyScalarUpdates(from: activity)
             existingActivity.lastSyncedAt = Date()
             existingActivity.cloudKitRecordID = "CD_Activity/\(activity.id.uuidString)"
-            existingActivity.caree = caree
-            existingActivity.activityType = activityType
+            existingActivity.caree = managedCaree
+            existingActivity.activityType = managedActivityType
 
             logger.info("Updated existing activity in cache")
         } else {
-            // Insert new
             activity.lastSyncedAt = Date()
             activity.cloudKitRecordID = "CD_Activity/\(activity.id.uuidString)"
-            activity.caree = caree
-            activity.activityType = activityType
+            activity.caree = managedCaree
+            activity.activityType = managedActivityType
 
             modelContext.insert(activity)
             logger.info("Inserted new activity into cache")
@@ -190,9 +218,6 @@ class LocalCacheService: ObservableObject {
 
     // MARK: - Cache Read Operations
 
-    /// Get a cached Caree by ID
-    /// - Parameter id: Caree UUID
-    /// - Returns: Cached Caree if found
     func getCachedCaree(id: UUID) -> Caree? {
         let careeId = id
         let fetchDescriptor = FetchDescriptor<Caree>(
@@ -208,28 +233,26 @@ class LocalCacheService: ObservableObject {
         }
     }
 
-    /// Get all cached ActivityTypes for a Caree
-    /// - Parameter caree: Parent Caree
-    /// - Returns: Array of ActivityTypes
+    private func fetchActivityType(id: UUID) throws -> ActivityType? {
+        let fetchDescriptor = FetchDescriptor<ActivityType>(
+            predicate: #Predicate { $0.id == id }
+        )
+        let results = try modelContext.fetch(fetchDescriptor)
+        return results.first
+    }
+
     func getCachedActivityTypes(for caree: Caree) -> [ActivityType] {
         return caree.sortedActivityTypes
     }
 
-    /// Get all cached Activities for a Caree
-    /// - Parameter caree: Parent Caree
-    /// - Returns: Array of Activities
     func getCachedActivities(for caree: Caree) -> [Activity] {
         return caree.recentActivities
     }
 
-    /// Check if cache is stale for a given record
-    /// - Parameter lastSyncedAt: Last sync timestamp
-    /// - Returns: true if cache is stale
     func isCacheStale(lastSyncedAt: Date?) -> Bool {
         guard let lastSyncedAt = lastSyncedAt else {
-            return true // No sync timestamp means stale
+            return true
         }
-
         let age = Date().timeIntervalSince(lastSyncedAt)
         return age > cacheTTL
     }
@@ -256,16 +279,12 @@ class LocalCacheService: ObservableObject {
         }
     }
 
-    /// Refresh cache from CloudKit (delegates to CloudKitDataService)
-    /// This should be called by CloudKitDataService after sync operations
     func refreshCache() async throws {
         isLoading = true
         defer { isLoading = false }
-
         await refreshPublishedProperties()
     }
 
-    /// Invalidate and refresh the entire cache from SwiftData
     /// This forces a complete refresh of all published properties
     func invalidateAndRefresh() async throws {
         logger.info("Invalidating and refreshing cache")
@@ -279,7 +298,6 @@ class LocalCacheService: ObservableObject {
 
     // MARK: - Cache Invalidation
 
-    /// Clear all cached data (use with caution)
     func clearCache() async throws {
         logger.warning("Clearing all cached data")
 

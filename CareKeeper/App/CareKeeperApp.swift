@@ -123,17 +123,50 @@ struct CareKeeperApp: App {
         }
     }()
 
+    // Separate, non-synced in-memory container dedicated to LocalCacheService
+    private var cacheModelContainer: ModelContainer = {
+        let schema = Schema([
+            Caree.self,
+            ActivityType.self,
+            Activity.self
+        ])
+
+        do {
+            let config = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: true // Ensure cache never mirrors to CloudKit
+                // No groupContainer, no cloudKitDatabase
+            )
+            let container = try ModelContainer(
+                for: schema,
+                configurations: [config]
+            )
+            AppLogger.app.info("🧠 Initialized in-memory ModelContainer for LocalCacheService")
+            return container
+        } catch {
+            AppLogger.app.error("❌ Failed to create in-memory cache ModelContainer: \(error.localizedDescription)")
+            fatalError("Cannot create cache ModelContainer: \(error)")
+        }
+    }()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(cloudKitService)
                 .environmentObject(sharedRecordsService)
                 .task {
-                    // Initialize cache service with modelContainer's mainContext
+                    // Initialize cache service with its own in-memory ModelContainer
                     if cacheService == nil {
-                        cacheService = LocalCacheService(modelContext: sharedModelContainer.mainContext)
-                        cloudKitService.setCacheService(cacheService!)
-                        sharedRecordsService.setCacheService(cacheService!)
+                        let cacheContext = cacheModelContainer.mainContext
+                        let newCacheService = LocalCacheService(modelContext: cacheContext)
+
+                        // Wire services to the non-optional instance
+                        cloudKitService.setCacheService(newCacheService)
+                        sharedRecordsService.setCacheService(newCacheService)
+
+                        // Store on @State
+                        cacheService = newCacheService
+
                         AppLogger.app.info("✅ Shared CloudKitDataService and LocalCacheService initialized")
                     }
                 }
@@ -150,6 +183,7 @@ struct CareKeeperApp: App {
                     Text(shareNotifier.alertMessage)
                 }
         }
+        // Keep the app’s main environment bound to the CloudKit-synced container
         .modelContainer(sharedModelContainer)
     }
 

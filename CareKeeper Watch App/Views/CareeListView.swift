@@ -49,20 +49,8 @@ struct CareeListView: View {
             }
             .navigationTitle(NSLocalizedString("Carees", comment: "Navigation title for carees list"))
             .task {
-                //
-                // Initialize cache service with model context
-//                if cacheService == nil {
-//                    cacheService = LocalCacheService(modelContext: modelContext)
-//                    cloudKitService.setCacheService(cacheService!)
-//                }
-
-                // Fetch shared carees and update cache
+                // Fetch shared carees and update cache (service will push into cache internally)
                 await sharedRecordsService.fetchSharedCarees()
-
-                // Cache shared carees
-                for sharedCaree in sharedRecordsService.sharedCarees {
-                    try? await cacheService?.cacheCaree(sharedCaree, isShared: true)
-                }
 
                 // Refresh cache to update published properties
                 try? await cacheService?.refreshCache()
@@ -158,10 +146,6 @@ struct CareeListView: View {
         .refreshable {
             // Refresh shared carees and update cache
             await sharedRecordsService.fetchSharedCarees()
-
-            for sharedCaree in sharedRecordsService.sharedCarees {
-                try? await cacheService?.cacheCaree(sharedCaree, isShared: true)
-            }
 
             // Invalidate and refresh cache to ensure latest data
             try? await cacheService?.invalidateAndRefresh()
