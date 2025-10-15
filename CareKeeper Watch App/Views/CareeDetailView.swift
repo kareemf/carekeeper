@@ -92,19 +92,13 @@ struct CareeDetailView: View {
             }
         }
         .task {
-            // Refresh cache to load caree
+            // Light-weight cache refresh (debounced/coalesced)
             try? await cacheService?.refreshCache()
 
-            // Only fetch shared carees if this caree is not in cache yet or is shared
+            // If this caree is missing or shared, fetch shared carees (service will update cache in batch)
             if caree == nil || caree?.isShared == true {
                 isLoadingSharedCaree = true
                 await sharedRecordsService.fetchSharedCarees()
-
-                // Cache shared carees
-                for sharedCaree in sharedRecordsService.sharedCarees {
-                    try? await cacheService?.cacheCaree(sharedCaree, isShared: true)
-                }
-
                 isLoadingSharedCaree = false
             }
         }

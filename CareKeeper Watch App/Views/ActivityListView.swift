@@ -8,6 +8,7 @@ struct ActivityListView: View {
 
     // Use shared services from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
+    @EnvironmentObject private var sharedDataService: CloudKitSharedDataService
 
     // Get cache service from shared CloudKitDataService
     private var cacheService: LocalCacheService? {
@@ -85,7 +86,7 @@ struct ActivityListView: View {
             Text(NSLocalizedString("This cannot be undone.", comment: "Delete confirmation message"))
         }
         .task {
-            // Refresh cache to load caree and activities
+            // Light-weight cache refresh (debounced/coalesced)
             try? await cacheService?.refreshCache()
         }
     }
@@ -169,10 +170,14 @@ struct ActivityListView: View {
 
         Task {
             do {
-                // Pure CloudKit: Delete via CloudKitDataService
-                try await cloudKitService.deleteActivity(activity, isShared: isShared)
+                if isShared {
+                    // Shared path via CloudKitSharedDataService
+                    try await sharedDataService.deleteActivity(activity, caree: caree)
+                } else {
+                    // Owned path via CloudKitDataService
+                    try await cloudKitService.deleteActivity(activity, isShared: false)
+                }
 
-                // Cache is automatically updated by CloudKitDataService
                 await MainActor.run {
                     activityToDelete = nil
                 }

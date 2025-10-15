@@ -49,14 +49,8 @@ struct CareeListView: View {
             }
             .navigationTitle(NSLocalizedString("Carees", comment: "Navigation title for carees list"))
             .task {
-                // Fetch shared carees and update cache (service will push into cache internally)
+                // Fetch shared carees; service will push into cache (batched)
                 await sharedRecordsService.fetchSharedCarees()
-
-                // Refresh cache to update published properties
-                try? await cacheService?.refreshCache()
-
-                // Update combined list
-                updateAllCarees()
             }
             .onReceive(sharedRecordsService.$error) { newError in
                 if let newError = newError {
@@ -144,14 +138,8 @@ struct CareeListView: View {
             }
         }
         .refreshable {
-            // Refresh shared carees and update cache
+            // Refresh shared carees; LocalCacheService will update via batched apply
             await sharedRecordsService.fetchSharedCarees()
-
-            // Invalidate and refresh cache to ensure latest data
-            try? await cacheService?.invalidateAndRefresh()
-
-            // Update combined list
-            updateAllCarees()
         }
     }
 }

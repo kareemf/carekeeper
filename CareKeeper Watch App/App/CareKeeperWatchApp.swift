@@ -4,6 +4,9 @@ import SwiftData
 @main
 struct CareKeeperWatchApp: App {
     @StateObject private var cloudKitService = CloudKitDataService()
+    @StateObject private var sharedDataService = CloudKitSharedDataService()
+    @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
+    @StateObject private var notificationService = CloudKitNotificationService()
     @State private var cacheService: LocalCacheService?
     
     private let logger = AppLogger.cloudkit
@@ -53,13 +56,34 @@ struct CareKeeperWatchApp: App {
         WindowGroup {
             CareeListView()
                 .environmentObject(cloudKitService)
+                .environmentObject(sharedDataService)
+                .environmentObject(sharedRecordsService)
                 .task {
                     // Initialize cache service with modelContainer's mainContext
                     if cacheService == nil {
-                        cacheService = LocalCacheService(modelContext: sharedModelContainer.mainContext)
-                        cloudKitService.setCacheService(cacheService!)
+                        let cache = LocalCacheService(modelContext: sharedModelContainer.mainContext)
+                        cacheService = cache
+
+                        // Wire services to the cache
+                        cloudKitService.setCacheService(cache)
+                        sharedRecordsService.setCacheService(cache)
+                        sharedDataService.setCacheService(cache)
+                        
                         AppLogger.app.info("✅ Shared CloudKitDataService and LocalCacheService initialized (watchOS)")
+
+                        // Seed cache with owned records once (avoid redundant invalidateAndRefresh)
+                        do {
+                            try await cloudKitService.refreshOwnedCareesFromCloudKit()
+                            AppLogger.app.info("✅ Initial owned records loaded into cache (watchOS)")
+                        } catch {
+                            AppLogger.app.warning("⚠️ Initial owned refresh failed (watchOS): \(error.localizedDescription)")
+                        }
                     }
+                }
+                .task {
+                    // Set up CloudKit database subscriptions and shared-records refresh on watchOS
+                    await notificationService.setupNotifications(sharedRecordsService: sharedRecordsService)
+                    AppLogger.cloudkit.info("✅ CloudKit notification service setup complete (watchOS)")
                 }
         }
         .modelContainer(sharedModelContainer)
