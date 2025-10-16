@@ -26,10 +26,13 @@ struct CareeListView: View {
     // Loading coordination
     @State private var initialLoading = true
 
-    // Keeps the list in a loading state during the very first on-appear fetch, before either of the two services has had a chance to flip their own isLoading flags or publish any data (after rendered but before tasks run).
+    // Show full-screen loading only on initial load when cache is empty
+    // Otherwise, show cached content and refresh in background
     private var isLoadingCombined: Bool {
-        let cacheLoading = cacheService?.isLoading ?? false
-        return initialLoading || sharedRecordsService.isLoading || cacheLoading
+        // Only show full-screen loading if:
+        // 1. Initial load is happening, AND
+        // 2. Cache is empty (no content to show yet)
+        return initialLoading && allCarees.isEmpty
     }
 
     // Backup/Restore (iOS only)
@@ -91,7 +94,8 @@ struct CareeListView: View {
     private var contentView: some View {
         Group {
             if isLoadingCombined {
-                // Unified loading state while owned and shared sources are being fetched
+                // Full-screen loading only on initial load with empty cache
+                // Otherwise, show cached content and refresh in background (status shown in toolbar)
                 VStack(spacing: 16) {
                     ProgressView()
                     Text(NSLocalizedString("Loading carees...", comment: "Loading owned and shared carees message"))
