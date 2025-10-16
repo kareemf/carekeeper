@@ -28,9 +28,10 @@ class CloudKitDataService: ObservableObject {
     private let maxRetries = 3
     private let retryDelay: TimeInterval = 2.0
 
-    // MARK: - Public Cache Service (for view observation)
+    // MARK: - Public Services (for unified API)
 
     private(set) var cacheService: LocalCacheService?
+    private(set) var sharedDataService: CloudKitSharedDataService?
 
     // MARK: - Initialization
 
@@ -58,6 +59,12 @@ class CloudKitDataService: ObservableObject {
     func setCacheService(_ cacheService: LocalCacheService) {
         self.cacheService = cacheService
         logger.info("Cache service integrated with CloudKitDataService")
+    }
+
+    /// Set the shared data service for routing shared caree operations
+    func setSharedDataService(_ sharedDataService: CloudKitSharedDataService) {
+        self.sharedDataService = sharedDataService
+        logger.info("Shared data service integrated with CloudKitDataService")
     }
 
     // MARK: - Sync Status
@@ -729,6 +736,158 @@ class CloudKitDataService: ObservableObject {
             logger.error("❌ Failed to delete Activity: \(error.localizedDescription)")
             syncStatus = .failed(error)
             throw error
+        }
+    }
+
+    // MARK: - Unified CRUD API (routes shared vs owned internally)
+
+    /// Unified createActivityType that routes based on caree.isShared
+    func createActivityType(
+        caree: Caree,
+        name: String,
+        icon: String?,
+        hasQuantity: Bool,
+        quantityUnit: String?,
+        hasLocation: Bool,
+        listOrder: Int
+    ) async throws -> ActivityType {
+        guard let sharedDataService = sharedDataService else {
+            throw AppError.invalidInput("Shared data service not configured")
+        }
+
+        if caree.isShared {
+            return try await sharedDataService.createActivityType(
+                for: caree,
+                name: name,
+                icon: icon,
+                hasQuantity: hasQuantity,
+                quantityUnit: quantityUnit,
+                hasLocation: hasLocation,
+                listOrder: listOrder
+            )
+        } else {
+            return try await createActivityType(
+                for: caree,
+                name: name,
+                icon: icon,
+                hasQuantity: hasQuantity,
+                quantityUnit: quantityUnit,
+                hasLocation: hasLocation,
+                listOrder: listOrder,
+                isShared: false
+            )
+        }
+    }
+
+    /// Unified updateActivityType that routes based on caree.isShared
+    func updateActivityType(activityType: ActivityType, caree: Caree) async throws {
+        guard let sharedDataService = sharedDataService else {
+            throw AppError.invalidInput("Shared data service not configured")
+        }
+
+        if caree.isShared {
+            try await sharedDataService.updateActivityType(activityType, caree: caree)
+        } else {
+            // Extract field values from object before calling owned implementation
+            try await updateActivityType(
+                activityType,
+                caree: caree,
+                name: activityType.name,
+                icon: activityType.icon,
+                hasQuantity: activityType.hasQuantity,
+                quantityUnit: activityType.quantityUnit,
+                hasLocation: activityType.hasLocation,
+                listOrder: activityType.listOrder,
+                isShared: false
+            )
+        }
+    }
+
+    /// Unified deleteActivityType that routes based on caree.isShared
+    func deleteActivityType(activityType: ActivityType, caree: Caree) async throws {
+        guard let sharedDataService = sharedDataService else {
+            throw AppError.invalidInput("Shared data service not configured")
+        }
+
+        if caree.isShared {
+            try await sharedDataService.deleteActivityType(activityType, caree: caree)
+        } else {
+            try await deleteActivityType(activityType, isShared: false)
+        }
+    }
+
+    /// Unified createActivity that routes based on caree.isShared
+    func createActivity(
+        caree: Caree,
+        activityType: ActivityType,
+        dateTime: Date,
+        notes: String?,
+        quantity: Double?,
+        latitude: Double?,
+        longitude: Double?
+    ) async throws -> Activity {
+        guard let sharedDataService = sharedDataService else {
+            throw AppError.invalidInput("Shared data service not configured")
+        }
+
+        if caree.isShared {
+            return try await sharedDataService.createActivity(
+                for: caree,
+                activityType: activityType,
+                dateTime: dateTime,
+                notes: notes,
+                quantity: quantity,
+                latitude: latitude,
+                longitude: longitude
+            )
+        } else {
+            return try await createActivity(
+                for: caree,
+                activityType: activityType,
+                dateTime: dateTime,
+                notes: notes,
+                quantity: quantity,
+                latitude: latitude,
+                longitude: longitude,
+                isShared: false
+            )
+        }
+    }
+
+    /// Unified updateActivity that routes based on caree.isShared
+    func updateActivity(activity: Activity, caree: Caree, activityType: ActivityType) async throws {
+        guard let sharedDataService = sharedDataService else {
+            throw AppError.invalidInput("Shared data service not configured")
+        }
+
+        if caree.isShared {
+            try await sharedDataService.updateActivity(activity, caree: caree)
+        } else {
+            // Extract field values from object before calling owned implementation
+            try await updateActivity(
+                activity,
+                caree: caree,
+                activityType: activityType,
+                dateTime: activity.dateTime,
+                notes: activity.notes,
+                quantity: activity.quantity,
+                latitude: activity.latitude,
+                longitude: activity.longitude,
+                isShared: false
+            )
+        }
+    }
+
+    /// Unified deleteActivity that routes based on caree.isShared
+    func deleteActivity(activity: Activity, caree: Caree) async throws {
+        guard let sharedDataService = sharedDataService else {
+            throw AppError.invalidInput("Shared data service not configured")
+        }
+
+        if caree.isShared {
+            try await sharedDataService.deleteActivity(activity, caree: caree)
+        } else {
+            try await deleteActivity(activity, isShared: false)
         }
     }
 

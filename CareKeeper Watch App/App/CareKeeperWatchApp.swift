@@ -68,7 +68,10 @@ struct CareKeeperWatchApp: App {
                         cloudKitService.setCacheService(cache)
                         sharedRecordsService.setCacheService(cache)
                         sharedDataService.setCacheService(cache)
-                        
+
+                        // Wire sharedDataService to cloudKitService for unified API
+                        cloudKitService.setSharedDataService(sharedDataService)
+
                         AppLogger.app.info("✅ Shared CloudKitDataService and LocalCacheService initialized (watchOS)")
 
                         // Seed cache with owned records once (avoid redundant invalidateAndRefresh)

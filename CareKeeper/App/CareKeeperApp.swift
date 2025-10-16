@@ -172,6 +172,9 @@ struct CareKeeperApp: App {
                         sharedRecordsService.setCacheService(newCacheService)
                         sharedDataService.setCacheService(newCacheService)
 
+                        // Wire sharedDataService to cloudKitService for unified API
+                        cloudKitService.setSharedDataService(sharedDataService)
+
                         // Store on @State
                         cacheService = newCacheService
 

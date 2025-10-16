@@ -8,9 +8,8 @@ struct ActivityDetailView: View {
 
     let activityID: UUID
 
-    // Use shared services from environment
+    // Use unified API from CloudKitDataService
     @EnvironmentObject private var cloudKitService: CloudKitDataService
-    @EnvironmentObject private var sharedDataService: CloudKitSharedDataService
 
     // Get cache service from shared CloudKitDataService
     private var cacheService: LocalCacheService? {
@@ -28,12 +27,6 @@ struct ActivityDetailView: View {
             }
         }
         return nil
-    }
-
-    // Check if this activity belongs to a shared caree
-    private var isSharedActivity: Bool {
-        guard let activity = activity, let caree = activity.caree else { return false }
-        return caree.isShared  // Use cache metadata
     }
 
     @State private var isEditing = false
@@ -287,46 +280,19 @@ struct ActivityDetailView: View {
 
         isSaving = true
 
-        if isSharedActivity {
-            // Handle shared activity - use CloudKit service
-            Task {
-                do {
-                    try await sharedDataService.updateActivity(activity, caree: caree)
+        Task {
+            do {
+                // Update activity (unified API routes internally)
+                try await cloudKitService.updateActivity(activity: activity, caree: caree, activityType: activityType)
 
-                    await MainActor.run {
-                        isSaving = false
-                        isEditing = false
-                    }
-                } catch {
-                    await MainActor.run {
-                        self.error = AppError.saveFailed(error.localizedDescription)
-                        isSaving = false
-                    }
+                await MainActor.run {
+                    isSaving = false
+                    isEditing = false
                 }
-            }
-        } else {
-            // Handle owned activity - use Pure CloudKit
-            Task {
-                do {
-                    try await cloudKitService.updateActivity(
-                        activity,
-                        caree: caree,
-                        activityType: activityType,
-                        dateTime: editingDateTime,
-                        notes: editingNotes.isEmpty ? nil : editingNotes,
-                        quantity: Double(editingQuantity),
-                        isShared: false
-                    )
-
-                    await MainActor.run {
-                        isSaving = false
-                        isEditing = false
-                    }
-                } catch {
-                    await MainActor.run {
-                        self.error = AppError.saveFailed(error.localizedDescription)
-                        isSaving = false
-                    }
+            } catch {
+                await MainActor.run {
+                    self.error = AppError.saveFailed(error.localizedDescription)
+                    isSaving = false
                 }
             }
         }
@@ -349,15 +315,10 @@ struct ActivityDetailView: View {
 
         Task {
             do {
-                if isSharedActivity {
-                    // Handle shared activity - use CloudKit service
-                    try await sharedDataService.deleteActivity(activity, caree: caree)
-                } else {
-                    // Handle owned activity - use Pure CloudKit
-                    try await cloudKitService.deleteActivity(activity, isShared: false)
-                }
+                // Delete activity (unified API routes internally)
+                try await cloudKitService.deleteActivity(activity: activity, caree: caree)
 
-                // Cache is automatically updated by CloudKitDataService
+                // Cache is automatically updated by service
                 await MainActor.run {
                     dismiss()
                 }

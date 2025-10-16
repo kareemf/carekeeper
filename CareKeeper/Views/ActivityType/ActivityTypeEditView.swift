@@ -16,15 +16,10 @@ struct ActivityTypeEditView: View {
     @State private var isSaving: Bool = false
     @FocusState private var isNameFieldFocused: Bool
 
-    // Use shared service from environment
+    // Use unified API from CloudKitDataService
     @EnvironmentObject private var cloudKitService: CloudKitDataService
-    @EnvironmentObject private var sharedDataService: CloudKitSharedDataService
 
     private var isEditing: Bool { activityType != nil }
-
-    private var isSharedCaree: Bool {
-        caree.isShared  // Use cache metadata
-    }
 
     init(caree: Caree, activityType: ActivityType? = nil) {
         self.caree = caree
@@ -112,82 +107,38 @@ struct ActivityTypeEditView: View {
 
         isSaving = true
 
-        if isSharedCaree {
-            // Handle shared caree - use CloudKit service
-            Task {
-                do {
-                    if let existingActivityType = activityType {
-                        // Update existing activity type in shared database
-                        existingActivityType.name = trimmedName
-                        existingActivityType.icon = icon.isEmpty ? nil : icon
-                        existingActivityType.hasQuantity = hasQuantity
-                        existingActivityType.quantityUnit = hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil
-                        existingActivityType.hasLocation = hasLocation
+        Task {
+            do {
+                if let existingActivityType = activityType {
+                    // Update existing activity type (unified API routes internally)
+                    existingActivityType.name = trimmedName
+                    existingActivityType.icon = icon.isEmpty ? nil : icon
+                    existingActivityType.hasQuantity = hasQuantity
+                    existingActivityType.quantityUnit = hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil
+                    existingActivityType.hasLocation = hasLocation
 
-                        try await sharedDataService.updateActivityType(existingActivityType, caree: caree)
-                    } else {
-                        // Create new activity type in shared database
-                        _ = try await sharedDataService.createActivityType(
-                            for: caree,
-                            name: trimmedName,
-                            icon: icon.isEmpty ? nil : icon,
-                            hasQuantity: hasQuantity,
-                            quantityUnit: hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil,
-                            hasLocation: hasLocation,
-                            listOrder: caree.activityTypes?.count ?? 0
-                        )
-                    }
-
-                    await MainActor.run {
-                        isSaving = false
-                        dismiss()
-                    }
-                } catch {
-                    await MainActor.run {
-                        self.error = AppError.saveFailed(error.localizedDescription)
-                        isSaving = false
-                    }
+                    try await cloudKitService.updateActivityType(activityType: existingActivityType, caree: caree)
+                } else {
+                    // Create new activity type (unified API routes internally)
+                    _ = try await cloudKitService.createActivityType(
+                        caree: caree,
+                        name: trimmedName,
+                        icon: icon.isEmpty ? nil : icon,
+                        hasQuantity: hasQuantity,
+                        quantityUnit: hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil,
+                        hasLocation: hasLocation,
+                        listOrder: caree.activityTypes?.count ?? 0
+                    )
                 }
-            }
-        } else {
-            // Handle owned caree - use Pure CloudKit
-            Task {
-                do {
-                    if let existingActivityType = activityType {
-                        // Pure CloudKit: Update existing activity type
-                        try await cloudKitService.updateActivityType(
-                            existingActivityType,
-                            caree: caree,
-                            name: trimmedName,
-                            icon: icon.isEmpty ? nil : icon,
-                            hasQuantity: hasQuantity,
-                            quantityUnit: hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil,
-                            hasLocation: hasLocation,
-                            isShared: false,
-                        )
-                    } else {
-                        // Pure CloudKit: Create new activity type
-                        _ = try await cloudKitService.createActivityType(
-                            for: caree,
-                            name: trimmedName,
-                            icon: icon.isEmpty ? nil : icon,
-                            hasQuantity: hasQuantity,
-                            quantityUnit: hasQuantity && !quantityUnit.isEmpty ? quantityUnit : nil,
-                            hasLocation: hasLocation,
-                            listOrder: caree.activityTypes?.count ?? 0,
-                            isShared: false
-                        )
-                    }
 
-                    await MainActor.run {
-                        isSaving = false
-                        dismiss()
-                    }
-                } catch {
-                    await MainActor.run {
-                        self.error = AppError.saveFailed(error.localizedDescription)
-                        isSaving = false
-                    }
+                await MainActor.run {
+                    isSaving = false
+                    dismiss()
+                }
+            } catch {
+                await MainActor.run {
+                    self.error = AppError.saveFailed(error.localizedDescription)
+                    isSaving = false
                 }
             }
         }

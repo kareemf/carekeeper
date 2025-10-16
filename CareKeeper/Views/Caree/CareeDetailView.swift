@@ -7,11 +7,10 @@ struct CareeDetailView: View {
 
     let careeID: UUID
 
-    // Use shared services from environment
+    // Use services from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
     @EnvironmentObject private var sharedRecordsService: CloudKitSharedRecordsService
-    @EnvironmentObject private var sharedDataService: CloudKitSharedDataService
-    
+
     private let logger = AppLogger.cloudkit
 
     // Get cache service from shared CloudKitDataService
@@ -306,13 +305,9 @@ struct CareeDetailView: View {
 
         Task {
             do {
-                if caree.isShared {
-                    try await sharedDataService.deleteActivityType(activityType, caree: caree)
-                    // Cache is automatically updated by CloudKitSharedDataService with optimistic update
-                } else {
-                    try await cloudKitService.deleteActivityType(activityType, isShared: false)
-                    // Cache is automatically updated by CloudKitDataService for owned records
-                }
+                // Delete activity type (unified API routes internally)
+                try await cloudKitService.deleteActivityType(activityType: activityType, caree: caree)
+                // Cache is automatically updated by service with optimistic update
 
                 activityTypeToDelete = nil
             } catch {
@@ -327,13 +322,9 @@ struct CareeDetailView: View {
 
         Task {
             do {
-                if caree.isShared {
-                    try await sharedDataService.deleteActivity(activity, caree: caree)
-                    // Cache is automatically updated by CloudKitSharedDataService with optimistic update
-                } else {
-                    try await cloudKitService.deleteActivity(activity, isShared: false)
-                    // Cache is automatically updated by CloudKitDataService for owned records
-                }
+                // Delete activity (unified API routes internally)
+                try await cloudKitService.deleteActivity(activity: activity, caree: caree)
+                // Cache is automatically updated by service with optimistic update
 
                 activityToDelete = nil
             } catch {
