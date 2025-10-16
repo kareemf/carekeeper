@@ -30,8 +30,9 @@ struct SharingView: View {
     var body: some View {
         NavigationView {
             Group {
-                if isInitialLoad {
-                    // Show loading state on first load
+                if isInitialLoad && allCarees.isEmpty {
+                    // Show full-screen loading only on first load with empty cache
+                    // Otherwise, show cached content and refresh in background
                     VStack(spacing: 16) {
                         ProgressView()
                         Text(NSLocalizedString("Loading shared carees...", comment: "Loading shared carees message"))
@@ -106,6 +107,11 @@ struct SharingView: View {
                 isRefreshingShares = false
             }
             .navigationTitle(NSLocalizedString("Sharing", comment: "Sharing view title"))
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    SyncStatusIndicator()
+                }
+            }
             .overlay {
                 if isRefreshingShares && !isInitialLoad {
                     VStack {
