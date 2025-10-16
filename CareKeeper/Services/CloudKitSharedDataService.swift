@@ -132,7 +132,22 @@ class CloudKitSharedDataService: ObservableObject {
 
         // Fetch the existing record
         guard let record = try await findActivityTypeRecord(activityType, in: zoneID) else {
-            throw AppError.invalidInput("Could not find ActivityType record in shared database")
+            // ActivityType not found in shared database - probably already deleted by another participant
+            logger.info("ℹ️ ActivityType not found in shared database (likely already deleted by another participant): \(activityType.name)")
+
+            // Remove from local cache to ensure consistency
+            if let cache = cacheService {
+                try? await cache.withBatch {
+                    try await cache.removeCachedActivityType(activityType)
+                }
+                // Force immediate refresh of published properties so views see the update
+                await cache.refreshPublishedProperties()
+                // Post notification for immediate UI update
+                NotificationCenter.default.post(name: NSNotification.Name("SharedCareeDataUpdated"), object: caree.id)
+            }
+
+            // Return successfully without throwing error (graceful handling for collaborative deletions)
+            return
         }
 
         // Delete record
@@ -266,7 +281,22 @@ class CloudKitSharedDataService: ObservableObject {
 
         // Fetch the existing record
         guard let record = try await findActivityRecord(activity, in: zoneID) else {
-            throw AppError.invalidInput("Could not find Activity record in shared database")
+            // Activity not found in shared database - probably already deleted by another participant
+            logger.info("ℹ️ Activity not found in shared database (likely already deleted by another participant): \(activity.dateTime)")
+
+            // Remove from local cache to ensure consistency
+            if let cache = cacheService {
+                try? await cache.withBatch {
+                    try await cache.removeCachedActivity(activity)
+                }
+                // Force immediate refresh of published properties so views see the update
+                await cache.refreshPublishedProperties()
+                // Post notification for immediate UI update
+                NotificationCenter.default.post(name: NSNotification.Name("SharedCareeDataUpdated"), object: caree.id)
+            }
+
+            // Return successfully without throwing error (graceful handling for collaborative deletions)
+            return
         }
 
         // Delete record
