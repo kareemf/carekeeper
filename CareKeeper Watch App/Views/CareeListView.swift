@@ -125,7 +125,11 @@ struct CareeListView: View {
             allCarees = []
             return
         }
-        allCarees = cacheService.myCarees + cacheService.sharedCarees
+        let newCombined = cacheService.myCarees + cacheService.sharedCarees
+        // Only assign when the identity + order actually changed to keep navigation stable
+        if !arraysEqualByID(lhs: allCarees, rhs: newCombined) {
+            allCarees = newCombined
+        }
     }
 
     private var careeListView: some View {
@@ -141,6 +145,22 @@ struct CareeListView: View {
             // Refresh shared carees; LocalCacheService will update via batched apply
             await sharedRecordsService.fetchSharedCarees()
         }
+    }
+
+    // MARK: - Helpers
+
+    private func arraysEqualByID<T: AnyObject>(lhs: [T], rhs: [T]) -> Bool {
+        func id(of obj: AnyObject) -> UUID? {
+            if let c = obj as? Caree { return c.id }
+            if let a = obj as? Activity { return a.id }
+            if let t = obj as? ActivityType { return t.id }
+            return nil
+        }
+        guard lhs.count == rhs.count else { return false }
+        for (l, r) in zip(lhs, rhs) {
+            if id(of: l) != id(of: r) { return false }
+        }
+        return true
     }
 }
 

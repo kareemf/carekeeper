@@ -510,9 +510,6 @@ struct CareeDetailView: View {
             isLoadingSharedCaree = false
         }
 
-        // Invalidate and refresh the cache to get latest data
-        try? await cacheService?.invalidateAndRefresh()
-
         // Check sync status (only relevant for owned carees; harmless for shared)
         await checkSyncStatus(for: caree)
 

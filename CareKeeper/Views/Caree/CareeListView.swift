@@ -43,7 +43,7 @@ struct CareeListView: View {
     #endif
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             mainContent
         }
     }
@@ -274,7 +274,11 @@ struct CareeListView: View {
             allCarees = []
             return
         }
-        allCarees = cacheService.myCarees + cacheService.sharedCarees
+        let newCombined = cacheService.myCarees + cacheService.sharedCarees
+        // Only assign when the identity + order actually changed
+        if !arraysEqualByID(lhs: allCarees, rhs: newCombined) {
+            allCarees = newCombined
+        }
     }
 
     private func refreshAllCarees(initial: Bool = false) async {
@@ -293,9 +297,6 @@ struct CareeListView: View {
         } catch {
             AppLogger.cloudkit.warning("⚠️ Owned refresh failed: \(error.localizedDescription)")
         }
-
-        // Refresh cache to update published properties
-        try? await cacheService.invalidateAndRefresh()
 
         // Update combined list
         await MainActor.run {
@@ -420,6 +421,22 @@ struct CareeListView: View {
         }
     }
     #endif
+
+    // MARK: - Helpers
+
+    private func arraysEqualByID<T: AnyObject>(lhs: [T], rhs: [T]) -> Bool {
+        func id(of obj: AnyObject) -> UUID? {
+            if let c = obj as? Caree { return c.id }
+            if let a = obj as? Activity { return a.id }
+            if let t = obj as? ActivityType { return t.id }
+            return nil
+        }
+        guard lhs.count == rhs.count else { return false }
+        for (l, r) in zip(lhs, rhs) {
+            if id(of: l) != id(of: r) { return false }
+        }
+        return true
+    }
 }
 
 // MARK: - View Modifiers
