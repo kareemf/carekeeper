@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Combine
 
 struct CareeDetailView: View {
     @Environment(\.modelContext) private var modelContext
@@ -20,6 +21,9 @@ struct CareeDetailView: View {
 
     // Keep a resilient, last-known reference to the Caree while refreshes occur
     @State private var resolvedCaree: Caree?
+    // Refresh trigger to force view updates when relationships change
+    @State private var refreshID = UUID()
+
     // Fast accessor to try resolving from cache
     private func resolveCareeFromCache() -> Caree? {
         cacheService?.getCachedCaree(id: careeID)
@@ -134,6 +138,7 @@ struct CareeDetailView: View {
                     }
                 }
                 .listStyle(.plain)
+                .id(refreshID) // Refresh List content without re-running .task blocks
                 .navigationTitle(caree.name)
                 .navigationBarTitleDisplayMode(.large)
                 .refreshable {
@@ -175,14 +180,7 @@ struct CareeDetailView: View {
                 .sheet(isPresented: $showingAddActivityType) {
                     ActivityTypeEditView(caree: caree)
                 }
-                .sheet(isPresented: $showingTrackActivity, onDismiss: {
-                    // After adding an activity, refresh shared caree data to update the recent list
-                    if caree.isShared {
-                        Task {
-                            await refreshCareeData(for: caree)
-                        }
-                    }
-                }) {
+                .sheet(isPresented: $showingTrackActivity) {
                     TrackActivityView(caree: caree)
                 }
                 .confirmationDialog(
@@ -280,6 +278,26 @@ struct CareeDetailView: View {
             resolvedCaree = resolveCareeFromCache()
             isLoadingSharedCaree = false
         }
+        // REACTIVE: Re-resolve when cache publishers update (for inline CRUD reactivity)
+        .onReceive(cacheService?.$myCarees.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()) { _ in
+            if let current = resolvedCaree, !current.isShared {
+                resolvedCaree = resolveCareeFromCache()
+            }
+        }
+        .onReceive(cacheService?.$sharedCarees.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()) { _ in
+            if let current = resolvedCaree, current.isShared {
+                resolvedCaree = resolveCareeFromCache()
+            }
+        }
+        // REACTIVE: Listen for shared caree data updates (immediate notification)
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SharedCareeDataUpdated"))) { notification in
+            // Check if this notification is for our caree
+            if let updatedCareeID = notification.object as? UUID, updatedCareeID == careeID {
+                resolvedCaree = resolveCareeFromCache()
+                // Force view refresh to see updated relationships
+                refreshID = UUID()
+            }
+        }
         .errorAlert($error)
     }
     
@@ -290,7 +308,7 @@ struct CareeDetailView: View {
             do {
                 if caree.isShared {
                     try await sharedDataService.deleteActivityType(activityType, caree: caree)
-                    await refreshCareeData(for: caree)
+                    // Cache is automatically updated by CloudKitSharedDataService with optimistic update
                 } else {
                     try await cloudKitService.deleteActivityType(activityType, isShared: false)
                     // Cache is automatically updated by CloudKitDataService for owned records
@@ -311,7 +329,7 @@ struct CareeDetailView: View {
             do {
                 if caree.isShared {
                     try await sharedDataService.deleteActivity(activity, caree: caree)
-                    await refreshCareeData(for: caree)
+                    // Cache is automatically updated by CloudKitSharedDataService with optimistic update
                 } else {
                     try await cloudKitService.deleteActivity(activity, isShared: false)
                     // Cache is automatically updated by CloudKitDataService for owned records

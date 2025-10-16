@@ -59,11 +59,15 @@ class CloudKitSharedDataService: ObservableObject {
             _ = try await sharedDatabase.save(record)
             logger.info("✅ Created ActivityType in shared database: \(name)")
 
-            // Optimistically update local cache (coalesced refresh)
+            // Optimistically update local cache
             if let cache = cacheService {
                 try? await cache.withBatch {
                     try await cache.cacheActivityType(activityType, for: caree)
                 }
+                // Force immediate refresh of published properties so views see the update
+                await cache.refreshPublishedProperties()
+                // Post notification for immediate UI update
+                NotificationCenter.default.post(name: NSNotification.Name("SharedCareeDataUpdated"), object: caree.id)
             }
 
             return activityType
@@ -108,6 +112,8 @@ class CloudKitSharedDataService: ObservableObject {
                 try? await cache.withBatch {
                     try await cache.cacheActivityType(activityType, for: caree)
                 }
+                // Post notification for immediate UI update
+                NotificationCenter.default.post(name: NSNotification.Name("SharedCareeDataUpdated"), object: caree.id)
             }
         } catch {
             logger.error("❌ Failed to update ActivityType: \(error.localizedDescription)")
@@ -139,6 +145,10 @@ class CloudKitSharedDataService: ObservableObject {
                 try? await cache.withBatch {
                     try await cache.removeCachedActivityType(activityType)
                 }
+                // Force immediate refresh of published properties so views see the update
+                await cache.refreshPublishedProperties()
+                // Post notification for immediate UI update
+                NotificationCenter.default.post(name: NSNotification.Name("SharedCareeDataUpdated"), object: caree.id)
             }
         } catch {
             logger.error("❌ Failed to delete ActivityType: \(error.localizedDescription)")
@@ -189,6 +199,10 @@ class CloudKitSharedDataService: ObservableObject {
                 try? await cache.withBatch {
                     try await cache.cacheActivity(activity, for: caree, activityType: activityType)
                 }
+                // Force immediate refresh of published properties so views see the update
+                await cache.refreshPublishedProperties()
+                // Post notification for immediate UI update
+                NotificationCenter.default.post(name: NSNotification.Name("SharedCareeDataUpdated"), object: caree.id)
             }
 
             return activity
@@ -232,6 +246,8 @@ class CloudKitSharedDataService: ObservableObject {
                 try? await cache.withBatch {
                     try await cache.cacheActivity(activity, for: caree, activityType: activityType)
                 }
+                // Post notification for immediate UI update
+                NotificationCenter.default.post(name: NSNotification.Name("SharedCareeDataUpdated"), object: caree.id)
             }
         } catch {
             logger.error("❌ Failed to update Activity: \(error.localizedDescription)")
@@ -263,6 +279,10 @@ class CloudKitSharedDataService: ObservableObject {
                 try? await cache.withBatch {
                     try await cache.removeCachedActivity(activity)
                 }
+                // Force immediate refresh of published properties so views see the update
+                await cache.refreshPublishedProperties()
+                // Post notification for immediate UI update
+                NotificationCenter.default.post(name: NSNotification.Name("SharedCareeDataUpdated"), object: caree.id)
             }
         } catch {
             logger.error("❌ Failed to delete Activity: \(error.localizedDescription)")

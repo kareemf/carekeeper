@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Combine
 
 struct CareeDetailView: View {
     @Environment(\.modelContext) private var modelContext
@@ -17,6 +18,8 @@ struct CareeDetailView: View {
 
     // Keep a resilient, last-known reference to the Caree while refreshes occur
     @State private var resolvedCaree: Caree?
+    // Refresh trigger to force view updates when relationships change
+    @State private var refreshID = UUID()
 
     // Fast accessor to try resolving from cache
     private func resolveCareeFromCache() -> Caree? {
@@ -59,6 +62,7 @@ struct CareeDetailView: View {
                             .containerBackground(.background, for: .tabView)
                     }
                     .tabViewStyle(.verticalPage)
+                    .id(refreshID) // Refresh TabView content without re-running .task blocks
                     .navigationTitle(caree.name)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
@@ -136,6 +140,26 @@ struct CareeDetailView: View {
         .onChange(of: sharedRecordsService.sharedCarees) { _ in
             resolvedCaree = resolveCareeFromCache()
             isLoadingSharedCaree = false
+        }
+        // REACTIVE: Re-resolve when cache publishers update (for inline CRUD reactivity)
+        .onReceive(cacheService?.$myCarees.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()) { _ in
+            if let current = resolvedCaree, !current.isShared {
+                resolvedCaree = resolveCareeFromCache()
+            }
+        }
+        .onReceive(cacheService?.$sharedCarees.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()) { _ in
+            if let current = resolvedCaree, current.isShared {
+                resolvedCaree = resolveCareeFromCache()
+            }
+        }
+        // REACTIVE: Listen for shared caree data updates (immediate notification)
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SharedCareeDataUpdated"))) { notification in
+            // Check if this notification is for our caree
+            if let updatedCareeID = notification.object as? UUID, updatedCareeID == careeID {
+                resolvedCaree = resolveCareeFromCache()
+                // Force view refresh to see updated relationships
+                refreshID = UUID()
+            }
         }
     }
 
