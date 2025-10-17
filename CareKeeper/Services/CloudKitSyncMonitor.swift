@@ -128,8 +128,7 @@ class CloudKitSyncMonitor {
     /// Note: accountIssue is only shown during explicit CloudKit status check,
     /// and is immediately cleared once any sync activity occurs
     private func updateStatus() {
-        // Priority 1: Network issues
-        let monitor = NWPathMonitor()
+        // Priority 1: Network issues (use the persistent monitor, not a new instance)
         if monitor.currentPath.status != .satisfied {
             AppLogger.cloudkit.debug("🔄 SyncMonitor: Setting status to .offline (network not satisfied)")
             status = .offline
