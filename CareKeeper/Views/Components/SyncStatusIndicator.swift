@@ -1,10 +1,8 @@
 import SwiftUI
 
 struct SyncStatusIndicator: View {
+    @Environment(CloudKitSyncMonitor.self) private var syncMonitor
     @State private var isRetrying = false
-
-    // Access the shared monitor directly - it's @Observable so SwiftUI will track changes
-    private var syncMonitor: CloudKitSyncMonitor { CloudKitSyncMonitor.shared }
 
     var body: some View {
         Group {

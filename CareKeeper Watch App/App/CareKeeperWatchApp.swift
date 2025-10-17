@@ -59,6 +59,7 @@ struct CareKeeperWatchApp: App {
     var body: some Scene {
         WindowGroup {
             CareeListView()
+                .environment(CloudKitSyncMonitor.shared)
                 .environmentObject(cloudKitService)
                 .environmentObject(sharedDataService)
                 .environmentObject(sharedRecordsService)
