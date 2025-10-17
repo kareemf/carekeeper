@@ -8,10 +8,12 @@ struct CareKeeperWatchApp: App {
     @StateObject private var sharedRecordsService = CloudKitSharedRecordsService()
     @StateObject private var notificationService = CloudKitNotificationService()
     @State private var cacheService: LocalCacheService?
-    
+
     private let logger = AppLogger.cloudkit
 
-    let sharedModelContainer: ModelContainer
+    // Local-only cache container (no CloudKit mirroring)
+    // Data comes from pure CloudKit services, SwiftData is only for local caching
+    let cacheModelContainer: ModelContainer
 
     init() {
         let logger = AppLogger.cloudkit
@@ -22,20 +24,21 @@ struct CareKeeperWatchApp: App {
             Activity.self
         ])
 
-        // Configure CloudKit sync with private database
-        // Use app group for shared data with iOS app
+        // Local-only cache container - no CloudKit sync
+        // This matches iOS behavior where cache is separate from CloudKit operations
         let modelConfiguration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
-            groupContainer: .identifier(CloudKitConfig.appGroupID),
-            cloudKitDatabase: .private(CloudKitConfig.containerID)
+            groupContainer: .identifier(CloudKitConfig.appGroupID)
+            // Intentionally omit cloudKitDatabase to keep this store local-only
         )
 
         do {
-            sharedModelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
+            cacheModelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
+            logger.info("🧠 Initialized local-only cache ModelContainer (watchOS)")
         } catch {
             // Log the error and fall back to in-memory storage
-            logger.info("⚠️ Failed to create CloudKit-enabled ModelContainer: \(error.localizedDescription)")
+            logger.info("⚠️ Failed to create cache ModelContainer: \(error.localizedDescription)")
             logger.info("   Falling back to in-memory storage (data will not persist)")
 
             // Fallback to in-memory store for development
@@ -45,7 +48,7 @@ struct CareKeeperWatchApp: App {
             )
 
             do {
-                sharedModelContainer = try ModelContainer(for: schema, configurations: [fallbackConfig])
+                cacheModelContainer = try ModelContainer(for: schema, configurations: [fallbackConfig])
             } catch {
                 fatalError("Could not create ModelContainer: \(error)")
             }
@@ -59,9 +62,9 @@ struct CareKeeperWatchApp: App {
                 .environmentObject(sharedDataService)
                 .environmentObject(sharedRecordsService)
                 .task {
-                    // Initialize cache service with modelContainer's mainContext
+                    // Initialize cache service with cacheModelContainer's mainContext
                     if cacheService == nil {
-                        let cache = LocalCacheService(modelContext: sharedModelContainer.mainContext)
+                        let cache = LocalCacheService(modelContext: cacheModelContainer.mainContext)
                         cacheService = cache
 
                         // Wire services to the cache
@@ -96,6 +99,5 @@ struct CareKeeperWatchApp: App {
                     AppLogger.cloudkit.info("✅ CloudKit notification service setup complete (watchOS)")
                 }
         }
-        .modelContainer(sharedModelContainer)
     }
 }

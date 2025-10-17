@@ -52,13 +52,13 @@ struct Provider: TimelineProvider {
     private func fetchCurrentData() -> SimpleEntry {
         let schema = Schema([Caree.self, ActivityType.self, Activity.self])
 
-        // Read from the same CloudKit-synced container as the watch app
-        // This ensures the widget sees the same data
+        // Read from the local-only cache container (same as watch app)
+        // The cache is populated by CloudKit services in the main app
         let configuration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
-            groupContainer: .identifier(CloudKitConfig.appGroupID),
-            cloudKitDatabase: .private(CloudKitConfig.containerID)
+            groupContainer: .identifier(CloudKitConfig.appGroupID)
+            // Intentionally omit cloudKitDatabase - widget reads from local cache only
         )
 
         guard let container = try? ModelContainer(for: schema, configurations: [configuration]) else {
