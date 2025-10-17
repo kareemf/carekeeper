@@ -1,12 +1,14 @@
 import SwiftUI
 import Network
 import CloudKit
+import Combine
 
 @MainActor
 @Observable
 class CloudKitSyncMonitor {
     enum SyncStatus {
         case idle
+        case syncing
         case offline
         case checking
         case accountIssue
@@ -15,6 +17,8 @@ class CloudKitSyncMonitor {
             switch self {
             case .idle:
                 return NSLocalizedString("Synced", comment: "Sync status: idle")
+            case .syncing:
+                return NSLocalizedString("Syncing...", comment: "Sync status: syncing")
             case .offline:
                 return NSLocalizedString("Offline", comment: "Sync status: offline")
             case .checking:
@@ -28,6 +32,8 @@ class CloudKitSyncMonitor {
             switch self {
             case .idle:
                 return "icloud"
+            case .syncing:
+                return "arrow.triangle.2.circlepath"
             case .offline:
                 return "wifi.slash"
             case .checking:
@@ -41,6 +47,8 @@ class CloudKitSyncMonitor {
             switch self {
             case .idle:
                 return .secondary
+            case .syncing:
+                return .blue
             case .offline:
                 return .orange
             case .checking:
@@ -65,10 +73,87 @@ class CloudKitSyncMonitor {
     private(set) var status: SyncStatus = .idle
     private let monitor = NWPathMonitor()
     private let monitorQueue = DispatchQueue(label: "com.carekeeper.networkmonitor")
+    private var cancellables = Set<AnyCancellable>()
+
+    // Service references (set externally)
+    private weak var cloudKitService: CloudKitDataService?
+    private weak var sharedRecordsService: CloudKitSharedRecordsService?
+    private weak var cacheService: LocalCacheService?
 
     private init() {
         setupNetworkMonitoring()
         checkCloudKitStatus()
+    }
+
+    /// Configure services to monitor for sync status
+    func configureServices(
+        cloudKitService: CloudKitDataService,
+        sharedRecordsService: CloudKitSharedRecordsService,
+        cacheService: LocalCacheService
+    ) {
+        self.cloudKitService = cloudKitService
+        self.sharedRecordsService = sharedRecordsService
+        self.cacheService = cacheService
+
+        // Observe CloudKitDataService.syncStatus
+        cloudKitService.$syncStatus
+            .sink { [weak self] syncStatus in
+                Task { @MainActor in
+                    self?.updateStatus()
+                }
+            }
+            .store(in: &cancellables)
+
+        // Observe CloudKitSharedRecordsService.isLoading
+        sharedRecordsService.$isLoading
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    self?.updateStatus()
+                }
+            }
+            .store(in: &cancellables)
+
+        // Observe LocalCacheService.isLoading
+        cacheService.$isLoading
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    self?.updateStatus()
+                }
+            }
+            .store(in: &cancellables)
+    }
+
+    /// Update status based on priority: offline > accountIssue > syncing > idle
+    private func updateStatus() {
+        // Priority 1: Network issues
+        let monitor = NWPathMonitor()
+        if monitor.currentPath.status != .satisfied {
+            status = .offline
+            return
+        }
+
+        // Priority 2: Account issues (check current status, don't re-check)
+        if case .accountIssue = status {
+            return
+        }
+
+        // Priority 3: Active syncing (check if any service is actively working)
+        let isCloudKitSyncing: Bool = {
+            if case .syncing = cloudKitService?.syncStatus {
+                return true
+            }
+            return false
+        }()
+        let isSharedRecordsLoading = sharedRecordsService?.isLoading ?? false
+        let isCacheLoading = cacheService?.isLoading ?? false
+
+        if isCloudKitSyncing || isSharedRecordsLoading || isCacheLoading {
+            status = .syncing
+            return
+        }
+
+        // Default: idle
+        status = .idle
     }
 
     private func setupNetworkMonitoring() {
@@ -77,8 +162,9 @@ class CloudKitSyncMonitor {
                 guard let self = self else { return }
                 if path.status == .satisfied {
                     if case .offline = self.status {
-                        self.status = .idle
                         self.checkCloudKitStatus()
+                    } else {
+                        self.updateStatus()
                     }
                 } else {
                     self.status = .offline
@@ -99,7 +185,7 @@ class CloudKitSyncMonitor {
                 await MainActor.run {
                     switch accountStatus {
                     case .available:
-                        self.status = .idle
+                        self.updateStatus()
                     case .noAccount, .restricted, .couldNotDetermine, .temporarilyUnavailable:
                         self.status = .accountIssue
                     @unknown default:

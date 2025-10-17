@@ -175,6 +175,13 @@ struct CareKeeperApp: App {
                         // Wire sharedDataService to cloudKitService for unified API
                         cloudKitService.setSharedDataService(sharedDataService)
 
+                        // Wire services to CloudKitSyncMonitor for status tracking
+                        CloudKitSyncMonitor.shared.configureServices(
+                            cloudKitService: cloudKitService,
+                            sharedRecordsService: sharedRecordsService,
+                            cacheService: newCacheService
+                        )
+
                         // Store on @State
                         cacheService = newCacheService
 

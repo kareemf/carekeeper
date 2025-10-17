@@ -9,8 +9,8 @@ struct SyncStatusIndicator: View {
             case .idle:
                 EmptyView()
 
-            case .checking:
-                checkingView
+            case .syncing, .checking:
+                syncingView
 
             case .offline, .accountIssue:
                 issueView
@@ -18,7 +18,7 @@ struct SyncStatusIndicator: View {
         }
     }
 
-    private var checkingView: some View {
+    private var syncingView: some View {
         HStack(spacing: 4) {
             ProgressView()
                 .scaleEffect(0.7)
