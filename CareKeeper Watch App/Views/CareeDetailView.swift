@@ -3,8 +3,6 @@ import SwiftData
 import Combine
 
 struct CareeDetailView: View {
-    @Environment(\.modelContext) private var modelContext
-
     let careeID: UUID
 
     // Use shared services from environment

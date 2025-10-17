@@ -2,8 +2,6 @@ import SwiftUI
 import SwiftData
 
 struct ActivityListView: View {
-    @Environment(\.modelContext) private var modelContext
-
     let careeID: UUID
 
     // Use shared services from environment

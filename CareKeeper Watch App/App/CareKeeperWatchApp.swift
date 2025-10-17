@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import WidgetKit
 
 @main
 struct CareKeeperWatchApp: App {
@@ -88,6 +89,9 @@ struct CareKeeperWatchApp: App {
                         do {
                             try await cloudKitService.refreshOwnedCareesFromCloudKit()
                             AppLogger.app.info("✅ Initial owned records loaded into cache (watchOS)")
+
+                            // Reload widget timelines after loading initial data
+                            WidgetCenter.shared.reloadAllTimelines()
                         } catch {
                             AppLogger.app.warning("⚠️ Initial owned refresh failed (watchOS): \(error.localizedDescription)")
                         }
@@ -97,6 +101,9 @@ struct CareKeeperWatchApp: App {
                     // Set up CloudKit database subscriptions and shared-records refresh on watchOS
                     await notificationService.setupNotifications(sharedRecordsService: sharedRecordsService)
                     AppLogger.cloudkit.info("✅ CloudKit notification service setup complete (watchOS)")
+
+                    // Also reload widget after shared records are fetched
+                    WidgetCenter.shared.reloadAllTimelines()
                 }
         }
     }

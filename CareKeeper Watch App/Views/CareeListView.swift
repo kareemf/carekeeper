@@ -3,8 +3,6 @@ import Combine
 import SwiftData
 
 struct CareeListView: View {
-    @Environment(\.modelContext) private var modelContext
-
     // Use shared services from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
     @EnvironmentObject private var sharedRecordsService: CloudKitSharedRecordsService
