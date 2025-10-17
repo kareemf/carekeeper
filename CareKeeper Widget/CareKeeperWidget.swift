@@ -52,12 +52,13 @@ struct Provider: TimelineProvider {
     private func fetchCurrentData() -> SimpleEntry {
         let schema = Schema([Caree.self, ActivityType.self, Activity.self])
 
-        // IMPORTANT: Widget/complication should NOT attach CloudKit.
-        // Read only from the shared App Group store that the watch app writes to.
+        // Read from the same CloudKit-synced container as the watch app
+        // This ensures the widget sees the same data
         let configuration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
-            groupContainer: .identifier(CloudKitConfig.appGroupID)
+            groupContainer: .identifier(CloudKitConfig.appGroupID),
+            cloudKitDatabase: .private(CloudKitConfig.containerID)
         )
 
         guard let container = try? ModelContainer(for: schema, configurations: [configuration]) else {
