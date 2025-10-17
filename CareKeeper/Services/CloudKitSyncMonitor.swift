@@ -82,7 +82,8 @@ class CloudKitSyncMonitor {
 
     private init() {
         setupNetworkMonitoring()
-        checkCloudKitStatus()
+        // Don't check CloudKit status immediately - wait for services to be configured
+        // and for actual sync attempts, which will reveal real connectivity issues
     }
 
     /// Configure services to monitor for sync status
@@ -123,21 +124,19 @@ class CloudKitSyncMonitor {
             .store(in: &cancellables)
     }
 
-    /// Update status based on priority: offline > accountIssue > syncing > idle
+    /// Update status based on priority: offline > syncing > idle
+    /// Note: accountIssue is only shown during explicit CloudKit status check,
+    /// and is immediately cleared once any sync activity occurs
     private func updateStatus() {
         // Priority 1: Network issues
         let monitor = NWPathMonitor()
         if monitor.currentPath.status != .satisfied {
+            AppLogger.cloudkit.debug("🔄 SyncMonitor: Setting status to .offline (network not satisfied)")
             status = .offline
             return
         }
 
-        // Priority 2: Account issues (check current status, don't re-check)
-        if case .accountIssue = status {
-            return
-        }
-
-        // Priority 3: Active syncing (check if any service is actively working)
+        // Priority 2: Active syncing (check if any service is actively working)
         let isCloudKitSyncing: Bool = {
             if case .syncing = cloudKitService?.syncStatus {
                 return true
@@ -147,12 +146,17 @@ class CloudKitSyncMonitor {
         let isSharedRecordsLoading = sharedRecordsService?.isLoading ?? false
         let isCacheLoading = cacheService?.isLoading ?? false
 
+        AppLogger.cloudkit.debug("🔄 SyncMonitor: updateStatus - CloudKit: \(isCloudKitSyncing), SharedRecords: \(isSharedRecordsLoading), Cache: \(isCacheLoading), Current: \(String(describing: self.status))")
+
         if isCloudKitSyncing || isSharedRecordsLoading || isCacheLoading {
+            AppLogger.cloudkit.debug("🔄 SyncMonitor: Setting status to .syncing")
             status = .syncing
             return
         }
 
-        // Default: idle
+        // Priority 3: Default to idle
+        // Don't persist accountIssue - if we reach here, services are idle and working fine
+        AppLogger.cloudkit.debug("🔄 SyncMonitor: Setting status to .idle")
         status = .idle
     }
 
