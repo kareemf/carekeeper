@@ -165,12 +165,12 @@ class CloudKitSyncMonitor {
             Task { @MainActor in
                 guard let self = self else { return }
                 if path.status == .satisfied {
-                    if case .offline = self.status {
-                        self.checkCloudKitStatus()
-                    } else {
-                        self.updateStatus()
-                    }
+                    // When network comes back, just update status based on service activity
+                    // Don't automatically check CloudKit account (causes false accountIssue in simulator)
+                    AppLogger.cloudkit.debug("🔄 SyncMonitor: Network online, updating status")
+                    self.updateStatus()
                 } else {
+                    AppLogger.cloudkit.debug("🔄 SyncMonitor: Network offline")
                     self.status = .offline
                 }
             }
