@@ -20,11 +20,6 @@ struct TrackActivityView: View {
 
     // Use shared services from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
-    @EnvironmentObject private var sharedDataService: CloudKitSharedDataService
-
-    private var isSharedCaree: Bool {
-        caree.isShared  // Use cache metadata
-    }
 
     var body: some View {
         NavigationStack {
@@ -208,57 +203,28 @@ struct TrackActivityView: View {
         let now = Date()
         let finalDateTime: Date = useCustomTime ? combine(date: now, timeOfDayFrom: customTime) : now
 
-        if isSharedCaree {
-            // Handle shared caree - use CloudKit service
-            Task {
-                do {
-                    _ = try await sharedDataService.createActivity(
-                        for: caree,
-                        activityType: activityType,
-                        dateTime: finalDateTime,
-                        notes: notes.isEmpty ? nil : notes,
-                        quantity: activityType.hasQuantity && quantity > 0 ? quantity : nil,
-                        latitude: location?.coordinate.latitude,
-                        longitude: location?.coordinate.longitude
-                    )
+        // Use unified API (routes internally based on caree.isShared)
+        Task {
+            do {
+                _ = try await cloudKitService.createActivity(
+                    caree: caree,
+                    activityType: activityType,
+                    dateTime: finalDateTime,
+                    notes: notes.isEmpty ? nil : notes,
+                    quantity: activityType.hasQuantity && quantity > 0 ? quantity : nil,
+                    latitude: location?.coordinate.latitude,
+                    longitude: location?.coordinate.longitude
+                )
 
-                    await MainActor.run {
-                        locationManager.stopUpdating()
-                        WidgetCenter.shared.reloadAllTimelines()
-                        dismiss()
-                    }
-                } catch {
-                    await MainActor.run {
-                        self.error = AppError.saveFailed(error.localizedDescription)
-                        locationManager.stopUpdating()
-                    }
+                await MainActor.run {
+                    locationManager.stopUpdating()
+                    WidgetCenter.shared.reloadAllTimelines()
+                    dismiss()
                 }
-            }
-        } else {
-            // Handle owned caree - use Pure CloudKit
-            Task {
-                do {
-                    _ = try await cloudKitService.createActivity(
-                        for: caree,
-                        activityType: activityType,
-                        dateTime: finalDateTime,
-                        notes: notes.isEmpty ? nil : notes,
-                        quantity: activityType.hasQuantity && quantity > 0 ? quantity : nil,
-                        latitude: location?.coordinate.latitude,
-                        longitude: location?.coordinate.longitude,
-                        isShared: false
-                    )
-
-                    await MainActor.run {
-                        locationManager.stopUpdating()
-                        WidgetCenter.shared.reloadAllTimelines()
-                        dismiss()
-                    }
-                } catch {
-                    await MainActor.run {
-                        self.error = AppError.saveFailed(error.localizedDescription)
-                        locationManager.stopUpdating()
-                    }
+            } catch {
+                await MainActor.run {
+                    self.error = AppError.saveFailed(error.localizedDescription)
+                    locationManager.stopUpdating()
                 }
             }
         }

@@ -147,14 +147,13 @@ struct ActivityListView: View {
 
     private func deleteActivities(at offsets: IndexSet, from caree: Caree) {
         let activities = filteredActivities(for: caree)
-        let isShared = caree.isShared  // Use cache metadata
 
         Task {
             do {
                 for index in offsets {
                     let activity = activities[index]
-                    // Pure CloudKit: Delete via CloudKitDataService
-                    try await cloudKitService.deleteActivity(activity, isShared: isShared)
+                    // Pure CloudKit: Delete via unified API (routes internally based on caree.isShared)
+                    try await cloudKitService.deleteActivity(activity: activity, caree: caree)
                 }
 
                 // Cache is automatically updated by CloudKitDataService

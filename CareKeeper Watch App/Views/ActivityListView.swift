@@ -6,7 +6,6 @@ struct ActivityListView: View {
 
     // Use shared services from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
-    @EnvironmentObject private var sharedDataService: CloudKitSharedDataService
 
     // Get cache service from shared CloudKitDataService
     private var cacheService: LocalCacheService? {
@@ -164,17 +163,10 @@ struct ActivityListView: View {
             return
         }
 
-        let isShared = caree.isShared  // Use cache metadata
-
         Task {
             do {
-                if isShared {
-                    // Shared path via CloudKitSharedDataService
-                    try await sharedDataService.deleteActivity(activity, caree: caree)
-                } else {
-                    // Owned path via CloudKitDataService
-                    try await cloudKitService.deleteActivity(activity, isShared: false)
-                }
+                // Use unified API (routes internally based on caree.isShared)
+                try await cloudKitService.deleteActivity(activity: activity, caree: caree)
 
                 await MainActor.run {
                     activityToDelete = nil
