@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Combine
 
 struct ActivityListView: View {
     @Environment(\.modelContext) private var modelContext
@@ -14,10 +15,9 @@ struct ActivityListView: View {
         cloudKitService.cacheService
     }
 
-    // Get the specific caree from cache
-    private var caree: Caree? {
-        cacheService?.getCachedCaree(id: careeID)
-    }
+    // Reactive state - updated when cache changes
+    @State private var caree: Caree?
+    @State private var activities: [Activity] = []
 
     @State private var selectedActivityType: ActivityType?
     @State private var showingFilterMenu = false
@@ -27,6 +27,23 @@ struct ActivityListView: View {
 
     init(careeID: UUID) {
         self.careeID = careeID
+    }
+
+    // Helper publishers to observe cache changes
+    private var myCareesPublisher: AnyPublisher<[Caree], Never> {
+        if let cacheService = cacheService {
+            return cacheService.$myCarees.eraseToAnyPublisher()
+        } else {
+            return Just([]).eraseToAnyPublisher()
+        }
+    }
+
+    private var sharedCareesPublisher: AnyPublisher<[Caree], Never> {
+        if let cacheService = cacheService {
+            return cacheService.$sharedCarees.eraseToAnyPublisher()
+        } else {
+            return Just([]).eraseToAnyPublisher()
+        }
     }
 
     var body: some View {
@@ -82,6 +99,10 @@ struct ActivityListView: View {
                         }
                     }
                 }
+                .refreshable {
+                    // Refresh cache on pull-to-refresh
+                    try? await cacheService?.refreshCache()
+                }
             } else {
                 Text(NSLocalizedString("Caree not found", comment: "Caree not found message"))
                     .foregroundColor(.secondary)
@@ -105,8 +126,15 @@ struct ActivityListView: View {
             Text(NSLocalizedString("This cannot be undone.", comment: "Delete confirmation message"))
         }
         .task {
-            // Refresh cache to load caree and activities
+            // Initial load: refresh cache and update activities
             try? await cacheService?.refreshCache()
+            updateActivities()
+        }
+        .onReceive(myCareesPublisher) { _ in
+            updateActivities()
+        }
+        .onReceive(sharedCareesPublisher) { _ in
+            updateActivities()
         }
     }
 
@@ -135,9 +163,29 @@ struct ActivityListView: View {
         .listRowSeparator(.hidden)
     }
 
-    private func filteredActivities(for caree: Caree) -> [Activity] {
-        let activities = (caree.activities ?? []).sorted { $0.dateTime > $1.dateTime }
+    private func updateActivities() {
+        guard let cacheService = cacheService else {
+            caree = nil
+            activities = []
+            return
+        }
 
+        // Find the specific caree from cache (owned or shared)
+        let foundCaree = cacheService.getCachedCaree(id: careeID)
+
+        // Update caree and activities state
+        caree = foundCaree
+
+        if let foundCaree = foundCaree {
+            // Extract and sort activities
+            activities = (foundCaree.activities ?? []).sorted { $0.dateTime > $1.dateTime }
+        } else {
+            activities = []
+        }
+    }
+
+    private func filteredActivities(for caree: Caree) -> [Activity] {
+        // Use state activities array instead of reading from caree
         if let selectedType = selectedActivityType {
             return activities.filter { $0.activityType?.id == selectedType.id }
         }
