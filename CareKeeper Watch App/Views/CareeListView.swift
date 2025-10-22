@@ -91,6 +91,9 @@ struct CareeListView: View {
             }
             .errorAlert($error)
         }
+        .navigationDestination(for: UUID.self) { careeID in
+            CareeDetailView(careeID: careeID)
+        }
     }
 
     private var emptyStateView: some View {
@@ -132,7 +135,7 @@ struct CareeListView: View {
 
     private var careeListView: some View {
         List(allCarees) { caree in
-            NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
+            NavigationLink(value: caree.id) {
                 CareeRowView(
                     caree: caree,
                     isShared: caree.isShared  // Use cache metadata

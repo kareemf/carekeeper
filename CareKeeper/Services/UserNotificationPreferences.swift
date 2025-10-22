@@ -13,6 +13,9 @@ class UserNotificationPreferences: ObservableObject {
     // MARK: - App Group UserDefaults
 
     private let appGroupDefaults: UserDefaults
+    private let logger = AppLogger.app
+    private let isUsingFallbackDefaults: Bool
+    private var hasLoggedFallbackWarning = false
 
     // MARK: - Keys
 
@@ -44,13 +47,17 @@ class UserNotificationPreferences: ObservableObject {
 
     private init() {
         // Initialize app group UserDefaults
-        guard let defaults = UserDefaults(suiteName: CloudKitConfig.appGroupID) else {
-            fatalError("Failed to initialize app group UserDefaults with suite: \(CloudKitConfig.appGroupID)")
+        if let appGroupDefaults = UserDefaults(suiteName: CloudKitConfig.appGroupID) {
+            self.appGroupDefaults = appGroupDefaults
+            self.isUsingFallbackDefaults = false
+        } else {
+            self.logger.error("⚠️ Failed to resolve app-group UserDefaults (\(CloudKitConfig.appGroupID, privacy: .public)); falling back to standard defaults.")
+            self.appGroupDefaults = .standard
+            self.isUsingFallbackDefaults = true
         }
-        self.appGroupDefaults = defaults
 
         // Load initial value
-        self.notificationsEnabled = defaults.bool(forKey: Keys.notificationsEnabled)
+        self.notificationsEnabled = self.appGroupDefaults.bool(forKey: Keys.notificationsEnabled)
     }
 
     // MARK: - Per-Caree Preferences
@@ -75,6 +82,11 @@ class UserNotificationPreferences: ObservableObject {
         // If enabling a caree, ensure global notifications are enabled
         if enabled && !notificationsEnabled {
             notificationsEnabled = true
+        }
+
+        if isUsingFallbackDefaults && !hasLoggedFallbackWarning {
+            logger.warning("⚠️ Notification preferences are using fallback defaults; settings will not sync via app group.")
+            hasLoggedFallbackWarning = true
         }
 
         objectWillChange.send()
