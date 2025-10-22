@@ -16,8 +16,8 @@ struct CareeListView: View {
     @State private var deletionProgress: Double = 0.0
     @State private var isDeleting = false
 
-    // Combined list of all carees - updated when cache changes
-    @State private var allCarees: [Caree] = []
+    // Track combined carees by stable identifier to avoid holding onto invalidated models
+    @State private var careeIDs: [UUID] = []
 
     // Helper publishers to unify types and provide safe fallbacks
     private var myCareesPublisher: AnyPublisher<[Caree], Never> {
@@ -37,16 +37,19 @@ struct CareeListView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        let carees = resolvedCarees()
+
+        return NavigationStack {
             Group {
-                if allCarees.isEmpty {
+                if carees.isEmpty {
                     emptyStateView
                 } else {
-                    careeListView
+                    careeListView(carees)
                 }
             }
             .navigationTitle(NSLocalizedString("Carees", comment: "Navigation title for carees list"))
             .task {
+                updateAllCarees()
                 // Fetch shared carees; service will push into cache (batched)
                 await sharedRecordsService.fetchSharedCarees()
             }
@@ -121,20 +124,28 @@ struct CareeListView: View {
         .padding()
     }
 
+    private func resolvedCarees() -> [Caree] {
+        guard let cacheService = cacheService else {
+            return []
+        }
+
+        return careeIDs.compactMap { cacheService.getCachedCaree(id: $0) }
+    }
+
     private func updateAllCarees() {
         guard let cacheService = cacheService else {
-            allCarees = []
+            careeIDs = []
             return
         }
-        let newCombined = cacheService.myCarees + cacheService.sharedCarees
-        // Only assign when the identity + order actually changed to keep navigation stable
-        if !arraysEqualByID(lhs: allCarees, rhs: newCombined) {
-            allCarees = newCombined
+
+        let newIDs = (cacheService.myCarees + cacheService.sharedCarees).map { $0.id }
+        if careeIDs != newIDs {
+            careeIDs = newIDs
         }
     }
 
-    private var careeListView: some View {
-        List(allCarees) { caree in
+    private func careeListView(_ carees: [Caree]) -> some View {
+        List(carees) { caree in
             NavigationLink(value: caree.id) {
                 CareeRowView(
                     caree: caree,
@@ -146,22 +157,6 @@ struct CareeListView: View {
             // Refresh shared carees; LocalCacheService will update via batched apply
             await sharedRecordsService.fetchSharedCarees()
         }
-    }
-
-    // MARK: - Helpers
-
-    private func arraysEqualByID<T: AnyObject>(lhs: [T], rhs: [T]) -> Bool {
-        func id(of obj: AnyObject) -> UUID? {
-            if let c = obj as? Caree { return c.id }
-            if let a = obj as? Activity { return a.id }
-            if let t = obj as? ActivityType { return t.id }
-            return nil
-        }
-        guard lhs.count == rhs.count else { return false }
-        for (l, r) in zip(lhs, rhs) {
-            if id(of: l) != id(of: r) { return false }
-        }
-        return true
     }
 }
 
