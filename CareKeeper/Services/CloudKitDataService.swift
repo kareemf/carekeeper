@@ -626,7 +626,7 @@ class CloudKitDataService: ObservableObject {
                 // Find cached activity type
                 let cachedActivityTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
                 if let cachedActivityType = cachedActivityTypes.first(where: { $0.id == activityType.id }) {
-                    try await cacheService.cacheActivity(syncedActivity, for: cachedCaree, activityType: cachedActivityType)
+                    try await cacheService.cacheActivity(syncedActivity, for: cachedCaree, activityTypeID: cachedActivityType.id)
                     logger.info("✅ Activity cached locally")
                 }
             }
@@ -695,7 +695,7 @@ class CloudKitDataService: ObservableObject {
                let cachedCaree = cacheService.getCachedCaree(id: caree.id) {
                 let cachedActivityTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
                 if let cachedActivityType = cachedActivityTypes.first(where: { $0.id == activityType.id }) {
-                    try await cacheService.cacheActivity(activity, for: cachedCaree, activityType: cachedActivityType)
+                    try await cacheService.cacheActivity(activity, for: cachedCaree, activityTypeID: cachedActivityType.id)
                     logger.info("✅ Activity cache updated")
                 }
             }
@@ -946,9 +946,13 @@ class CloudKitDataService: ObservableObject {
 
         // Convert carees first
         var careesByID: [UUID: Caree] = [:]
+        var activityTypesByCaree: [UUID: [ActivityType]] = [:]
+        var activitiesByCaree: [UUID: [Activity]] = [:]
         for record in careeRecords {
             do {
                 let caree = try await converter.recordToCaree(record)
+                caree.isShared = false
+                caree.isOwned = true
                 careesByID[caree.id] = caree
             } catch {
                 logger.warning("⚠️ Convert caree failed: \(error.localizedDescription)")
@@ -957,6 +961,7 @@ class CloudKitDataService: ObservableObject {
 
         // Convert activity types and attach to carees
         var activityTypesByID: [UUID: ActivityType] = [:]
+        var activityTypeIDByActivity: [UUID: UUID] = [:]
         for record in atRecords {
             do {
                 let at = try converter.recordToActivityType(record)
@@ -966,10 +971,8 @@ class CloudKitDataService: ObservableObject {
                 if let careeRef = record["CD_caree"] as? CKRecord.Reference,
                    let careeIDStr = careeRef.recordID.recordName.split(separator: "/").last,
                    let careeID = UUID(uuidString: String(careeIDStr)),
-                   let parentCaree = careesByID[careeID] {
-                    if parentCaree.activityTypes == nil { parentCaree.activityTypes = [] }
-                    at.caree = parentCaree
-                    parentCaree.activityTypes?.append(at)
+                   careesByID[careeID] != nil {
+                    activityTypesByCaree[careeID, default: []].append(at)
                 }
             } catch {
                 logger.warning("⚠️ Convert activity type failed: \(error.localizedDescription)")
@@ -985,23 +988,42 @@ class CloudKitDataService: ObservableObject {
                 if let atRef = record["CD_activityType"] as? CKRecord.Reference,
                    let atIDStr = atRef.recordID.recordName.split(separator: "/").last,
                    let atID = UUID(uuidString: String(atIDStr)),
-                   let at = activityTypesByID[atID] {
-                    if at.activities == nil { at.activities = [] }
-                    activity.activityType = at
-                    at.activities?.append(activity)
+                   activityTypesByID[atID] != nil {
+                    activityTypeIDByActivity[activity.id] = atID
                 }
 
                 // Attach to caree
                 if let careeRef = record["CD_caree"] as? CKRecord.Reference,
                    let careeIDStr = careeRef.recordID.recordName.split(separator: "/").last,
                    let careeID = UUID(uuidString: String(careeIDStr)),
-                   let parentCaree = careesByID[careeID] {
-                    if parentCaree.activities == nil { parentCaree.activities = [] }
-                    activity.caree = parentCaree
-                    parentCaree.activities?.append(activity)
+                   careesByID[careeID] != nil {
+                    activitiesByCaree[careeID, default: []].append(activity)
                 }
             } catch {
                 logger.warning("⚠️ Convert activity failed: \(error.localizedDescription)")
+            }
+        }
+
+        // Populate relationships for transient objects used outside the cache.
+        for (careeID, caree) in careesByID {
+            let types = activityTypesByCaree[careeID] ?? []
+            caree.activityTypes = types
+            let activities = activitiesByCaree[careeID] ?? []
+            caree.activities = activities
+
+            for activityType in types {
+                activityType.caree = caree
+            }
+
+            for activity in activities {
+                if let activityTypeID = activityTypeIDByActivity[activity.id],
+                   let activityType = activityTypesByID[activityTypeID] {
+                    activity.activityType = activityType
+                    var activitiesForType = activityType.activities ?? []
+                    activitiesForType.append(activity)
+                    activityType.activities = activitiesForType
+                }
+                activity.caree = caree
             }
         }
 
@@ -1022,14 +1044,17 @@ class CloudKitDataService: ObservableObject {
             // Upsert everything into cache
             for caree in careesByID.values.sorted(by: { $0.listOrder < $1.listOrder }) {
                 do {
-                    try await cacheService.cacheCaree(caree, isShared: false)
-                    for at in (caree.activityTypes ?? []) {
-                        try await cacheService.cacheActivityType(at, for: caree)
+                    let cacheCaree = cloneCareeForCaching(caree, isShared: false)
+                    try await cacheService.cacheCaree(cacheCaree, isShared: false)
+                    for at in (activityTypesByCaree[caree.id] ?? []) {
+                        try await cacheService.cacheActivityType(at, for: cacheCaree)
                     }
-                    for activity in (caree.activities ?? []) {
-                        if let at = activity.activityType {
-                            try await cacheService.cacheActivity(activity, for: caree, activityType: at)
+                    for activity in (activitiesByCaree[caree.id] ?? []) {
+                        guard let activityTypeID = activityTypeIDByActivity[activity.id] else {
+                            logger.warning("⚠️ Missing activity type reference for activity \(activity.id)")
+                            continue
                         }
+                        try await cacheService.cacheActivity(activity, for: cacheCaree, activityTypeID: activityTypeID)
                     }
                 } catch {
                     logger.warning("⚠️ Failed caching owned records: \(error.localizedDescription)")
@@ -1040,6 +1065,17 @@ class CloudKitDataService: ObservableObject {
         // No explicit refreshPublishedProperties call needed; the batch coalesces a single refresh.
         NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
         logger.info("✅ Owned records refreshed and cache updated")
+    }
+
+    private func cloneCareeForCaching(_ caree: Caree, isShared: Bool) -> Caree {
+        let clone = Caree(name: caree.name, image: caree.image, listOrder: caree.listOrder)
+        clone.id = caree.id
+        clone.dateCreated = caree.dateCreated
+        clone.isShared = isShared
+        clone.isOwned = !isShared
+        clone.lastSyncedAt = caree.lastSyncedAt
+        clone.cloudKitRecordID = caree.cloudKitRecordID
+        return clone
     }
 
     // MARK: - Zone Management (for Migration)

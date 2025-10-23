@@ -145,16 +145,24 @@ class LocalCacheService: ObservableObject {
             existingActivityType.applyScalarUpdates(from: activityType)
             existingActivityType.lastSyncedAt = Date()
             existingActivityType.cloudKitRecordID = "CD_ActivityType/\(activityType.id.uuidString)"
-            existingActivityType.caree = managedCaree
-
+            attachActivityType(existingActivityType, to: managedCaree)
             logger.info("Updated existing activity type in cache: \(activityType.name)")
         } else {
-            // Insert new managed instance, attach to managedCaree
-            activityType.lastSyncedAt = Date()
-            activityType.cloudKitRecordID = "CD_ActivityType/\(activityType.id.uuidString)"
-            activityType.caree = managedCaree
+            let newActivityType = ActivityType(
+                name: activityType.name,
+                icon: activityType.icon,
+                hasQuantity: activityType.hasQuantity,
+                quantityUnit: activityType.quantityUnit,
+                hasLocation: activityType.hasLocation,
+                listOrder: activityType.listOrder
+            )
+            newActivityType.id = activityType.id
+            newActivityType.dateCreated = activityType.dateCreated
+            newActivityType.lastSyncedAt = Date()
+            newActivityType.cloudKitRecordID = "CD_ActivityType/\(activityType.id.uuidString)"
 
-            modelContext.insert(activityType)
+            modelContext.insert(newActivityType)
+            attachActivityType(newActivityType, to: managedCaree)
             logger.info("Inserted new activity type into cache: \(activityType.name)")
         }
 
@@ -166,30 +174,26 @@ class LocalCacheService: ObservableObject {
     /// - Parameters:
     ///   - activity: Activity to cache (may be transient)
     ///   - caree: Parent Caree (may be transient) — will be resolved to the managed instance
-    ///   - activityType: ActivityType (may be transient) — will be resolved to the managed instance
-    func cacheActivity(_ activity: Activity, for caree: Caree, activityType: ActivityType) async throws {
+    ///   - activityTypeID: Identifier of the parent ActivityType
+    func cacheActivity(_ activity: Activity, for caree: Caree, activityTypeID: UUID) async throws {
         logger.info("Caching activity at: \(activity.dateTime)")
 
         // Resolve managed parent Caree and ActivityType
         guard let managedCaree = getCachedCaree(id: caree.id) else {
             logger.warning("Parent caree not found in cache; caching it first to avoid implicit insert")
             try await cacheCaree(caree, isShared: caree.isShared)
-            try await cacheActivity(activity, for: caree, activityType: activityType)
+            try await cacheActivity(activity, for: caree, activityTypeID: activityTypeID)
             return
         }
 
         let managedActivityType: ActivityType
         do {
-            if let at = try fetchActivityType(id: activityType.id) {
+            if let at = try fetchActivityType(id: activityTypeID) {
                 managedActivityType = at
             } else {
                 logger.warning("Parent activity type not found; caching it first to avoid implicit insert")
-                try await cacheActivityType(activityType, for: managedCaree)
-                guard let at2 = try fetchActivityType(id: activityType.id) else {
-                    logger.error("Failed to resolve activity type after caching; aborting Activity cache")
-                    return
-                }
-                managedActivityType = at2
+                logger.error("Cannot resolve parent activity type \(activityTypeID)")
+                return
             }
         } catch {
             logger.error("Failed to fetch activity type: \(error.localizedDescription)")
@@ -207,24 +211,33 @@ class LocalCacheService: ObservableObject {
             existingActivity.applyScalarUpdates(from: activity)
             existingActivity.lastSyncedAt = Date()
             existingActivity.cloudKitRecordID = "CD_Activity/\(activity.id.uuidString)"
-            existingActivity.caree = managedCaree
-            existingActivity.activityType = managedActivityType
+            attachActivity(existingActivity, to: managedCaree)
+            attachActivity(existingActivity, toActivityType: managedActivityType)
 
             logger.info("Updated existing activity in cache")
         } else {
-            activity.lastSyncedAt = Date()
-            activity.cloudKitRecordID = "CD_Activity/\(activity.id.uuidString)"
-            activity.caree = managedCaree
-            activity.activityType = managedActivityType
+            let newActivity = Activity(
+                dateTime: activity.dateTime,
+                notes: activity.notes,
+                quantity: activity.quantity,
+                latitude: activity.latitude,
+                longitude: activity.longitude
+            )
+            newActivity.id = activity.id
+            newActivity.dateCreated = activity.dateCreated
+            newActivity.lastSyncedAt = Date()
+            newActivity.cloudKitRecordID = "CD_Activity/\(activity.id.uuidString)"
 
-            modelContext.insert(activity)
+            modelContext.insert(newActivity)
+            attachActivity(newActivity, to: managedCaree)
+            attachActivity(newActivity, toActivityType: managedActivityType)
+
             logger.info("Inserted new activity into cache")
         }
 
         try modelContext.save()
         scheduleRefresh(reason: "cacheActivity")
     }
-
     // MARK: - Cache Read Operations
 
     func getCachedCaree(id: UUID) -> Caree? {
@@ -470,6 +483,34 @@ class LocalCacheService: ObservableObject {
         defer { endBatch() }
         return try await operation()
     }
+
+    private func attachActivityType(_ activityType: ActivityType, to caree: Caree) {
+        var types = caree.activityTypes ?? []
+        if !types.contains(where: { $0.id == activityType.id }) {
+            types.append(activityType)
+            caree.activityTypes = types
+        }
+    }
+
+    private func attachActivity(_ activity: Activity, to caree: Caree) {
+        var activities = caree.activities ?? []
+        if let index = activities.firstIndex(where: { $0.id == activity.id }) {
+            activities[index] = activity
+        } else {
+            activities.append(activity)
+        }
+        caree.activities = activities
+    }
+
+    private func attachActivity(_ activity: Activity, toActivityType activityType: ActivityType) {
+        var activities = activityType.activities ?? []
+        if let index = activities.firstIndex(where: { $0.id == activity.id }) {
+            activities[index] = activity
+        } else {
+            activities.append(activity)
+        }
+        activityType.activities = activities
+    }
 }
 
 // MARK: - Cache Statistics
@@ -490,4 +531,3 @@ struct CacheStats {
         """
     }
 }
-

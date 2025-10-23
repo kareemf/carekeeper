@@ -139,7 +139,7 @@ class CloudKitSharedRecordsService: ObservableObject {
                     self.sharesByCareeID = [:]
                     self.isLoading = false
                 }
-                await applySharedResultsToCache([])
+                await applySharedResultsToCache([], activityTypesByCaree: [:], activitiesByCaree: [:], activityTypeIDByActivity: [:])
                 NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
                 return
             }
@@ -221,7 +221,7 @@ class CloudKitSharedRecordsService: ObservableObject {
             }
 
             // Step 3: Convert to objects with relationships
-            let carees = try await convertRecordsToCarees(
+            let (carees, activityTypesByCaree, activitiesByCaree, activityTypeIDByActivity) = try await convertRecordsToCarees(
                 allCareeRecords,
                 activityTypeRecords: allActivityTypeRecords,
                 activityRecords: allActivityRecords
@@ -235,7 +235,12 @@ class CloudKitSharedRecordsService: ObservableObject {
             }
 
             // Step 4: Push results into LocalCacheService so UI updates automatically
-            await applySharedResultsToCache(carees)
+            await applySharedResultsToCache(
+                carees,
+                activityTypesByCaree: activityTypesByCaree,
+                activitiesByCaree: activitiesByCaree,
+                activityTypeIDByActivity: activityTypeIDByActivity
+            )
             NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
 
         } catch {
@@ -252,9 +257,12 @@ class CloudKitSharedRecordsService: ObservableObject {
         _ careeRecords: [CKRecord],
         activityTypeRecords: [CKRecord],
         activityRecords: [CKRecord]
-    ) async throws -> [Caree] {
+    ) async throws -> ([Caree], [UUID: [ActivityType]], [UUID: [Activity]], [UUID: UUID]) {
         var careesByID: [UUID: Caree] = [:]
+        var activityTypesByCaree: [UUID: [ActivityType]] = [:]
+        var activitiesByCaree: [UUID: [Activity]] = [:]
         var activityTypesByID: [UUID: ActivityType] = [:]
+        var activityTypeIDByActivity: [UUID: UUID] = [:]
 
         for record in careeRecords {
             guard let cdId = record["CD_id"] as? String,
@@ -266,6 +274,8 @@ class CloudKitSharedRecordsService: ObservableObject {
 
             let caree = Caree(name: name, listOrder: record["CD_listOrder"] as? Int ?? 0)
             caree.id = uuid
+            caree.isShared = true
+            caree.isOwned = false
 
             if let imageAsset = record["CD_image_ckAsset"] as? CKAsset,
                let imageURL = imageAsset.fileURL,
@@ -308,10 +318,8 @@ class CloudKitSharedRecordsService: ObservableObject {
             if let careeReference = record["CD_caree"] as? CKRecord.Reference,
                let careeIDString = careeReference.recordID.recordName.components(separatedBy: "/").last,
                let careeUUID = UUID(uuidString: careeIDString),
-               let caree = careesByID[careeUUID] {
-                activityType.caree = caree
-                if caree.activityTypes == nil { caree.activityTypes = [] }
-                caree.activityTypes?.append(activityType)
+               careesByID[careeUUID] != nil {
+                activityTypesByCaree[careeUUID, default: []].append(activityType)
             }
 
             activityTypesByID[uuid] = activityType
@@ -341,26 +349,50 @@ class CloudKitSharedRecordsService: ObservableObject {
             if let activityTypeReference = record["CD_activityType"] as? CKRecord.Reference,
                let activityTypeIDString = activityTypeReference.recordID.recordName.components(separatedBy: "/").last,
                let activityTypeUUID = UUID(uuidString: activityTypeIDString),
-               let activityType = activityTypesByID[activityTypeUUID] {
-                activity.activityType = activityType
-                if activityType.activities == nil { activityType.activities = [] }
-                activityType.activities?.append(activity)
+               activityTypesByID[activityTypeUUID] != nil {
+                activityTypeIDByActivity[activity.id] = activityTypeUUID
             }
 
             if let careeReference = record["CD_caree"] as? CKRecord.Reference,
                let careeIDString = careeReference.recordID.recordName.components(separatedBy: "/").last,
                let careeUUID = UUID(uuidString: careeIDString),
-               let caree = careesByID[careeUUID] {
-                activity.caree = caree
-                if caree.activities == nil { caree.activities = [] }
-                caree.activities?.append(activity)
+               careesByID[careeUUID] != nil {
+                activitiesByCaree[careeUUID, default: []].append(activity)
             }
         }
 
-        return Array(careesByID.values).sorted { $0.listOrder < $1.listOrder }
+        for (careeID, caree) in careesByID {
+            let types = activityTypesByCaree[careeID] ?? []
+            caree.activityTypes = types
+            let activities = activitiesByCaree[careeID] ?? []
+            caree.activities = activities
+
+            for activityType in types {
+                activityType.caree = caree
+            }
+
+            for activity in activities {
+                if let activityTypeID = activityTypeIDByActivity[activity.id],
+                   let activityType = activityTypesByID[activityTypeID] {
+                    activity.activityType = activityType
+                    var activitiesForType = activityType.activities ?? []
+                    activitiesForType.append(activity)
+                    activityType.activities = activitiesForType
+                }
+                activity.caree = caree
+            }
+        }
+
+        let carees = Array(careesByID.values).sorted { $0.listOrder < $1.listOrder }
+        return (carees, activityTypesByCaree, activitiesByCaree, activityTypeIDByActivity)
     }
 
-    private func applySharedResultsToCache(_ carees: [Caree]) async {
+    private func applySharedResultsToCache(
+        _ carees: [Caree],
+        activityTypesByCaree: [UUID: [ActivityType]],
+        activitiesByCaree: [UUID: [Activity]],
+        activityTypeIDByActivity: [UUID: UUID]
+    ) async {
         guard let cacheService = cacheService else {
             logger.info("ℹ️ No cacheService injected; skipping cache update.")
             return
@@ -382,14 +414,17 @@ class CloudKitSharedRecordsService: ObservableObject {
             // Upsert fetched carees and their children.
             for caree in carees {
                 do {
-                    try await cacheService.cacheCaree(caree, isShared: true)
-                    for activityType in (caree.activityTypes ?? []) {
-                        try await cacheService.cacheActivityType(activityType, for: caree)
+                    let cacheCaree = cloneCareeForCaching(caree, isShared: true)
+                    try await cacheService.cacheCaree(cacheCaree, isShared: true)
+                    for activityType in (activityTypesByCaree[caree.id] ?? []) {
+                        try await cacheService.cacheActivityType(activityType, for: cacheCaree)
                     }
-                    for activity in (caree.activities ?? []) {
-                        if let activityType = activity.activityType {
-                            try await cacheService.cacheActivity(activity, for: caree, activityType: activityType)
+                    for activity in (activitiesByCaree[caree.id] ?? []) {
+                        guard let activityTypeID = activityTypeIDByActivity[activity.id] else {
+                            logger.warning("⚠️ Missing activity type reference for shared activity \(activity.id)")
+                            continue
                         }
+                        try await cacheService.cacheActivity(activity, for: cacheCaree, activityTypeID: activityTypeID)
                     }
                 } catch {
                     logger.warning("⚠️ Failed caching shared records: \(error.localizedDescription)")
@@ -398,5 +433,16 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
 
         // No direct refreshPublishedProperties() here; the batch will coalesce refresh.
+    }
+
+    private func cloneCareeForCaching(_ caree: Caree, isShared: Bool) -> Caree {
+        let clone = Caree(name: caree.name, image: caree.image, listOrder: caree.listOrder)
+        clone.id = caree.id
+        clone.dateCreated = caree.dateCreated
+        clone.isShared = isShared
+        clone.isOwned = !isShared
+        clone.lastSyncedAt = caree.lastSyncedAt
+        clone.cloudKitRecordID = caree.cloudKitRecordID
+        return clone
     }
 }

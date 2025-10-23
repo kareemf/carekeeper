@@ -36,10 +36,12 @@ struct CareeListView: View {
         }
     }
 
+    @State private var navigationPath = NavigationPath()
+
     var body: some View {
         let carees = resolvedCarees()
 
-        return NavigationStack {
+        return NavigationStack(path: $navigationPath) {
             Group {
                 if carees.isEmpty {
                     emptyStateView

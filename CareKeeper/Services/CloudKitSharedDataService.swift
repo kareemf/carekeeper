@@ -212,7 +212,7 @@ class CloudKitSharedDataService: ObservableObject {
             // Optimistically update local cache
             if let cache = cacheService {
                 try? await cache.withBatch {
-                    try await cache.cacheActivity(activity, for: caree, activityType: activityType)
+                    try await cache.cacheActivity(activity, for: caree, activityTypeID: activityType.id)
                 }
                 // Force immediate refresh of published properties so views see the update
                 await cache.refreshPublishedProperties()
@@ -259,7 +259,7 @@ class CloudKitSharedDataService: ObservableObject {
             // Optimistically update local cache
             if let cache = cacheService, let activityType = activity.activityType {
                 try? await cache.withBatch {
-                    try await cache.cacheActivity(activity, for: caree, activityType: activityType)
+                    try await cache.cacheActivity(activity, for: caree, activityTypeID: activityType.id)
                 }
                 // Post notification for immediate UI update
                 NotificationCenter.default.post(name: NSNotification.Name("SharedCareeDataUpdated"), object: caree.id)
