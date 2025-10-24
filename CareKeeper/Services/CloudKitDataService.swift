@@ -30,7 +30,7 @@ class CloudKitDataService: ObservableObject {
 
     // MARK: - Public Services (for unified API)
 
-    private(set) var cacheService: LocalCacheService?
+    @Published private(set) var cacheService: LocalCacheService?
     private(set) var sharedDataService: CloudKitSharedDataService?
 
     // MARK: - Initialization
@@ -57,8 +57,17 @@ class CloudKitDataService: ObservableObject {
 
     /// Set the cache service for automatic caching of CloudKit operations
     func setCacheService(_ cacheService: LocalCacheService) {
+        guard self.cacheService !== cacheService else {
+            logger.info("Cache service already configured; skipping reassignment")
+            return
+        }
+
         self.cacheService = cacheService
         logger.info("Cache service integrated with CloudKitDataService")
+
+        Task {
+            await cacheService.refreshPublishedProperties()
+        }
     }
 
     /// Set the shared data service for routing shared caree operations

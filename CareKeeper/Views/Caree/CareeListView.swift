@@ -10,6 +10,7 @@ struct CareeListView: View {
     @State private var error: Error?
     @State private var deletionProgress: Double = 0.0
     @State private var isDeleting = false
+    @State private var reorderTask: Task<Void, Never>?
 
     // Pure CloudKit architecture: Cache service as source of truth
     @EnvironmentObject private var cloudKitService: CloudKitDataService
@@ -125,6 +126,11 @@ struct CareeListView: View {
                 handleImport: handleImport
             ))
             .task(initializeTask)
+            .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { _ in
+                Task {
+                    await refreshAllCarees(initial: allCarees.isEmpty)
+                }
+            }
             .modifier(DataObservers(
                 sharedRecordsService: sharedRecordsService,
                 cacheService: cacheService,
@@ -137,6 +143,9 @@ struct CareeListView: View {
             ))
             .overlay { deletionProgressOverlay }
             .errorAlert($error)
+            .onDisappear {
+                reorderTask?.cancel()
+            }
     }
 
     private var contentView: some View {
@@ -420,13 +429,31 @@ struct CareeListView: View {
         // Shared carees maintain the owner's listOrder
         guard let cacheService = cacheService else { return }
 
-        withAnimation(.easeInOut(duration: 0.3)) {
-            var updatedCarees = cacheService.myCarees
-            updatedCarees.move(fromOffsets: source, toOffset: destination)
+        var ownedCarees = cacheService.myCarees
+        let originalIDs = ownedCarees.map(\.id)
 
-            for (index, caree) in updatedCarees.enumerated() {
+        ownedCarees.move(fromOffsets: source, toOffset: destination)
+        let newIDs = ownedCarees.map(\.id)
+
+        guard newIDs != originalIDs else { return }
+
+        var updates: [(caree: Caree, order: Int)] = []
+
+        for (index, caree) in ownedCarees.enumerated() {
+            if caree.listOrder != index {
                 caree.listOrder = index
+                updates.append((caree, index))
             }
+        }
+
+        withAnimation(.easeInOut(duration: 0.3)) {
+            let sharedCarees = cacheService.sharedCarees
+            allCarees = ownedCarees + sharedCarees
+        }
+
+        reorderTask?.cancel()
+        reorderTask = Task { [updates] in
+            await persistReorderedCarees(updates)
         }
     }
 
@@ -503,6 +530,37 @@ struct CareeListView: View {
             if id(of: l) != id(of: r) { return false }
         }
         return true
+    }
+
+    private func persistReorderedCarees(_ updates: [(caree: Caree, order: Int)]) async {
+        guard !updates.isEmpty else { return }
+
+        do {
+            for update in updates {
+                if Task.isCancelled { return }
+                try await cloudKitService.updateCaree(
+                    update.caree,
+                    listOrder: update.order
+                )
+            }
+
+            if Task.isCancelled { return }
+
+            if let cacheService = cacheService {
+                await cacheService.refreshPublishedProperties()
+            }
+        } catch {
+            await MainActor.run {
+                let template = NSLocalizedString(
+                    "Failed to update caree order. %@",
+                    comment: "Caree reorder failure message"
+                )
+                let message = String(format: template, error.localizedDescription)
+                self.error = AppError.saveFailed(message)
+            }
+
+            await refreshAllCarees()
+        }
     }
 }
 
