@@ -50,6 +50,9 @@ struct CareeListView: View {
                 }
             }
             .navigationTitle(NSLocalizedString("Carees", comment: "Navigation title for carees list"))
+            .navigationDestination(for: UUID.self) { careeID in
+                CareeDetailView(careeID: careeID)
+            }
             .task {
                 updateAllCarees()
                 // Fetch shared carees; service will push into cache (batched)
@@ -95,9 +98,6 @@ struct CareeListView: View {
                 }
             }
             .errorAlert($error)
-        }
-        .navigationDestination(for: UUID.self) { careeID in
-            CareeDetailView(careeID: careeID)
         }
     }
 
