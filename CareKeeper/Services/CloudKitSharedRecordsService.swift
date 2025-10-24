@@ -24,6 +24,39 @@ class CloudKitSharedRecordsService: ObservableObject {
         self.cacheService = cacheService
     }
 
+    /// Remove the current user from a shared caree.
+    func leaveShare(for caree: Caree) async throws {
+        guard let share = sharesByCareeID[caree.id] else {
+            throw AppError.invalidInput("Share metadata not found for this caree. Please refresh and try again.")
+        }
+
+        do {
+            try await container.sharedCloudDatabase.deleteRecord(withID: share.recordID)
+            logger.info("✅ Left share for caree: \(caree.id)")
+
+            if let cacheService = cacheService,
+               let cached = cacheService.sharedCarees.first(where: { $0.id == caree.id }) {
+                do {
+                    try await cacheService.removeCachedCaree(cached)
+                } catch {
+                    logger.warning("⚠️ Failed to remove cached caree after leaving share: \(error.localizedDescription)")
+                }
+            }
+
+            sharesByCareeID[caree.id] = nil
+            sharedCarees.removeAll { $0.id == caree.id }
+
+            NotificationCenter.default.post(name: NSNotification.Name("SharedCareeDataUpdated"), object: caree.id)
+
+            Task {
+                await self.fetchSharedCarees()
+            }
+        } catch {
+            logger.error("❌ Failed to leave share: \(error.localizedDescription)")
+            throw AppError.deleteFailed("Could not leave this shared caree. \(error.localizedDescription)")
+        }
+    }
+
     /// Setup notification observers for automatic refresh on CloudKit changes
     private func setupNotificationObservers() {
         NotificationCenter.default.addObserver(

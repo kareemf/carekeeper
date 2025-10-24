@@ -20,6 +20,54 @@ struct CareeListView: View {
         cloudKitService.cacheService
     }
 
+    private var pendingDeletionCarees: [Caree] {
+        guard let offsets = careeToDelete else { return [] }
+        return offsets.compactMap { index in
+            allCarees.indices.contains(index) ? allCarees[index] : nil
+        }
+    }
+
+    private var pendingDeletionIncludesShared: Bool {
+        pendingDeletionCarees.contains(where: { $0.isShared })
+    }
+
+    private var pendingDeletionIncludesOwned: Bool {
+        pendingDeletionCarees.contains(where: { !$0.isShared })
+    }
+
+    private var deleteConfirmationTitle: String {
+        if pendingDeletionIncludesShared && !pendingDeletionIncludesOwned {
+            return NSLocalizedString("Leave Shared Caree?", comment: "Leave shared caree confirmation title")
+        } else if pendingDeletionIncludesShared {
+            return NSLocalizedString("Remove Carees?", comment: "Mixed delete confirmation title")
+        } else {
+            return NSLocalizedString("Delete Caree?", comment: "Delete caree confirmation title")
+        }
+    }
+
+    private var deleteConfirmationPrimaryButtonTitle: String {
+        if pendingDeletionIncludesShared && !pendingDeletionIncludesOwned {
+            return NSLocalizedString("Leave Share", comment: "Leave shared caree confirmation button")
+        } else if pendingDeletionIncludesShared {
+            return NSLocalizedString("Continue", comment: "Mixed delete confirmation button")
+        } else {
+            return NSLocalizedString("Delete", comment: "Delete caree confirmation button")
+        }
+    }
+
+    private var deleteConfirmationMessageText: String {
+        switch (pendingDeletionIncludesOwned, pendingDeletionIncludesShared) {
+        case (false, false):
+            return NSLocalizedString("This will delete all activity types and activities. This cannot be undone.", comment: "Delete caree confirmation message")
+        case (true, false):
+            return NSLocalizedString("This will delete all activity types and activities. This cannot be undone.", comment: "Delete caree confirmation message")
+        case (false, true):
+            return NSLocalizedString("You will no longer receive updates for this shared caree. Other participants will retain access.", comment: "Leave shared caree confirmation message")
+        case (true, true):
+            return NSLocalizedString("Owned carees will be deleted for everyone. Shared carees will be removed from your list.", comment: "Mixed delete confirmation message")
+        }
+    }
+
     // Combined list of all carees - updated when cache changes
     @State private var allCarees: [Caree] = []
 
@@ -60,7 +108,7 @@ struct CareeListView: View {
                     .presentationDragIndicator(.visible)
             }
             .confirmationDialog(
-                NSLocalizedString("Delete Caree?", comment: "Delete caree confirmation title"),
+                deleteConfirmationTitle,
                 isPresented: $showingDeleteConfirmation,
                 titleVisibility: .visible
             ) {
@@ -162,7 +210,7 @@ struct CareeListView: View {
 
     private var deleteConfirmationButtons: some View {
         Group {
-            Button(NSLocalizedString("Delete", comment: "Delete button"), role: .destructive) {
+            Button(deleteConfirmationPrimaryButtonTitle, role: .destructive) {
                 if let offsets = careeToDelete {
                     Task { @MainActor in
                         await deleteCarees(offsets: offsets)
@@ -177,7 +225,7 @@ struct CareeListView: View {
     }
 
     private var deleteConfirmationMessage: some View {
-        Text(NSLocalizedString("This will delete all activity types and activities. This cannot be undone.", comment: "Delete caree confirmation message"))
+        Text(deleteConfirmationMessageText)
     }
 
     @Sendable
@@ -320,32 +368,47 @@ struct CareeListView: View {
             allCarees.indices.contains(index) ? allCarees[index] : nil
         }
 
-        // Check permissions asynchronously (owner can delete)
-        var deletable: [Caree] = []
+        guard !itemsToConsider.isEmpty else { return }
+
+        var ownedCarees: [Caree] = []
+        var sharedCareesToLeave: [Caree] = []
+
         for caree in itemsToConsider {
-            let allowed = await sharingService.canDelete(caree: caree, in: modelContext)
-            if allowed {
-                deletable.append(caree)
+            if caree.isShared {
+                sharedCareesToLeave.append(caree)
             } else {
-                // Show error - user doesn't have permission to delete
-                error = AppError.invalidInput("You don't have permission to delete this caree")
+                let allowed = await sharingService.canDelete(caree: caree, in: modelContext)
+                if allowed {
+                    ownedCarees.append(caree)
+                } else {
+                    error = AppError.invalidInput("You don't have permission to delete this caree")
+                }
             }
         }
 
-        // Pure CloudKit: Delete from CloudKit first, then cache
-        withAnimation(.easeInOut(duration: 0.3)) {
-            for caree in deletable {
-                Task {
-                    do {
-                        // Determine if this is a shared caree
-                        let isShared = caree.isShared
+        if !sharedCareesToLeave.isEmpty {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                for caree in sharedCareesToLeave {
+                    Task {
+                        do {
+                            try await sharedRecordsService.leaveShare(for: caree)
+                        } catch {
+                            await MainActor.run { self.error = error }
+                        }
+                    }
+                }
+            }
+        }
 
-                        // Delete from CloudKit
-                        try await cloudKitService.deleteCaree(caree, isShared: isShared)
-
-                        // Cache is automatically updated by CloudKitDataService
-                    } catch {
-                        await MainActor.run { self.error = error }
+        if !ownedCarees.isEmpty {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                for caree in ownedCarees {
+                    Task {
+                        do {
+                            try await cloudKitService.deleteCaree(caree, isShared: false)
+                        } catch {
+                            await MainActor.run { self.error = error }
+                        }
                     }
                 }
             }
