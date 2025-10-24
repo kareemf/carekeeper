@@ -9,6 +9,7 @@ struct ActivityListView: View {
 
     // Use shared services from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
+    @EnvironmentObject private var sharedRecordsService: CloudKitSharedRecordsService
 
     // Get cache service from shared CloudKitDataService
     private var cacheService: LocalCacheService? {
@@ -100,8 +101,7 @@ struct ActivityListView: View {
                     }
                 }
                 .refreshable {
-                    // Refresh cache on pull-to-refresh
-                    try? await cacheService?.refreshCache()
+                    await refreshData()
                 }
             } else {
                 Text(NSLocalizedString("Caree not found", comment: "Caree not found message"))
@@ -126,15 +126,21 @@ struct ActivityListView: View {
             Text(NSLocalizedString("This cannot be undone.", comment: "Delete confirmation message"))
         }
         .task {
-            // Initial load: refresh cache and update activities
-            try? await cacheService?.refreshCache()
-            updateActivities()
+            await refreshData()
         }
         .onReceive(myCareesPublisher) { _ in
             updateActivities()
         }
         .onReceive(sharedCareesPublisher) { _ in
             updateActivities()
+        }
+        .onReceive(sharedRecordsService.$sharedCarees.eraseToAnyPublisher()) { _ in
+            updateActivities()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SharedCareeDataUpdated"))) { notification in
+            if let updatedCareeID = notification.object as? UUID, updatedCareeID == careeID {
+                updateActivities()
+            }
         }
     }
 
@@ -163,6 +169,7 @@ struct ActivityListView: View {
         .listRowSeparator(.hidden)
     }
 
+    @MainActor
     private func updateActivities() {
         guard let cacheService = cacheService else {
             caree = nil
@@ -211,6 +218,27 @@ struct ActivityListView: View {
                     self.error = AppError.deleteFailed(error.localizedDescription)
                 }
             }
+        }
+    }
+
+    @Sendable
+    private func refreshData() async {
+        if let cacheService = cacheService {
+            try? await cacheService.refreshCache()
+        }
+
+        let needsSharedFetch = await MainActor.run { () -> Bool in
+            guard let cacheService = cacheService else { return true }
+            guard let targetCaree = cacheService.getCachedCaree(id: careeID) else { return true }
+            return targetCaree.isShared
+        }
+
+        if needsSharedFetch {
+            await sharedRecordsService.fetchSharedCarees()
+        }
+
+        await MainActor.run {
+            updateActivities()
         }
     }
 }
