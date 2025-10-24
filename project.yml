@@ -133,6 +133,8 @@ targets:
         WKCompanionAppBundleIdentifier: com.kareemf.CareKeeper
         WKApplication: true
         NSLocationWhenInUseUsageDescription: "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types."
+        UIBackgroundModes:
+          - remote-notification
     entitlements:
       path: "CareKeeper Watch App/CareKeeper Watch App.entitlements"
       properties:
