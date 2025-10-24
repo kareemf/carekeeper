@@ -58,6 +58,12 @@ struct CareeListView: View {
                 // Fetch shared carees; service will push into cache (batched)
                 await sharedRecordsService.fetchSharedCarees()
             }
+            .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { _ in
+                updateAllCarees()
+                Task {
+                    await sharedRecordsService.fetchSharedCarees()
+                }
+            }
             .onReceive(sharedRecordsService.$error) { newError in
                 if let newError = newError {
                     error = newError

@@ -108,6 +108,14 @@ struct ActivityListView: View {
             try? await cacheService?.refreshCache()
             updateActivities()
         }
+        .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { cache in
+            Task {
+                try? await cache.refreshCache()
+                await MainActor.run {
+                    updateActivities()
+                }
+            }
+        }
         .onReceive(myCareesPublisher) { _ in
             updateActivities()
         }

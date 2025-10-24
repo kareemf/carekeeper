@@ -129,6 +129,11 @@ struct CareeDetailView: View {
                 isLoadingSharedCaree = false
             }
         }
+        .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { _ in
+            Task {
+                await handleCacheServiceAttachment()
+            }
+        }
         // Re-resolve after any shared refresh completes (both services post this)
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CloudKitBackgroundRefreshFinished"))) { _ in
             resolvedCaree = resolveCareeFromCache()
@@ -158,6 +163,18 @@ struct CareeDetailView: View {
                 // Force view refresh to see updated relationships
                 refreshID = UUID()
             }
+        }
+    }
+
+    private func handleCacheServiceAttachment() async {
+        resolvedCaree = resolveCareeFromCache()
+        try? await cacheService?.refreshCache()
+
+        if resolvedCaree == nil || resolvedCaree?.isShared == true {
+            isLoadingSharedCaree = true
+            await sharedRecordsService.fetchSharedCarees()
+            resolvedCaree = resolveCareeFromCache()
+            isLoadingSharedCaree = false
         }
     }
 

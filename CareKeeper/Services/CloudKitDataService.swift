@@ -176,6 +176,8 @@ class CloudKitDataService: ObservableObject {
             if let cacheService = cacheService {
                 try await cacheService.cacheCaree(syncedCaree, isShared: false)
                 logger.info("✅ Caree cached locally")
+                await cacheService.refreshPublishedProperties()
+                logger.info("✅ Cache published properties refreshed after create")
             }
 
             logger.info("✅ Caree created and verified: \(syncedCaree.id)")

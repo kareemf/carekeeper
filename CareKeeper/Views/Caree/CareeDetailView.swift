@@ -267,6 +267,11 @@ struct CareeDetailView: View {
                 isLoadingSharedCaree = false
             }
         }
+        .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { _ in
+            Task {
+                await handleCacheServiceAttachment()
+            }
+        }
         // Re-resolve after any shared refresh completes (both services post this)
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CloudKitBackgroundRefreshFinished"))) { _ in
             resolvedCaree = resolveCareeFromCache()
@@ -300,6 +305,22 @@ struct CareeDetailView: View {
         .errorAlert($error)
     }
     
+    private func handleCacheServiceAttachment() async {
+        resolvedCaree = resolveCareeFromCache()
+        try? await cacheService?.refreshCache()
+
+        if resolvedCaree == nil || resolvedCaree?.isShared == true {
+            isLoadingSharedCaree = true
+            await sharedRecordsService.fetchSharedCarees()
+            resolvedCaree = resolveCareeFromCache()
+            isLoadingSharedCaree = false
+        }
+
+        if let caree = resolvedCaree {
+            await checkSyncStatus(for: caree)
+        }
+    }
+
     private func deleteActivityType(_ activityType: ActivityType) {
         guard let caree = resolvedCaree else { return }
 
@@ -582,4 +603,3 @@ struct ExportItem: Identifiable {
     }
     .modelContainer(PreviewContainer.shared)
 }
-

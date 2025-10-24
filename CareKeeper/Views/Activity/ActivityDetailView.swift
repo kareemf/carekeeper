@@ -118,6 +118,16 @@ struct ActivityDetailView: View {
                     // Refresh cache to load activities
                     try? await cacheService?.refreshCache()
                 }
+                .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { cache in
+                    Task {
+                        try? await cache.refreshCache()
+                        await MainActor.run {
+                            if let activity = self.activity {
+                                self.setupEditingValues(for: activity)
+                            }
+                        }
+                    }
+                }
             } else {
                 Text(NSLocalizedString("Activity not found", comment: "Activity not found message"))
                     .foregroundColor(.secondary)
