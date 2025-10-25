@@ -36,6 +36,7 @@ struct CareeDetailView: View {
     @State private var showingEditCaree = false
     @State private var showingAddActivityType = false
     @State private var showingTrackActivity = false
+    @State private var reorderTask: Task<Void, Never>?
     @State private var activityTypeToDelete: ActivityType?
     @State private var showingDeleteActivityTypeConfirmation = false
     @State private var activityToDelete: Activity?
@@ -303,6 +304,9 @@ struct CareeDetailView: View {
             }
         }
         .errorAlert($error)
+        .onDisappear {
+            reorderTask?.cancel()
+        }
     }
     
     private func handleCacheServiceAttachment() async {
@@ -364,6 +368,14 @@ struct CareeDetailView: View {
         for (index, activityType) in updatedActivityTypes.enumerated() {
             activityType.listOrder = index
         }
+
+        reorderTask?.cancel()
+        reorderTask = Task {
+            await persistActivityTypeOrder(
+                updates: updatedActivityTypes.map { ($0, $0.listOrder) },
+                caree: caree
+            )
+        }
     }
 
     private func headerSection(for caree: Caree) -> some View {
@@ -397,6 +409,43 @@ struct CareeDetailView: View {
                     .accessibilityLabel(Text(NSLocalizedString("Shared Caree", comment: "Shared caree indicator")))
             }
             #endif
+        }
+    }
+
+    private func persistActivityTypeOrder(
+        updates: [(ActivityType, Int)],
+        caree: Caree
+    ) async {
+        guard !updates.isEmpty else { return }
+
+        do {
+            for (activityType, order) in updates {
+                if Task.isCancelled { return }
+                activityType.listOrder = order
+                try await cloudKitService.updateActivityType(
+                    activityType,
+                    caree: caree,
+                    listOrder: order,
+                    isShared: activityType.caree?.isShared ?? caree.isShared
+                )
+            }
+
+            if Task.isCancelled { return }
+
+            if let cache = cloudKitService.cacheService {
+                await cache.refreshPublishedProperties()
+            }
+        } catch {
+            await MainActor.run {
+                let template = NSLocalizedString(
+                    "Failed to update activity type order. %@",
+                    comment: "Activity type reorder failure message"
+                )
+                let message = String(format: template, error.localizedDescription)
+                self.error = AppError.saveFailed(message)
+            }
+
+            await refreshCareeData(for: caree)
         }
     }
 
