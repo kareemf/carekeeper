@@ -138,8 +138,10 @@ struct ActivityDetailView: View {
     
     private func headerSection(for activity: Activity) -> some View {
         HStack {
-            Text(activity.activityType?.displayIcon ?? "⭐")
-                .font(.system(size: 50))
+            if let icon = activity.activityType?.displayIcon, !icon.isEmpty {
+                Text(icon)
+                    .font(.system(size: 50))
+            }
 
             VStack(alignment: .leading, spacing: 8) {
                 Text(activity.activityType?.name ?? NSLocalizedString("Unknown Activity", comment: "Unknown activity"))

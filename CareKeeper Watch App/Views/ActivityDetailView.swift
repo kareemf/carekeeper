@@ -25,8 +25,10 @@ struct ActivityDetailView: View {
             VStack(alignment: .leading, spacing: 16) {
                 // Header with icon and name
                 VStack(spacing: 8) {
-                    Text(activityType?.icon ?? "⭐")
-                        .font(.system(size: 50))
+                    if let icon = activityType?.icon, !icon.isEmpty {
+                        Text(icon)
+                            .font(.system(size: 50))
+                    }
 
                     Text(activityType?.name ?? "Activity")
                         .font(.title3)
