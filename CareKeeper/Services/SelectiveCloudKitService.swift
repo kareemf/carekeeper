@@ -66,14 +66,33 @@ class SelectiveCloudKitService {
 
     private func fetchSharedCarees() async throws -> [CareeSnapshot] {
         let database = container.sharedCloudDatabase
-        let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
 
-        let results = try await database.records(matching: query)
+        // Shared database requires zone-specific queries (no zone-wide queries!)
+        let zones = try await database.allRecordZones()
+        logger.info("📱 Found \(zones.count) shared zones")
 
-        return try results.matchResults.compactMap { _, result in
-            let record = try result.get()
-            return try CareeSnapshot(from: record, isShared: true)
+        var allCarees: [CareeSnapshot] = []
+
+        for zone in zones {
+            // Skip default zone
+            if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
+
+            logger.info("🔍 Querying shared carees in zone: \(zone.zoneID.zoneName)")
+
+            let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
+            let (matchResults, _) = try await database.records(matching: query, inZoneWith: zone.zoneID)
+
+            for (_, result) in matchResults {
+                if let record = try? result.get() {
+                    if let caree = try? CareeSnapshot(from: record, isShared: true) {
+                        allCarees.append(caree)
+                    }
+                }
+            }
         }
+
+        logger.info("✅ Loaded \(allCarees.count) shared carees from \(zones.count) zones")
+        return allCarees
     }
 
     // MARK: - ActivityType Queries (On-Demand Per Caree)
@@ -98,14 +117,39 @@ class SelectiveCloudKitService {
         let query = CKQuery(recordType: "CD_ActivityType", predicate: predicate)
         query.sortDescriptors = [NSSortDescriptor(key: "CD_listOrder", ascending: true)]
 
-        let results = try await database.records(
-            matching: query,
-            desiredKeys: nil,
-            resultsLimit: Self.maxActivityTypes
-        )
+        var activityTypes: [ActivityTypeSnapshot] = []
 
-        let activityTypes = try results.matchResults.compactMap { _, result in
-            try ActivityTypeSnapshot(from: result.get())
+        if isShared {
+            // Shared database requires zone-specific queries
+            let zones = try await database.allRecordZones()
+            for zone in zones {
+                if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
+
+                let (matchResults, _) = try await database.records(
+                    matching: query,
+                    inZoneWith: zone.zoneID,
+                    desiredKeys: nil,
+                    resultsLimit: Self.maxActivityTypes
+                )
+
+                for (_, result) in matchResults {
+                    if let record = try? result.get(),
+                       let activityType = try? ActivityTypeSnapshot(from: record) {
+                        activityTypes.append(activityType)
+                    }
+                }
+            }
+        } else {
+            // Private database supports zone-wide queries
+            let results = try await database.records(
+                matching: query,
+                desiredKeys: nil,
+                resultsLimit: Self.maxActivityTypes
+            )
+
+            activityTypes = try results.matchResults.compactMap { _, result in
+                try ActivityTypeSnapshot(from: result.get())
+            }
         }
 
         logger.info("✅ Loaded \(activityTypes.count) activity types for caree")
@@ -160,15 +204,47 @@ class SelectiveCloudKitService {
         let query = CKQuery(recordType: "CD_Activity", predicate: predicate)
         query.sortDescriptors = [NSSortDescriptor(key: "CD_dateTime", ascending: false)]
 
-        // Hard limit to prevent memory issues
-        let results = try await database.records(
-            matching: query,
-            desiredKeys: nil,
-            resultsLimit: Self.maxActivitiesPerCaree
-        )
+        var activities: [ActivitySnapshot] = []
 
-        let activities = try results.matchResults.compactMap { _, result in
-            try ActivitySnapshot(from: result.get())
+        if isShared {
+            // Shared database requires zone-specific queries
+            let zones = try await database.allRecordZones()
+            for zone in zones {
+                if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
+
+                let (matchResults, _) = try await database.records(
+                    matching: query,
+                    inZoneWith: zone.zoneID,
+                    desiredKeys: nil,
+                    resultsLimit: Self.maxActivitiesPerCaree
+                )
+
+                for (_, result) in matchResults {
+                    if let record = try? result.get(),
+                       let activity = try? ActivitySnapshot(from: record) {
+                        activities.append(activity)
+                    }
+                }
+            }
+
+            // Sort combined results by date (newest first)
+            activities.sort { $0.dateTime > $1.dateTime }
+
+            // Apply overall limit
+            if activities.count > Self.maxActivitiesPerCaree {
+                activities = Array(activities.prefix(Self.maxActivitiesPerCaree))
+            }
+        } else {
+            // Private database supports zone-wide queries
+            let results = try await database.records(
+                matching: query,
+                desiredKeys: nil,
+                resultsLimit: Self.maxActivitiesPerCaree
+            )
+
+            activities = try results.matchResults.compactMap { _, result in
+                try ActivitySnapshot(from: result.get())
+            }
         }
 
         logger.info("✅ Loaded \(activities.count) recent activities (capped at \(Self.maxActivitiesPerCaree))")
@@ -198,14 +274,34 @@ class SelectiveCloudKitService {
 
         let query = CKQuery(recordType: "CD_ActivityType", predicate: predicate)
 
-        // Only fetch count, not full records (use empty desiredKeys for minimal data)
-        let results = try await database.records(
-            matching: query,
-            desiredKeys: [],
-            resultsLimit: 1000  // High enough to get accurate count
-        )
+        var count = 0
 
-        let count = results.matchResults.count
+        if isShared {
+            // Shared database requires zone-specific queries
+            let zones = try await database.allRecordZones()
+            for zone in zones {
+                if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
+
+                let (matchResults, _) = try await database.records(
+                    matching: query,
+                    inZoneWith: zone.zoneID,
+                    desiredKeys: [],
+                    resultsLimit: 1000
+                )
+
+                count += matchResults.count
+            }
+        } else {
+            // Private database supports zone-wide queries
+            let results = try await database.records(
+                matching: query,
+                desiredKeys: [],
+                resultsLimit: 1000
+            )
+
+            count = results.matchResults.count
+        }
+
         logger.info("📊 Activity type count for caree \(careeID): \(count)")
 
         return count
