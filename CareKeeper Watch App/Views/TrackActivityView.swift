@@ -18,8 +18,9 @@ struct TrackActivityView: View {
     @State private var quantity: Double = 0
     @State private var includeLocation: Bool = false
     @State private var useCustomTime: Bool = false
-    @State private var customTime: Date = Date()
+    @State private var minutesAgo: Int = 0
     @State private var isSaving = false
+    @State private var showSuccessToast = false
     @State private var error: Error?
 
     @StateObject private var locationManager = LocationManager()
@@ -41,10 +42,41 @@ struct TrackActivityView: View {
                 .disabled(isSaving)
             }
         }
+        .overlay(alignment: .center) {
+            if showSuccessToast {
+                successToast
+            }
+        }
         .errorAlert($error)
     }
 
+    // MARK: - Computed Properties
+
+    private var timeText: String {
+        let targetTime = Date().addingTimeInterval(-Double(minutesAgo) * 60)
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: targetTime)
+    }
+
     // MARK: - View Components
+
+    private var successToast: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 48))
+                .foregroundColor(.green)
+
+            Text("Saved!")
+                .font(.headline)
+        }
+        .padding(24)
+        .background(
+            Color.black.opacity(0.85)
+                .cornerRadius(16)
+        )
+        .transition(.scale.combined(with: .opacity))
+    }
 
     private var saveButton: some View {
         Button(action: saveActivity) {
@@ -115,12 +147,34 @@ struct TrackActivityView: View {
                         }
 
                         if useCustomTime {
-                            DatePicker(
-                                "",
-                                selection: $customTime,
-                                displayedComponents: [.date, .hourAndMinute]
+                            VStack(spacing: 8) {
+                                HStack {
+                                    Text(timeText)
+                                        .font(.title2)
+                                        .fontWeight(.semibold)
+                                    Spacer()
+                                }
+
+                                HStack {
+                                    Text("\(minutesAgo) min ago")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    Spacer()
+                                }
+                            }
+                            .padding()
+                            .background(Color.gray.opacity(0.3))
+                            .cornerRadius(8)
+                            .focusable(true)
+                            .digitalCrownRotation(
+                                $minutesAgo,
+                                from: 0,
+                                through: 1440, // 24 hours
+                                by: 1,
+                                sensitivity: .low,
+                                isContinuous: false,
+                                isHapticFeedbackEnabled: true
                             )
-                            .datePickerStyle(.wheel)
                         }
                     }
                     .padding()
@@ -196,7 +250,7 @@ struct TrackActivityView: View {
         isSaving = true
 
         Task {
-            let dateTime = useCustomTime ? customTime : Date()
+            let dateTime = useCustomTime ? Date().addingTimeInterval(-Double(minutesAgo) * 60) : Date()
             let activityQuantity = activityTypeSnapshot.hasQuantity ? quantity : nil
             let latitude = (includeLocation && activityTypeSnapshot.hasLocation) ? locationManager.location?.coordinate.latitude : nil
             let longitude = (includeLocation && activityTypeSnapshot.hasLocation) ? locationManager.location?.coordinate.longitude : nil
@@ -215,9 +269,19 @@ struct TrackActivityView: View {
             // Track with optimistic UI
             await dataProvider.trackActivity(activity)
 
-            // Dismiss (activity is saved in background)
+            // Show success toast briefly before dismissing
             await MainActor.run {
                 isSaving = false
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    showSuccessToast = true
+                }
+            }
+
+            // Wait for toast to be visible
+            try? await Task.sleep(nanoseconds: 800_000_000) // 0.8 seconds
+
+            // Navigate back to caree detail
+            await MainActor.run {
                 dismiss()
             }
         }
