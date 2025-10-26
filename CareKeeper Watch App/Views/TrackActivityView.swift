@@ -18,7 +18,7 @@ struct TrackActivityView: View {
     @State private var quantity: Double = 0
     @State private var includeLocation: Bool = false
     @State private var useCustomTime: Bool = false
-    @State private var minutesAgo: Int = 0
+    @State private var minutesAgo: Double = 0
     @State private var isSaving = false
     @State private var showSuccessToast = false
     @State private var error: Error?
@@ -156,7 +156,7 @@ struct TrackActivityView: View {
                                 }
 
                                 HStack {
-                                    Text("\(minutesAgo) min ago")
+                                    Text("\(Int(minutesAgo)) min ago")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                     Spacer()
