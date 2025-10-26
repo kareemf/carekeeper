@@ -71,6 +71,35 @@ struct ActivityDetailView: View {
                     locationSection
                         .padding(.horizontal)
                 }
+
+                // Delete button (only shown when not editing)
+                if !isEditing {
+                    Divider()
+                        .padding(.top, 8)
+
+                    Button(role: .destructive) {
+                        showingDeleteConfirmation = true
+                    } label: {
+                        HStack {
+                            Spacer()
+                            if isDeleting {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                Text("Deleting...")
+                            } else {
+                                Image(systemName: "trash")
+                                Text("Delete Activity")
+                            }
+                            Spacer()
+                        }
+                        .padding(.vertical, 8)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.red)
+                    .disabled(isDeleting)
+                    .padding(.horizontal)
+                    .padding(.bottom)
+                }
             }
             .padding(.vertical)
         }
@@ -105,22 +134,6 @@ struct ActivityDetailView: View {
                     } label: {
                         Image(systemName: "pencil")
                     }
-                }
-            }
-
-            ToolbarItem(placement: .bottomBar) {
-                if !isEditing {
-                    Button(role: .destructive) {
-                        showingDeleteConfirmation = true
-                    } label: {
-                        if isDeleting {
-                            ProgressView()
-                                .scaleEffect(0.7)
-                        } else {
-                            Label("Delete", systemImage: "trash")
-                        }
-                    }
-                    .disabled(isDeleting)
                 }
             }
         }
