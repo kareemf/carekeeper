@@ -31,6 +31,7 @@ class FileLogger {
             forSecurityApplicationGroupIdentifier: CloudKitConfig.appGroupID
         ) else {
             logger.error("❌ Failed to access app group container for logging")
+            logger.error("   App Group ID: \(CloudKitConfig.appGroupID)")
             return
         }
 
@@ -38,12 +39,20 @@ class FileLogger {
             .appendingPathComponent("diagnostics", isDirectory: true)
             .appendingPathComponent("logs", isDirectory: true)
 
+        logger.info("📁 Creating log directory: \(logsURL.path)")
+
         // Create logs directory
-        try? FileManager.default.createDirectory(
-            at: logsURL,
-            withIntermediateDirectories: true,
-            attributes: nil
-        )
+        do {
+            try FileManager.default.createDirectory(
+                at: logsURL,
+                withIntermediateDirectories: true,
+                attributes: nil
+            )
+            logger.info("✅ Log directory created successfully")
+        } catch {
+            logger.error("❌ Failed to create log directory: \(error.localizedDescription)")
+            return
+        }
 
         // Create new log file with timestamp
         let timestamp = Int(Date().timeIntervalSince1970)
@@ -56,10 +65,24 @@ class FileLogger {
         let filename = "log-\(platform)-\(timestamp).txt"
         currentLogFile = logsURL.appendingPathComponent(filename)
 
+        logger.info("📝 Creating log file: \(filename)")
+        logger.info("   Full path: \(currentLogFile?.path ?? "nil")")
+
         // Create file and get handle
         if let logFile = currentLogFile {
-            FileManager.default.createFile(atPath: logFile.path, contents: nil)
-            currentLogHandle = try? FileHandle(forWritingTo: logFile)
+            let created = FileManager.default.createFile(atPath: logFile.path, contents: nil)
+            if !created {
+                logger.error("❌ Failed to create log file at path: \(logFile.path)")
+                return
+            }
+
+            do {
+                currentLogHandle = try FileHandle(forWritingTo: logFile)
+                logger.info("✅ FileHandle created successfully")
+            } catch {
+                logger.error("❌ Failed to create FileHandle: \(error.localizedDescription)")
+                return
+            }
 
             // Write header
             let header = """
@@ -68,11 +91,13 @@ class FileLogger {
             Started: \(Date())
             Platform: \(platform)
             OS Version: \(ProcessInfo.processInfo.operatingSystemVersionString)
+            App Group: \(CloudKitConfig.appGroupID)
+            Container: \(containerURL.path)
             ===========================================
 
             """
             writeToFile(header)
-            logger.info("📝 Log file created: \(filename)")
+            logger.info("📝 Log file initialized: \(filename)")
         }
 
         // Cleanup old logs
