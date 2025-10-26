@@ -200,6 +200,14 @@ struct CareeListView: View {
             Button(action: { showingImport = true }) {
                 Label("Import Data", systemImage: "square.and.arrow.down")
             }
+
+            Divider()
+
+            NavigationLink {
+                WatchDiagnosticsView()
+            } label: {
+                Label("Watch Diagnostics", systemImage: "chart.bar.doc.horizontal")
+            }
         } label: {
             Image(systemName: "ellipsis.circle")
         }

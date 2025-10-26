@@ -87,6 +87,7 @@ class WatchDataProvider: ObservableObject {
             } catch {
                 careesError = error
                 logger.error("❌ Failed to load carees: \(error.localizedDescription)")
+                FileLogger.shared.exception(error, context: "WatchDataProvider.loadCarees() - Failed to load carees from CloudKit")
             }
 
             isLoadingCarees = false
@@ -132,6 +133,7 @@ class WatchDataProvider: ObservableObject {
 
             } catch {
                 logger.error("❌ Failed to load activity types: \(error.localizedDescription)")
+                FileLogger.shared.exception(error, context: "WatchDataProvider.loadActivityTypes() - Failed to load activity types for caree \(careeID)")
                 // Set empty array so we don't retry constantly
                 activityTypesByCaree[careeID] = []
             }
@@ -178,6 +180,7 @@ class WatchDataProvider: ObservableObject {
 
             } catch {
                 logger.error("❌ Failed to load activities: \(error.localizedDescription)")
+                FileLogger.shared.exception(error, context: "WatchDataProvider.loadRecentActivities() - Failed to load activities for caree \(careeID)")
                 // Keep existing data if available
             }
         }
@@ -233,6 +236,9 @@ class WatchDataProvider: ObservableObject {
                 // Update state to failed
                 await self.updateActivityState(activity.id, state: .failed(error.localizedDescription))
                 self.logger.error("❌ Failed to sync activity: \(error.localizedDescription)")
+                await MainActor.run {
+                    FileLogger.shared.exception(error, context: "WatchDataProvider.trackActivity() - Failed to sync activity to CloudKit")
+                }
             }
         }
     }
