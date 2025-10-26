@@ -27,13 +27,20 @@ class FileLogger {
     // MARK: - Setup
 
     private func setupLogFile() {
+        logger.info("🚀 FileLogger.setupLogFile() started")
+        logger.info("   App Group ID: \(CloudKitConfig.appGroupID)")
+
         guard let containerURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: CloudKitConfig.appGroupID
         ) else {
             logger.error("❌ Failed to access app group container for logging")
             logger.error("   App Group ID: \(CloudKitConfig.appGroupID)")
+            logger.error("   This usually means the entitlement is not configured correctly")
             return
         }
+
+        logger.info("✅ App group container accessible")
+        logger.info("   Container path: \(containerURL.path)")
 
         let logsURL = containerURL
             .appendingPathComponent("diagnostics", isDirectory: true)
@@ -49,6 +56,11 @@ class FileLogger {
                 attributes: nil
             )
             logger.info("✅ Log directory created successfully")
+
+            // Verify directory exists
+            var isDirectory: ObjCBool = false
+            let exists = FileManager.default.fileExists(atPath: logsURL.path, isDirectory: &isDirectory)
+            logger.info("   Directory exists: \(exists), isDirectory: \(isDirectory.boolValue)")
         } catch {
             logger.error("❌ Failed to create log directory: \(error.localizedDescription)")
             return
@@ -70,17 +82,26 @@ class FileLogger {
 
         // Create file and get handle
         if let logFile = currentLogFile {
+            logger.info("📝 Creating log file at: \(logFile.path)")
+
             let created = FileManager.default.createFile(atPath: logFile.path, contents: nil)
             if !created {
                 logger.error("❌ Failed to create log file at path: \(logFile.path)")
+                logger.error("   Check permissions and available disk space")
                 return
             }
+            logger.info("✅ Log file created successfully")
+
+            // Verify file exists
+            let fileExists = FileManager.default.fileExists(atPath: logFile.path)
+            logger.info("   File exists after creation: \(fileExists)")
 
             do {
                 currentLogHandle = try FileHandle(forWritingTo: logFile)
                 logger.info("✅ FileHandle created successfully")
             } catch {
                 logger.error("❌ Failed to create FileHandle: \(error.localizedDescription)")
+                logger.error("   File path: \(logFile.path)")
                 return
             }
 
@@ -98,6 +119,13 @@ class FileLogger {
             """
             writeToFile(header)
             logger.info("📝 Log file initialized: \(filename)")
+            logger.info("   Full path: \(logFile.path)")
+
+            // Verify file has content after writing header
+            if let attributes = try? FileManager.default.attributesOfItem(atPath: logFile.path),
+               let fileSize = attributes[.size] as? Int {
+                logger.info("   File size after header: \(fileSize) bytes")
+            }
         }
 
         // Cleanup old logs

@@ -9,6 +9,7 @@ struct ActivityDetailView: View {
     let activitySnapshot: ActivitySnapshot
 
     @EnvironmentObject private var dataProvider: WatchDataProvider
+    @State private var isRetrying = false
 
     private var activityType: ActivityTypeSnapshot? {
         // Find activity type across all loaded carees
@@ -67,28 +68,71 @@ struct ActivityDetailView: View {
     // MARK: - Sections
 
     private var syncStateBadge: some View {
-        HStack(spacing: 4) {
-            switch activitySnapshot.syncState {
-            case .pending:
-                Image(systemName: "clock")
-                Text("Pending")
-            case .syncing:
-                ProgressView()
-                    .scaleEffect(0.8)
-                Text("Syncing...")
-            case .failed(_):
-                Image(systemName: "exclamationmark.triangle")
-                Text("Failed")
-            case .synced:
-                EmptyView()
+        VStack(spacing: 8) {
+            HStack(spacing: 4) {
+                switch activitySnapshot.syncState {
+                case .pending:
+                    Image(systemName: "clock")
+                    Text("Pending")
+                case .syncing:
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    Text("Syncing...")
+                case .failed(let errorMessage):
+                    Image(systemName: "exclamationmark.triangle")
+                    Text("Failed")
+                case .synced:
+                    EmptyView()
+                }
+            }
+            .font(.caption)
+            .foregroundColor(.orange)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color.orange.opacity(0.2))
+            .cornerRadius(12)
+
+            // Show error details for failed state
+            if case .failed(let errorMessage) = activitySnapshot.syncState {
+                VStack(spacing: 8) {
+                    Text(errorMessage)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+
+                    Button {
+                        retrySync()
+                    } label: {
+                        if isRetrying {
+                            ProgressView()
+                                .scaleEffect(0.7)
+                        } else {
+                            Label("Retry", systemImage: "arrow.clockwise")
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .font(.caption)
+                    .disabled(isRetrying)
+                }
             }
         }
-        .font(.caption)
-        .foregroundColor(.orange)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
-        .background(Color.orange.opacity(0.2))
-        .cornerRadius(12)
+    }
+
+    // MARK: - Actions
+
+    private func retrySync() {
+        guard !isRetrying else { return }
+        isRetrying = true
+
+        Task {
+            // Re-trigger the sync by calling trackActivity again
+            await dataProvider.trackActivity(activitySnapshot)
+
+            await MainActor.run {
+                isRetrying = false
+            }
+        }
     }
 
     private var detailsSection: some View {
