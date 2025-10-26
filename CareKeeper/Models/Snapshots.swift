@@ -47,7 +47,16 @@ struct CareeSnapshot: Identifiable, Hashable, Sendable {
 
         self.id = id
         self.name = name
-        self.imageData = record["CD_image"] as? Data
+
+        // Load image from CKAsset (using CD_image_ckAsset field)
+        if let imageAsset = record["CD_image_ckAsset"] as? CKAsset,
+           let imageURL = imageAsset.fileURL,
+           let imageData = try? Data(contentsOf: imageURL) {
+            self.imageData = imageData
+        } else {
+            self.imageData = nil
+        }
+
         self.isShared = isShared
         self.listOrder = (record["CD_listOrder"] as? Int) ?? 0
         self.dateCreated = (record["CD_dateCreated"] as? Date) ?? Date()
