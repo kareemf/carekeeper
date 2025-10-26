@@ -1,110 +1,90 @@
 import SwiftUI
-import Combine
-import SwiftData
 
+/// CareeListView rebuilt with defensive patterns
+/// Key changes from original:
+/// - Uses WatchDataProvider instead of multiple services
+/// - Consumes immutable snapshots (no SwiftData models in UI)
+/// - Task cancellation on view disappear
+/// - No Combine subscriptions (explicit async/await)
+/// - Safe rendering (no relationship access like caree.activityTypes)
 struct CareeListView: View {
-    // Use shared services from environment
-    @EnvironmentObject private var cloudKitService: CloudKitDataService
-    @EnvironmentObject private var sharedRecordsService: CloudKitSharedRecordsService
 
-    // Get cache service from shared CloudKitDataService
-    private var cacheService: LocalCacheService? {
-        cloudKitService.cacheService
-    }
-
+    @StateObject private var dataProvider = WatchDataProvider()
+    @State private var loadTask: Task<Void, Never>?
     @State private var error: Error?
-    @State private var deletionProgress: Double = 0.0
-    @State private var isDeleting = false
-
-    // Track combined carees by stable identifier to avoid holding onto invalidated models
-    @State private var careeIDs: [UUID] = []
-
-    // Helper publishers to unify types and provide safe fallbacks
-    private var myCareesPublisher: AnyPublisher<[Caree], Never> {
-        if let cacheService = cacheService {
-            return cacheService.$myCarees.eraseToAnyPublisher()
-        } else {
-            return Just([]).eraseToAnyPublisher()
-        }
-    }
-
-    private var sharedCareesPublisher: AnyPublisher<[Caree], Never> {
-        if let cacheService = cacheService {
-            return cacheService.$sharedCarees.eraseToAnyPublisher()
-        } else {
-            return Just([]).eraseToAnyPublisher()
-        }
-    }
-
-    @State private var navigationPath = NavigationPath()
 
     var body: some View {
-        let carees = resolvedCarees()
+        NavigationStack {
+            contentView
+                .navigationTitle("Carees")
+                .task {
+                    // Cancel previous task if view reappears
+                    loadTask?.cancel()
 
-        return NavigationStack(path: $navigationPath) {
-            Group {
-                if carees.isEmpty {
-                    emptyStateView
-                } else {
-                    careeListView(carees)
-                }
-            }
-            .navigationTitle(NSLocalizedString("Carees", comment: "Navigation title for carees list"))
-            .navigationDestination(for: UUID.self) { careeID in
-                CareeDetailView(careeID: careeID)
-            }
-            .task {
-                updateAllCarees()
-                // Fetch shared carees; service will push into cache (batched)
-                await sharedRecordsService.fetchSharedCarees()
-            }
-            .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { _ in
-                updateAllCarees()
-                Task {
-                    await sharedRecordsService.fetchSharedCarees()
-                }
-            }
-            .onReceive(sharedRecordsService.$error) { newError in
-                if let newError = newError {
-                    error = newError
-                }
-            }
-            .onReceive(myCareesPublisher) { _ in
-                updateAllCarees()
-            }
-            .onReceive(sharedCareesPublisher) { _ in
-                updateAllCarees()
-            }
-            .onReceive(cloudKitService.$deletionProgress) { progress in
-                isDeleting = progress.isDeleting
-                deletionProgress = progress.progress
-            }
-            .overlay {
-                if isDeleting {
-                    ZStack {
-                        Color.black.opacity(0.6)
-                            .ignoresSafeArea()
-
-                        VStack(spacing: 8) {
-                            ProgressView(value: deletionProgress) {
-                                Text(NSLocalizedString("Deleting...", comment: "Deletion progress title"))
-                                    .font(.caption)
-                            }
-                            .progressViewStyle(.linear)
-                            .tint(.white)
-
-                            Text("\(Int(deletionProgress * 100))%")
-                                .font(.caption2)
-                                .foregroundColor(.white)
-                        }
-                        .padding()
-                        .background(.ultraThinMaterial)
-                        .cornerRadius(8)
+                    loadTask = Task {
+                        await loadWithCancellation()
                     }
                 }
-            }
-            .errorAlert($error)
+                .onDisappear {
+                    // Clean up when view disappears
+                    loadTask?.cancel()
+                    loadTask = nil
+                }
+                .errorAlert($error)
         }
+    }
+
+    @ViewBuilder
+    private var contentView: some View {
+        if dataProvider.isLoadingCarees && dataProvider.carees.isEmpty {
+            // Loading state (only if no cached data)
+            loadingView
+        } else if let error = dataProvider.careesError, dataProvider.carees.isEmpty {
+            // Error state (only if no cached data to show)
+            errorView(error)
+        } else if dataProvider.carees.isEmpty {
+            // Empty state
+            emptyStateView
+        } else {
+            // Data loaded - show list
+            careeList
+        }
+    }
+
+    private var loadingView: some View {
+        VStack(spacing: 12) {
+            ProgressView()
+                .scaleEffect(1.2)
+
+            Text("Loading Carees...")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+    }
+
+    private func errorView(_ error: Error) -> some View {
+        VStack(spacing: 12) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 40))
+                .foregroundColor(.orange)
+
+            Text("Load Failed")
+                .font(.headline)
+
+            Text(error.localizedDescription)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+
+            Button {
+                Task { await dataProvider.loadCarees() }
+            } label: {
+                Label("Retry", systemImage: "arrow.clockwise")
+            }
+            .buttonStyle(.bordered)
+        }
+        .padding()
     }
 
     private var emptyStateView: some View {
@@ -113,84 +93,81 @@ struct CareeListView: View {
                 .font(.system(size: 40))
                 .foregroundColor(.secondary)
 
-            Text(NSLocalizedString("No Carees", comment: "Empty state title"))
+            Text("No Carees")
                 .font(.headline)
 
-            if sharedRecordsService.isLoading {
-                ProgressView()
-                    .scaleEffect(0.8)
-                Text(NSLocalizedString("Loading shared carees...", comment: "Loading shared carees message"))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            } else {
-                Text(NSLocalizedString("Add carees on iPhone or accept shared ones", comment: "Empty state description"))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-            }
+            Text("Add carees on iPhone or accept shared ones")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
         }
         .padding()
     }
 
-    private func resolvedCarees() -> [Caree] {
-        guard let cacheService = cacheService else {
-            return []
-        }
-
-        return careeIDs.compactMap { cacheService.getCachedCaree(id: $0) }
-    }
-
-    private func updateAllCarees() {
-        guard let cacheService = cacheService else {
-            careeIDs = []
-            return
-        }
-
-        let newIDs = (cacheService.myCarees + cacheService.sharedCarees).map { $0.id }
-        if careeIDs != newIDs {
-            careeIDs = newIDs
-        }
-    }
-
-    private func careeListView(_ carees: [Caree]) -> some View {
-        List(carees) { caree in
-            NavigationLink(value: caree.id) {
-                CareeRowView(
-                    caree: caree,
-                    isShared: caree.isShared  // Use cache metadata
-                )
+    private var careeList: some View {
+        List(dataProvider.carees) { caree in
+            NavigationLink {
+                CareeDetailView(careeSnapshot: caree)
+                    .environmentObject(dataProvider)
+            } label: {
+                CareeRowView(snapshot: caree)
             }
         }
         .refreshable {
-            // Refresh shared carees; LocalCacheService will update via batched apply
-            await sharedRecordsService.fetchSharedCarees()
+            guard !Task.isCancelled else { return }
+            await dataProvider.loadCarees()
+        }
+    }
+
+    // MARK: - Data Loading
+
+    private func loadWithCancellation() async {
+        // Check cancellation before starting
+        guard !Task.isCancelled else { return }
+
+        MemoryMonitor.logMemoryUsage(context: "CareeListView - Before Load")
+
+        await dataProvider.loadCarees()
+
+        // Check again after async work
+        guard !Task.isCancelled else { return }
+
+        MemoryMonitor.logMemoryUsage(context: "CareeListView - After Load")
+
+        // Handle errors
+        if let error = dataProvider.careesError {
+            self.error = error
         }
     }
 }
 
+// MARK: - Row Views
+
+/// Row view using snapshot instead of SwiftData model
+/// Safe - all properties are pre-loaded, no relationship access
 struct CareeRowView: View {
-    let caree: Caree
-    let isShared: Bool
+    let snapshot: CareeSnapshot
 
     var body: some View {
-        HStack {
-            ProfileImageView(caree: caree)
-            
+        HStack(spacing: 12) {
+            ProfileImageView(imageData: snapshot.imageData)
+
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text(caree.name)
+                    Text(snapshot.name)
                         .font(.headline)
-                    
-                    if isShared {
+
+                    if snapshot.isShared {
                         Image(systemName: "person.2.fill")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.blue)
                     }
-                    
+
                     Spacer()
                 }
 
-                Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) Activity Types", comment: "Activity Types count"))
+                // Safe - count pre-loaded, NOT accessing relationship!
+                Text("\(snapshot.activityTypeCount) Activity Types")
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
@@ -198,12 +175,14 @@ struct CareeRowView: View {
     }
 }
 
+/// Profile image view using optional Data instead of SwiftData model
 struct ProfileImageView: View {
-    let caree: Caree
-    
+    let imageData: Data?
+
     var body: some View {
         Group {
-            if let imageData = caree.image, let uiImage = UIImage(data: imageData) {
+            if let imageData = imageData,
+               let uiImage = UIImage(data: imageData) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -221,5 +200,4 @@ struct ProfileImageView: View {
 
 #Preview {
     CareeListView()
-        .modelContainer(PreviewContainer.shared)
 }

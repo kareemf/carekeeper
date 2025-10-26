@@ -1,149 +1,227 @@
 import SwiftUI
-import SwiftData
-import Combine
 
+/// ActivityListView rebuilt with lazy loading and pagination
+/// Key features:
+/// - Lazy loads activities when view appears (not upfront)
+/// - Only loads last 48h by default
+/// - Pagination: "Load Older" button for more history
+/// - Uses snapshots instead of SwiftData models
+/// - Task cancellation and memory cleanup
 struct ActivityListView: View {
-    let careeID: UUID
 
-    // Use shared services from environment
-    @EnvironmentObject private var cloudKitService: CloudKitDataService
+    let careeSnapshot: CareeSnapshot
+    let activityTypes: [ActivityTypeSnapshot]
 
-    // Get cache service from shared CloudKitDataService
-    private var cacheService: LocalCacheService? {
-        cloudKitService.cacheService
+    @EnvironmentObject private var dataProvider: WatchDataProvider
+    @State private var loadTask: Task<Void, Never>?
+    @State private var hoursToLoad: TimeInterval = 48 * 3600  // Start with 48h
+    @State private var filterActivityTypeID: UUID? = nil
+
+    private var activities: [ActivitySnapshot] {
+        dataProvider.recentActivitiesByCaree[careeSnapshot.id] ?? []
     }
 
-    // Reactive state - updated when cache changes
-    @State private var caree: Caree?
-    @State private var activities: [Activity] = []
-
-    @State private var selectedActivityType: ActivityType?
-    @State private var error: Error?
-    @State private var activityToDelete: Activity?
-    @State private var showingDeleteConfirmation = false
-
-    init(careeID: UUID) {
-        self.careeID = careeID
-    }
-
-    // Helper publishers to observe cache changes
-    private var myCareesPublisher: AnyPublisher<[Caree], Never> {
-        if let cacheService = cacheService {
-            return cacheService.$myCarees.eraseToAnyPublisher()
-        } else {
-            return Just([]).eraseToAnyPublisher()
+    private var filteredActivities: [ActivitySnapshot] {
+        guard let filterID = filterActivityTypeID else {
+            return activities
         }
+        return activities.filter { $0.activityTypeID == filterID }
     }
 
-    private var sharedCareesPublisher: AnyPublisher<[Caree], Never> {
-        if let cacheService = cacheService {
-            return cacheService.$sharedCarees.eraseToAnyPublisher()
-        } else {
-            return Just([]).eraseToAnyPublisher()
-        }
+    private var isLoading: Bool {
+        dataProvider.recentActivitiesByCaree[careeSnapshot.id] == nil
     }
 
     var body: some View {
         Group {
-            if let caree = caree {
-                List {
-                    if filteredActivities(for: caree).isEmpty {
-                        emptyStateView
-                    } else {
-                        ForEach(filteredActivities(for: caree)) { activity in
-                            NavigationLink(destination: ActivityDetailView(activityID: activity.id)) {
-                                activityRow(for: activity)
-                            }
-                        }
-                        .onDelete { offsets in
-                            if let index = offsets.first {
-                                activityToDelete = filteredActivities(for: caree)[index]
-                                showingDeleteConfirmation = true
-                            }
-                        }
-                    }
-                }
-                .navigationTitle(NSLocalizedString("Activities", comment: "Activities list title"))
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            cycleFilter(for: caree)
-                        } label: {
-                            if let selectedType = selectedActivityType {
-                                Text(selectedType.displayIcon)
-                            } else {
-                                Image(systemName: "line.3.horizontal.decrease.circle")
-                            }
-                        }
-                    }
-                }
-                .refreshable {
-                    // Refresh cache on pull-to-refresh
-                    try? await cacheService?.refreshCache()
-                }
+            if isLoading {
+                loadingView
+            } else if filteredActivities.isEmpty {
+                emptyStateView
             } else {
-                Text(NSLocalizedString("Caree not found", comment: "Caree not found message"))
-                    .foregroundColor(.secondary)
+                activityList
             }
         }
-        .errorAlert($error)
-        .confirmationDialog(
-            NSLocalizedString("Delete Activity?", comment: "Delete activity confirmation title"),
-            isPresented: $showingDeleteConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button(NSLocalizedString("Delete", comment: "Delete button"), role: .destructive) {
-                if let activity = activityToDelete {
-                    deleteActivity(activity)
-                }
+        .navigationTitle("Activities")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                filterButton
             }
-            Button(NSLocalizedString("Cancel", comment: "Cancel button"), role: .cancel) {
-                activityToDelete = nil
-            }
-        } message: {
-            Text(NSLocalizedString("This cannot be undone.", comment: "Delete confirmation message"))
         }
         .task {
-            // Initial load: refresh cache and update activities
-            try? await cacheService?.refreshCache()
-            updateActivities()
-        }
-        .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { cache in
-            Task {
-                try? await cache.refreshCache()
-                await MainActor.run {
-                    updateActivities()
-                }
+            // Lazy load activities when view appears
+            loadTask?.cancel()
+
+            loadTask = Task {
+                guard !Task.isCancelled else { return }
+
+                MemoryMonitor.logMemoryUsage(context: "ActivityListView - Before Load")
+
+                await dataProvider.loadRecentActivities(for: careeSnapshot.id, hoursBack: hoursToLoad)
+
+                guard !Task.isCancelled else { return }
+
+                MemoryMonitor.logMemoryUsage(context: "ActivityListView - After Load")
             }
+
+            await loadTask?.value
         }
-        .onReceive(myCareesPublisher) { _ in
-            updateActivities()
-        }
-        .onReceive(sharedCareesPublisher) { _ in
-            updateActivities()
+        .onDisappear {
+            loadTask?.cancel()
+            loadTask = nil
         }
     }
 
-    private func activityRow(for activity: Activity) -> some View {
+    // MARK: - Subviews
+
+    private var loadingView: some View {
+        VStack(spacing: 12) {
+            ProgressView()
+                .scaleEffect(1.2)
+
+            Text("Loading Activities...")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+    }
+
+    private var emptyStateView: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "tray")
+                .font(.system(size: 40))
+                .foregroundColor(.secondary)
+
+            if filterActivityTypeID != nil {
+                Text("No Matching Activities")
+                    .font(.headline)
+
+                Text("No activities found for this type in the selected time range")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+
+                Button {
+                    filterActivityTypeID = nil
+                } label: {
+                    Text("Clear Filter")
+                }
+                .buttonStyle(.bordered)
+            } else {
+                Text("No Activities")
+                    .font(.headline)
+
+                Text("Track an activity to see it appear here")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .padding()
+    }
+
+    private var activityList: some View {
+        List {
+            ForEach(filteredActivities) { activity in
+                NavigationLink {
+                    ActivityDetailView(activitySnapshot: activity)
+                        .environmentObject(dataProvider)
+                } label: {
+                    ActivityRowView(
+                        activity: activity,
+                        activityType: activityTypes.first { $0.id == activity.activityTypeID }
+                    )
+                }
+            }
+
+            // Pagination: load more if we hit the limit
+            if activities.count >= SelectiveCloudKitService.maxActivitiesPerCaree {
+                loadMoreButton
+            }
+        }
+        .refreshable {
+            guard !Task.isCancelled else { return }
+            await dataProvider.loadRecentActivities(for: careeSnapshot.id, hoursBack: hoursToLoad)
+        }
+    }
+
+    private var filterButton: some View {
+        Menu {
+            Button {
+                filterActivityTypeID = nil
+            } label: {
+                Label("All Activities", systemImage: "line.3.horizontal.decrease.circle")
+            }
+
+            Divider()
+
+            ForEach(activityTypes) { activityType in
+                Button {
+                    filterActivityTypeID = activityType.id
+                } label: {
+                    HStack {
+                        Text(activityType.icon)
+                        Text(activityType.name)
+                    }
+                }
+            }
+        } label: {
+            Image(systemName: "line.3.horizontal.decrease.circle")
+        }
+    }
+
+    private var loadMoreButton: some View {
+        Button {
+            hoursToLoad += 48 * 3600  // Add another 48h
+            Task {
+                await dataProvider.loadRecentActivities(for: careeSnapshot.id, hoursBack: hoursToLoad)
+            }
+        } label: {
+            HStack {
+                Spacer()
+                Text("Load Older Activities")
+                    .font(.caption)
+                    .foregroundColor(.blue)
+                Spacer()
+            }
+        }
+    }
+}
+
+// MARK: - Row View
+
+/// Activity row using snapshots
+struct ActivityRowView: View {
+    let activity: ActivitySnapshot
+    let activityType: ActivityTypeSnapshot?
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text(activity.activityType?.displayIcon ?? "⭐")
+                Text(activityType?.icon ?? "⭐")
                     .font(.title3)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(activity.activityType?.name ?? NSLocalizedString("Unknown", comment: "Unknown activity type"))
+                    Text(activityType?.name ?? "Unknown")
                         .font(.headline)
 
-                    Text(activity.formattedDateTime)
+                    Text(activity.dateTime, style: .time)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
 
                 Spacer()
+
+                // Sync state indicator
+                if activity.syncState != .synced {
+                    syncStateIndicator(for: activity.syncState)
+                }
             }
 
-            if let formattedQuantity = activity.formattedQuantity {
-                Text(formattedQuantity)
+            if let quantity = activity.quantity,
+               let unit = activityType?.quantityUnit {
+                Text("\(String(format: "%.1f", quantity)) \(unit)")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -158,110 +236,40 @@ struct ActivityListView: View {
         .padding(.vertical, 4)
     }
 
-    private var emptyStateView: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "clock.circle")
-                .font(.system(size: 40))
-                .foregroundColor(.secondary)
-
-            Text(selectedActivityType == nil
-                 ? NSLocalizedString("No activities yet", comment: "Empty activities message")
-                 : NSLocalizedString("No activities for this type", comment: "Empty filtered activities message"))
+    @ViewBuilder
+    private func syncStateIndicator(for state: ActivitySnapshot.SyncState) -> some View {
+        switch state {
+        case .pending:
+            Image(systemName: "clock")
                 .font(.caption)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-
-            if selectedActivityType != nil {
-                Button(NSLocalizedString("Show All", comment: "Show all activities button")) {
-                    selectedActivityType = nil
-                }
-                .buttonStyle(.bordered)
+                .foregroundColor(.orange)
+        case .syncing:
+            ProgressView()
+                .scaleEffect(0.7)
+        case .failed:
+            Image(systemName: "exclamationmark.triangle")
                 .font(.caption)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-    }
-
-    private func updateActivities() {
-        guard let cacheService = cacheService else {
-            caree = nil
-            activities = []
-            return
-        }
-
-        // Find the specific caree from cache (owned or shared)
-        let foundCaree = cacheService.getCachedCaree(id: careeID)
-
-        // Update caree and activities state
-        caree = foundCaree
-
-        if let foundCaree = foundCaree {
-            // Extract and sort activities
-            activities = (foundCaree.activities ?? []).sorted { $0.dateTime > $1.dateTime }
-        } else {
-            activities = []
-        }
-    }
-
-    private func filteredActivities(for caree: Caree) -> [Activity] {
-        // Use state activities array instead of reading from caree
-        if let selectedType = selectedActivityType {
-            return activities.filter { $0.activityType?.id == selectedType.id }
-        }
-
-        return activities
-    }
-
-    private func deleteActivity(_ activity: Activity) {
-        guard let caree = activity.caree else {
-            self.error = AppError.invalidInput("Activity has no associated caree")
-            return
-        }
-
-        Task {
-            do {
-                // Use unified API (routes internally based on caree.isShared)
-                try await cloudKitService.deleteActivity(activity: activity, caree: caree)
-
-                await MainActor.run {
-                    activityToDelete = nil
-                }
-            } catch {
-                await MainActor.run {
-                    self.error = AppError.deleteFailed(error.localizedDescription)
-                }
-            }
-        }
-    }
-
-    private func cycleFilter(for caree: Caree) {
-        let types = caree.sortedActivityTypes
-
-        if types.isEmpty {
-            selectedActivityType = nil
-            return
-        }
-
-        if let currentType = selectedActivityType,
-           let currentIndex = types.firstIndex(where: { $0.id == currentType.id }) {
-            // Move to next type or wrap to "All"
-            let nextIndex = currentIndex + 1
-            if nextIndex < types.count {
-                selectedActivityType = types[nextIndex]
-            } else {
-                selectedActivityType = nil  // Back to "All"
-            }
-        } else {
-            // No filter or not found, select first type
-            selectedActivityType = types.first
+                .foregroundColor(.red)
+        case .synced:
+            EmptyView()
         }
     }
 }
 
 #Preview {
-    NavigationStack {
-        ActivityListView(careeID: PreviewData.sampleCareeWithActivities.id)
+    let careeSnapshot = CareeSnapshot(
+        from: PreviewData.sampleCareeWithActivities
+    )
+
+    let activityTypes = PreviewData.sampleCareeWithActivities.sortedActivityTypes.map {
+        ActivityTypeSnapshot(from: $0, careeID: careeSnapshot.id)
     }
-    .modelContainer(PreviewContainer.shared)
+
+    return NavigationStack {
+        ActivityListView(
+            careeSnapshot: careeSnapshot,
+            activityTypes: activityTypes
+        )
+        .environmentObject(WatchDataProvider())
+    }
 }

@@ -1,189 +1,142 @@
 import SwiftUI
-import SwiftData
-import Combine
 
+/// CareeDetailView rebuilt with lazy loading and defensive patterns
+/// Key changes:
+/// - Lazy loads activity types when view appears (not loaded in CareeListView)
+/// - Uses snapshots instead of SwiftData models
+/// - Task cancellation on view disappear
+/// - Memory cleanup when leaving view
+/// - No relationship access (caree.activityTypes, etc.)
 struct CareeDetailView: View {
-    let careeID: UUID
 
-    // Use shared services from environment
-    @EnvironmentObject private var cloudKitService: CloudKitDataService
-    @EnvironmentObject private var sharedRecordsService: CloudKitSharedRecordsService
+    let careeSnapshot: CareeSnapshot
 
-    // Get cache service from shared CloudKitDataService
-    private var cacheService: LocalCacheService? {
-        cloudKitService.cacheService
-    }
-
-    // Keep a resilient, last-known reference to the Caree while refreshes occur
-    @State private var resolvedCaree: Caree?
-    // Refresh trigger to force view updates when relationships change
-    @State private var refreshID = UUID()
-
-    // Fast accessor to try resolving from cache
-    private func resolveCareeFromCache() -> Caree? {
-        cacheService?.getCachedCaree(id: careeID)
-    }
-
+    @EnvironmentObject private var dataProvider: WatchDataProvider
+    @State private var loadTask: Task<Void, Never>?
     @State private var showingTrackActivity = false
-    @State private var isLoadingSharedCaree = false
 
     @StateObject private var notificationPrefs = UserNotificationPreferences.shared
     @StateObject private var notificationService = UserNotificationService.shared
 
-    init(careeID: UUID) {
-        self.careeID = careeID
+    private var activityTypes: [ActivityTypeSnapshot] {
+        dataProvider.activityTypesByCaree[careeSnapshot.id] ?? []
+    }
+
+    private var isLoadingActivityTypes: Bool {
+        dataProvider.activityTypesByCaree[careeSnapshot.id] == nil
     }
 
     var body: some View {
         Group {
-            if isLoadingSharedCaree {
-                // Show loading state while fetching shared caree
-                VStack(spacing: 12) {
-                    ProgressView()
-                    Text(NSLocalizedString("Loading...", comment: "Loading shared caree message"))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            } else if let caree = resolvedCaree {
-                if !caree.sortedActivityTypes.isEmpty {
-                    TabView {
-                        // Track tab
-                        VStack {
-                            Spacer()
-                            trackActivityButton(for: caree)
-                            Spacer()
-                        }
-                        .containerBackground(.background, for: .tabView)
-
-                        // Today tab
-                        todayActivitiesSection(for: caree)
-                            .containerBackground(.background, for: .tabView)
-                    }
-                    .tabViewStyle(.verticalPage)
-                    .id(refreshID) // Refresh TabView content without re-running .task blocks
-                    .navigationTitle(caree.name)
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button {
-                                toggleNotifications(for: caree)
-                            } label: {
-                                Image(systemName: notificationPrefs.isEnabled(for: caree.id) ? "bell.fill" : "bell.slash")
-                                    .foregroundColor(notificationPrefs.isEnabled(for: caree.id) ? .blue : .gray)
-                            }
-                        }
-                    }
-                    .sheet(isPresented: $showingTrackActivity) {
-                        TrackActivityView(caree: caree)
-                    }
-                } else {
-                    ScrollView {
-                        gettingStartedView
-                    }
-                    .navigationTitle(caree.name)
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button {
-                                toggleNotifications(for: caree)
-                            } label: {
-                                Image(systemName: notificationPrefs.isEnabled(for: caree.id) ? "bell.fill" : "bell.slash")
-                                    .foregroundColor(notificationPrefs.isEnabled(for: caree.id) ? .blue : .gray)
-                            }
-                        }
-                    }
-                }
+            if isLoadingActivityTypes {
+                loadingView
+            } else if activityTypes.isEmpty {
+                gettingStartedView
             } else {
-                // Keep a benign placeholder instead of an empty view to avoid navigation pop
-                VStack(spacing: 8) {
-                    ProgressView()
-                    Text(NSLocalizedString("Preparing...", comment: "Placeholder while resolving caree"))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                TabView {
+                    // Track tab
+                    VStack {
+                        Spacer()
+                        trackActivityButton
+                        Spacer()
+                    }
+                    .containerBackground(.background, for: .tabView)
+
+                    // Activities tab
+                    activitiesTab
+                        .containerBackground(.background, for: .tabView)
                 }
+                .tabViewStyle(.verticalPage)
+            }
+        }
+        .navigationTitle(careeSnapshot.name)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    toggleNotifications()
+                } label: {
+                    Image(systemName: notificationPrefs.isEnabled(for: careeSnapshot.id) ? "bell.fill" : "bell.slash")
+                        .foregroundColor(notificationPrefs.isEnabled(for: careeSnapshot.id) ? .blue : .gray)
+                }
+            }
+        }
+        .sheet(isPresented: $showingTrackActivity) {
+            // Show activity types to select from
+            if !activityTypes.isEmpty {
+                TrackActivitySelectionView(
+                    careeSnapshot: careeSnapshot,
+                    activityTypes: activityTypes
+                )
+                .environmentObject(dataProvider)
             }
         }
         .task {
-            // Initial resolve
-            resolvedCaree = resolveCareeFromCache()
+            // Lazy load activity types when view appears
+            loadTask?.cancel()
 
-            // Light-weight cache refresh (debounced/coalesced)
-            try? await cacheService?.refreshCache()
+            loadTask = Task {
+                guard !Task.isCancelled else { return }
 
-            // If this caree is missing or shared, fetch shared carees (service will update cache in batch)
-            if resolvedCaree == nil || resolvedCaree?.isShared == true {
-                isLoadingSharedCaree = true
-                await sharedRecordsService.fetchSharedCarees()
-                // Re-resolve after fetch completes
-                resolvedCaree = resolveCareeFromCache()
-                isLoadingSharedCaree = false
-            }
-        }
-        .task(id: careeID) {
-            // Refresh when caree ID changes
-            resolvedCaree = resolveCareeFromCache()
-            try? await cacheService?.refreshCache()
+                MemoryMonitor.logMemoryUsage(context: "CareeDetailView - Before Load ActivityTypes")
 
-            if resolvedCaree == nil || resolvedCaree?.isShared == true {
-                isLoadingSharedCaree = true
-                await sharedRecordsService.fetchSharedCarees()
-                resolvedCaree = resolveCareeFromCache()
-                isLoadingSharedCaree = false
+                // Load activity types for this caree (on-demand)
+                await dataProvider.loadActivityTypes(for: careeSnapshot.id)
+
+                guard !Task.isCancelled else { return }
+
+                MemoryMonitor.logMemoryUsage(context: "CareeDetailView - After Load ActivityTypes")
             }
+
+            await loadTask?.value
         }
-        .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { _ in
-            Task {
-                await handleCacheServiceAttachment()
-            }
-        }
-        // Re-resolve after any shared refresh completes (both services post this)
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CloudKitBackgroundRefreshFinished"))) { _ in
-            resolvedCaree = resolveCareeFromCache()
-            isLoadingSharedCaree = false
-        }
-        // Also re-resolve when the in-memory shared list changes
-        .onChange(of: sharedRecordsService.sharedCarees) { _ in
-            resolvedCaree = resolveCareeFromCache()
-            isLoadingSharedCaree = false
-        }
-        // REACTIVE: Re-resolve when cache publishers update (for inline CRUD reactivity)
-        .onReceive(cacheService?.$myCarees.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()) { _ in
-            if let current = resolvedCaree, !current.isShared {
-                resolvedCaree = resolveCareeFromCache()
-            }
-        }
-        .onReceive(cacheService?.$sharedCarees.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()) { _ in
-            if let current = resolvedCaree, current.isShared {
-                resolvedCaree = resolveCareeFromCache()
-            }
-        }
-        // REACTIVE: Listen for shared caree data updates (immediate notification)
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SharedCareeDataUpdated"))) { notification in
-            // Check if this notification is for our caree
-            if let updatedCareeID = notification.object as? UUID, updatedCareeID == careeID {
-                resolvedCaree = resolveCareeFromCache()
-                // Force view refresh to see updated relationships
-                refreshID = UUID()
-            }
+        .onDisappear {
+            loadTask?.cancel()
+            loadTask = nil
+
+            // Clear cache for this caree to free memory
+            dataProvider.clearUnusedCache(except: nil)
         }
     }
 
-    private func handleCacheServiceAttachment() async {
-        resolvedCaree = resolveCareeFromCache()
-        try? await cacheService?.refreshCache()
+    // MARK: - Subviews
 
-        if resolvedCaree == nil || resolvedCaree?.isShared == true {
-            isLoadingSharedCaree = true
-            await sharedRecordsService.fetchSharedCarees()
-            resolvedCaree = resolveCareeFromCache()
-            isLoadingSharedCaree = false
+    private var loadingView: some View {
+        VStack(spacing: 12) {
+            ProgressView()
+                .scaleEffect(1.2)
+
+            Text("Loading Activity Types...")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+    }
+
+    private var gettingStartedView: some View {
+        ScrollView {
+            VStack(spacing: 12) {
+                Image(systemName: "lightbulb.circle")
+                    .font(.system(size: 50))
+                    .foregroundColor(.accentColor)
+
+                Text("Getting Started")
+                    .font(.headline)
+
+                Text("Activity types must be created on iPhone before you can track activities on Apple Watch.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding()
         }
     }
 
-    private func trackActivityButton(for caree: Caree) -> some View {
+    private var trackActivityButton: some View {
         Button(action: { showingTrackActivity = true }) {
             VStack(spacing: 8) {
                 Image(systemName: "plus.circle.fill")
                     .font(.system(size: 40))
-                Text(NSLocalizedString("Track", comment: "Track activity button"))
+                Text("Track")
                     .font(.title3)
                     .fontWeight(.semibold)
             }
@@ -194,96 +147,32 @@ struct CareeDetailView: View {
             .cornerRadius(12)
         }
         .padding(.horizontal, 12)
-        .disabled(caree.activityTypes?.isEmpty ?? true)
     }
 
-    private var gettingStartedView: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "lightbulb.circle")
-                .font(.system(size: 50))
-                .foregroundColor(.accentColor)
-
-            Text(NSLocalizedString("Getting Started", comment: "Getting started title"))
-                .font(.headline)
-
-            Text(NSLocalizedString("Activity types must be created on iPhone before you can track activities on Apple Watch.", comment: "Getting started message"))
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding()
-    }
-
-    private func todayActivities(for caree: Caree) -> [Activity] {
-        let allActivities = caree.activities ?? []
-        return allActivities
-            .filter { Calendar.current.isDateInToday($0.dateTime) }
-            .sorted { $0.dateTime > $1.dateTime }
-    }
-
-    private func todayActivitiesSection(for caree: Caree) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text(NSLocalizedString("Today", comment: "Today's activities section title"))
-                .font(.headline)
-                .padding(.horizontal)
-                .padding(.top, 8)
-
-            if todayActivities(for: caree).isEmpty {
-                VStack(spacing: 12) {
-                    Text(NSLocalizedString("No activities recorded today", comment: "Empty today's activities message"))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List {
-                    ForEach(todayActivities(for: caree)) { activity in
-                        NavigationLink(destination: ActivityDetailView(activityID: activity.id)) {
-                            activityRow(for: activity)
-                        }
-                    }
-                }
-                .listStyle(.plain)
-            }
-        }
-    }
-
-    private func activityRow(for activity: Activity) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(activity.activityType?.displayIcon ?? "⭐")
+    private var activitiesTab: some View {
+        NavigationLink {
+            ActivityListView(careeSnapshot: careeSnapshot, activityTypes: activityTypes)
+                .environmentObject(dataProvider)
+        } label: {
+            VStack(spacing: 8) {
+                Image(systemName: "list.bullet")
+                    .font(.system(size: 40))
+                Text("Activities")
                     .font(.title3)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(activity.activityType?.name ?? NSLocalizedString("Unknown", comment: "Unknown activity type"))
-                        .font(.headline)
-
-                    Text(activity.formattedDateTime)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                Spacer()
+                    .fontWeight(.semibold)
             }
-
-            if let formattedQuantity = activity.formattedQuantity {
-                Text(formattedQuantity)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
-            if let notes = activity.notes, !notes.isEmpty {
-                Text(notes)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
-            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 24)
+            .foregroundColor(.white)
+            .background(Color.blue.opacity(0.8))
+            .cornerRadius(12)
         }
-        .padding(.vertical, 4)
+        .padding(.horizontal, 12)
     }
 
-    private func toggleNotifications(for caree: Caree) {
+    // MARK: - Actions
+
+    private func toggleNotifications() {
         Task {
             // Check current authorization status
             await notificationService.checkAuthorizationStatus()
@@ -293,11 +182,11 @@ struct CareeDetailView: View {
                 let granted = await notificationService.requestPermission()
                 if granted {
                     // Enable notifications for this caree
-                    notificationPrefs.setEnabled(true, for: caree.id)
+                    notificationPrefs.setEnabled(true, for: careeSnapshot.id)
                 }
             } else if notificationService.authorizationStatus == .authorized {
                 // Toggle the preference
-                notificationPrefs.toggle(for: caree.id)
+                notificationPrefs.toggle(for: careeSnapshot.id)
             }
             // Note: watchOS doesn't have Settings deep linking like iOS,
             // so we silently fail if permission is denied
@@ -305,9 +194,52 @@ struct CareeDetailView: View {
     }
 }
 
-#Preview {
-    NavigationStack {
-        CareeDetailView(careeID: PreviewData.sampleCareeWithActivities.id)
+/// Activity type selection view for tracking
+struct TrackActivitySelectionView: View {
+    let careeSnapshot: CareeSnapshot
+    let activityTypes: [ActivityTypeSnapshot]
+
+    @EnvironmentObject private var dataProvider: WatchDataProvider
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List(activityTypes) { activityType in
+                NavigationLink {
+                    TrackActivityView(
+                        careeSnapshot: careeSnapshot,
+                        activityTypeSnapshot: activityType
+                    )
+                    .environmentObject(dataProvider)
+                } label: {
+                    HStack {
+                        Text(activityType.icon)
+                            .font(.title3)
+                        Text(activityType.name)
+                            .font(.headline)
+                    }
+                }
+            }
+            .navigationTitle("Track Activity")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+            }
+        }
     }
-    .modelContainer(PreviewContainer.shared)
+}
+
+#Preview {
+    let snapshot = CareeSnapshot(
+        from: PreviewData.sampleCareeWithActivities
+    )
+
+    return NavigationStack {
+        CareeDetailView(careeSnapshot: snapshot)
+            .environmentObject(WatchDataProvider())
+    }
 }
