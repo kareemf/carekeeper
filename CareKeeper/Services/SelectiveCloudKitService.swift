@@ -27,6 +27,80 @@ class SelectiveCloudKitService {
     private let container = CKContainer(identifier: CloudKitConfig.containerID)
     private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "selective-queries")
 
+    // MARK: - Retry Configuration
+
+    /// Maximum retry attempts for transient errors
+    private let maxRetries = 3
+
+    /// Base delay for exponential backoff (seconds)
+    private let baseRetryDelay: TimeInterval = 2.0
+
+    // MARK: - Retry Logic
+
+    /// Execute a CloudKit request with automatic retry for transient errors
+    /// Uses exponential backoff: 2s, 4s, 8s
+    private func retryableRequest<T>(
+        operation: String,
+        _ block: @escaping () async throws -> T
+    ) async throws -> T {
+        var lastError: Error?
+
+        for attempt in 0..<maxRetries {
+            do {
+                FileLogger.shared.info("☁️ \(operation) (attempt \(attempt + 1)/\(maxRetries))")
+                let result = try await block()
+
+                if attempt > 0 {
+                    logger.info("✅ \(operation) succeeded after \(attempt + 1) attempts")
+                    FileLogger.shared.info("✅ \(operation) succeeded after \(attempt + 1) attempts")
+                }
+
+                return result
+
+            } catch {
+                lastError = error
+
+                // Check if error is retryable
+                let ckError = error as? CKError
+                let isRetryable = ckError?.isRetryable ?? false
+
+                logger.error("❌ \(operation) failed (attempt \(attempt + 1)/\(maxRetries)): \(error.localizedDescription)")
+                FileLogger.shared.error("❌ \(operation) failed (attempt \(attempt + 1)/\(maxRetries)): \(error.localizedDescription)")
+
+                // Log network state
+                if let ckError = ckError {
+                    FileLogger.shared.error("   CKError code: \(ckError.code.rawValue)")
+                    FileLogger.shared.error("   Is retryable: \(isRetryable)")
+                }
+
+                // Don't retry if not a transient error
+                guard isRetryable else {
+                    logger.error("⚠️ Non-retryable error, failing immediately")
+                    FileLogger.shared.error("⚠️ Non-retryable error, failing immediately")
+                    throw error
+                }
+
+                // Don't retry if this was the last attempt
+                guard attempt < maxRetries - 1 else {
+                    break
+                }
+
+                // Exponential backoff
+                let delay = baseRetryDelay * pow(2.0, Double(attempt))
+                logger.info("⏳ Waiting \(delay)s before retry...")
+                FileLogger.shared.info("⏳ Waiting \(delay)s before retry...")
+
+                try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+            }
+        }
+
+        // All retries exhausted
+        logger.error("❌ \(operation) failed after \(maxRetries) attempts")
+        FileLogger.shared.error("❌ \(operation) failed after \(maxRetries) attempts")
+
+        throw lastError ?? CKError(.networkFailure)
+    }
+
     // MARK: - Caree Queries (Small Dataset - Load All)
 
     /// Load all carees (both owned and shared)
@@ -56,7 +130,9 @@ class SelectiveCloudKitService {
         let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
         query.sortDescriptors = [NSSortDescriptor(key: "CD_listOrder", ascending: true)]
 
-        let results = try await database.records(matching: query)
+        let results = try await retryableRequest(operation: "fetchOwnedCarees") {
+            try await database.records(matching: query)
+        }
 
         return try results.matchResults.compactMap { _, result in
             let record = try result.get()
@@ -68,7 +144,9 @@ class SelectiveCloudKitService {
         let database = container.sharedCloudDatabase
 
         // Shared database requires zone-specific queries (no zone-wide queries!)
-        let zones = try await database.allRecordZones()
+        let zones = try await retryableRequest(operation: "fetchSharedZones") {
+            try await database.allRecordZones()
+        }
         logger.info("📱 Found \(zones.count) shared zones")
 
         var allCarees: [CareeSnapshot] = []
@@ -80,7 +158,9 @@ class SelectiveCloudKitService {
             logger.info("🔍 Querying shared carees in zone: \(zone.zoneID.zoneName)")
 
             let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
-            let (matchResults, _) = try await database.records(matching: query, inZoneWith: zone.zoneID)
+            let (matchResults, _) = try await retryableRequest(operation: "fetchSharedCarees(zone: \(zone.zoneID.zoneName))") {
+                try await database.records(matching: query, inZoneWith: zone.zoneID)
+            }
 
             for (_, result) in matchResults {
                 if let record = try? result.get() {
@@ -121,16 +201,20 @@ class SelectiveCloudKitService {
 
         if isShared {
             // Shared database requires zone-specific queries
-            let zones = try await database.allRecordZones()
+            let zones = try await retryableRequest(operation: "fetchSharedZones") {
+                try await database.allRecordZones()
+            }
             for zone in zones {
                 if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
 
-                let (matchResults, _) = try await database.records(
-                    matching: query,
-                    inZoneWith: zone.zoneID,
-                    desiredKeys: nil,
-                    resultsLimit: Self.maxActivityTypes
-                )
+                let (matchResults, _) = try await retryableRequest(operation: "fetchActivityTypes(zone: \(zone.zoneID.zoneName))") {
+                    try await database.records(
+                        matching: query,
+                        inZoneWith: zone.zoneID,
+                        desiredKeys: nil,
+                        resultsLimit: Self.maxActivityTypes
+                    )
+                }
 
                 for (_, result) in matchResults {
                     if let record = try? result.get(),
@@ -141,11 +225,13 @@ class SelectiveCloudKitService {
             }
         } else {
             // Private database supports zone-wide queries
-            let results = try await database.records(
-                matching: query,
-                desiredKeys: nil,
-                resultsLimit: Self.maxActivityTypes
-            )
+            let results = try await retryableRequest(operation: "fetchActivityTypes(private)") {
+                try await database.records(
+                    matching: query,
+                    desiredKeys: nil,
+                    resultsLimit: Self.maxActivityTypes
+                )
+            }
 
             activityTypes = try results.matchResults.compactMap { _, result in
                 try ActivityTypeSnapshot(from: result.get())
@@ -208,16 +294,20 @@ class SelectiveCloudKitService {
 
         if isShared {
             // Shared database requires zone-specific queries
-            let zones = try await database.allRecordZones()
+            let zones = try await retryableRequest(operation: "fetchSharedZones") {
+                try await database.allRecordZones()
+            }
             for zone in zones {
                 if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
 
-                let (matchResults, _) = try await database.records(
-                    matching: query,
-                    inZoneWith: zone.zoneID,
-                    desiredKeys: nil,
-                    resultsLimit: Self.maxActivitiesPerCaree
-                )
+                let (matchResults, _) = try await retryableRequest(operation: "fetchRecentActivities(zone: \(zone.zoneID.zoneName))") {
+                    try await database.records(
+                        matching: query,
+                        inZoneWith: zone.zoneID,
+                        desiredKeys: nil,
+                        resultsLimit: Self.maxActivitiesPerCaree
+                    )
+                }
 
                 for (_, result) in matchResults {
                     if let record = try? result.get(),
@@ -236,11 +326,13 @@ class SelectiveCloudKitService {
             }
         } else {
             // Private database supports zone-wide queries
-            let results = try await database.records(
-                matching: query,
-                desiredKeys: nil,
-                resultsLimit: Self.maxActivitiesPerCaree
-            )
+            let results = try await retryableRequest(operation: "fetchRecentActivities(private)") {
+                try await database.records(
+                    matching: query,
+                    desiredKeys: nil,
+                    resultsLimit: Self.maxActivitiesPerCaree
+                )
+            }
 
             activities = try results.matchResults.compactMap { _, result in
                 try ActivitySnapshot(from: result.get())
@@ -278,26 +370,32 @@ class SelectiveCloudKitService {
 
         if isShared {
             // Shared database requires zone-specific queries
-            let zones = try await database.allRecordZones()
+            let zones = try await retryableRequest(operation: "fetchSharedZones") {
+                try await database.allRecordZones()
+            }
             for zone in zones {
                 if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
 
-                let (matchResults, _) = try await database.records(
-                    matching: query,
-                    inZoneWith: zone.zoneID,
-                    desiredKeys: [],
-                    resultsLimit: 1000
-                )
+                let (matchResults, _) = try await retryableRequest(operation: "fetchActivityTypeCount(zone: \(zone.zoneID.zoneName))") {
+                    try await database.records(
+                        matching: query,
+                        inZoneWith: zone.zoneID,
+                        desiredKeys: [],
+                        resultsLimit: 1000
+                    )
+                }
 
                 count += matchResults.count
             }
         } else {
             // Private database supports zone-wide queries
-            let results = try await database.records(
-                matching: query,
-                desiredKeys: [],
-                resultsLimit: 1000
-            )
+            let results = try await retryableRequest(operation: "fetchActivityTypeCount(private)") {
+                try await database.records(
+                    matching: query,
+                    desiredKeys: [],
+                    resultsLimit: 1000
+                )
+            }
 
             count = results.matchResults.count
         }
@@ -341,8 +439,10 @@ class SelectiveCloudKitService {
         // Set parent reference for sharing hierarchy
         record.parent = CKRecord.Reference(recordID: careeRecordID, action: .none)
 
-        // Save to CloudKit
-        _ = try await database.save(record)
+        // Save to CloudKit with retry
+        _ = try await retryableRequest(operation: "createActivity") {
+            try await database.save(record)
+        }
 
         logger.info("✅ Activity created successfully")
 
@@ -350,5 +450,45 @@ class SelectiveCloudKitService {
         var updatedActivity = activity
         updatedActivity.syncState = .synced
         return updatedActivity
+    }
+}
+
+// MARK: - CKError Extension
+
+extension CKError {
+    /// Check if this error is transient and should be retried
+    var isRetryable: Bool {
+        switch code {
+        case .networkUnavailable, .networkFailure, .serviceUnavailable:
+            return true
+        case .requestRateLimited:
+            return true
+        case .zoneBusy:
+            return true
+        default:
+            return false
+        }
+    }
+
+    /// User-friendly error message
+    var userFriendlyMessage: String {
+        switch code {
+        case .networkUnavailable:
+            return "Network unavailable. Please check your connection."
+        case .networkFailure:
+            return "Network error. Please try again."
+        case .serviceUnavailable:
+            return "iCloud is temporarily unavailable. Please try again later."
+        case .requestRateLimited:
+            return "Too many requests. Please wait a moment."
+        case .notAuthenticated:
+            return "Please sign in to iCloud in Settings."
+        case .zoneBusy:
+            return "iCloud is busy. Please try again."
+        case .partialFailure:
+            return "Some items couldn't sync. Please try again."
+        default:
+            return "iCloud error: \(localizedDescription)"
+        }
     }
 }
