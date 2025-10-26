@@ -130,11 +130,14 @@ class SelectiveCloudKitService {
         let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
         query.sortDescriptors = [NSSortDescriptor(key: "CD_listOrder", ascending: true)]
 
-        let results = try await retryableRequest(operation: "fetchOwnedCarees") {
-            try await database.records(matching: query)
+        // Query from the custom app zone (matches iOS app)
+        let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
+
+        let (results, _) = try await retryableRequest(operation: "fetchOwnedCarees") {
+            try await database.records(matching: query, inZoneWith: zoneID)
         }
 
-        return try results.matchResults.compactMap { _, result in
+        return try results.compactMap { _, result in
             let record = try result.get()
             return try CareeSnapshot(from: record, isShared: false)
         }
@@ -224,17 +227,20 @@ class SelectiveCloudKitService {
                 }
             }
         } else {
-            // Private database supports zone-wide queries
-            let results = try await retryableRequest(operation: "fetchActivityTypes(private)") {
+            // Private database - query from custom app zone (matches iOS app)
+            let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
+
+            let (matchResults, _) = try await retryableRequest(operation: "fetchActivityTypes(private)") {
                 try await database.records(
                     matching: query,
+                    inZoneWith: zoneID,
                     desiredKeys: nil,
                     resultsLimit: Self.maxActivityTypes
                 )
             }
 
-            activityTypes = try results.matchResults.compactMap { _, result in
-                try ActivityTypeSnapshot(from: result.get())
+            activityTypes = try matchResults.compactMap { _, result in
+                try? ActivityTypeSnapshot(from: result.get())
             }
         }
 
@@ -325,17 +331,20 @@ class SelectiveCloudKitService {
                 activities = Array(activities.prefix(Self.maxActivitiesPerCaree))
             }
         } else {
-            // Private database supports zone-wide queries
-            let results = try await retryableRequest(operation: "fetchRecentActivities(private)") {
+            // Private database - query from custom app zone (matches iOS app)
+            let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
+
+            let (matchResults, _) = try await retryableRequest(operation: "fetchRecentActivities(private)") {
                 try await database.records(
                     matching: query,
+                    inZoneWith: zoneID,
                     desiredKeys: nil,
                     resultsLimit: Self.maxActivitiesPerCaree
                 )
             }
 
-            activities = try results.matchResults.compactMap { _, result in
-                try ActivitySnapshot(from: result.get())
+            activities = try matchResults.compactMap { _, result in
+                try? ActivitySnapshot(from: result.get())
             }
         }
 
@@ -388,16 +397,19 @@ class SelectiveCloudKitService {
                 count += matchResults.count
             }
         } else {
-            // Private database supports zone-wide queries
-            let results = try await retryableRequest(operation: "fetchActivityTypeCount(private)") {
+            // Private database - query from custom app zone (matches iOS app)
+            let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
+
+            let (matchResults, _) = try await retryableRequest(operation: "fetchActivityTypeCount(private)") {
                 try await database.records(
                     matching: query,
+                    inZoneWith: zoneID,
                     desiredKeys: [],
                     resultsLimit: 1000
                 )
             }
 
-            count = results.matchResults.count
+            count = matchResults.count
         }
 
         logger.info("📊 Activity type count for caree \(careeID): \(count)")
@@ -413,12 +425,50 @@ class SelectiveCloudKitService {
     ///   - isShared: Whether this belongs to a shared caree
     /// - Returns: Updated snapshot with synced state
     func createActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws -> ActivitySnapshot {
-        logger.info("📝 Creating activity in CloudKit")
+        logger.info("📝 Creating activity in CloudKit (isShared: \(isShared))")
 
         let database = isShared ? container.sharedCloudDatabase : container.privateCloudDatabase
 
-        // Create CKRecord
-        let recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)")
+        // Determine the correct zone for this activity
+        // - Owned carees: Custom app zone (matches iOS app)
+        // - Shared carees: Custom zone (requires discovery)
+        let zoneID: CKRecordZone.ID
+        if isShared {
+            // Find the zone containing this shared caree
+            logger.info("🔍 Finding zone for shared caree: \(activity.careeID)")
+            let zones = try await retryableRequest(operation: "fetchSharedZones") {
+                try await database.allRecordZones()
+            }
+
+            var foundZone: CKRecordZone.ID?
+            for zone in zones {
+                if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
+
+                // Query for the caree in this zone
+                let careeRecordName = "CD_Caree/\(activity.careeID.uuidString)"
+                let careeRecordID = CKRecord.ID(recordName: careeRecordName, zoneID: zone.zoneID)
+
+                do {
+                    _ = try await database.record(for: careeRecordID)
+                    foundZone = zone.zoneID
+                    logger.info("✅ Found caree in zone: \(zone.zoneID.zoneName)")
+                    break
+                } catch {
+                    // Caree not in this zone, continue searching
+                }
+            }
+
+            guard let zone = foundZone else {
+                throw SnapshotError.invalidInput("Shared caree \(activity.careeID) not found in any zone")
+            }
+            zoneID = zone
+        } else {
+            // Owned carees are in the custom app zone (matches iOS app)
+            zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
+        }
+
+        // Create CKRecord in the correct zone
+        let recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)", zoneID: zoneID)
         let record = CKRecord(recordType: "CD_Activity", recordID: recordID)
 
         // Set fields
@@ -429,14 +479,14 @@ class SelectiveCloudKitService {
         record["CD_longitude"] = activity.longitude
         record["CD_dateCreated"] = activity.dateCreated
 
-        // Set references
-        let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(activity.careeID.uuidString)")
+        // Set references (in the same zone)
+        let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(activity.careeID.uuidString)", zoneID: zoneID)
         record["CD_caree"] = CKRecord.Reference(recordID: careeRecordID, action: .none)
 
-        let typeRecordID = CKRecord.ID(recordName: "CD_ActivityType/\(activity.activityTypeID.uuidString)")
+        let typeRecordID = CKRecord.ID(recordName: "CD_ActivityType/\(activity.activityTypeID.uuidString)", zoneID: zoneID)
         record["CD_activityType"] = CKRecord.Reference(recordID: typeRecordID, action: .none)
 
-        // Set parent reference for sharing hierarchy
+        // Set parent reference for sharing hierarchy (in the same zone)
         record.parent = CKRecord.Reference(recordID: careeRecordID, action: .none)
 
         // Save to CloudKit with retry
@@ -458,10 +508,45 @@ class SelectiveCloudKitService {
     ///   - isShared: Whether this belongs to a shared caree
     /// - Returns: Updated snapshot with synced state
     func updateActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws -> ActivitySnapshot {
-        logger.info("📝 Updating activity in CloudKit: \(activity.id)")
+        logger.info("📝 Updating activity in CloudKit: \(activity.id) (isShared: \(isShared))")
 
         let database = isShared ? container.sharedCloudDatabase : container.privateCloudDatabase
-        let recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)")
+
+        // Determine the correct zone for this activity
+        // - Owned activities: Custom app zone (matches iOS app)
+        // - Shared activities: Custom zone (requires discovery)
+        let recordID: CKRecord.ID
+        if isShared {
+            // Find the zone containing this shared activity
+            logger.info("🔍 Finding zone for shared activity: \(activity.id)")
+            let zones = try await retryableRequest(operation: "fetchSharedZones") {
+                try await database.allRecordZones()
+            }
+
+            var foundRecordID: CKRecord.ID?
+            for zone in zones {
+                if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
+
+                let testRecordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)", zoneID: zone.zoneID)
+                do {
+                    _ = try await database.record(for: testRecordID)
+                    foundRecordID = testRecordID
+                    logger.info("✅ Found activity in zone: \(zone.zoneID.zoneName)")
+                    break
+                } catch {
+                    // Activity not in this zone, continue searching
+                }
+            }
+
+            guard let found = foundRecordID else {
+                throw SnapshotError.invalidInput("Shared activity \(activity.id) not found in any zone")
+            }
+            recordID = found
+        } else {
+            // Owned activities are in the custom app zone (matches iOS app)
+            let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
+            recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)", zoneID: zoneID)
+        }
 
         // Fetch existing record with retry
         let record = try await retryableRequest(operation: "fetchActivity") {
