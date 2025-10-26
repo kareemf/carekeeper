@@ -74,7 +74,7 @@ struct ActivityDetailView: View {
                 ProgressView()
                     .scaleEffect(0.8)
                 Text("Syncing...")
-            case .failed(let message):
+            case .failed(_):
                 Image(systemName: "exclamationmark.triangle")
                 Text("Failed")
             case .synced:

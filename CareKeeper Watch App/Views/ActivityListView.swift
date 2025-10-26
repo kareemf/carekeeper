@@ -44,11 +44,11 @@ struct ActivityListView: View {
         }
         .navigationTitle("Activities")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                filterButton
-            }
-        }
+//        .toolbar {
+//            ToolbarItem(placement: .topBarTrailing) {
+//                filterButton
+//            }
+//        }
         .task {
             // Lazy load activities when view appears
             loadTask?.cancel()
@@ -146,30 +146,30 @@ struct ActivityListView: View {
         }
     }
 
-    private var filterButton: some View {
-        Menu {
-            Button {
-                filterActivityTypeID = nil
-            } label: {
-                Label("All Activities", systemImage: "line.3.horizontal.decrease.circle")
-            }
-
-            Divider()
-
-            ForEach(activityTypes) { activityType in
-                Button {
-                    filterActivityTypeID = activityType.id
-                } label: {
-                    HStack {
-                        Text(activityType.icon)
-                        Text(activityType.name)
-                    }
-                }
-            }
-        } label: {
-            Image(systemName: "line.3.horizontal.decrease.circle")
-        }
-    }
+//    private var filterButton: some View {
+//        Menu {
+//            Button {
+//                filterActivityTypeID = nil
+//            } label: {
+//                Label("All Activities", systemImage: "line.3.horizontal.decrease.circle")
+//            }
+//
+//            Divider()
+//
+//            ForEach(activityTypes) { activityType in
+//                Button {
+//                    filterActivityTypeID = activityType.id
+//                } label: {
+//                    HStack {
+//                        Text(activityType.icon)
+//                        Text(activityType.name)
+//                    }
+//                }
+//            }
+//        } label: {
+//            Image(systemName: "line.3.horizontal.decrease.circle")
+//        }
+//    }
 
     private var loadMoreButton: some View {
         Button {

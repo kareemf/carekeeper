@@ -82,7 +82,7 @@ class WatchDataProvider: ObservableObject {
                 }
 
                 carees = loadedCarees
-                logger.info("✅ Loaded \(carees.count) carees")
+                logger.info("✅ Loaded \(self.carees.count) carees")
 
             } catch {
                 careesError = error
@@ -173,7 +173,7 @@ class WatchDataProvider: ObservableObject {
                     .sorted { $0.dateTime > $1.dateTime }
 
                 recentActivitiesByCaree[careeID] = allActivities
-                logger.info("✅ Loaded \(activities.count) activities (+ \(pendingActivities.count) pending)")
+                logger.info("✅ Loaded \(activities.count) activities (+ \(self.pendingActivities.count) pending)")
                 MemoryMonitor.logMemoryUsage(context: "After loadRecentActivities")
 
             } catch {
@@ -218,7 +218,7 @@ class WatchDataProvider: ObservableObject {
                 await self.updateActivityState(activity.id, state: .syncing)
 
                 // Create in CloudKit
-                let syncedActivity = try await self.selectiveService.createActivity(
+                _ = try await self.selectiveService.createActivity(
                     activity,
                     isShared: caree.isShared
                 )
@@ -289,7 +289,7 @@ class WatchDataProvider: ObservableObject {
         recentActivitiesByCaree.removeAll()
 
         // Keep carees loaded (small memory footprint)
-        logger.info("✅ Cache cleared (kept \(carees.count) carees)")
+        logger.info("✅ Cache cleared (kept \(self.carees.count) carees)")
         MemoryMonitor.logMemoryUsage(context: "After full cache clear")
     }
 
@@ -302,9 +302,5 @@ class WatchDataProvider: ObservableObject {
         loadActivitiesTask?.cancel()
 
         logger.info("🛑 Cancelled all running tasks")
-    }
-
-    deinit {
-        cancelAllTasks()
     }
 }

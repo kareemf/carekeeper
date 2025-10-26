@@ -132,15 +132,16 @@ class SelectiveCloudKitService {
         for careeID: UUID,
         activityTypeID: UUID? = nil,
         isShared: Bool,
-        hoursBack: TimeInterval = activityHistoryHours
+        hoursBack: TimeInterval? = nil
     ) async throws -> [ActivitySnapshot] {
-        logger.info("🔍 Fetching recent activities (last \(hoursBack/3600)h) for caree: \(careeID)")
+        let hours = hoursBack ?? Self.activityHistoryHours
+        logger.info("🔍 Fetching recent activities (last \(hours/3600)h) for caree: \(careeID)")
         MemoryMonitor.logMemoryUsage(context: "Before fetchRecentActivities")
 
         let database = isShared ? container.sharedCloudDatabase : container.privateCloudDatabase
 
         // Build predicate with date filter (CRITICAL for performance)
-        let cutoffDate = Date().addingTimeInterval(-hoursBack)
+        let cutoffDate = Date().addingTimeInterval(-hours)
         let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(careeID.uuidString)")
         let careeReference = CKRecord.Reference(recordID: careeRecordID, action: .none)
 

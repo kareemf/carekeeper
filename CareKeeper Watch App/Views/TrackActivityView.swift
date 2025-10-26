@@ -27,28 +27,48 @@ struct TrackActivityView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                // Large Save button at top
-                Button(action: saveActivity) {
-                    if isSaving {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .tint(.white)
-                    } else {
-                        Text("Save")
-                            .font(.title3)
-                            .fontWeight(.semibold)
-                    }
+                saveButton
+                formFields
+            }
+        }
+        .navigationTitle(activityTypeSnapshot.name)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") {
+                    dismiss()
                 }
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .foregroundColor(.white)
-                .background(Color.green.opacity(0.8))
-                .cornerRadius(12)
                 .disabled(isSaving)
-                .padding(.horizontal)
+            }
+        }
+        .errorAlert($error)
+    }
 
-                // Form fields
-                VStack(spacing: 12) {
+    // MARK: - View Components
+
+    private var saveButton: some View {
+        Button(action: saveActivity) {
+            if isSaving {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .tint(.white)
+            } else {
+                Text("Save")
+                    .font(.title3)
+                    .fontWeight(.semibold)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 50)
+        .foregroundColor(.white)
+        .background(Color.green.opacity(0.8))
+        .cornerRadius(12)
+        .disabled(isSaving)
+        .padding(.horizontal)
+    }
+
+    private var formFields: some View {
+        VStack(spacing: 12) {
                     // Quantity section
                     if activityTypeSnapshot.hasQuantity {
                         VStack(alignment: .leading, spacing: 4) {
@@ -70,7 +90,7 @@ struct TrackActivityView: View {
                                 Spacer()
                             }
                             .padding()
-                            .background(Color(.systemGray6))
+                            .background(Color.gray.opacity(0.2))
                             .cornerRadius(8)
                             .focusable(true)
                             .digitalCrownRotation(
@@ -104,7 +124,7 @@ struct TrackActivityView: View {
                         }
                     }
                     .padding()
-                    .background(Color(.systemGray6))
+                    .background(Color.gray.opacity(0.2))
                     .cornerRadius(8)
 
                     // Location section
@@ -124,7 +144,7 @@ struct TrackActivityView: View {
                                     Text("📍 Location captured")
                                         .font(.caption)
                                         .foregroundColor(.green)
-                                } else if locationManager.isLoading {
+                                } else if locationManager.isUpdating {
                                     HStack {
                                         ProgressView()
                                             .scaleEffect(0.8)
@@ -143,7 +163,7 @@ struct TrackActivityView: View {
                             }
                         }
                         .padding()
-                        .background(Color(.systemGray6))
+                        .background(Color.gray.opacity(0.2))
                         .cornerRadius(8)
                         .onChange(of: includeLocation) { _, enabled in
                             if enabled {
@@ -163,30 +183,12 @@ struct TrackActivityView: View {
                         TextField("Optional notes", text: $notes, axis: .vertical)
                             .lineLimit(2...4)
                             .padding()
-                            .background(Color(.systemGray5))
+                            .background(Color.gray.opacity(0.3))
                             .cornerRadius(8)
                     }
                 }
                 .padding(.horizontal)
-            }
         }
-        .navigationTitle(activityTypeSnapshot.name)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") {
-                    dismiss()
-                }
-                .disabled(isSaving)
-            }
-        }
-        .onChange(of: locationManager.error) { _, error in
-            if let error = error {
-                self.error = error
-            }
-        }
-        .errorAlert($error)
-    }
 
     // MARK: - Actions
 

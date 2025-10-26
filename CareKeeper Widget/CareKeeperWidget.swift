@@ -12,12 +12,20 @@ struct CareKeeperWidget: Widget {
         }
         .configurationDisplayName("CareKeeper")
         .description("Quick access to track activities")
+        #if os(watchOS)
         .supportedFamilies([
             .accessoryCircular,
             .accessoryRectangular,
             .accessoryInline,
             .accessoryCorner
         ])
+        #else
+        .supportedFamilies([
+            .accessoryCircular,
+            .accessoryRectangular,
+            .accessoryInline
+        ])
+        #endif
     }
 }
 
@@ -126,8 +134,10 @@ struct CareKeeperWidgetView: View {
             RectangularView(entry: entry)
         case .accessoryInline:
             InlineView(entry: entry)
+        #if os(watchOS)
         case .accessoryCorner:
             CornerView(entry: entry)
+        #endif
         default:
             Text("CK")
         }

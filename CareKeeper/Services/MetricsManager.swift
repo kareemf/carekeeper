@@ -1,3 +1,4 @@
+#if canImport(MetricKit)
 import Foundation
 import MetricKit
 import os.log
@@ -78,8 +79,8 @@ class MetricsManager: NSObject, MXMetricManagerSubscriber {
 
         // Log memory metrics if available
         if let memoryMetrics = payload.memoryMetrics {
-            let peakMemoryBytes = memoryMetrics.peakMemoryUsage.measurement.converted(to: .megabytes).value
-            logger.info("📊 Peak memory usage: \(String(format: "%.1f", peakMemoryBytes)) MB")
+            let peakMemoryMB = memoryMetrics.peakMemoryUsage.converted(to: UnitInformationStorage.megabytes).value
+            logger.info("📊 Peak memory usage: \(String(format: "%.1f", peakMemoryMB)) MB")
         }
     }
 
@@ -178,3 +179,26 @@ class MetricsManager: NSObject, MXMetricManagerSubscriber {
         }
     }
 }
+
+#else
+
+import Foundation
+import os.log
+
+/// Fallback MetricsManager for platforms/SDKs where MetricKit is unavailable
+@MainActor
+class MetricsManager: NSObject {
+
+    static let shared = MetricsManager()
+    private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "metrics")
+
+    private override init() {
+        super.init()
+        logger.info("📊 MetricKit not available on this platform/SDK; metrics disabled")
+    }
+
+    /// No-op: returns an empty list since diagnostics aren’t collected without MetricKit
+    func getAllDiagnostics() -> [URL] { [] }
+}
+
+#endif
