@@ -140,7 +140,7 @@ struct TrackActivityView: View {
                             }
 
                             if includeLocation {
-                                if let location = locationManager.location {
+                                if locationManager.location != nil {
                                     Text("📍 Location captured")
                                         .font(.caption)
                                         .foregroundColor(.green)
@@ -167,9 +167,7 @@ struct TrackActivityView: View {
                         .cornerRadius(8)
                         .onChange(of: includeLocation) { _, enabled in
                             if enabled {
-                                Task {
-                                    await locationManager.requestLocation()
-                                }
+                                locationManager.requestLocation()
                             }
                         }
                     }
