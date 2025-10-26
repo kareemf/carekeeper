@@ -66,7 +66,7 @@ class FileLogger {
         currentLogFile = logsURL.appendingPathComponent(filename)
 
         logger.info("📝 Creating log file: \(filename)")
-        logger.info("   Full path: \(currentLogFile?.path ?? "nil")")
+        logger.info("   Full path: \(self.currentLogFile?.path ?? "nil")")
 
         // Create file and get handle
         if let logFile = currentLogFile {

@@ -45,9 +45,9 @@ class SelectiveCloudKitService {
     ) async throws -> T {
         var lastError: Error?
 
-        for attempt in 0..<maxRetries {
+        for attempt in 0..<self.maxRetries {
             do {
-                FileLogger.shared.info("☁️ \(operation) (attempt \(attempt + 1)/\(maxRetries))")
+                FileLogger.shared.info("☁️ \(operation) (attempt \(attempt + 1)/\(self.maxRetries))")
                 let result = try await block()
 
                 if attempt > 0 {
@@ -64,8 +64,8 @@ class SelectiveCloudKitService {
                 let ckError = error as? CKError
                 let isRetryable = ckError?.isRetryable ?? false
 
-                logger.error("❌ \(operation) failed (attempt \(attempt + 1)/\(maxRetries)): \(error.localizedDescription)")
-                FileLogger.shared.error("❌ \(operation) failed (attempt \(attempt + 1)/\(maxRetries)): \(error.localizedDescription)")
+                logger.error("❌ \(operation) failed (attempt \(attempt + 1)/\(self.maxRetries)): \(error.localizedDescription)")
+                FileLogger.shared.error("❌ \(operation) failed (attempt \(attempt + 1)/\(self.maxRetries)): \(error.localizedDescription)")
 
                 // Log network state
                 if let ckError = ckError {
@@ -81,12 +81,12 @@ class SelectiveCloudKitService {
                 }
 
                 // Don't retry if this was the last attempt
-                guard attempt < maxRetries - 1 else {
+                guard attempt < self.maxRetries - 1 else {
                     break
                 }
 
                 // Exponential backoff
-                let delay = baseRetryDelay * pow(2.0, Double(attempt))
+                let delay = self.baseRetryDelay * pow(2.0, Double(attempt))
                 logger.info("⏳ Waiting \(delay)s before retry...")
                 FileLogger.shared.info("⏳ Waiting \(delay)s before retry...")
 
@@ -95,8 +95,8 @@ class SelectiveCloudKitService {
         }
 
         // All retries exhausted
-        logger.error("❌ \(operation) failed after \(maxRetries) attempts")
-        FileLogger.shared.error("❌ \(operation) failed after \(maxRetries) attempts")
+        logger.error("❌ \(operation) failed after \(self.maxRetries) attempts")
+        FileLogger.shared.error("❌ \(operation) failed after \(self.maxRetries) attempts")
 
         throw lastError ?? CKError(.networkFailure)
     }
@@ -450,45 +450,5 @@ class SelectiveCloudKitService {
         var updatedActivity = activity
         updatedActivity.syncState = .synced
         return updatedActivity
-    }
-}
-
-// MARK: - CKError Extension
-
-extension CKError {
-    /// Check if this error is transient and should be retried
-    var isRetryable: Bool {
-        switch code {
-        case .networkUnavailable, .networkFailure, .serviceUnavailable:
-            return true
-        case .requestRateLimited:
-            return true
-        case .zoneBusy:
-            return true
-        default:
-            return false
-        }
-    }
-
-    /// User-friendly error message
-    var userFriendlyMessage: String {
-        switch code {
-        case .networkUnavailable:
-            return "Network unavailable. Please check your connection."
-        case .networkFailure:
-            return "Network error. Please try again."
-        case .serviceUnavailable:
-            return "iCloud is temporarily unavailable. Please try again later."
-        case .requestRateLimited:
-            return "Too many requests. Please wait a moment."
-        case .notAuthenticated:
-            return "Please sign in to iCloud in Settings."
-        case .zoneBusy:
-            return "iCloud is busy. Please try again."
-        case .partialFailure:
-            return "Some items couldn't sync. Please try again."
-        default:
-            return "iCloud error: \(localizedDescription)"
-        }
     }
 }
