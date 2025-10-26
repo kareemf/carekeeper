@@ -451,4 +451,39 @@ class SelectiveCloudKitService {
         updatedActivity.syncState = .synced
         return updatedActivity
     }
+
+    /// Update an existing activity record in CloudKit
+    /// - Parameters:
+    ///   - activity: Activity snapshot with updated values
+    ///   - isShared: Whether this belongs to a shared caree
+    /// - Returns: Updated snapshot with synced state
+    func updateActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws -> ActivitySnapshot {
+        logger.info("📝 Updating activity in CloudKit: \(activity.id)")
+
+        let database = isShared ? container.sharedCloudDatabase : container.privateCloudDatabase
+        let recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)")
+
+        // Fetch existing record with retry
+        let record = try await retryableRequest(operation: "fetchActivity") {
+            try await database.record(for: recordID)
+        }
+
+        // Update editable fields
+        record["CD_dateTime"] = activity.dateTime
+        record["CD_notes"] = activity.notes
+        record["CD_quantity"] = activity.quantity
+        // Note: latitude/longitude are not editable
+
+        // Save to CloudKit with retry
+        _ = try await retryableRequest(operation: "updateActivity") {
+            try await database.save(record)
+        }
+
+        logger.info("✅ Activity updated successfully")
+
+        // Return updated snapshot with synced state
+        var updatedActivity = activity
+        updatedActivity.syncState = .synced
+        return updatedActivity
+    }
 }

@@ -194,7 +194,7 @@ class WatchDataProvider: ObservableObject {
         await loadActivitiesTask?.value
     }
 
-    // MARK: - Activity Creation (Optimistic UI)
+    // MARK: - Activity Management (Optimistic UI)
 
     /// Track a new activity with optimistic UI
     /// Shows immediately, syncs in background
@@ -246,6 +246,60 @@ class WatchDataProvider: ObservableObject {
                     FileLogger.shared.exception(error, context: "WatchDataProvider.trackActivity() - Failed to sync activity to CloudKit")
                 }
             }
+        }
+    }
+
+    /// Update an existing activity with optimistic UI
+    /// Updates locally immediately, syncs in background
+    /// - Parameter activity: Activity snapshot with updated values
+    func updateActivity(_ activity: ActivitySnapshot) async {
+        guard let caree = carees.first(where: { $0.id == activity.careeID }) else {
+            logger.error("Cannot update activity: caree not found")
+            return
+        }
+
+        logger.info("📱 Updating activity (optimistic)")
+
+        // 1. Update immediately in UI
+        updateActivityState(activity.id, state: .syncing)
+        updateActivityData(activity)
+
+        // 2. Upload to CloudKit (async)
+        Task.detached { [weak self] in
+            guard let self = self else { return }
+
+            do {
+                // Update state to syncing
+                await self.updateActivityState(activity.id, state: .syncing)
+
+                // Update in CloudKit
+                _ = try await self.selectiveService.updateActivity(
+                    activity,
+                    isShared: caree.isShared
+                )
+
+                // Update state to synced
+                await self.updateActivityState(activity.id, state: .synced)
+
+                self.logger.info("✅ Activity updated successfully")
+
+            } catch {
+                // Update state to failed
+                await self.updateActivityState(activity.id, state: .failed(error.localizedDescription))
+                self.logger.error("❌ Failed to update activity: \(error.localizedDescription)")
+                await MainActor.run {
+                    FileLogger.shared.exception(error, context: "WatchDataProvider.updateActivity() - Failed to update activity in CloudKit")
+                }
+            }
+        }
+    }
+
+    private func updateActivityData(_ activity: ActivitySnapshot) {
+        // Update in recent activities
+        if var existing = recentActivitiesByCaree[activity.careeID],
+           let index = existing.firstIndex(where: { $0.id == activity.id }) {
+            existing[index] = activity
+            recentActivitiesByCaree[activity.careeID] = existing
         }
     }
 

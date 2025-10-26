@@ -2,14 +2,21 @@ import SwiftUI
 import MapKit
 
 /// ActivityDetailView rebuilt with snapshots
-/// Currently read-only for simplicity and stability
-/// Edit functionality can be added later if needed
+/// Supports editing notes, quantity, and time
 struct ActivityDetailView: View {
 
     let activitySnapshot: ActivitySnapshot
 
     @EnvironmentObject private var dataProvider: WatchDataProvider
+    @Environment(\.dismiss) private var dismiss
+
     @State private var isRetrying = false
+    @State private var isEditing = false
+    @State private var editedNotes: String = ""
+    @State private var editedQuantity: Double = 0
+    @State private var minutesAgo: Double = 0
+    @State private var isSaving = false
+    @State private var showingDeleteConfirmation = false
 
     private var activityType: ActivityTypeSnapshot? {
         // Find activity type across all loaded carees
@@ -19,6 +26,10 @@ struct ActivityDetailView: View {
             }
         }
         return nil
+    }
+
+    private var editedDateTime: Date {
+        Date().addingTimeInterval(-minutesAgo * 60)
     }
 
     var body: some View {
@@ -63,6 +74,50 @@ struct ActivityDetailView: View {
         }
         .navigationTitle(Text(activitySnapshot.dateTime, style: .date))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                if isEditing {
+                    Button("Cancel") {
+                        cancelEditing()
+                    }
+                    .disabled(isSaving)
+                }
+            }
+
+            ToolbarItem(placement: .confirmationAction) {
+                if isEditing {
+                    Button {
+                        saveChanges()
+                    } label: {
+                        if isSaving {
+                            ProgressView()
+                                .scaleEffect(0.7)
+                        } else {
+                            Text("Save")
+                        }
+                    }
+                    .disabled(isSaving)
+                } else {
+                    Button {
+                        startEditing()
+                    } label: {
+                        Image(systemName: "pencil")
+                    }
+                }
+            }
+        }
+        .confirmationDialog(
+            "Delete this activity?",
+            isPresented: $showingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                deleteActivity()
+            }
+        }
+        .onAppear {
+            initializeEditingValues()
+        }
     }
 
     // MARK: - Sections
@@ -135,26 +190,125 @@ struct ActivityDetailView: View {
         }
     }
 
+    private func initializeEditingValues() {
+        editedNotes = activitySnapshot.notes ?? ""
+        editedQuantity = activitySnapshot.quantity ?? 0
+
+        // Calculate minutes ago from current time
+        let timeDiff = Date().timeIntervalSince(activitySnapshot.dateTime)
+        minutesAgo = max(0, timeDiff / 60)
+    }
+
+    private func startEditing() {
+        initializeEditingValues()
+        withAnimation {
+            isEditing = true
+        }
+    }
+
+    private func cancelEditing() {
+        withAnimation {
+            isEditing = false
+        }
+    }
+
+    private func saveChanges() {
+        guard !isSaving else { return }
+        isSaving = true
+
+        Task {
+            // Create new activity snapshot with updated values
+            let updatedActivity = ActivitySnapshot(
+                id: activitySnapshot.id,
+                dateTime: editedDateTime,
+                notes: editedNotes.isEmpty ? nil : editedNotes,
+                quantity: activityType?.hasQuantity == true ? editedQuantity : activitySnapshot.quantity,
+                latitude: activitySnapshot.latitude,
+                longitude: activitySnapshot.longitude,
+                activityTypeID: activitySnapshot.activityTypeID,
+                careeID: activitySnapshot.careeID
+            )
+
+            // Update the activity (optimistic UI with background sync)
+            await dataProvider.updateActivity(updatedActivity)
+
+            await MainActor.run {
+                isSaving = false
+                isEditing = false
+            }
+        }
+    }
+
+    private func deleteActivity() {
+        Task {
+            // For watchOS, we need to implement delete in WatchDataProvider
+            // For now, just dismiss - actual deletion would need service implementation
+            FileLogger.shared.warning("Delete activity not yet implemented on watchOS")
+
+            await MainActor.run {
+                dismiss()
+            }
+        }
+    }
+
     private var detailsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Time
-            HStack {
-                Label("Time", systemImage: "clock")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                Spacer()
-                Text(activitySnapshot.dateTime, style: .time)
-                    .font(.body)
-            }
+            if isEditing {
+                // Editable time with crown control
+                VStack(alignment: .leading, spacing: 8) {
+                    Label("Time", systemImage: "clock")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
 
-            // Date
-            HStack {
-                Label("Date", systemImage: "calendar")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                Spacer()
-                Text(activitySnapshot.dateTime, style: .date)
-                    .font(.body)
+                    VStack(spacing: 4) {
+                        HStack {
+                            Text(editedDateTime, style: .time)
+                                .font(.title3)
+                                .fontWeight(.semibold)
+                            Spacer()
+                        }
+
+                        HStack {
+                            Text("\(Int(minutesAgo)) min ago")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                        }
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.3))
+                    .cornerRadius(8)
+                    .focusable(true)
+                    .digitalCrownRotation(
+                        $minutesAgo,
+                        from: 0,
+                        through: 1440,
+                        by: 1,
+                        sensitivity: .low,
+                        isContinuous: false,
+                        isHapticFeedbackEnabled: true
+                    )
+                }
+            } else {
+                // Time
+                HStack {
+                    Label("Time", systemImage: "clock")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text(activitySnapshot.dateTime, style: .time)
+                        .font(.body)
+                }
+
+                // Date
+                HStack {
+                    Label("Date", systemImage: "calendar")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text(activitySnapshot.dateTime, style: .date)
+                        .font(.body)
+                }
             }
         }
     }
@@ -162,31 +316,75 @@ struct ActivityDetailView: View {
     private var additionalInfoSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Quantity
-            if let quantity = activitySnapshot.quantity {
-                HStack {
-                    Label("Quantity", systemImage: "number")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    if let unit = activityType?.quantityUnit {
-                        Text("\(String(format: "%.1f", quantity)) \(unit)")
-                            .font(.body)
-                    } else {
-                        Text(String(format: "%.1f", quantity))
-                            .font(.body)
+            if activityType?.hasQuantity == true {
+                if isEditing {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label(activityType?.quantityUnit ?? "Quantity", systemImage: "number")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+
+                        HStack {
+                            Text(String(format: "%.1f", editedQuantity))
+                                .font(.title3)
+                                .fontWeight(.semibold)
+
+                            if let unit = activityType?.quantityUnit {
+                                Text(unit)
+                                    .font(.body)
+                                    .foregroundColor(.secondary)
+                            }
+
+                            Spacer()
+                        }
+                        .padding()
+                        .background(Color.gray.opacity(0.3))
+                        .cornerRadius(8)
+                        .focusable(true)
+                        .digitalCrownRotation(
+                            $editedQuantity,
+                            from: 0,
+                            through: 100,
+                            by: 0.5,
+                            sensitivity: .medium
+                        )
+                    }
+                } else if let quantity = activitySnapshot.quantity {
+                    HStack {
+                        Label("Quantity", systemImage: "number")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        if let unit = activityType?.quantityUnit {
+                            Text("\(String(format: "%.1f", quantity)) \(unit)")
+                                .font(.body)
+                        } else {
+                            Text(String(format: "%.1f", quantity))
+                                .font(.body)
+                        }
                     }
                 }
             }
 
             // Notes
-            if let notes = activitySnapshot.notes, !notes.isEmpty {
-                VStack(alignment: .leading, spacing: 4) {
-                    Label("Notes", systemImage: "note.text")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+            VStack(alignment: .leading, spacing: 8) {
+                Label("Notes", systemImage: "note.text")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                if isEditing {
+                    TextField("Optional notes", text: $editedNotes, axis: .vertical)
+                        .lineLimit(2...4)
+                        .padding()
+                        .background(Color.gray.opacity(0.3))
+                        .cornerRadius(8)
+                } else if let notes = activitySnapshot.notes, !notes.isEmpty {
                     Text(notes)
                         .font(.body)
                         .foregroundColor(.primary)
+                } else if !isEditing {
+                    Text("No notes")
+                        .font(.body)
+                        .foregroundColor(.secondary)
                 }
             }
         }
