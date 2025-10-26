@@ -8,10 +8,15 @@ struct CareKeeperWatchApp: App {
 
     // Initialize diagnostics
     private let metricsManager = MetricsManager.shared
+    private let fileLogger = FileLogger.shared
 
     init() {
         // Log initial memory state
         MemoryMonitor.logMemoryUsage(context: "App Init Start (watchOS)")
+
+        // Log app startup
+        fileLogger.info("🚀 watchOS app launched")
+        fileLogger.info("   OS Version: \(ProcessInfo.processInfo.operatingSystemVersionString)")
     }
 
     var body: some Scene {

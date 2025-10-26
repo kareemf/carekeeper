@@ -43,7 +43,7 @@ struct WatchDiagnosticsView: View {
                         Text("No Diagnostics Found")
                             .font(.headline)
 
-                        Text("Diagnostic data from your watch will appear here. Make sure the watch app has been running on a physical device.")
+                        Text("Diagnostic data from your watch will appear here.\n\n• Real-time logs write immediately\n• MetricKit diagnostics arrive in 24-48h (device on charger)")
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
@@ -51,13 +51,19 @@ struct WatchDiagnosticsView: View {
                     .padding()
                 }
             } else {
-                Section(header: Text("Crash & Hang Diagnostics")) {
+                Section(header: Text("Real-Time Logs (Immediate)")) {
+                    ForEach(diagnosticFiles.filter { $0.type == "logs" }) { file in
+                        diagnosticRow(file)
+                    }
+                }
+
+                Section(header: Text("MetricKit Crash Diagnostics (Delayed 24-48h)")) {
                     ForEach(diagnosticFiles.filter { $0.type == "diagnostic" }) { file in
                         diagnosticRow(file)
                     }
                 }
 
-                Section(header: Text("Performance Metrics")) {
+                Section(header: Text("MetricKit Performance Metrics (Delayed 24-48h)")) {
                     ForEach(diagnosticFiles.filter { $0.type == "metric" }) { file in
                         diagnosticRow(file)
                     }
@@ -161,8 +167,8 @@ struct WatchDiagnosticsView: View {
         let diagnosticsURL = containerURL.appendingPathComponent("diagnostics", isDirectory: true)
         var allFiles: [DiagnosticFile] = []
 
-        // Load from both subdirectories
-        for subdirectory in ["diagnostic", "metric"] {
+        // Load from all subdirectories (logs, diagnostic, metric)
+        for subdirectory in ["logs", "diagnostic", "metric"] {
             let subdirURL = diagnosticsURL.appendingPathComponent(subdirectory, isDirectory: true)
 
             guard let files = try? FileManager.default.contentsOfDirectory(
