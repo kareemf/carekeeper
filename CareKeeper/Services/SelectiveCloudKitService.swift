@@ -571,4 +571,57 @@ class SelectiveCloudKitService {
         updatedActivity.syncState = .synced
         return updatedActivity
     }
+
+    /// Delete an existing activity record from CloudKit
+    /// - Parameters:
+    ///   - activity: Activity snapshot to delete
+    ///   - isShared: Whether this belongs to a shared caree
+    func deleteActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws {
+        logger.info("🗑️ Deleting activity from CloudKit: \(activity.id) (isShared: \(isShared))")
+
+        let database = isShared ? container.sharedCloudDatabase : container.privateCloudDatabase
+
+        // Determine the correct zone for this activity
+        // - Owned activities: Custom app zone (matches iOS app)
+        // - Shared activities: Custom zone (requires discovery)
+        let recordID: CKRecord.ID
+        if isShared {
+            // Find the zone containing this shared activity
+            logger.info("🔍 Finding zone for shared activity: \(activity.id)")
+            let zones = try await retryableRequest(operation: "fetchSharedZones") {
+                try await database.allRecordZones()
+            }
+
+            var foundRecordID: CKRecord.ID?
+            for zone in zones {
+                if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
+
+                let testRecordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)", zoneID: zone.zoneID)
+                do {
+                    _ = try await database.record(for: testRecordID)
+                    foundRecordID = testRecordID
+                    logger.info("✅ Found activity in zone: \(zone.zoneID.zoneName)")
+                    break
+                } catch {
+                    // Activity not in this zone, continue searching
+                }
+            }
+
+            guard let found = foundRecordID else {
+                throw SnapshotError.invalidInput("Shared activity \(activity.id) not found in any zone")
+            }
+            recordID = found
+        } else {
+            // Owned activities are in the custom app zone (matches iOS app)
+            let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
+            recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)", zoneID: zoneID)
+        }
+
+        // Delete from CloudKit with retry
+        _ = try await retryableRequest(operation: "deleteActivity") {
+            try await database.deleteRecord(withID: recordID)
+        }
+
+        logger.info("✅ Activity deleted successfully")
+    }
 }

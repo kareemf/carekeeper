@@ -17,6 +17,8 @@ struct ActivityDetailView: View {
     @State private var minutesAgo: Double = 0
     @State private var isSaving = false
     @State private var showingDeleteConfirmation = false
+    @State private var isDeleting = false
+    @State private var showingDeleteSuccess = false
 
     private var activityType: ActivityTypeSnapshot? {
         // Find activity type across all loaded carees
@@ -105,6 +107,22 @@ struct ActivityDetailView: View {
                     }
                 }
             }
+
+            ToolbarItem(placement: .bottomBar) {
+                if !isEditing {
+                    Button(role: .destructive) {
+                        showingDeleteConfirmation = true
+                    } label: {
+                        if isDeleting {
+                            ProgressView()
+                                .scaleEffect(0.7)
+                        } else {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+                    .disabled(isDeleting)
+                }
+            }
         }
         .confirmationDialog(
             "Delete this activity?",
@@ -114,6 +132,13 @@ struct ActivityDetailView: View {
             Button("Delete", role: .destructive) {
                 deleteActivity()
             }
+        }
+        .alert("Activity Deleted", isPresented: $showingDeleteSuccess) {
+            Button("OK") {
+                dismiss()
+            }
+        } message: {
+            Text("The activity has been deleted successfully")
         }
         .onAppear {
             initializeEditingValues()
@@ -240,13 +265,17 @@ struct ActivityDetailView: View {
     }
 
     private func deleteActivity() {
+        guard !isDeleting else { return }
+        isDeleting = true
+
         Task {
-            // For watchOS, we need to implement delete in WatchDataProvider
-            // For now, just dismiss - actual deletion would need service implementation
-            FileLogger.shared.warning("Delete activity not yet implemented on watchOS")
+            // Delete the activity using WatchDataProvider
+            await dataProvider.deleteActivity(activitySnapshot)
 
             await MainActor.run {
-                dismiss()
+                isDeleting = false
+                // Show success message
+                showingDeleteSuccess = true
             }
         }
     }

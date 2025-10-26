@@ -7,11 +7,6 @@ import Foundation
 /// - Record IDs follow pattern: CD_{EntityName}/{UUID}
 /// - Parent references use CKRecord.Reference for cascading deletes
 enum CloudKitConfig {
-    /// Legacy zone name used by SwiftData/CoreData CloudKit integration
-    /// Pure CloudKit uses the default zone instead of this custom zone
-    /// Kept for reference and legacy zone cleanup utilities
-    static let swiftDataZoneName = "com.apple.coredata.cloudkit.zone"
-    
     static let zoneName = "com.kareemf.carekeeper.cloudkit.zone"
 
     /// The CloudKit container identifier for this app

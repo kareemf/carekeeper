@@ -294,11 +294,72 @@ class WatchDataProvider: ObservableObject {
         }
     }
 
+    /// Delete an existing activity with optimistic UI
+    /// Removes from UI immediately, deletes from CloudKit in background
+    /// - Parameter activity: Activity snapshot to delete
+    func deleteActivity(_ activity: ActivitySnapshot) async {
+        guard let caree = carees.first(where: { $0.id == activity.careeID }) else {
+            logger.error("Cannot delete activity: caree not found")
+            return
+        }
+
+        logger.info("📱 Deleting activity (optimistic)")
+
+        // 1. Remove immediately from UI
+        removeActivityFromUI(activity.id)
+
+        // 2. Delete from CloudKit (async)
+        Task.detached { [weak self] in
+            guard let self = self else { return }
+
+            do {
+                // Delete from CloudKit
+                try await self.selectiveService.deleteActivity(
+                    activity,
+                    isShared: caree.isShared
+                )
+
+                self.logger.info("✅ Activity deleted successfully")
+
+            } catch {
+                // Restore activity on failure
+                await self.restoreActivityToUI(activity)
+                self.logger.error("❌ Failed to delete activity: \(error.localizedDescription)")
+                await MainActor.run {
+                    FileLogger.shared.exception(error, context: "WatchDataProvider.deleteActivity() - Failed to delete activity from CloudKit")
+                }
+            }
+        }
+    }
+
     private func updateActivityData(_ activity: ActivitySnapshot) {
         // Update in recent activities
         if var existing = recentActivitiesByCaree[activity.careeID],
            let index = existing.firstIndex(where: { $0.id == activity.id }) {
             existing[index] = activity
+            recentActivitiesByCaree[activity.careeID] = existing
+        }
+    }
+
+    private func removeActivityFromUI(_ activityID: UUID) {
+        // Remove from pending list
+        pendingActivities.removeAll { $0.id == activityID }
+
+        // Remove from recent activities
+        for (careeID, activities) in recentActivitiesByCaree {
+            if let index = activities.firstIndex(where: { $0.id == activityID }) {
+                var updated = activities
+                updated.remove(at: index)
+                recentActivitiesByCaree[careeID] = updated
+            }
+        }
+    }
+
+    private func restoreActivityToUI(_ activity: ActivitySnapshot) {
+        // Add back to recent activities
+        if var existing = recentActivitiesByCaree[activity.careeID] {
+            existing.append(activity)
+            existing.sort { $0.dateTime > $1.dateTime }
             recentActivitiesByCaree[activity.careeID] = existing
         }
     }
