@@ -1,6 +1,19 @@
 import Foundation
 import CloudKit
 
+// MARK: - Snapshot Errors
+
+enum SnapshotError: LocalizedError {
+    case invalidInput(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidInput(let message):
+            return message
+        }
+    }
+}
+
 // MARK: - Snapshot Models for Watch App
 
 /// Immutable value types for watch UI - NO SwiftData relationships
@@ -25,11 +38,11 @@ struct CareeSnapshot: Identifiable, Hashable, Sendable {
         // Extract ID from record name (format: "CD_Caree/UUID")
         guard let idString = record.recordID.recordName.components(separatedBy: "/").last,
               let id = UUID(uuidString: idString) else {
-            throw AppError.invalidInput("Invalid caree record ID: \(record.recordID.recordName)")
+            throw SnapshotError.invalidInput("Invalid caree record ID: \(record.recordID.recordName)")
         }
 
         guard let name = record["CD_name"] as? String else {
-            throw AppError.invalidInput("Missing caree name in record")
+            throw SnapshotError.invalidInput("Missing caree name in record")
         }
 
         self.id = id
@@ -77,18 +90,18 @@ struct ActivityTypeSnapshot: Identifiable, Hashable, Sendable {
         // Extract ID from record name (format: "CD_ActivityType/UUID")
         guard let idString = record.recordID.recordName.components(separatedBy: "/").last,
               let id = UUID(uuidString: idString) else {
-            throw AppError.invalidInput("Invalid activity type record ID: \(record.recordID.recordName)")
+            throw SnapshotError.invalidInput("Invalid activity type record ID: \(record.recordID.recordName)")
         }
 
         guard let name = record["CD_name"] as? String else {
-            throw AppError.invalidInput("Missing activity type name in record")
+            throw SnapshotError.invalidInput("Missing activity type name in record")
         }
 
         // Extract caree ID from reference
         guard let careeRef = record["CD_caree"] as? CKRecord.Reference,
               let careeIDString = careeRef.recordID.recordName.components(separatedBy: "/").last,
               let careeID = UUID(uuidString: careeIDString) else {
-            throw AppError.invalidInput("Invalid caree reference in activity type")
+            throw SnapshotError.invalidInput("Invalid caree reference in activity type")
         }
 
         self.id = id
@@ -151,25 +164,25 @@ struct ActivitySnapshot: Identifiable, Hashable, Sendable {
         // Extract ID from record name (format: "CD_Activity/UUID")
         guard let idString = record.recordID.recordName.components(separatedBy: "/").last,
               let id = UUID(uuidString: idString) else {
-            throw AppError.invalidInput("Invalid activity record ID: \(record.recordID.recordName)")
+            throw SnapshotError.invalidInput("Invalid activity record ID: \(record.recordID.recordName)")
         }
 
         guard let dateTime = record["CD_dateTime"] as? Date else {
-            throw AppError.invalidInput("Missing dateTime in activity record")
+            throw SnapshotError.invalidInput("Missing dateTime in activity record")
         }
 
         // Extract activity type ID from reference
         guard let typeRef = record["CD_activityType"] as? CKRecord.Reference,
               let typeIDString = typeRef.recordID.recordName.components(separatedBy: "/").last,
               let typeID = UUID(uuidString: typeIDString) else {
-            throw AppError.invalidInput("Invalid activity type reference")
+            throw SnapshotError.invalidInput("Invalid activity type reference")
         }
 
         // Extract caree ID from reference
         guard let careeRef = record["CD_caree"] as? CKRecord.Reference,
               let careeIDString = careeRef.recordID.recordName.components(separatedBy: "/").last,
               let careeID = UUID(uuidString: careeIDString) else {
-            throw AppError.invalidInput("Invalid caree reference in activity")
+            throw SnapshotError.invalidInput("Invalid caree reference in activity")
         }
 
         self.id = id

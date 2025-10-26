@@ -52,10 +52,7 @@ class MetricsManager: NSObject, MXMetricManagerSubscriber {
     // MARK: - Payload Processing
 
     private func processDiagnosticPayload(_ payload: MXDiagnosticPayload) async {
-        guard let jsonData = payload.jsonRepresentation() else {
-            logger.error("❌ Failed to get JSON representation of diagnostic payload")
-            return
-        }
+        let jsonData = payload.jsonRepresentation()
 
         let timestamp = payload.timeStampEnd.timeIntervalSince1970
         let filename = "diagnostic-\(Int(timestamp)).json"
@@ -72,10 +69,7 @@ class MetricsManager: NSObject, MXMetricManagerSubscriber {
     }
 
     private func processMetricPayload(_ payload: MXMetricPayload) async {
-        guard let jsonData = payload.jsonRepresentation() else {
-            logger.error("❌ Failed to get JSON representation of metric payload")
-            return
-        }
+        let jsonData = payload.jsonRepresentation()
 
         let timestamp = payload.timeStampEnd.timeIntervalSince1970
         let filename = "metric-\(Int(timestamp)).json"
@@ -84,8 +78,8 @@ class MetricsManager: NSObject, MXMetricManagerSubscriber {
 
         // Log memory metrics if available
         if let memoryMetrics = payload.memoryMetrics {
-            let peakMemoryMB = Double(memoryMetrics.peakMemoryUsage.value(for: .megabytes))
-            logger.info("📊 Peak memory usage: \(String(format: "%.1f", peakMemoryMB)) MB")
+            let peakMemoryBytes = memoryMetrics.peakMemoryUsage.measurement.converted(to: .megabytes).value
+            logger.info("📊 Peak memory usage: \(String(format: "%.1f", peakMemoryBytes)) MB")
         }
     }
 
