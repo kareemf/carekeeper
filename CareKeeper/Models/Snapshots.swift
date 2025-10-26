@@ -106,7 +106,7 @@ struct ActivityTypeSnapshot: Identifiable, Hashable, Sendable {
     init(from activityType: ActivityType, careeID: UUID) {
         self.id = activityType.id
         self.name = activityType.name
-        self.icon = activityType.icon
+        self.icon = activityType.icon ?? "circle.fill"
         self.hasQuantity = activityType.hasQuantity
         self.quantityUnit = activityType.quantityUnit
         self.hasLocation = activityType.hasLocation
