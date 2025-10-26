@@ -40,13 +40,19 @@ class WatchDataProvider: ObservableObject {
 
     /// Load all carees (owned + shared)
     /// This is the only eager load - carees are small and needed upfront
-    func loadCarees() async {
+    /// Always refreshes to ensure deleted carees are removed
+    func loadCarees(force: Bool = false) async {
         // Cancel any existing task
         loadCareesTask?.cancel()
 
         loadCareesTask = Task {
             guard !Task.isCancelled else { return }
-            guard !isLoadingCarees else { return }
+
+            // Skip if already loading, unless force refresh
+            if isLoadingCarees && !force {
+                logger.info("⏭️ Skipping loadCarees - already loading")
+                return
+            }
 
             isLoadingCarees = true
             careesError = nil

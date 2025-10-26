@@ -78,7 +78,7 @@ struct CareeListView: View {
                 .multilineTextAlignment(.center)
 
             Button {
-                Task { await dataProvider.loadCarees() }
+                Task { await dataProvider.loadCarees(force: true) }
             } label: {
                 Label("Retry", systemImage: "arrow.clockwise")
             }
@@ -115,7 +115,7 @@ struct CareeListView: View {
         }
         .refreshable {
             guard !Task.isCancelled else { return }
-            await dataProvider.loadCarees()
+            await dataProvider.loadCarees(force: true) // Force refresh to remove deleted carees
         }
     }
 
