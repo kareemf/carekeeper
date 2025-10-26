@@ -12,12 +12,18 @@ struct CareKeeperWatchApp: App {
 
     private let logger = AppLogger.cloudkit
 
+    // Initialize diagnostics
+    private let metricsManager = MetricsManager.shared
+
     // Local-only cache container (no CloudKit mirroring)
     // Data comes from pure CloudKit services, SwiftData is only for local caching
     let cacheModelContainer: ModelContainer
 
     init() {
         let logger = AppLogger.cloudkit
+
+        // Log initial memory state
+        MemoryMonitor.logMemoryUsage(context: "App Init Start (watchOS)")
 
         let schema = Schema([
             Caree.self,
@@ -37,6 +43,7 @@ struct CareKeeperWatchApp: App {
         do {
             cacheModelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
             logger.info("🧠 Initialized local-only cache ModelContainer (watchOS)")
+            MemoryMonitor.logMemoryUsage(context: "After ModelContainer Init")
         } catch {
             // Log the error and fall back to in-memory storage
             logger.info("⚠️ Failed to create cache ModelContainer: \(error.localizedDescription)")
@@ -84,11 +91,13 @@ struct CareKeeperWatchApp: App {
                         )
 
                         AppLogger.app.info("✅ Shared CloudKitDataService and LocalCacheService initialized (watchOS)")
+                        MemoryMonitor.logMemoryUsage(context: "After Service Init")
 
                         // Seed cache with owned records once (avoid redundant invalidateAndRefresh)
                         do {
                             try await cloudKitService.refreshOwnedCareesFromCloudKit()
                             AppLogger.app.info("✅ Initial owned records loaded into cache (watchOS)")
+                            MemoryMonitor.logMemoryUsage(context: "After Initial Data Load")
 
                             // Reload widget timelines after loading initial data
                             WidgetCenter.shared.reloadAllTimelines()

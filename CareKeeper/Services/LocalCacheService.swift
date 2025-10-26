@@ -329,6 +329,8 @@ class LocalCacheService: ObservableObject {
 
     /// Refresh the @Published properties from SwiftData
     func refreshPublishedProperties() async {
+        MemoryMonitor.logMemoryUsage(context: "Before Cache Refresh")
+
         do {
             // Fetch owned and shared separately to avoid in-memory filtering.
             let ownedFetch = FetchDescriptor<Caree>(
@@ -352,6 +354,11 @@ class LocalCacheService: ObservableObject {
             }
 
             logger.info("Refreshed cache: \(self.myCarees.count) owned, \(self.sharedCarees.count) shared")
+            MemoryMonitor.logMemoryUsage(
+                context: "After Cache Refresh",
+                objectCount: myCarees.count + sharedCarees.count,
+                objectType: "carees"
+            )
         } catch {
             logger.error("Failed to refresh published properties: \(error.localizedDescription)")
             syncError = error
