@@ -147,12 +147,10 @@ struct ActivityDetailView: View {
                 deleteActivity()
             }
         }
-        .alert("Activity Deleted", isPresented: $showingDeleteSuccess) {
-            Button("OK") {
-                dismiss()
+        .overlay(alignment: .center) {
+            if showingDeleteSuccess {
+                deleteSuccessToast
             }
-        } message: {
-            Text("The activity has been deleted successfully")
         }
         .onAppear {
             initializeEditingValues()
@@ -160,6 +158,23 @@ struct ActivityDetailView: View {
     }
 
     // MARK: - Sections
+
+    private var deleteSuccessToast: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 48))
+                .foregroundColor(.green)
+
+            Text("Deleted!")
+                .font(.headline)
+        }
+        .padding(24)
+        .background(
+            Color.black.opacity(0.85)
+                .cornerRadius(16)
+        )
+        .transition(.scale.combined(with: .opacity))
+    }
 
     private var syncStateBadge: some View {
         VStack(spacing: 8) {
@@ -288,10 +303,20 @@ struct ActivityDetailView: View {
             // Delete the activity using WatchDataProvider
             await dataProvider.deleteActivity(activitySnapshot)
 
+            // Show success toast briefly before dismissing
             await MainActor.run {
                 isDeleting = false
-                // Show success message
-                showingDeleteSuccess = true
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    showingDeleteSuccess = true
+                }
+            }
+
+            // Wait for toast to be visible
+            try? await Task.sleep(nanoseconds: 800_000_000) // 0.8 seconds
+
+            // Navigate back to activity list
+            await MainActor.run {
+                dismiss()
             }
         }
     }
