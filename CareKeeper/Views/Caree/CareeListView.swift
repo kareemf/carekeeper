@@ -92,6 +92,7 @@ struct CareeListView: View {
     @State private var isImporting = false
     @State private var importProgress: ImportProgress = .idle
     @State private var importService: CareeImportService?
+    @State private var showingHelp = false
     #endif
     
     var body: some View {
@@ -123,7 +124,8 @@ struct CareeListView: View {
                 showingImport: $showingImport,
                 isImporting: $isImporting,
                 importProgress: importProgress,
-                handleImport: handleImport
+                handleImport: handleImport,
+                showingHelp: $showingHelp
             ))
             .task(initializeTask)
             .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { _ in
@@ -193,6 +195,12 @@ struct CareeListView: View {
     #if os(iOS)
     private var backupRestoreMenu: some View {
         Menu {
+            Button(action: { showingHelp = true }) {
+                Label("Help", systemImage: "questionmark.circle")
+            }
+
+            Divider()
+
             Button(action: exportAllCarees) {
                 Label("Export Data", systemImage: "square.and.arrow.up")
             }
@@ -582,6 +590,7 @@ struct BackupRestoreSheets: ViewModifier {
     @Binding var isImporting: Bool
     let importProgress: ImportProgress
     let handleImport: (Result<URL, Error>) -> Void
+    @Binding var showingHelp: Bool
 
     func body(content: Content) -> some View {
         content
@@ -597,6 +606,9 @@ struct BackupRestoreSheets: ViewModifier {
             )
             .sheet(isPresented: $isImporting) {
                 ImportProgressView(progress: importProgress)
+            }
+            .sheet(isPresented: $showingHelp) {
+                HelpView()
             }
     }
 }
