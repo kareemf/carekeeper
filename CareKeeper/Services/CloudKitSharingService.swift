@@ -80,7 +80,7 @@ class CloudKitSharingService: ObservableObject {
 
             if verifiedCount < activityTypeCount {
                 logger.error("❌ Only \(verifiedCount)/\(activityTypeCount) ActivityTypes found in CloudKit")
-                throw AppError.invalidInput("Some activity types haven't synced to CloudKit yet. Please wait and try again.")
+                throw AppError.invalidInput("Some activity types haven't synced to CloudKit yet. \(verifiedCount)/\(activityTypeCount) activity types synced. Please wait a moment and try again.")
             }
 
             if missingParents > 0 {
@@ -98,7 +98,7 @@ class CloudKitSharingService: ObservableObject {
 
             if verifiedCount < activityCount {
                 logger.error("❌ Only \(verifiedCount)/\(activityCount) Activities found in CloudKit")
-                throw AppError.invalidInput("Some activities haven't synced to CloudKit yet. Please wait and try again.")
+                throw AppError.invalidInput("Some activities haven't synced to CloudKit yet. \(verifiedCount)/\(activityCount) activities synced. Please wait a moment and try again.")
             }
 
             if missingParents > 0 {
