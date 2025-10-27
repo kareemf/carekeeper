@@ -49,10 +49,18 @@ The app uses SwiftData with three main model entities:
 - **Shared Components**: `ErrorAlert`, reusable view modifiers
 
 #### SwiftUI Views (watchOS)
-- **Main App**: `CareKeeperWatchApp.swift` - NavigationStack root
-- **Caree List**: Primary view for selecting caree
-- **Activity Tracking**: `TrackActivityView` with Digital Crown quantity input
-- **Activity Details**: Basic view/delete functionality (edit pending)
+- **Main App**: `CareKeeperWatchApp.swift` - Minimal NavigationStack (30 lines vs iOS 250+)
+- **Caree List**: Primary view with lazy loading, pull-to-refresh
+- **Activity Tracking**: Full CRUD with Digital Crown input for quantity and time
+  - Auto-focus on time input when custom time enabled
+  - Save toast with reactive list updates
+  - SF Symbol and emoji icon rendering
+- **Activity Details**: Complete edit functionality (notes, quantity, time)
+  - Edit mode with save toast feedback
+  - Delete with confirmation dialog and toast
+  - Sync state tracking (pending/syncing/synced/failed) with retry
+- **Activity List**: Filtering by activity type (tap-to-cycle), reactive updates
+- **Optimistic UI**: All mutations show immediately, sync in background with state tracking
 
 #### Services
 - **LocationManager**: Cross-platform location service for iOS/watchOS
@@ -103,6 +111,22 @@ The app uses SwiftData with three main model entities:
   - Silent notifications for sync coordination
   - Filters activity records for user-facing notifications
 
+- **WatchDataProvider** (watchOS only): Snapshot-based data provider
+  - Direct CloudKit communication via SelectiveCloudKitService
+  - Lazy loading strategy: carees eager, activity types on-demand, activities on-demand (48h window)
+  - Memory management with cache clearing (`clearUnusedCache`, `clearAllCache`) and task cancellation
+  - Optimistic UI with sync state tracking (pending → syncing → synced/failed)
+  - No SwiftData - uses immutable snapshots (CareeSnapshot, ActivityTypeSnapshot, ActivitySnapshot)
+  - Background sync with Task.detached, restores UI on failure
+
+- **SelectiveCloudKitService** (watchOS only): Watch-optimized CloudKit queries
+  - Aggressive filtering: 48-hour activity window, 100 activities max, 50 activity types max
+  - Retry logic with exponential backoff (2s, 4s, 8s) for transient errors
+  - Zone discovery for shared database queries (searches all zones)
+  - Lightweight count queries without loading full objects
+  - Compatible with iOS SwiftData schema (sets CD_id, CD_creatorUserRecordID fields)
+  - Memory monitoring with MemoryMonitor logging
+
 ### Key Patterns
 - SwiftUI with `@State`, `@StateObject`, `@Environment` for state management
 - SwiftData models shared between iOS and watchOS targets via project.yml
@@ -130,6 +154,73 @@ The app uses SwiftData with three main model entities:
 - Location services integrated for activities when ActivityType.hasLocation == true
 - XcodeGen project generation from `project.yml`
 - Unit tests with in-memory ModelContainer for isolation
+
+## Platform Architecture Differences
+
+### iOS: SwiftData + CloudKit Hybrid
+**Persistence**: Dual ModelContainer architecture
+- **Main container**: CloudKit-synced with `cloudKitDatabase: .private()`
+- **Cache container**: Local-only SwiftData for fast offline reads
+- SwiftData as source of truth, automatic background sync
+
+**Services**: Multi-service architecture (5+ specialized services)
+- CloudKitDataService: CRUD for owned carees
+- CloudKitSharedDataService: CRUD for shared carees
+- LocalCacheService: SwiftData cache with debounced refresh (0.25s)
+- CloudKitSharingService: Share management (UICloudSharingController)
+- UserNotificationService: Push notifications with deep linking
+
+**Loading Strategy**: Eager loading with background refresh
+- All data loaded on demand
+- SwiftData handles relationship traversal
+- Background tasks for sync
+
+**Data Models**: SwiftData managed objects with relationships
+- `caree.activityTypes`, `caree.activities` relationships
+- Mutable objects tracked by SwiftData context
+
+### watchOS: Direct CloudKit with Snapshots
+**Persistence**: No SwiftData - direct CloudKit only
+- WatchDataProvider as single data source
+- Direct CloudKit API calls via SelectiveCloudKitService
+- No ModelContainer initialization
+
+**Services**: Unified provider architecture
+- Single WatchDataProvider manages all state
+- SelectiveCloudKitService for optimized queries
+- Shares logging, monitoring, preferences services with iOS
+
+**Loading Strategy**: Lazy loading with aggressive limits
+- Carees: Eager (small dataset, ~20 typical)
+- Activity types: On-demand when user opens caree detail
+- Activities: On-demand with 48-hour window, 100 max per caree
+- Active cache clearing on view disappear
+
+**Data Models**: Immutable snapshots, flat structure
+- CareeSnapshot, ActivityTypeSnapshot, ActivitySnapshot
+- No relationships - all IDs stored as UUID properties
+- Prevents accidental relationship traversal
+
+### Shared Between Platforms
+**Models**: Caree, ActivityType, Activity (SwiftData definitions)
+- Compiled for both targets via project.yml
+- watchOS doesn't use SwiftData features, but shares type definitions
+
+**Snapshots**: CareeSnapshot, ActivityTypeSnapshot, ActivitySnapshot
+- Used by watchOS exclusively
+- Could be adopted by iOS for view layer
+
+**Services** (cross-platform):
+- AppLogger, FileLogger: Logging infrastructure
+- MemoryMonitor, MetricsManager: Diagnostics
+- CloudKitConfig: Container and zone constants
+- LocationManager: Location services (platform-adapted)
+- UserNotificationPreferences: Settings synced via app group UserDefaults
+- AppError: Shared error definitions
+
+**Architecture Tradeoffs**:
+- iOS: Full power, offline-first, relationship queries → Higher memory, more complex
+- watchOS: Optimized, memory-conscious, explicit loading → Limited history, manual cache management
 
 ## Development Guidelines
 
@@ -275,6 +366,16 @@ Enable multiple caregivers to track activities for the same caree(s) across thei
 - ActivityType and Activity cascade from Caree
 - Sharing a Caree includes all its ActivityTypes and Activities
 
+**Critical Schema Fields** (required for iOS/watchOS compatibility):
+- `CD_id`: String UUID (required by SwiftData CloudKit integration)
+  - iOS SwiftData auto-generates this field
+  - watchOS SelectiveCloudKitService must explicitly set: `record["CD_id"] = activity.id.uuidString`
+  - Without this field, iOS cannot import watch-created activities
+- `CD_creatorUserRecordID`: String (for notification filtering and attribution)
+  - Set using: `CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName`
+  - Used to exclude own activities from notifications
+  - Enables proper attribution in shared caree scenarios
+
 #### CloudKit Parent Reference Constraints
 
 **Critical Requirement**: CloudKit requires parent references in sharing hierarchies to use `CKRecord.ReferenceAction.none` instead of `.deleteSelf`. This is a CloudKit constraint for records that participate in sharing.
@@ -409,12 +510,19 @@ record.parent = CKRecord.Reference(record: parentCaree, action: .none)
   - ✅ Display today's activity count
   - ✅ App group sharing for data access
 
-- ✅ watchOS feature parity
+- ✅ watchOS feature parity (COMPLETE)
   - ✅ ActivityListView with filtering by activity type (tap-to-cycle filter)
-  - ✅ Edit capability in ActivityDetailView (notes, quantity, dateTime)
-  - ✅ Delete functionality with confirmation dialogs
+  - ✅ Full edit capability in ActivityDetailView (notes, quantity, dateTime)
+  - ✅ Delete functionality with confirmation dialog and success toast
+  - ✅ Save functionality with success toast and reactive list updates
+  - ✅ Auto-focus on time input when entering edit mode
+  - ✅ Digital Crown integration for both quantity and time editing
+  - ✅ Symbol rendering (SF Symbols and emoji support via ActivityTypeIconView)
+  - ✅ Optimistic UI with background sync and retry logic
+  - ✅ Sync state tracking (pending/syncing/synced/failed) with manual retry
+  - ✅ Memory management with cache clearing and task cancellation
   - ✅ Navigation from CareeDetailView to full activity list
-  - ✅ watchOS-specific UI adaptations (no Menu, wheel date picker)
+  - ✅ watchOS-specific UI adaptations (Digital Crown, no Menu, focusable controls)
 
 - ✅ Shared Caree Full CRUD Support
   - ✅ Fetch ActivityTypes and Activities from CloudKit shared database
@@ -499,6 +607,28 @@ record.parent = CKRecord.Reference(record: parentCaree, action: .none)
 5. Check notification handler filtering logic in `CloudKitSharedRecordsService`
 
 ### Data Sync Issues
+
+#### Watch-created activities not syncing to iOS
+**Symptoms**:
+- Activities created on watchOS don't appear in iOS app
+- iOS logs show: "Missing required field 'CD_id or CD_dateTime'"
+- iOS logs show: "Record identifier should be a string"
+- CoreData+CloudKit errors: NSCocoaErrorDomain Code=134420
+
+**Root Cause**: Missing required CloudKit fields that iOS SwiftData expects
+
+**Solution**: Implemented in commits 957775c and 57a42b4
+- SelectiveCloudKitService now sets `CD_id` field: `record["CD_id"] = activity.id.uuidString`
+- SelectiveCloudKitService now sets `CD_creatorUserRecordID` field
+- Both fields are required for iOS SwiftData CloudKit integration
+
+**Verification**:
+1. Check CloudKit Dashboard that new watch-created activities have `CD_id` as String field
+2. Check that `CD_creatorUserRecordID` is set to current user's record ID
+3. Pull to refresh on iOS CareeDetail or ActivityList
+4. New activities should now appear
+
+**Important Note**: Activities created before these fixes (prior to commits 957775c, 57a42b4) won't sync as they're missing required fields. These old records cannot be retroactively fixed and should be re-created if needed.
 
 #### CareeList not updating after creation
 **Cause**: View using computed property instead of observable state
