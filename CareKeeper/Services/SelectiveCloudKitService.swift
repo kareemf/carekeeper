@@ -471,7 +471,8 @@ class SelectiveCloudKitService {
         let recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)", zoneID: zoneID)
         let record = CKRecord(recordType: "CD_Activity", recordID: recordID)
 
-        // Set fields
+        // Set fields (CD_id required by SwiftData CloudKit schema)
+        record["CD_id"] = activity.id.uuidString
         record["CD_dateTime"] = activity.dateTime
         record["CD_notes"] = activity.notes
         record["CD_quantity"] = activity.quantity
