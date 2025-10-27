@@ -19,6 +19,7 @@
 		174FACFFEF8A26394A888700 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D48AF5D29BE95FF4982D277 /* AppError.swift */; };
 		1ACD811C263D77D505DDC1D9 /* CareKeeper Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1C40B2F36B2FEF8D200C1D6A /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F445F3809EAF0F93A2583BD1 /* LocationManager.swift */; };
+		1E1D24785B986643846FAF0A /* CloudKitRetryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2965CC30AD13A51A100D45F /* CloudKitRetryService.swift */; };
 		2AE6F0B5667E58000BF31695 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A8D35563F0827622269172EA /* Assets.xcassets */; };
 		2DC6ED05DA7EE5485FFE7312 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B487DA5E1F85ECB1C6B6FA7 /* AppLogger.swift */; };
 		32264FE6CCB02AB8753A9ED0 /* LocalCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B75FFD77DA56F8E53AF30E4 /* LocalCacheService.swift */; };
@@ -97,6 +98,7 @@
 		ACA2F67C4D1E482F462ED518 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF1FB5B93A58A39C08B20E /* Activity.swift */; };
 		ACD19F7F12830E6D2DB5AB55 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF1FB5B93A58A39C08B20E /* Activity.swift */; };
 		B0ED683655A816C71A8677BF /* MetricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F488F7DACAEE871D1A9C19 /* MetricsManager.swift */; };
+		B1663FE533B73F382C43A9C3 /* CloudKitRetryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2965CC30AD13A51A100D45F /* CloudKitRetryService.swift */; };
 		B3A2312A4D4A800FB043D276 /* FileLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = D923D552CDE37575075E4E2D /* FileLogger.swift */; };
 		B3D954DC9B97C5EF41E208D1 /* ActivityRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F045A407E5D82FE3B07CC3 /* ActivityRowView.swift */; };
 		B3F684F48479BFBEC5B7139A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD077A1E7DC30A9AF398FCD9 /* AppDelegate.swift */; };
@@ -266,6 +268,7 @@
 		DDC044C52BF16B9B99F3C6DD /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
 		E16FBE8C16D3C0D2B5A0DD7F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EFF0F7407FAB7635569FDB8F /* CareKeeperWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWidget.swift; sourceTree = "<group>"; };
+		F2965CC30AD13A51A100D45F /* CloudKitRetryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitRetryService.swift; sourceTree = "<group>"; };
 		F445F3809EAF0F93A2583BD1 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		F7FC66039C53C043A170CDEB /* ActivityTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeTests.swift; sourceTree = "<group>"; };
 		F9FDB6B1D732C3F073280581 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -504,6 +507,7 @@
 				760EF2FC3943A2D06800C2CA /* CloudKitNotificationService.swift */,
 				B9745B8C8BD61826BBEAB21C /* CloudKitParentReferenceService.swift */,
 				AC39F5973C55FEC0F697F0C6 /* CloudKitRecordConverter.swift */,
+				F2965CC30AD13A51A100D45F /* CloudKitRetryService.swift */,
 				50674CDF7CAA8A50B04AB426 /* CloudKitSharedDataService.swift */,
 				7ED849B08BAEA65938EE5A41 /* CloudKitSharedRecordsService.swift */,
 				AD6CD974E62394F6A1ED007F /* CloudKitSharingService.swift */,
@@ -754,6 +758,7 @@
 				6495BDC2A675EBC2A3702FF0 /* CloudKitNotificationService.swift in Sources */,
 				E38856F5F140149FA07E6286 /* CloudKitParentReferenceService.swift in Sources */,
 				8FC50303577CF7ECE2FC6C9B /* CloudKitRecordConverter.swift in Sources */,
+				1E1D24785B986643846FAF0A /* CloudKitRetryService.swift in Sources */,
 				0D78ADF9039F2A0F8F81AD8B /* CloudKitSharedDataService.swift in Sources */,
 				FD14052DB26A1D9549357F09 /* CloudKitSharedRecordsService.swift in Sources */,
 				770A4488C02071798279442F /* CloudKitSharingService.swift in Sources */,
@@ -839,6 +844,7 @@
 				E09349DEFD7FE2376BEACDE7 /* CloudKitNotificationService.swift in Sources */,
 				9AD36D1AB30DDE09190FEF3E /* CloudKitParentReferenceService.swift in Sources */,
 				6C3750748A6F6752ED4F4084 /* CloudKitRecordConverter.swift in Sources */,
+				B1663FE533B73F382C43A9C3 /* CloudKitRetryService.swift in Sources */,
 				9B80A01D26FF638025A5FB9B /* CloudKitSharedDataService.swift in Sources */,
 				C2BA15E396C1AEA7B5E44629 /* CloudKitSharedRecordsService.swift in Sources */,
 				C1B750DAA7023A5564DA45E9 /* CloudKitSharingService.swift in Sources */,
