@@ -7,7 +7,7 @@ struct ActivityRowView: View {
     var body: some View {
         HStack {
             // Activity type icon
-            Text(activity.activityType?.displayIcon ?? "⭐")
+            ActivityTypeIconView(icon: activity.activityType?.displayIcon ?? "")
                 .font(.title2)
                 .frame(width: 30)
             

@@ -97,7 +97,7 @@ struct ActivityListView: View {
                 Text("No Matching Activities")
                     .font(.headline)
 
-                Text("No activities found for this type in the selected time range")
+                Text("No activities found for this type in the last 48 hours")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -109,10 +109,10 @@ struct ActivityListView: View {
                 }
                 .buttonStyle(.bordered)
             } else {
-                Text("No Activities")
+                Text("No (Recent) Activities")
                     .font(.headline)
 
-                Text("Track an activity to see it appear here")
+                Text("Activities tracked in the last 48 hours will appear here")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
