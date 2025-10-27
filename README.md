@@ -304,6 +304,65 @@ All tests use in-memory SwiftData containers for fast, isolated execution.
 - **Offline-First**: Local storage with cloud sync
 - **Privacy by Design**: Encrypt sensitive data
 
+## Documentation
+
+CareKeeper includes comprehensive documentation for both developers and users.
+
+### For Developers
+
+**Technical Documentation** (in `/technical/`):
+- **ADRs** (`technical/adr/`): Architecture Decision Records documenting key design choices
+- **Specifications** (`technical/specs/`): Detailed feature specifications (CloudKit migration, push notifications)
+- **Troubleshooting** (`technical/troubleshooting/`): Debugging guides and diagnostics
+- **Retrospectives** (`technical/retrospectives/`): Post-implementation reviews and refactoring plans
+
+**Quick Reference**:
+- `CLAUDE.md`: Development guidance for AI assistants and developers
+- `DEPLOYMENT.md`: Documentation site deployment guide
+
+### For Users
+
+**User Documentation** (powered by MkDocs Material):
+
+The user-facing documentation site includes:
+- **Tutorials**: Step-by-step guides for getting started
+- **How-To Guides**: Task-oriented instructions
+- **Explanations**: Conceptual information about how CareKeeper works
+- **Reference**: Complete feature reference and troubleshooting
+
+**Local Preview**:
+```bash
+# Install dependencies
+pip3 install -r requirements.txt
+
+# Serve locally with live reload
+./scripts/serve-docs.sh
+
+# Visit http://localhost:8000
+```
+
+**Build for Production**:
+```bash
+# Build static site
+./scripts/build-docs.sh
+
+# Output in site/ directory
+```
+
+**In-App Documentation**:
+- Access help directly in the app via Menu > Help
+- WebView integration displays full documentation site
+- iOS-only feature (available on iPhone and iPad)
+
+**Deployment**:
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions (Cloudflare Pages, GitHub Pages, etc.).
+
+**Screenshots**:
+Use the screenshot capture helper to add images to documentation:
+```bash
+./scripts/capture-screenshots.sh
+```
+
 ## Contributing
 
 1. Fork the repository
