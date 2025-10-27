@@ -61,7 +61,7 @@ struct ActivityDetailView: View {
                 detailsSection
                     .padding(.horizontal)
 
-                if activitySnapshot.notes != nil || activitySnapshot.quantity != nil {
+                if isEditing || activitySnapshot.notes != nil || activitySnapshot.quantity != nil {
                     Divider()
                     additionalInfoSection
                         .padding(.horizontal)
