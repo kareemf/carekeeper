@@ -19,6 +19,7 @@ struct ActivityDetailView: View {
     @State private var showingDeleteConfirmation = false
     @State private var isDeleting = false
     @State private var showingDeleteSuccess = false
+    @State private var showingSaveSuccess = false
     @FocusState private var timeInputFocused: Bool
 
     private var activityType: ActivityTypeSnapshot? {
@@ -150,6 +151,8 @@ struct ActivityDetailView: View {
         .overlay(alignment: .center) {
             if showingDeleteSuccess {
                 deleteSuccessToast
+            } else if showingSaveSuccess {
+                saveSuccessToast
             }
         }
         .onAppear {
@@ -166,6 +169,23 @@ struct ActivityDetailView: View {
                 .foregroundColor(.green)
 
             Text("Deleted!")
+                .font(.headline)
+        }
+        .padding(24)
+        .background(
+            Color.black.opacity(0.85)
+                .cornerRadius(16)
+        )
+        .transition(.scale.combined(with: .opacity))
+    }
+
+    private var saveSuccessToast: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 48))
+                .foregroundColor(.green)
+
+            Text("Saved!")
                 .font(.headline)
         }
         .padding(24)
@@ -288,8 +308,20 @@ struct ActivityDetailView: View {
             // Update the activity (optimistic UI with background sync)
             await dataProvider.updateActivity(updatedActivity)
 
+            // Show success toast briefly before exiting edit mode
             await MainActor.run {
                 isSaving = false
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    showingSaveSuccess = true
+                }
+            }
+
+            // Wait for toast to be visible
+            try? await Task.sleep(nanoseconds: 800_000_000) // 0.8 seconds
+
+            // Exit edit mode
+            await MainActor.run {
+                showingSaveSuccess = false
                 isEditing = false
             }
         }
