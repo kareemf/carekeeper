@@ -511,7 +511,7 @@ struct ActivityDetailView: View {
                     .foregroundColor(.secondary)
 
                 // In edit mode, allow capturing new location
-                if isEditing && activityType?.hasLocation == true {
+                if isEditing && (activityType?.hasLocation == true || (activitySnapshot.latitude != nil && activitySnapshot.longitude != nil)) {
                     Toggle(isOn: $captureNewLocation) {
                         Text("Update Location")
                             .font(.body)
