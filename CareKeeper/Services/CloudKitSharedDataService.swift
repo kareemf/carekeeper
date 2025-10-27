@@ -9,12 +9,16 @@ class CloudKitSharedDataService: ObservableObject {
     private let container: CKContainer
     private let logger = AppLogger.cloudkit
     private let converter = CloudKitRecordConverter()
+    private let zoneDiscovery: CloudKitZoneDiscoveryService
+    private let retryService: CloudKitRetryService
 
     // Optional local cache for immediate UI updates after successful mutations
     private var cacheService: LocalCacheService?
 
     init(containerIdentifier: String = CloudKitConfig.containerID) {
         self.container = CKContainer(identifier: containerIdentifier)
+        self.zoneDiscovery = CloudKitZoneDiscoveryService(containerIdentifier: containerIdentifier)
+        self.retryService = CloudKitRetryService()
     }
 
     func setCacheService(_ cacheService: LocalCacheService) {
@@ -54,9 +58,11 @@ class CloudKitSharedDataService: ObservableObject {
         // Convert to CKRecord
         let record = try await convertActivityTypeToRecord(activityType, caree: caree, zoneID: zoneID)
 
-        // Save to shared database
+        // Save to shared database with retry logic
         do {
-            _ = try await sharedDatabase.save(record)
+            _ = try await retryService.retryableRequest(operation: "createActivityType(\(name))") {
+                try await sharedDatabase.save(record)
+            }
             logger.info("✅ Created ActivityType in shared database: \(name)")
 
             // Optimistically update local cache
@@ -102,9 +108,11 @@ class CloudKitSharedDataService: ObservableObject {
         record["CD_hasLocation"] = (activityType.hasLocation ? 1 : 0) as CKRecordValue
         record["CD_listOrder"] = activityType.listOrder
 
-        // Save updated record
+        // Save updated record with retry logic
         do {
-            _ = try await sharedDatabase.save(record)
+            _ = try await retryService.retryableRequest(operation: "updateActivityType(\(activityType.name))") {
+                try await sharedDatabase.save(record)
+            }
             logger.info("✅ Updated ActivityType in shared database: \(activityType.name)")
 
             // Optimistically update local cache
@@ -150,9 +158,11 @@ class CloudKitSharedDataService: ObservableObject {
             return
         }
 
-        // Delete record
+        // Delete record with retry logic
         do {
-            _ = try await sharedDatabase.deleteRecord(withID: record.recordID)
+            _ = try await retryService.retryableRequest(operation: "deleteActivityType(\(activityType.name))") {
+                try await sharedDatabase.deleteRecord(withID: record.recordID)
+            }
             logger.info("✅ Deleted ActivityType from shared database: \(activityType.name)")
 
             // Remove from local cache
@@ -204,9 +214,11 @@ class CloudKitSharedDataService: ObservableObject {
         // Convert to CKRecord
         let record = try await convertActivityToRecord(activity, caree: caree, activityType: activityType, zoneID: zoneID)
 
-        // Save to shared database
+        // Save to shared database with retry logic
         do {
-            _ = try await sharedDatabase.save(record)
+            _ = try await retryService.retryableRequest(operation: "createActivity(\(dateTime))") {
+                try await sharedDatabase.save(record)
+            }
             logger.info("✅ Created Activity in shared database at: \(dateTime)")
 
             // Optimistically update local cache
@@ -251,9 +263,11 @@ class CloudKitSharedDataService: ObservableObject {
         record["CD_latitude"] = activity.latitude
         record["CD_longitude"] = activity.longitude
 
-        // Save updated record
+        // Save updated record with retry logic
         do {
-            _ = try await sharedDatabase.save(record)
+            _ = try await retryService.retryableRequest(operation: "updateActivity(\(activity.dateTime))") {
+                try await sharedDatabase.save(record)
+            }
             logger.info("✅ Updated Activity in shared database at: \(activity.dateTime)")
 
             // Optimistically update local cache
@@ -299,9 +313,11 @@ class CloudKitSharedDataService: ObservableObject {
             return
         }
 
-        // Delete record
+        // Delete record with retry logic
         do {
-            _ = try await sharedDatabase.deleteRecord(withID: record.recordID)
+            _ = try await retryService.retryableRequest(operation: "deleteActivity(\(activity.dateTime))") {
+                try await sharedDatabase.deleteRecord(withID: record.recordID)
+            }
             logger.info("✅ Deleted Activity from shared database at: \(activity.dateTime)")
 
             // Remove from local cache
@@ -324,31 +340,7 @@ class CloudKitSharedDataService: ObservableObject {
 
     /// Find the zone ID for a shared caree
     private func findZoneID(for caree: Caree) async throws -> CKRecordZone.ID? {
-        let sharedDatabase = container.sharedCloudDatabase
-        let zones = try await sharedDatabase.allRecordZones()
-
-        // Find the zone that contains this caree
-        for zone in zones {
-            if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName {
-                continue
-            }
-
-            let query = CKQuery(
-                recordType: "CD_Caree",
-                predicate: NSPredicate(format: "CD_id == %@", caree.id.uuidString)
-            )
-
-            do {
-                let (results, _) = try await sharedDatabase.records(matching: query, inZoneWith: zone.zoneID)
-                if !results.isEmpty {
-                    return zone.zoneID
-                }
-            } catch {
-                logger.warning("Failed to query zone \(zone.zoneID.zoneName): \(error.localizedDescription)")
-            }
-        }
-
-        return nil
+        return try await zoneDiscovery.findZone(for: caree.id)
     }
 
     /// Find an existing ActivityType record in the shared database
@@ -411,7 +403,9 @@ class CloudKitSharedDataService: ObservableObject {
         let sharedDatabase = container.sharedCloudDatabase
         let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
 
-        let parentCareeRecord = try await sharedDatabase.record(for: careeRecordID)
+        let parentCareeRecord = try await retryService.retryableRequest(operation: "fetchCareeRecord(\(caree.id))") {
+            try await sharedDatabase.record(for: careeRecordID)
+        }
 
         // Build the record directly in the correct zone via the converter
         let record = try converter.activityTypeToRecord(
@@ -432,8 +426,12 @@ class CloudKitSharedDataService: ObservableObject {
         let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
         let activityTypeRecordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)", zoneID: zoneID)
 
-        let parentCareeRecord = try await sharedDatabase.record(for: careeRecordID)
-        let activityTypeRecord = try await sharedDatabase.record(for: activityTypeRecordID)
+        let parentCareeRecord = try await retryService.retryableRequest(operation: "fetchCareeRecord(\(caree.id))") {
+            try await sharedDatabase.record(for: careeRecordID)
+        }
+        let activityTypeRecord = try await retryService.retryableRequest(operation: "fetchActivityTypeRecord(\(activityType.id))") {
+            try await sharedDatabase.record(for: activityTypeRecordID)
+        }
 
         // Build the record directly in the correct zone via the converter
         let record = try converter.activityToRecord(
