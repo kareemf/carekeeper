@@ -66,9 +66,8 @@ extension ActivityType {
 // MARK: - CloudKit Configuration
 extension ActivityType {
     static func configureCloudKitSchema() {
-        // Configure in CloudKit Dashboard:
-        // - name: encrypted field (contains user-defined taxonomy)
-        // - other fields: standard encryption
+        // All fields use CloudKit's infrastructure-level encryption.
+        // Activity types are shared with all caree participants.
     }
 }
 

@@ -276,12 +276,38 @@ The app uses SwiftData with three main model entities:
 - `dateCreated: Date`
 
 ### Encryption at Rest Strategy
-**Infrastructure-level encryption (no model properties needed):**
+**Infrastructure-level encryption:**
 - **Local device**: iOS automatically encrypts device storage when locked
 - **CloudKit sync**: Automatic encryption in transit and at rest on Apple servers
-- **Core Data store**: Configure with `NSPersistentStoreFileProtectionKey` for additional local protection
-- **Sensitive fields**: Use CloudKit's `CKRecord.EncryptedValues` for notes and other sensitive data
-- **CloudKit schema**: Configure field-level encryption settings for enhanced privacy
+- **Core Data store**: SwiftData with `NSPersistentStoreFileProtectionKey` for additional local protection
+- **Sharing compatibility**: Field-level encryption via `CKRecord.EncryptedValues` is NOT used because it's incompatible with CloudKit sharing (participants cannot decrypt owner's encrypted fields)
+- **Security model**: Relies on Apple's infrastructure encryption, which is industry-standard for collaborative apps
+
+**Note**: For truly private data that should never be shared, use `encryptedValues`. For collaborative data (this app's use case), infrastructure encryption is the correct choice.
+
+### Why Not Field-Level Encryption?
+
+**TL;DR**: `CKRecord.EncryptedValues` is incompatible with CloudKit sharing.
+
+**Technical Details**:
+- `encryptedValues` uses owner's private key for encryption
+- Only owner's device can decrypt
+- Share participants see `nil` for encrypted fields
+- Designed for truly private data (passwords, tokens, etc.)
+
+**CareKeeper's Requirements**:
+- ✅ Multiple caregivers need read/write access to shared data
+- ✅ Notes, locations, and names must be accessible to all participants
+- ✅ Collaborative care tracking is the core feature
+
+**Decision**: Use infrastructure-level encryption (industry standard for collaborative apps like iCloud Notes, shared reminders, etc.)
+
+**Additional Security Measures**:
+- Device encryption protects local data
+- iCloud account security (2FA) protects cloud access
+- Explicit share acceptance required
+- Permission management (owner can revoke access)
+- App-level access controls can be added (Face ID lock, etc.)
 
 ### Implementation Phases
 

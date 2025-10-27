@@ -48,12 +48,10 @@ extension Caree {
 
 // MARK: - CloudKit Configuration
 extension Caree {
-    // Configure CloudKit field encryption for sensitive data
     static func configureCloudKitSchema() {
-        // This would be configured in CloudKit Dashboard
-        // - name: encrypted field
-        // - image: encrypted field  
-        // - other fields: standard encryption
+        // All fields use CloudKit's infrastructure-level encryption.
+        // Caree data is designed to be shared with other caregivers,
+        // so field-level encryption would prevent collaborative access.
     }
 }
 

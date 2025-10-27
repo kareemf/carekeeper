@@ -71,10 +71,14 @@ extension Activity {
 // MARK: - CloudKit Configuration
 extension Activity {
     static func configureCloudKitSchema() {
-        // Configure in CloudKit Dashboard:
-        // - notes: encrypted field (sensitive user data)
-        // - location data: encrypted fields (privacy sensitive)
-        // - other fields: standard encryption
+        // All fields use CloudKit's infrastructure-level encryption (in transit and at rest).
+        // Field-level encryption via encryptedValues is not used to maintain CloudKit
+        // sharing compatibility - participants need access to all activity data.
+        //
+        // Privacy is maintained through:
+        // - Apple ID authentication
+        // - Explicit share acceptance
+        // - Device-level encryption when locked
     }
 }
 

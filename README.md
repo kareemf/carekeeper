@@ -314,10 +314,11 @@ All tests use in-memory SwiftData containers for fast, isolated execution.
 
 ## Security & Privacy
 
-- **Local Encryption**: Device storage encrypted when locked
-- **CloudKit Encryption**: Automatic encryption in transit and at rest
-- **Field-Level Encryption**: Sensitive data (notes, personal info) uses CloudKit's encrypted fields
-- **No Third-Party Analytics**: Privacy-first approach
+- **Local Encryption**: Device storage encrypted when locked (File Protection Complete)
+- **CloudKit Encryption**: Automatic encryption in transit (TLS) and at rest on Apple servers
+- **Collaborative Security Model**: Infrastructure-level encryption balances security with sharing functionality
+- **No Third-Party Analytics**: Privacy-first approach with no data sold or shared
+- **iCloud Account Security**: Protected by user's Apple ID credentials and two-factor authentication
 
 ## License
 
