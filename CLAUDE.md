@@ -6,6 +6,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 CareKeeper is an iOS/watchOS app for tracking care activities using SwiftUI and Core Data with CloudKit sharing. The app manages "Carees" (care recipients), their behaviors, and activity tracking with location support.
 
+## Documentation
+
+This file (CLAUDE.md) provides quick reference for development. Additional technical documentation:
+
+- **Architecture Decision Records (ADRs)**: `/technical/adr/` - Key architectural decisions with context and rationale
+- **Specifications**: `/technical/specs/` - Detailed feature specifications (CloudKit migration, push notifications)
+- **Troubleshooting**: `/technical/troubleshooting/` - Debugging guides and diagnostics
+- **Retrospectives**: `/technical/retrospectives/` - Post-implementation reviews and refactoring plans
+
+User-facing documentation (tutorials, how-tos, reference) is in `/docs/` (MkDocs site).
+
 ## Development Commands
 
 ### Building and Running
