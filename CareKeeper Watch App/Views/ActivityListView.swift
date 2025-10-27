@@ -233,11 +233,20 @@ struct ActivityRowView: View {
                 }
             }
 
-            if let quantity = activity.quantity,
-               let unit = activityType?.quantityUnit {
-                Text("\(String(format: "%.1f", quantity)) \(unit)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+            // Metadata row: quantity and location
+            HStack(spacing: 12) {
+                if let quantity = activity.quantity,
+                   let unit = activityType?.quantityUnit {
+                    Label("\(String(format: "%.1f", quantity)) \(unit)", systemImage: "number")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                if activity.latitude != nil && activity.longitude != nil {
+                    Label("Location", systemImage: "location.fill")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
 
             if let notes = activity.notes, !notes.isEmpty {

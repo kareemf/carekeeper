@@ -1,8 +1,9 @@
 import SwiftUI
 import MapKit
+import CoreLocation
 
 /// ActivityDetailView rebuilt with snapshots
-/// Supports editing notes, quantity, and time
+/// Supports editing notes, quantity, time, and location
 struct ActivityDetailView: View {
 
     let activitySnapshot: ActivitySnapshot
@@ -15,12 +16,15 @@ struct ActivityDetailView: View {
     @State private var editedNotes: String = ""
     @State private var editedQuantity: Double = 0
     @State private var minutesAgo: Double = 0
+    @State private var captureNewLocation: Bool = false
     @State private var isSaving = false
     @State private var showingDeleteConfirmation = false
     @State private var isDeleting = false
     @State private var showingDeleteSuccess = false
     @State private var showingSaveSuccess = false
     @FocusState private var timeInputFocused: Bool
+
+    @StateObject private var locationManager = LocationManager()
 
     private var activityType: ActivityTypeSnapshot? {
         // Find activity type across all loaded carees
@@ -293,14 +297,18 @@ struct ActivityDetailView: View {
         isSaving = true
 
         Task {
+            // Use new location if captured, otherwise keep existing location
+            let latitude = captureNewLocation ? locationManager.location?.coordinate.latitude : activitySnapshot.latitude
+            let longitude = captureNewLocation ? locationManager.location?.coordinate.longitude : activitySnapshot.longitude
+
             // Create new activity snapshot with updated values
             let updatedActivity = ActivitySnapshot(
                 id: activitySnapshot.id,
                 dateTime: editedDateTime,
                 notes: editedNotes.isEmpty ? nil : editedNotes,
                 quantity: activityType?.hasQuantity == true ? editedQuantity : activitySnapshot.quantity,
-                latitude: activitySnapshot.latitude,
-                longitude: activitySnapshot.longitude,
+                latitude: latitude,
+                longitude: longitude,
                 activityTypeID: activitySnapshot.activityTypeID,
                 careeID: activitySnapshot.careeID
             )
@@ -495,27 +503,71 @@ struct ActivityDetailView: View {
 
     @ViewBuilder
     private var locationSection: some View {
-        if let latitude = activitySnapshot.latitude,
-           let longitude = activitySnapshot.longitude {
+        // Only show if activity type supports location OR if there's already a location
+        if activityType?.hasLocation == true || (activitySnapshot.latitude != nil && activitySnapshot.longitude != nil) {
             VStack(alignment: .leading, spacing: 8) {
                 Label("Location", systemImage: "location")
                     .font(.caption)
                     .foregroundColor(.secondary)
 
-                Map(initialPosition: .region(
-                    MKCoordinateRegion(
-                        center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
-                        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-                    )
-                )) {
-                    Marker("", coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
-                }
-                .frame(height: 120)
-                .cornerRadius(8)
+                // In edit mode, allow capturing new location
+                if isEditing && activityType?.hasLocation == true {
+                    Toggle(isOn: $captureNewLocation) {
+                        Text("Update Location")
+                            .font(.body)
+                    }
+                    .onChange(of: captureNewLocation) { _, enabled in
+                        if enabled {
+                            locationManager.requestLocation()
+                        }
+                    }
 
-                Text("Lat: \(String(format: "%.6f", latitude)), Lon: \(String(format: "%.6f", longitude))")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
+                    if captureNewLocation {
+                        if locationManager.location != nil {
+                            Text("📍 New location captured")
+                                .font(.caption)
+                                .foregroundColor(.green)
+                        } else if locationManager.isUpdating {
+                            HStack {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                Text("Getting location...")
+                                    .font(.caption)
+                            }
+                        } else if locationManager.authorizationStatus == .denied {
+                            Text("Location access denied")
+                                .font(.caption)
+                                .foregroundColor(.red)
+                        } else {
+                            Text("Waiting for location...")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+
+                // Display current or existing location
+                if let latitude = (captureNewLocation ? locationManager.location?.coordinate.latitude : activitySnapshot.latitude),
+                   let longitude = (captureNewLocation ? locationManager.location?.coordinate.longitude : activitySnapshot.longitude) {
+                    Map(initialPosition: .region(
+                        MKCoordinateRegion(
+                            center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
+                            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                        )
+                    )) {
+                        Marker("", coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                    }
+                    .frame(height: 120)
+                    .cornerRadius(8)
+
+                    Text("Lat: \(String(format: "%.6f", latitude)), Lon: \(String(format: "%.6f", longitude))")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                } else if !isEditing && activitySnapshot.latitude == nil {
+                    Text("No location recorded")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
         }
     }
