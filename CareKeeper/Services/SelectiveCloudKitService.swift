@@ -480,6 +480,9 @@ class SelectiveCloudKitService {
         record["CD_longitude"] = activity.longitude
         record["CD_dateCreated"] = activity.dateCreated
 
+        // Creator tracking (for notification filtering and shared activity attribution)
+        record["CD_creatorUserRecordID"] = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
+
         // Set references (in the same zone)
         let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(activity.careeID.uuidString)", zoneID: zoneID)
         record["CD_caree"] = CKRecord.Reference(recordID: careeRecordID, action: .none)
