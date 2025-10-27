@@ -4,7 +4,6 @@ import os.log
 
 /// Shared retry logic for CloudKit operations with exponential backoff
 /// Handles transient errors automatically with configurable retry attempts
-@MainActor
 class CloudKitRetryService {
 
     // MARK: - Configuration
@@ -48,12 +47,11 @@ class CloudKitRetryService {
 
         for attempt in 0..<maxRetries {
             do {
-                FileLogger.shared.info("☁️ \(operation) (attempt \(attempt + 1)/\(self.maxRetries))")
+                logger.info("☁️ \(operation) (attempt \(attempt + 1)/\(self.maxRetries))")
                 let result = try await block()
 
                 if attempt > 0 {
                     logger.info("✅ \(operation) succeeded after \(attempt + 1) attempts")
-                    FileLogger.shared.info("✅ \(operation) succeeded after \(attempt + 1) attempts")
                 }
 
                 return result
@@ -66,23 +64,21 @@ class CloudKitRetryService {
                 let isRetryable = ckError?.isRetryable ?? false
 
                 logger.error("❌ \(operation) failed (attempt \(attempt + 1)/\(self.maxRetries)): \(error.localizedDescription)")
-                FileLogger.shared.error("❌ \(operation) failed (attempt \(attempt + 1)/\(self.maxRetries)): \(error.localizedDescription)")
 
                 // Log CKError details for debugging
                 if let ckError = ckError {
-                    FileLogger.shared.error("   CKError code: \(ckError.code.rawValue)")
-                    FileLogger.shared.error("   Is retryable: \(isRetryable)")
+                    logger.error("   CKError code: \(ckError.code.rawValue)")
+                    logger.error("   Is retryable: \(isRetryable)")
 
                     // Log retry after delay if CKError suggests it
                     if let retryAfter = ckError.retryAfterSeconds {
-                        FileLogger.shared.info("   CloudKit suggests retry after: \(retryAfter)s")
+                        logger.info("   CloudKit suggests retry after: \(retryAfter)s")
                     }
                 }
 
                 // Don't retry if not a transient error
                 guard isRetryable else {
                     logger.error("⚠️ Non-retryable error, failing immediately")
-                    FileLogger.shared.error("⚠️ Non-retryable error, failing immediately")
                     throw error
                 }
 
@@ -102,7 +98,7 @@ class CloudKitRetryService {
                     logger.info("⏳ Exponential backoff: waiting \(delay)s before retry...")
                 }
 
-                FileLogger.shared.info("⏳ Waiting \(delay)s before retry...")
+                logger.info("⏳ Waiting \(delay)s before retry...")
 
                 try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
             }
@@ -110,23 +106,7 @@ class CloudKitRetryService {
 
         // All retries exhausted
         logger.error("❌ \(operation) failed after \(self.maxRetries) attempts")
-        FileLogger.shared.error("❌ \(operation) failed after \(self.maxRetries) attempts")
 
         throw lastError ?? CKError(.networkFailure)
-    }
-}
-
-// MARK: - CKError Extension
-
-extension CKError {
-    /// Check if this error should be retried
-    var isRetryable: Bool {
-        switch code {
-        case .networkUnavailable, .networkFailure, .serviceUnavailable,
-             .requestRateLimited, .zoneBusy, .resultsTruncated:
-            return true
-        default:
-            return false
-        }
     }
 }

@@ -4,7 +4,6 @@ import os.log
 
 /// Shared zone discovery logic for CloudKit shared database operations
 /// Finds zones containing specific records (carees, activity types, activities)
-@MainActor
 class CloudKitZoneDiscoveryService {
 
     // MARK: - Properties
@@ -80,7 +79,7 @@ class CloudKitZoneDiscoveryService {
     /// Find the zone containing a specific activity record
     /// - Parameter activityID: UUID of the activity to find
     /// - Returns: Zone ID if found, nil otherwise
-    func findZone(for activityID: UUID) async throws -> CKRecordZone.ID? {
+    func findZone(forActivity activityID: UUID) async throws -> CKRecordZone.ID? {
         // Check cache first
         if let cachedZone = getCachedZone(for: activityID) {
             logger.info("✅ Using cached zone for activity: \(activityID)")
