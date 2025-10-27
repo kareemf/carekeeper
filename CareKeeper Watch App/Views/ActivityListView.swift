@@ -216,19 +216,13 @@ struct ActivityRowView: View {
                     Text(activityType?.name ?? "Unknown")
                         .font(.headline)
 
-                    HStack(spacing: 4) {
-                        Text(activity.dateTime, style: .date)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                    Text(activity.dateTime, style: .date)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
 
-                        Text("•")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-
-                        Text(activity.dateTime, style: .time)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
+                    Text(activity.dateTime, style: .time)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
 
                 Spacer()

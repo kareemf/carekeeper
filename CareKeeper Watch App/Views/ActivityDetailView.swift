@@ -19,6 +19,7 @@ struct ActivityDetailView: View {
     @State private var showingDeleteConfirmation = false
     @State private var isDeleting = false
     @State private var showingDeleteSuccess = false
+    @FocusState private var timeInputFocused: Bool
 
     private var activityType: ActivityTypeSnapshot? {
         // Find activity type across all loaded carees
@@ -242,6 +243,8 @@ struct ActivityDetailView: View {
         withAnimation {
             isEditing = true
         }
+        // Focus time input when entering edit mode
+        timeInputFocused = true
     }
 
     private func cancelEditing() {
@@ -321,6 +324,7 @@ struct ActivityDetailView: View {
                     .background(Color.gray.opacity(0.3))
                     .cornerRadius(8)
                     .focusable(true)
+                    .focused($timeInputFocused)
                     .digitalCrownRotation(
                         $minutesAgo,
                         from: 0,

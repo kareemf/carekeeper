@@ -22,6 +22,7 @@ struct TrackActivityView: View {
     @State private var isSaving = false
     @State private var showSuccessToast = false
     @State private var error: Error?
+    @FocusState private var timeInputFocused: Bool
 
     @StateObject private var locationManager = LocationManager()
 
@@ -145,6 +146,12 @@ struct TrackActivityView: View {
                             Text(useCustomTime ? "Custom" : "Now")
                                 .font(.body)
                         }
+                        .onChange(of: useCustomTime) { _, newValue in
+                            if newValue {
+                                // Focus time input when custom time is enabled
+                                timeInputFocused = true
+                            }
+                        }
 
                         if useCustomTime {
                             VStack(spacing: 8) {
@@ -166,6 +173,7 @@ struct TrackActivityView: View {
                             .background(Color.gray.opacity(0.3))
                             .cornerRadius(8)
                             .focusable(true)
+                            .focused($timeInputFocused)
                             .digitalCrownRotation(
                                 $minutesAgo,
                                 from: 0,
