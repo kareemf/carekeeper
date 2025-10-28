@@ -216,20 +216,48 @@ class CloudKitSharingService: ObservableObject {
         let predicate = NSPredicate(format: "CD_caree == %@", parentReference)
         let query = CKQuery(recordType: "CD_ActivityType", predicate: predicate)
 
-        let (results, _) = try await container.privateCloudDatabase.records(matching: query, inZoneWith: zoneID)
-
         var verifiedCount = 0
         var missingParentCount = 0
+        var cursor: CKQueryOperation.Cursor? = nil
 
-        for (_, result) in results {
-            if case .success(let record) = result {
-                verifiedCount += 1
-                if record.parent == nil {
-                    missingParentCount += 1
-                    logger.warning("⚠️ ActivityType missing parent: \(record["CD_name"] as? String ?? "Unknown")")
+        // Paginate through all results (default limit is 100 per page)
+        repeat {
+            let (results, nextCursor): ([(CKRecord.ID, Result<CKRecord, Error>)], CKQueryOperation.Cursor?)
+
+            if let cursor = cursor {
+                // Continue from previous cursor
+                (results, nextCursor) = try await container.privateCloudDatabase.records(
+                    continuingMatchFrom: cursor,
+                    desiredKeys: nil,
+                    resultsLimit: 200
+                )
+            } else {
+                // Initial query
+                (results, nextCursor) = try await container.privateCloudDatabase.records(
+                    matching: query,
+                    inZoneWith: zoneID,
+                    desiredKeys: nil,
+                    resultsLimit: 200 // Explicit higher limit per page
+                )
+            }
+
+            cursor = nextCursor
+
+            for (_, result) in results {
+                if case .success(let record) = result {
+                    verifiedCount += 1
+                    if record.parent == nil {
+                        missingParentCount += 1
+                        logger.warning("⚠️ ActivityType missing parent: \(record["CD_name"] as? String ?? "Unknown")")
+                    }
                 }
             }
-        }
+
+            // Log pagination progress
+            if nextCursor != nil {
+                logger.info("📄 Loaded page of activity types, continuing... (total so far: \(verifiedCount))")
+            }
+        } while cursor != nil
 
         return (verifiedCount, missingParentCount)
     }
@@ -242,21 +270,49 @@ class CloudKitSharingService: ObservableObject {
         let predicate = NSPredicate(format: "CD_caree == %@", parentReference)
         let query = CKQuery(recordType: "CD_Activity", predicate: predicate)
 
-        let (results, _) = try await container.privateCloudDatabase.records(matching: query, inZoneWith: zoneID)
-
         var verifiedCount = 0
         var missingParentCount = 0
+        var cursor: CKQueryOperation.Cursor? = nil
 
-        for (_, result) in results {
-            if case .success(let record) = result {
-                verifiedCount += 1
-                if record.parent == nil {
-                    missingParentCount += 1
-                    let dateTime = record["CD_dateTime"] as? Date ?? Date()
-                    logger.warning("⚠️ Activity missing parent: \(dateTime)")
+        // Paginate through all results (default limit is 100 per page)
+        repeat {
+            let (results, nextCursor): ([(CKRecord.ID, Result<CKRecord, Error>)], CKQueryOperation.Cursor?)
+
+            if let cursor = cursor {
+                // Continue from previous cursor
+                (results, nextCursor) = try await container.privateCloudDatabase.records(
+                    continuingMatchFrom: cursor,
+                    desiredKeys: nil,
+                    resultsLimit: 200
+                )
+            } else {
+                // Initial query
+                (results, nextCursor) = try await container.privateCloudDatabase.records(
+                    matching: query,
+                    inZoneWith: zoneID,
+                    desiredKeys: nil,
+                    resultsLimit: 200 // Explicit higher limit per page
+                )
+            }
+
+            cursor = nextCursor
+
+            for (_, result) in results {
+                if case .success(let record) = result {
+                    verifiedCount += 1
+                    if record.parent == nil {
+                        missingParentCount += 1
+                        let dateTime = record["CD_dateTime"] as? Date ?? Date()
+                        logger.warning("⚠️ Activity missing parent: \(dateTime)")
+                    }
                 }
             }
-        }
+
+            // Log pagination progress
+            if nextCursor != nil {
+                logger.info("📄 Loaded page of activities, continuing... (total so far: \(verifiedCount))")
+            }
+        } while cursor != nil
 
         return (verifiedCount, missingParentCount)
     }
