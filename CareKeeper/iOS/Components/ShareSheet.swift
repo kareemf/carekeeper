@@ -1,4 +1,3 @@
-#if os(iOS)
 import SwiftUI
 import UIKit
 
@@ -18,4 +17,3 @@ struct ShareSheet: UIViewControllerRepresentable {
         // No updates needed
     }
 }
-#endif

@@ -18,9 +18,9 @@ targets:
     platform: iOS
     deploymentTarget: "18.0"
     sources:
-      - path: CareKeeper
-        excludes:
-          - "*.md"
+      - path: CareKeeper/iOS
+      - path: CareKeeper/Shared
+      - path: CareKeeper/Preview
     dependencies:
       - target: CareKeeper Watch App
       - framework: WebKit.framework
@@ -78,8 +78,12 @@ targets:
     deploymentTarget: "10.0"
     sources:
       - path: CareKeeper Widget
-      - path: CareKeeper/Models
-      - path: CareKeeper/Services/CloudKitConfig.swift
+        excludes:
+          - "**/*.md"
+      - path: CareKeeper/Shared/Models
+        excludes:
+          - "**/*.md"
+      - path: CareKeeper/Shared/Services/CloudKitConfig.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeper.watchkitapp.widget
@@ -104,10 +108,9 @@ targets:
     deploymentTarget: "10.0"
     sources:
       - path: CareKeeper Watch App
-      - path: CareKeeper/Models
+      - path: CareKeeper/Shared
+      - path: CareKeeper/watchOS
       - path: CareKeeper/Preview
-      - path: CareKeeper/Services
-      - path: CareKeeper/Views/Components
     dependencies:
       - target: CareKeeper Widget
         embed: true
@@ -156,7 +159,7 @@ targets:
     platform: iOS
     sources:
       - path: CareKeeperTests
-      - path: CareKeeper/Models
+      - path: CareKeeper/Shared/Models
     dependencies:
       - target: CareKeeper iOS
     settings:
@@ -208,6 +211,21 @@ schemes:
     build:
       targets:
         CareKeeper Watch App: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+
+  CareKeeper Widget:
+    build:
+      targets:
+        CareKeeper Widget: all
     run:
       config: Debug
     test:

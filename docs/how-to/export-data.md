@@ -18,20 +18,16 @@ Export your CareKeeper data to JSON format for backup, analysis, or migration to
 - Protect against data loss
 - Archive old data before deleting
 
+### Privacy
+- Keep a copy of your data outside of iCloud
+- Delete from CareKeeper while keeping records
+- Control your own data
+
 ### Analysis
 - Import into spreadsheets (Excel, Numbers, Google Sheets)
 - Create custom charts and reports
 - Analyze patterns over time
 
-### Portability
-- Move data to another tracking system
-- Share with healthcare providers
-- Keep permanent records
-
-### Privacy
-- Keep a copy of your data outside of iCloud
-- Delete from CareKeeper while keeping records
-- Control your own data
 
 ## Exporting Data
 

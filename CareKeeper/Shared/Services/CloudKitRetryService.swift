@@ -110,3 +110,17 @@ class CloudKitRetryService {
         throw lastError ?? CKError(.networkFailure)
     }
 }
+
+// MARK: - CKError Extension
+
+extension CKError {
+    /// Determine if error is retryable
+    var isRetryable: Bool {
+        switch code {
+        case .networkFailure, .networkUnavailable, .serviceUnavailable, .requestRateLimited, .zoneBusy:
+            return true
+        default:
+            return false
+        }
+    }
+}

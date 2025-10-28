@@ -22,7 +22,7 @@ struct HelpView: View {
 
     init(documentationURL: URL? = nil) {
         // Default to production URL (or local build for development)
-        self.documentationURL = documentationURL ?? URL(string: "https://carekeeper-docs.pages.dev")!
+        self.documentationURL = documentationURL ?? URL(string: "https://carekeeper.pages.dev")!
     }
 
     var body: some View {

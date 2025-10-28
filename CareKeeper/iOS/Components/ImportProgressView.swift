@@ -1,6 +1,5 @@
 import SwiftUI
 
-#if os(iOS)
 /// Simple progress view for import operations
 struct ImportProgressView: View {
     let progress: ImportProgress
@@ -24,4 +23,3 @@ struct ImportProgressView: View {
 #Preview {
     ImportProgressView(progress: .importing(current: 50, total: 100))
 }
-#endif

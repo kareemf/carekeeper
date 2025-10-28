@@ -1,4 +1,3 @@
-#if os(iOS)
 import SwiftUI
 import CloudKit
 import UIKit
@@ -59,4 +58,3 @@ struct CloudSharingView: UIViewControllerRepresentable {
         }
     }
 }
-#endif

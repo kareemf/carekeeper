@@ -1,3 +1,4 @@
+<!-- TODO: replace with initial proposal -->
 # Setting Up a Feeding Tracker
 
 In this tutorial, you'll create custom activity types to track feeding for your caree. This is a practical example that demonstrates CareKeeper's flexible tracking system.

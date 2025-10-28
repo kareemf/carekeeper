@@ -1233,20 +1233,6 @@ class CloudKitDataService: ObservableObject {
     }
 }
 
-// MARK: - CKError Extension
-
-extension CKError {
-    /// Determine if error is retryable
-    var isRetryable: Bool {
-        switch code {
-        case .networkFailure, .networkUnavailable, .serviceUnavailable, .requestRateLimited, .zoneBusy:
-            return true
-        default:
-            return false
-        }
-    }
-}
-
 // MARK: - Data Service Errors
 
 enum DataServiceError: LocalizedError {

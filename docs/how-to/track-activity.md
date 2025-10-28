@@ -5,17 +5,19 @@ This guide covers all the ways to track activities in CareKeeper, from simple on
 ## Quick Steps (iPhone)
 
 1. Open your caree's detail view
-2. Tap an activity type
-3. Adjust quantity/time if needed
-4. Tap **Save**
+2. Tap Track Activity
+3. Tap an activity type
+4. Adjust quantity/time if needed
+5. Tap **Save**
 
 ## Quick Steps (Watch)
 
 1. Open CareKeeper on your watch
 2. Tap your caree
-3. Tap an activity type button
-4. Adjust quantity with Digital Crown if needed
-5. Tap **Save** or press crown
+3. Tap Track Activity
+4. Tap an activity type button
+5. Adjust quantity with Digital Crown if needed
+6. Tap **Save** or press crown
 
 ## Tracking on iPhone
 
@@ -38,10 +40,9 @@ For simple tracking like diaper changes or naps:
 For tracking amounts (feeding, medication, etc.):
 
 1. Tap the activity type (e.g., "Bottle")
-2. The **Quantity** field is pre-filled with 0 or the last value
-3. Tap the quantity field and enter the amount using the number pad
-4. The unit is shown automatically (e.g., "oz")
-5. Tap **Save**
+2. Tap the quantity field and enter the amount using the number pad
+3. The unit is shown automatically (e.g., "oz")
+4. Tap **Save**
 
 [SCREENSHOT: Quantity entry with number pad]
 
@@ -62,6 +63,9 @@ For activities with location tracking enabled:
 
 !!! note "Location Permission"
     CareKeeper needs location permission to capture locations. Grant permission in Settings > CareKeeper > Location if prompted.
+
+!!! warning "Location Capture After Granting Permission"
+Location may not be captured immediately after granting location permissions. Toggle the location toggle off and back on again. On a phone, you should see lat and long coordinates. On a watch, you should see “Location captured” or a similar message 
 
 ### Customizing Date and Time
 

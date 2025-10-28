@@ -15,7 +15,7 @@ echo -e "${GREEN}CareKeeper Screenshot Capture Helper${NC}\n"
 # Configuration
 SCREENSHOTS_DIR="docs/images/screenshots"
 DATE=$(date +"%Y%m%d_%H%M%S")
-DEFAULT_DEVICE="iPhone 16 Pro"
+DEFAULT_DEVICE="17 pro w/ watch"
 
 # Create screenshots directory if it doesn't exist
 mkdir -p "$SCREENSHOTS_DIR"

@@ -26,9 +26,7 @@ Activity types are the building blocks of tracking in CareKeeper. This guide cov
 3. Keep it short for better display on watch
 
 !!! tip "Naming Best Practices"
-    - Use clear, specific names ("Amoxicillin" vs "Medicine")
     - Keep under 20 characters for watch compatibility
-    - Use consistent naming patterns ("Bottle", "Nursing", not "Fed bottle")
 
 ### Select an Icon
 
@@ -44,7 +42,6 @@ Icons help you quickly identify activity types. You can use:
 #### SF Symbols
 1. Tap the **Icon** field
 2. Type an SF Symbol name (e.g., "pill.fill", "figure.walk")
-3. The symbol appears in the preview
 
 [SCREENSHOT: SF Symbol selection]
 
@@ -88,18 +85,8 @@ Enable this to record where activities occurred:
 
 [SCREENSHOT: Location toggle and permission request]
 
-#### When to Use Location Tracking
-
-**Useful for:**
-- Walks (track your walking route)
-- Outdoor activities (playground visits, park time)
-- Travel (medical appointments, day trips)
-- Multi-location care (daycare drop-off/pickup)
-
-**Not useful for:**
-- Home activities (feeding, diaper changes, naps)
-- Medication at fixed locations
-- Routine daily tasks
+!!! note "Single point locations"
+   - Locations are stored as a single point rather than a route/trail
 
 !!! warning "Privacy Note"
     Locations are synced via iCloud and visible to anyone you share the caree with. Only enable for activity types where location adds value.

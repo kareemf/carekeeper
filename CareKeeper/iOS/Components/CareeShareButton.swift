@@ -1,4 +1,3 @@
-#if os(iOS)
 import SwiftUI
 import SwiftData
 import CloudKit
@@ -114,4 +113,3 @@ struct CareeShareButton: View {
     CareeShareButton(caree: PreviewData.sampleCaree, isSynced: true, isMyCaree: true)
         .modelContainer(PreviewContainer.shared)
 }
-#endif

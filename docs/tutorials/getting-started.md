@@ -14,13 +14,14 @@ By the end of this tutorial, you'll know how to:
 ## Prerequisites
 
 - iPhone running iOS 18.0 or later
-- Apple Watch running watchOS 10.0 or later (optional but recommended)
+- Optional but recommended: Apple Watch running watchOS 10.0 or later
 - iCloud account signed in
 
 ## Step 1: Install CareKeeper
 
 ### On iPhone
 
+<!-- TODO: Test Flight -->
 1. Open the App Store on your iPhone
 2. Search for "CareKeeper"
 3. Tap **Get** or the download button
@@ -79,8 +80,9 @@ CareKeeper uses iCloud to sync your data across devices and enable sharing:
 The iPhone app has three main areas:
 
 1. **Carees Tab**: View and manage care recipients
-2. **Settings**: Configure app preferences and view sync status
-3. **Activity Lists**: View activities for each caree
+<!-- 2. TODO: remove Settings -->
+3. **Settings**: Configure app preferences and view sync status
+4. **Activity Lists**: View activities for each caree
 
 [SCREENSHOT: iPhone app main interface with labeled areas]
 
