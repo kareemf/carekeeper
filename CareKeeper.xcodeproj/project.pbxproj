@@ -21,6 +21,7 @@
 		1C40B2F36B2FEF8D200C1D6A /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F445F3809EAF0F93A2583BD1 /* LocationManager.swift */; };
 		1E1D24785B986643846FAF0A /* CloudKitRetryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2965CC30AD13A51A100D45F /* CloudKitRetryService.swift */; };
 		2AE6F0B5667E58000BF31695 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A8D35563F0827622269172EA /* Assets.xcassets */; };
+		2BF1D1726E96E5DEB843604A /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A15DD7991742E0B0DA3CCA2 /* WebKit.framework */; };
 		2DC6ED05DA7EE5485FFE7312 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B487DA5E1F85ECB1C6B6FA7 /* AppLogger.swift */; };
 		32264FE6CCB02AB8753A9ED0 /* LocalCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B75FFD77DA56F8E53AF30E4 /* LocalCacheService.swift */; };
 		331480192628E58BC1A5FE92 /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8A9109CFC17794F75FB515 /* PreviewContainer.swift */; };
@@ -247,6 +248,7 @@
 		83E47FB3CDD0A1400A3E550B /* ActivityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityType.swift; sourceTree = "<group>"; };
 		84796E5CF92AEDF6DD4E92AA /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
 		88D9EC2B1F9A2FB0F13364A2 /* CareKeeper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CareKeeper.entitlements; sourceTree = "<group>"; };
+		8A15DD7991742E0B0DA3CCA2 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = WebKit.framework; sourceTree = "<group>"; };
 		8B8A9109CFC17794F75FB515 /* PreviewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewContainer.swift; sourceTree = "<group>"; };
 		96DD08EE9F0AB3DDD6B40B30 /* ActivityTypeIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeIconView.swift; sourceTree = "<group>"; };
 		97C3E57DFB34FB3E1A7DDCFA /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
@@ -284,6 +286,17 @@
 		FF35B00333E669D852B2B9BF /* CareKeeper Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeper Watch App.entitlements"; sourceTree = "<group>"; };
 		FFF8AB3750E092280F6B93E1 /* CareKeeperWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWatchApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F627708F8CB4C169D1B1A37F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2BF1D1726E96E5DEB843604A /* WebKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		155787F01B7FE1B61FA4205B /* CareKeeperTests */ = {
@@ -353,6 +366,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		5034B15A8E8B43E2FC9E6480 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8A15DD7991742E0B0DA3CCA2 /* WebKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		569CE10ABF0C6E70183E104B /* Activity */ = {
 			isa = PBXGroup;
 			children = (
@@ -398,6 +419,7 @@
 				5E724EF99C343B475B10F3B8 /* Models */,
 				90B165AE3BB97E0ADADD835D /* Preview */,
 				E6352C74DEDBD820A1B6402D /* Services */,
+				5034B15A8E8B43E2FC9E6480 /* Frameworks */,
 				4F693B2665B385AFBE2F92C7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -582,6 +604,7 @@
 			buildPhases = (
 				8B0C51C0B9B73D363E32B729 /* Sources */,
 				AE830C89523195A05968E3CF /* Resources */,
+				F627708F8CB4C169D1B1A37F /* Frameworks */,
 				9B1C309C0CDB21D49399FD23 /* Embed Watch Content */,
 			);
 			buildRules = (
@@ -1091,6 +1114,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\".\"",
+				);
 				INFOPLIST_FILE = CareKeeper/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1214,6 +1241,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\".\"",
+				);
 				INFOPLIST_FILE = CareKeeper/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (

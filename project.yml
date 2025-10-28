@@ -23,6 +23,8 @@ targets:
           - "*.md"
     dependencies:
       - target: CareKeeper Watch App
+      - framework: WebKit.framework
+        embed: false
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeper
