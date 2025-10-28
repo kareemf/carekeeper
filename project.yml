@@ -21,6 +21,7 @@ targets:
       - path: CareKeeper/iOS
       - path: CareKeeper/Shared
       - path: CareKeeper/Preview
+      - path: CareKeeper/Assets.xcassets
     dependencies:
       - target: CareKeeper Watch App
       - framework: WebKit.framework
@@ -43,6 +44,7 @@ targets:
       path: CareKeeper/Info.plist
       properties:
         CFBundleDisplayName: "CareKeeper"
+        CFBundleIconName: AppIcon
         LSRequiresIPhoneOS: true
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: true
