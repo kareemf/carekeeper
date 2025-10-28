@@ -32,12 +32,10 @@ For simple tracking like diaper changes or naps:
 
 [SCREENSHOT: Simple activity tracking form]
 
-!!! success "Instant Tracking"
-    For activities without quantity or location, you can track in just 2 taps!
 
 ### Activity with Quantity
 
-For tracking amounts (feeding, medication, etc.):
+For tracking amounts (feeding, water, etc.):
 
 1. Tap the activity type (e.g., "Bottle")
 2. Tap the quantity field and enter the amount using the number pad
@@ -91,15 +89,12 @@ Notes let you record additional details:
 1. Fill in the activity as normal
 2. Tap the **Notes** field
 3. Type any relevant information:
-   - "Took bottle eagerly"
-   - "Some spit-up after feeding"
-   - "Slept through the night!"
 4. Tap **Save**
 
 [SCREENSHOT: Notes field with keyboard]
 
 !!! tip "Notes Are Optional"
-    Only add notes when you have something worth recording. Most activities don't need notes.
+    Try to structure your Activity Types so that most activities don't need notes (info captured in activity type name)
 
 ## Tracking on Apple Watch
 
@@ -156,6 +151,9 @@ By default, activities are tracked at the current time. To change:
 
 [SCREENSHOT: Watch custom time selection]
 
+!!! tip "Make sure time input is selected"
+    When you are setting both a quantity and a custom time, tap the time input to make sure it is selected. Otherwise, you may accidentally adjust the quantity instead.
+
 ## Viewing Tracked Activities
 
 ### On iPhone
@@ -185,13 +183,13 @@ By default, activities are tracked at the current time. To change:
 
 ## Editing Activities
 
-Made a mistake? You can edit activities after tracking:
+You can edit activities after tracking:
 
 ### On iPhone
 
 1. Open the activity list
-2. Swipe left on the activity
-3. Tap **Edit**
+2. Tap on the activity
+3. Tap **Edit** from the toolbar
 4. Modify quantity, time, notes, or location
 5. Tap **Save**
 
@@ -235,8 +233,6 @@ Alternatively:
 
 [SCREENSHOT: Watch delete confirmation]
 
-## Troubleshooting
-
 ### Location Not Capturing
 - Check that location permission is granted in Settings
 - Make sure you're not in airplane mode
@@ -268,8 +264,6 @@ For more help, see the [Troubleshooting Guide](../reference/troubleshooting.md).
 
 ### Accuracy Tips
 - Use custom time for activities you forgot to track
-- Double-check quantities before saving
-- Review recent activities to catch mistakes
 
 ### Efficiency Tips
 - Reorder activity types to put frequent ones first

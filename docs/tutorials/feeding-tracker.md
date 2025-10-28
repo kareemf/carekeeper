@@ -1,6 +1,6 @@
 # Setting Up a Feeding Tracker
 
-In this tutorial, you'll create custom activity types to track feeding for your caree. This is a practical example that demonstrates CareKeeper's flexible tracking system.
+In this tutorial, you'll learn how to create custom activity types to track feeding for your caree. This is a practical example that demonstrates CareKeeper's flexible tracking system.
 
 ## What You'll Learn
 
@@ -16,10 +16,12 @@ In this tutorial, you'll create custom activity types to track feeding for your 
 
 ## Scenario
 
-You're tracking feeding for a baby named Emma. You want to record:
+You're tracking feeding for a baby. You may want to record things like:
 - Bottle feeding with quantity in ounces
 - Nursing (left/right side)
 - Solid foods
+
+This tutorial will focus on the bottle feeding setup.
 
 ## Approach 1: Simple Setup (One Activity Type)
 
@@ -48,20 +50,22 @@ Pros:
 - Quick to set up
 
 Cons:
-- Requires typing on Apple Watch (awkward)
+- Requires typing when using Apple Watch
 - Can't quickly see breakdown by type
-- Notes not required, easy to forget
+- Since notes are not a required field, its easy to forget
+  - ...but you can always edit to add them later on either the phone or watch
 
 ## Approach 2: Granular Setup (Multiple Activity Types)
 
-**Best for:** Heavy Apple Watch usage or wanting type-specific analytics
+**Best for:** Apple Watch usage or wanting type-specific analytics
 
 ### Setup
 
 Create separate activity types for each feeding type:
 - Bottle - Formula (with quantity)
-- Bottle - Fresh (with quantity)
+- Bottle - Pumped (with quantity)
 - Bottle - Frozen (with quantity)
+
 [SCREENSHOT: Three activity types listed]
 
 ### Logging an Activity
@@ -94,8 +98,9 @@ You can combine both:
 The watch app makes tracking even faster:
 
 1. Open CareKeeper on your Apple Watch
-2. Tap on your caree (e.g., "Emma")
-3. You'll see all activity types as large buttons
+2. Tap on your caree
+3. Tap Track 
+4. You'll see all activity types as large buttons
 
 [SCREENSHOT: Watch showing activity type buttons]
 
@@ -136,8 +141,8 @@ To see all activities for a caree:
 ### Activity List Features
 
 - **Filter by type**: Tap the filter button to show only specific activity types
-- **Edit**: Swipe left on an activity to edit or delete
-- **Details**: Tap an activity to see full details and notes
+- **Delete**: Swipe left on an activity to delete
+- **Details**: Tap an activity to see and/or edit full details and notes
 
 [SCREENSHOT: Filtered activity list and swipe actions]
 
@@ -174,12 +179,6 @@ Now you know how to:
 - Open the CareKeeper watch app and wait a few seconds for sync
 - Try force-quitting and reopening the watch app
 - Check that your watch is connected to your iPhone
-
-### "Cannot Enter Quantity"
-- Make sure "Has Quantity" is enabled for that activity type
-- Edit the activity type to enable quantity tracking
-
-For more help, see the [Troubleshooting Guide](../reference/troubleshooting.md).
 
 ---
 

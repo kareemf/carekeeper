@@ -31,7 +31,7 @@ CareKeeper installs automatically on your Apple Watch when you install it on you
 [SCREENSHOT: First launch sync screen]
 
 !!! note "Initial Sync"
-    The first launch may take 5-10 seconds to sync carees and activity types from your iPhone. Subsequent launches are instant.
+    The first launch may take a few seconds to a few minutes (if you have a lot of data owned or shared) to sync carees and activity types from your iPhone. Subsequent launches should be instant.
 
 ## Navigating the Watch App
 
@@ -77,7 +77,7 @@ For activities without quantity (diaper changes, naps, etc.):
 
 ### Tracking with Quantity
 
-For activities with quantity (feeding, medication, etc.):
+For activities with quantity (feeding, water, etc.):
 
 1. Tap your caree
 2. Tap the activity type button
@@ -115,7 +115,7 @@ By default, activities are tracked at "Now". To change the time:
 
 From the caree detail screen:
 
-1. Scroll down past activity type buttons
+1. Scroll down past the "Track" type button
 2. Tap **Activities**
 3. Recent activities appear in reverse chronological order
 
@@ -161,9 +161,6 @@ To filter by activity type:
 
 [SCREENSHOT: Watch edit activity screen]
 
-!!! note "Notes on Watch"
-    You cannot edit notes on the watch (keyboard limitation). Edit notes on iPhone if needed.
-
 ### Delete Activity
 
 1. Open activity list
@@ -178,7 +175,7 @@ To filter by activity type:
 
 Add CareKeeper to your watch face for instant access:
 
-### Adding a Complication
+### Adding a Complication to Your Watch Face (Quick Launch)
 
 1. Press and hold your watch face
 2. Tap **Edit**
@@ -189,76 +186,6 @@ Add CareKeeper to your watch face for instant access:
 7. Press Digital Crown to save
 
 [SCREENSHOT: Watch face editing with CareKeeper complication]
-
-### Complication Styles
-
-CareKeeper supports multiple complication families:
-
-**Circular**:
-- Shows today's activity count
-- Tap to open app
-
-[SCREENSHOT: Circular complication]
-
-**Rectangular**:
-- Shows "X activities today"
-- Larger text, easier to read
-
-[SCREENSHOT: Rectangular complication]
-
-**Inline**:
-- Minimalist text: "CareKeeper: 5"
-- Good for watch faces with limited space
-
-[SCREENSHOT: Inline complication]
-
-**Corner**:
-- Small icon with activity count
-- Fits in corner slots on some faces
-
-[SCREENSHOT: Corner complication]
-
-!!! tip "Activity Count"
-    Complications update every 15 minutes to show your activity count for today.
-
-## Best Practices
-
-### When to Use Watch vs iPhone
-
-**Use Watch For:**
-- ⌚ Quick tracking (feeding, diaper, sleep)
-- 💪 Hands-full situations (holding baby, cooking)
-- 🏃 On the go (walking dog, at playground)
-- 📊 Checking recent activities
-- ⚡ Speed (2-second tracking)
-
-**Use iPhone For:**
-- 📝 Adding detailed notes
-- 🖼️ Managing carees (create, edit, delete)
-- 🎨 Creating activity types
-- 📤 Sharing carees
-- 📊 Viewing full activity history
-- ✏️ Editing multiple fields at once
-
-### Tracking Tips
-
-**Efficiency:**
-- Use complications for instant app access
-- Memorize your caree's position in the list
-- Put frequent activity types first
-- Track immediately (don't wait to "remember later")
-
-**Accuracy:**
-- Double-check quantity before saving
-- Use custom time for forgotten activities
-- Review recent activities to catch mistakes
-
-**Battery Life:**
-- Watch app is lightweight and battery-efficient
-- Syncing happens in background
-- No significant battery impact from normal use
-
-## Troubleshooting
 
 ### Carees Not Appearing
 **Solutions:**
@@ -273,28 +200,6 @@ CareKeeper supports multiple complication families:
 - Check sync status on iPhone app
 - Pull down to refresh on iPhone
 - Wait a few seconds for iCloud sync
-
-### Cannot Adjust Quantity
-**Solutions:**
-- Make sure you're turning the Digital Crown
-- Try tapping the quantity field first
-- Check that activity type has quantity enabled
-
-### Watch App Slow or Laggy
-**Solutions:**
-- Force quit and reopen (hold side button, swipe to CareKeeper, swipe right to close)
-- Restart Apple Watch
-- Check available storage on watch
-- Reduce number of activity types if possible
-
-### Complication Not Updating
-**Solutions:**
-- Complications update every 15 minutes (Apple limitation)
-- Try removing and re-adding the complication
-- Check that CareKeeper has background refresh enabled
-
-For more help, see the [Troubleshooting Guide](../reference/troubleshooting.md).
-
 ## Advanced Features
 
 ### Haptic Feedback
@@ -316,7 +221,6 @@ Activities sync in the background:
 The watch app is optimized for memory:
 - Loads activities on demand
 - Caches recently accessed data
-- Clears cache automatically when needed
 
 !!! note "48-Hour Window"
     For performance, the watch app shows activities from the last 48 hours. View full history on iPhone.
@@ -325,4 +229,3 @@ The watch app is optimized for memory:
 
 - [How to Track an Activity](track-activity.md)
 - [How to Create an Activity Type](create-activity-type.md)
-- [Features Reference](../reference/features.md)

@@ -99,50 +99,33 @@ In this tutorial, you'll learn how to create your first caree and understand how
 
 If you have multiple carees, you can change their order:
 
-1. In the Carees list, tap **Edit**
-2. Drag the ☰ handle next to each caree
+1. In the Carees list, tap and hold on a caree until it starts to hover 
+2. Drag it to the new desired position
 3. Drop to reorder
-4. Tap **Done**
+
+!!! tip "Reordering lists"
+    You can reorder both the Carees and Activity Types lists
+
+!!! tip "Pull-to-refresh lists"
+    Most views in the app support pull-to-refresh to fetch latest data and refresh cache
 
 [SCREENSHOT: Reordering carees with drag handles]
-
-## Multiple Carees
-
-You can create as many carees as you need:
-
-- **Newborn twins**: Create separate carees for each baby to track individually
-- **Pets**: Create a caree for each pet
-- **Family care**: Create carees for multiple family members
-
-!!! example "Real-World Examples"
-    - **Day care provider**: Create carees for each child in your care
-    - **Pet sitter**: Create carees for each pet you're watching
-    - **Family caregiver**: Create carees for yourself, your partner, and any children
-
-[SCREENSHOT: List showing multiple carees]
 
 ## What's Next?
 
 Now that you have a caree, you're ready to:
 
-1. **Create activity types**: Define what activities you want to track (feeding, diaper changes, medications, etc.)
+1. **Create activity types**: Define what activities you want to track (feeding, diaper changes, sleep, etc.)
 2. **Start tracking**: Log your first activity
 
 Continue to the next tutorial: [Setting Up a Feeding Tracker →](feeding-tracker.md)
 
 ## Troubleshooting
 
-### "Cannot Save Caree"
-- Make sure the name field is not empty
-- Check that you have an internet connection for iCloud sync
-- Try force-closing and reopening the app
-
 ### Caree Not Appearing on Watch
 - Open the CareKeeper watch app (it may need to launch once to sync)
 - Wait a few seconds for iCloud sync to complete
 - Try pulling down to refresh on the watch
-
-For more help, see the [Troubleshooting Guide](../reference/troubleshooting.md).
 
 ---
 

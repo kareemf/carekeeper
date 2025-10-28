@@ -184,9 +184,9 @@ Only the owner can:
 - ✅ Activities relevant to ongoing care
 
 **Think carefully before sharing:**
-- 🤔 Carees with sensitive medical data
+- 🤔 Carees with sensitive data
 - 🤔 Activities with private notes
-- 🤔 Carees you're tracking for yourself (medication, symptoms)
+- 🤔 Carees you're tracking for yourself (personal habits, sleep patterns)
 
 **Don't share:**
 - ❌ Carees with people who don't need access

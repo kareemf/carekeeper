@@ -51,13 +51,6 @@ You can share via:
 
 [SCREENSHOT: Share via Messages]
 
-#### Mail
-1. Tap the **Mail** icon
-2. Enter the recipient's email
-3. Tap **Send**
-
-[SCREENSHOT: Share via Mail]
-
 #### Copy Link
 1. Tap **Copy Link**
 2. Paste the link in any app (WhatsApp, Slack, etc.)
@@ -204,40 +197,6 @@ You won't be notified about:
 **Global Settings**:
 - Turn off all notifications in iOS Settings > CareKeeper > Notifications
 
-## Troubleshooting Sharing
-
-### "Cannot Share"
-**Possible causes:**
-- Not signed into iCloud
-- No internet connection
-- Not the owner of the caree
-
-**Solutions:**
-1. Check iCloud sign-in: Settings > [Your Name]
-2. Check internet connection
-3. Verify you created this caree
-
-### "Share Link Not Working"
-**Solutions:**
-- Make sure recipient is signed into iCloud
-- Verify recipient has CareKeeper installed
-- Try sending a new share link
-
-### "Participant Can't See Activities"
-**Solutions:**
-- Check that both devices are connected to internet
-- Pull down to refresh on both devices
-- Wait a few seconds for iCloud sync
-- Check sync status indicator in settings
-
-### "Removed Participant Still Has Access"
-**Solutions:**
-- Removal can take a few minutes to propagate
-- Ask participant to force-quit and reopen CareKeeper
-- Verify removal in share sheet participant list
-
-For more help, see the [Troubleshooting Guide](../reference/troubleshooting.md).
-
 ## Real-World Scenarios
 
 ### Scenario 1: New Parents
@@ -264,13 +223,13 @@ For more help, see the [Troubleshooting Guide](../reference/troubleshooting.md).
 
 **Setup**:
 1. Owner creates caree "Max the Dog"
-2. Creates activity types: Walk, Feed, Water, Medication
+2. Creates activity types: Walk, Feed, Water, Play
 3. Shares with roommates
 4. Everyone tracks walks, feeding, etc.
 
 **Benefits**:
 - Know who walked the dog
-- Don't forget medication schedules
+- Track feeding schedules
 - Fair distribution of care tasks
 
 ### Scenario 3: Day Care Provider
@@ -314,4 +273,3 @@ For more help, see the [Troubleshooting Guide](../reference/troubleshooting.md).
 
 - [Understanding Collaboration](../explanation/collaboration.md)
 - [Security & Privacy](../explanation/security-privacy.md)
-- [Troubleshooting](../reference/troubleshooting.md)

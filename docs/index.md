@@ -55,9 +55,7 @@ New to CareKeeper? Follow these tutorials to get up and running:
 
 ## Need Help?
 
-- **Troubleshooting**: Check the [troubleshooting guide](reference/troubleshooting.md)
 - **FAQ**: Browse [frequently asked questions](reference/faq.md)
-- **Features**: See the [complete feature reference](reference/features.md)
 
 ## About CareKeeper
 
@@ -69,6 +67,7 @@ Have you ever asked yourself (or out loud) things like
  These are the types of questions we sometimes need to be ask/answer in the wee hours of the morning, when we're low on sleep and have a newborn/infant crying or on the verge thereof.
 
  If 
+ 
  * These questions resonate with you
  * You find it unreliable to commit the answers to memory
  * You find it is not always feasible to whip out a phone or paper notes to jot down the answers

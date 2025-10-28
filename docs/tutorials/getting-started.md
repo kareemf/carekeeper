@@ -20,10 +20,9 @@ By the end of this tutorial, you'll know how to:
 
 ### On iPhone
 
-<!-- TODO: Test Flight -->
 1. Open the App Store on your iPhone
 2. ~~Search for "CareKeeper"~~
-3. ~Search for "Test Flight" 
+3. Search for "Test Flight" 
 4. Tap **Get** or the download button
 5. Authenticate with your iCloud account
 6. Wait for the app to install
@@ -88,7 +87,7 @@ Each caree can have multiple activity types.
 An **activity type** is a category of activity you want to track. Examples:
 - Feeding (with quantity in oz/ml)
 - Diaper change
-- Medication (with dosage)
+- Bottle feeding (with volume)
 - Walk (with location)
 
 Activity types are customizable with:
@@ -100,7 +99,7 @@ Activity types are customizable with:
 An **activity** is a single instance of tracking. Examples:
 - "Fed 4 oz at 2:30 PM"
 - "Changed diaper at 3:15 PM"
-- "Gave medication 5mg at 8:00 AM"
+- "Bottle fed 4oz at 8:00 AM"
 
 ## Next Steps
 
@@ -108,23 +107,6 @@ Now that you understand the basics, you're ready to:
 
 1. [Create your first caree →](first-caree.md)
 2. [Set up activity tracking →](feeding-tracker.md)
-
-## Troubleshooting
-
-### "Cannot Connect to iCloud"
-Make sure you're signed into iCloud on your device:
-1. Go to Settings
-2. Tap your name at the top
-3. Tap iCloud
-4. Make sure iCloud Drive is enabled
-
-### "Sync Failed"
-Try these steps:
-1. Check your internet connection
-2. Pull down to refresh the caree list
-3. Tap the retry button in the sync status indicator
-
-For more help, see the [Troubleshooting Guide](../reference/troubleshooting.md).
 
 ---
 

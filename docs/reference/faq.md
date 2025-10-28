@@ -6,7 +6,7 @@ Common questions about CareKeeper, organized by topic.
 
 ### What is CareKeeper?
 
-CareKeeper is a fast, collaborative activity tracking app for iOS and watchOS. It helps multiple caregivers coordinate care for children, pets, or anyone who needs support by tracking activities like feeding, medications, sleep, and more.
+CareKeeper is a fast, collaborative activity tracking app for iOS and watchOS. It helps multiple caregivers coordinate care for children, pets, or anyone who needs support by tracking activities like feeding, sleep, and more.
 
 ---
 
@@ -406,11 +406,9 @@ This is useful for:
 
 ---
 
-## Troubleshooting
+## Support
 
 ### Why aren't my activities syncing?
-
-See the [Troubleshooting Guide](troubleshooting.md#data-not-syncing-between-devices) for detailed solutions.
 
 **Quick fixes:**
 1. Check internet connection
@@ -421,8 +419,6 @@ See the [Troubleshooting Guide](troubleshooting.md#data-not-syncing-between-devi
 ---
 
 ### Why can't I share a caree?
-
-See the [Troubleshooting Guide](troubleshooting.md#cannot-share-caree).
 
 **Common causes:**
 - Not the owner (participants can't share)
@@ -435,8 +431,7 @@ See the [Troubleshooting Guide](troubleshooting.md#cannot-share-caree).
 
 **Before contacting support:**
 1. Check this FAQ
-2. Read the [Troubleshooting Guide](troubleshooting.md)
-3. Export your data (Settings > Export Data) as backup
+2. Export your data (Settings > Export Data) as backup
 
 **Contact methods:**
 - 📧 Email: [support email when available]
@@ -543,8 +538,6 @@ No firm timeline yet.
 **Documentation:**
 - [Getting Started Tutorial](../tutorials/getting-started.md)
 - [How-To Guides](../how-to/track-activity.md)
-- [Feature Reference](features.md)
-- [Troubleshooting](troubleshooting.md)
 
 **Support:**
 - Email: [when available]

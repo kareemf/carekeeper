@@ -81,14 +81,6 @@ Choose from these options:
 
 [SCREENSHOT: Save to Files interface]
 
-#### Share via Email
-1. Tap **Mail**
-2. Enter recipient email
-3. Add subject/message if desired
-4. Tap **Send**
-
-[SCREENSHOT: Email with JSON attachment]
-
 #### AirDrop
 1. Tap **AirDrop**
 2. Select the receiving device
@@ -171,10 +163,10 @@ CareKeeper exports data as JSON (JavaScript Object Notation)—a standard, human
 ### What's NOT Included
 
 The following are not included in exports:
-- ❌ CloudKit sharing metadata (participant lists, share IDs)
-- ❌ Sync status information
-- ❌ User notification preferences
-- ❌ Other users' carees (only your own)
+- CloudKit sharing metadata (participant lists, share IDs)
+- Sync status information
+- User notification preferences
+- Other users' carees (only your own)
 
 ## Using Exported Data
 
@@ -268,51 +260,6 @@ To restore a previous export:
 
 [SCREENSHOT: Import data option in settings]
 
-!!! warning "Duplicate Handling"
-    CareKeeper uses UUIDs to detect duplicates. Importing the same file twice won't create duplicates—it will skip existing records.
-
-### Merge vs Replace
-
-When importing:
-
-**Merge** (default):
-- Keeps existing data
-- Adds new data from import
-- Skips duplicates based on ID
-
-**Replace** (optional):
-- Deletes existing data
-- Replaces with import data
-- Use carefully!
-
-[SCREENSHOT: Import options with merge/replace]
-
-## Troubleshooting
-
-### Export Button Not Responding
-- Wait a few seconds (app may be syncing)
-- Force close and reopen CareKeeper
-- Check available storage space
-- Try exporting one caree at a time
-
-### Export File Too Large
-- Export carees individually instead of all at once
-- Delete old activities you don't need before exporting
-- Compress the JSON file (zip) before sharing
-
-### Cannot Open JSON File
-- JSON files are text files—open with any text editor
-- Use TextEdit (Mac), Notepad (Windows), or VS Code
-- Verify file wasn't corrupted during transfer
-
-### Import Failed
-- Check JSON file is valid (use [JSONLint](https://jsonlint.com))
-- Make sure file is a CareKeeper export (not modified)
-- Try importing smaller portions
-- Check CareKeeper version compatibility
-
-For more help, see the [Troubleshooting Guide](../reference/troubleshooting.md).
-
 ## Privacy & Security
 
 ### Data Privacy
@@ -326,33 +273,8 @@ For more help, see the [Troubleshooting Guide](../reference/troubleshooting.md).
 - If sharing via email/cloud, consider encrypting the file
 - iOS Files app supports encryption via zip with password
 
-### GDPR & Data Rights
-Under data protection laws, you have the right to:
-- ✅ Export your data (this feature)
-- ✅ Delete your data (delete carees in app)
-- ✅ Control who accesses your data (sharing controls)
-
-## Best Practices
-
-### Regular Backups
-- 📅 Export monthly for ongoing tracking
-- 💾 Save to multiple locations
-- 🏷️ Name files with dates: `CareKeeper_2024-10.json`
-
-### Before Major Changes
-Export before:
-- Deleting a caree
-- Uninstalling CareKeeper
-- Sharing with new participants
-- iOS device upgrades
-
-### Data Retention
-- Keep exports for as long as relevant (medical records: years, pet care: months)
-- Delete sensitive data when no longer needed
-- Follow your local data retention laws
 
 ## Related Guides
 
 - [Understanding Security & Privacy](../explanation/security-privacy.md)
-- [Troubleshooting](../reference/troubleshooting.md)
 - [FAQ](../reference/faq.md)

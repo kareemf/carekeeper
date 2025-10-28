@@ -22,7 +22,7 @@ Activity types are the building blocks of tracking in CareKeeper. This guide cov
 ### Choose a Name
 
 1. Tap the **Name** field
-2. Enter a clear, descriptive name (e.g., "Medication", "Walk", "Playtime")
+2. Enter a clear, descriptive name (e.g., "Feeding", "Walk", "Playtime")
 3. Keep it short for better display on watch
 
 !!! tip "Naming Best Practices"
@@ -35,29 +35,29 @@ Icons help you quickly identify activity types. You can use:
 #### Emojis
 1. Tap the **Icon** field
 2. Your emoji keyboard appears
-3. Select any emoji (🍼, 💊, 🚶, etc.)
+3. Select any emoji (🍼, 😴, 🚶, etc.)
 
 [SCREENSHOT: Emoji picker]
 
 #### SF Symbols
 1. Tap the **Icon** field
-2. Type an SF Symbol name (e.g., "pill.fill", "figure.walk")
+2. Type an SF Symbol name (e.g., "drop.fill", "figure.walk")
 
 [SCREENSHOT: SF Symbol selection]
 
 !!! note "SF Symbols"
     SF Symbols are Apple's icon library. Search for symbols at [sf-symbols.com](https://developer.apple.com/sf-symbols/) or use common names like:
-    - Medical: `pill.fill`, `cross.fill`, `heart.fill`
     - Activity: `figure.walk`, `figure.run`, `sportscourt.fill`
-    - Food: `fork.knife`, `cup.and.saucer.fill`
+    - Food: `fork.knife`, `cup.and.saucer.fill`, `drop.fill`
+    - Sleep: `bed.double.fill`, `moon.fill`
     - General: `checkmark.circle.fill`, `star.fill`
 
 ### Configure Quantity Tracking
 
-Enable this if you want to record amounts (e.g., ounces, doses, minutes):
+Enable this if you want to record amounts (e.g., ounces, milliliters, minutes):
 
 1. Toggle **Has Quantity** to **ON**
-2. Enter a **Unit** (e.g., "oz", "ml", "min", "tablets", "mg")
+2. Enter a **Unit** (e.g., "oz", "ml", "min", "cups")
 3. This unit will appear when tracking activities
 
 [SCREENSHOT: Quantity configuration]
@@ -67,13 +67,13 @@ Enable this if you want to record amounts (e.g., ounces, doses, minutes):
 | Activity Type | Quantity | Unit |
 |--------------|----------|------|
 | Bottle feeding | 3.5 | oz |
-| Medication | 5 | mg |
 | Nursing | 15 | min |
 | Walk | 30 | min |
 | Water | 8 | oz |
+| Sleep | 120 | min |
 
 !!! tip "Decimal Values"
-    Quantities support decimals, so you can track "3.5 oz" or "2.5 tablets" precisely.
+    Quantities support decimals, so you can track "3.5 oz" or "1.5 hours" precisely.
 
 ### Configure Location Tracking
 
@@ -98,8 +98,6 @@ Enable this to record where activities occurred:
 3. The activity type appears in your list
 
 [SCREENSHOT: Saved activity type in list]
-
-## Advanced Options
 
 ### Editing Activity Types
 
@@ -142,17 +140,17 @@ Set the order for easier access:
 
 ## Examples
 
-### Example 1: Medication Tracking
+### Example 1: Bottle Feeding
 
-**Scenario**: Track daily medication with dosage
+**Scenario**: Track bottle feeding with volume
 
-- **Name**: "Amoxicillin"
-- **Icon**: 💊 or "pill.fill"
+- **Name**: "Bottle"
+- **Icon**: 🍼 or "drop.fill"
 - **Has Quantity**: ON
-- **Unit**: "mg"
+- **Unit**: "oz"
 - **Has Location**: OFF
 
-[SCREENSHOT: Medication activity type configuration]
+[SCREENSHOT: Bottle feeding activity type configuration]
 
 ### Example 2: Dog Walking
 
@@ -183,20 +181,7 @@ Set the order for easier access:
 - If using SF Symbol, verify the name is correct
 - Try using an emoji instead for simplicity
 - Leave blank to use default icon
-
-### Cannot Enable Quantity
-- Make sure you're editing (not viewing)
-- Save and try again if toggle is unresponsive
-
-### Activity Type Not Syncing
-- Check internet connection
-- Pull down to refresh on other devices
-- Check sync status in settings
-
-For more help, see the [Troubleshooting Guide](../reference/troubleshooting.md).
-
 ## Related Guides
 
 - [How to Track an Activity](track-activity.md)
 - [How to Use the Watch App](use-watch-app.md)
-- [Understanding the Features](../reference/features.md)

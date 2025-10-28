@@ -275,78 +275,20 @@ Even with trusted participants:
 
 [SCREENSHOT: Day care tracking example]
 
-### Scenario 4: Medication Tracking for Elderly Parent
+### Scenario 4: Pet Care Coordination
 
 **Setup:**
-- Adult child creates caree "Mom"
-- Shares with siblings
-- All track when medication is given
+- Pet owner creates caree "Luna the Cat"
+- Shares with roommates
+- All track feeding, water changes, litter box cleaning
 
 **Usage:**
-- Sibling A gives morning meds
-- Sibling B checks app before visit, sees meds already given
-- Everyone coordinates without phone calls
-- Medical history available for doctor visits
+- Roommate A feeds in morning
+- Roommate B checks app before feeding, sees already fed
+- Everyone coordinates without asking
+- Track patterns for vet visits
 
-[SCREENSHOT: Medication coordination example]
-
-## Troubleshooting Collaboration
-
-### "Others' Activities Not Appearing"
-
-**Check:**
-1. ✅ Internet connection on both devices
-2. ✅ Signed into iCloud on both devices
-3. ✅ Same caree shared (not different caree with same name)
-4. ✅ Pull down to refresh
-5. ✅ Wait 10-15 seconds for sync
-
-**Fix:**
-- Force quit and reopen CareKeeper
-- Check sync status indicator
-- Verify participant is in share list
-
-### "Cannot Edit Shared Activities"
-
-**Possible causes:**
-- ❌ Offline (edits require internet for shared data)
-- ❌ Share was revoked (owner removed you)
-- ❌ iCloud issues (check Settings > iCloud)
-
-**Fix:**
-- Check internet connection
-- Verify you're still in participant list
-- Try editing a different activity
-- Check iCloud status page (apple.com/support/systemstatus)
-
-### "Notifications Not Working"
-
-**Check:**
-1. ✅ Notification permission granted (Settings > CareKeeper > Notifications)
-2. ✅ Notifications enabled globally in CareKeeper settings
-3. ✅ Notifications enabled for specific caree
-4. ✅ Activity was tracked by someone else (not you)
-
-**Fix:**
-- Grant notification permission if denied
-- Check per-caree notification toggle
-- Disable and re-enable notifications
-- Test with another participant
-
-### "Participant Can't Accept Share"
-
-**Possible causes:**
-- ❌ Not signed into iCloud
-- ❌ CareKeeper not installed
-- ❌ Share link expired (rare)
-
-**Fix:**
-- Verify iCloud sign-in
-- Install CareKeeper first
-- Send new share link
-- Try different sharing method (Messages vs Mail)
-
-For more help, see the [Troubleshooting Guide](../reference/troubleshooting.md).
+[SCREENSHOT: Pet care coordination example]
 
 ## Advanced Topics
 
@@ -400,5 +342,4 @@ This architecture provides both speed and reliability.
 
 - [How to Share a Caree](../how-to/share-caree.md)
 - [Security & Privacy](security-privacy.md)
-- [Troubleshooting](../reference/troubleshooting.md)
 - [FAQ](../reference/faq.md)
