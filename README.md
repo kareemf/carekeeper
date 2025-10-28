@@ -1,6 +1,6 @@
 # CareKeeper
 
-A simple yet flexible collaborative activity tracking app for caregivers on iOS with watchOS companion app. Built with SwiftUI and SwiftData, featuring CloudKit integration for sharing across devices and between multiple caregivers.
+A simple yet flexible collaborative activity tracking app for caregivers on iOS and watchOS. Built with SwiftUI and SwiftData, featuring CloudKit integration for sharing across devices and between multiple caregivers.
 
 ## Features
 
@@ -303,11 +303,11 @@ CareKeeper includes documentation for both developers and users.
 
 **User Documentation** (powered by MkDocs Material):
 
-The user-facing documentation site includes:
+The user-facing documentation follows the [Diátaxis](https://diataxis.fr) framework. The site includes:
 - **Tutorials**: Step-by-step guides for getting started
 - **How-To Guides**: Task-oriented instructions
 - **Explanations**: Conceptual information about how CareKeeper works
-- **Reference**: Complete feature reference and troubleshooting
+- **Reference**: Feature reference and troubleshooting
 
 **Local Preview**:
 ```bash
@@ -327,6 +327,8 @@ pip3 install -r requirements.txt
 
 # Output in site/ directory
 ```
+
+The results are deployed to Cloudflare Pages
 
 **In-App Documentation**:
 - Access help directly in the app via Menu > Help

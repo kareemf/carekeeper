@@ -35,11 +35,6 @@ In this tutorial, you'll learn how to create your first caree and understand how
 2. Enter the caree's name (e.g., "Emma", "Max the Dog", "Mom")
 3. The name will appear in lists and on the watch app
 
-<!-- TODO: remove tip -->
-!!! tip "Naming Tips"
-    - Use names that are easy to recognize quickly
-    - For multiple pets/children, consider adding an identifier (e.g., "Ella (baby)", "Max (dog)")
-
 [SCREENSHOT: Name field being filled in]
 
 ### Profile Photo (Optional)

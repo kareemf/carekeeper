@@ -98,7 +98,7 @@ plugins:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/your-username
+      link: https://github.com/kareemf
       name: GitHub
 
   version:

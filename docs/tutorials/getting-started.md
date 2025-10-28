@@ -1,7 +1,6 @@
 # Getting Started with CareKeeper
 
-Welcome to CareKeeper! This tutorial will guide you through installing the app and creating your first care tracking setup.
-
+Learn the basics of CareKeeper by creating your first caree and logging your first activity.                                                                                                                                                                                                 
 ## What You'll Learn
 
 By the end of this tutorial, you'll know how to:
@@ -23,10 +22,11 @@ By the end of this tutorial, you'll know how to:
 
 <!-- TODO: Test Flight -->
 1. Open the App Store on your iPhone
-2. Search for "CareKeeper"
-3. Tap **Get** or the download button
-4. Authenticate with Face ID, Touch ID, or your Apple ID password
-5. Wait for the app to install
+2. ~~Search for "CareKeeper"~~
+3. ~Search for "Test Flight" 
+4. Tap **Get** or the download button
+5. Authenticate with your iCloud account
+6. Wait for the app to install
 
 [SCREENSHOT: App Store listing for CareKeeper]
 
@@ -73,29 +73,6 @@ CareKeeper uses iCloud to sync your data across devices and enable sharing:
 !!! warning "iCloud Required"
     CareKeeper requires iCloud to sync data between devices and share with other caregivers. Make sure you're signed into iCloud in Settings > [Your Name] > iCloud.
 
-## Understanding the Interface
-
-### iPhone App
-
-The iPhone app has three main areas:
-
-1. **Carees Tab**: View and manage care recipients
-<!-- 2. TODO: remove Settings -->
-3. **Settings**: Configure app preferences and view sync status
-4. **Activity Lists**: View activities for each caree
-
-[SCREENSHOT: iPhone app main interface with labeled areas]
-
-### Apple Watch App
-
-The watch app focuses on quick activity tracking:
-
-1. **Caree List**: Select who you're tracking for
-2. **Activity Type Buttons**: Tap to quickly log an activity
-3. **Digital Crown**: Adjust quantities and times
-
-[SCREENSHOT: Apple Watch app interface]
-
 ## Core Concepts
 
 Before creating your first caree, let's understand the key concepts:
@@ -104,7 +81,6 @@ Before creating your first caree, let's understand the key concepts:
 A **caree** is the person (or pet!) you're tracking care for. Examples:
 - Your baby
 - Your dog
-- An elderly parent
 
 Each caree can have multiple activity types.
 

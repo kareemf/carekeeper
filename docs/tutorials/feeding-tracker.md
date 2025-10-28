@@ -1,4 +1,3 @@
-<!-- TODO: replace with initial proposal -->
 # Setting Up a Feeding Tracker
 
 In this tutorial, you'll create custom activity types to track feeding for your caree. This is a practical example that demonstrates CareKeeper's flexible tracking system.
@@ -22,119 +21,75 @@ You're tracking feeding for a baby named Emma. You want to record:
 - Nursing (left/right side)
 - Solid foods
 
-Let's create activity types for each!
+## Approach 1: Simple Setup (One Activity Type)
 
-## Step 1: Open Caree Details
+**Best for:** Primary use on iPhone where typing is easy
 
-1. Open CareKeeper on your iPhone
-2. Tap on your caree (e.g., "Emma")
-3. You'll see the caree detail view
+### Setup
 
-[SCREENSHOT: Caree detail view]
+Create a single **"Bottle"** activity type with quantity enabled.
 
-## Step 2: Create "Bottle" Activity Type
+[SCREENSHOT: Single "Bottle" activity type]
 
-1. In the "Activity Types" section, tap **+ Add Activity Type**
-2. You'll see the activity type creation form
+### Logging an Activity
 
-[SCREENSHOT: New activity type form]
+Use the **notes field** to specify the type:
+- "Formula"
+- "Pumped milk"
+- "Donor milk"
+  
+[SCREENSHOT: Track activity with notes field filled]
 
-### Configure Bottle Feeding
+### Pros & Cons
 
-Fill in these fields:
+Pros:
+- Simple, minimal setup
+- All feeding in one list
+- Quick to set up
 
-1. **Name**: "Bottle"
-2. **Icon**: Tap the icon field and choose 🍼 (bottle emoji) or search for "baby.bottle" SF Symbol
-3. **Has Quantity**: Toggle **ON**
-4. **Unit**: "oz" (ounces)
-5. **Has Location**: Toggle **OFF** (not needed for feeding)
+Cons:
+- Requires typing on Apple Watch (awkward)
+- Can't quickly see breakdown by type
+- Notes not required, easy to forget
 
-[SCREENSHOT: Bottle activity type configuration]
+## Approach 2: Granular Setup (Multiple Activity Types)
 
-!!! tip "Quantity Units"
-    You can use any unit that makes sense for your tracking:
-    - Volume: oz, ml, cups
-    - Weight: lbs, kg, g
-    - Time: minutes, hours
-    - Custom: doses, servings, tablets
+**Best for:** Heavy Apple Watch usage or wanting type-specific analytics
 
-### Save the Activity Type
+### Setup
 
-1. Tap **Save** in the top-right corner
-2. "Bottle" appears in your activity types list
-3. You'll see it synced to all your devices
+Create separate activity types for each feeding type:
+- Bottle - Formula (with quantity)
+- Bottle - Fresh (with quantity)
+- Bottle - Frozen (with quantity)
+[SCREENSHOT: Three activity types listed]
 
-[SCREENSHOT: Bottle activity type in list]
+### Logging an Activity
 
-## Step 3: Create "Nursing" Activity Types
+Just tap the appropriate activity type and enter quantity - no typing needed!
+[SCREENSHOT: watchoS showing three buttons, tap → enter quantity → done]
 
-Create two separate activity types for nursing sides:
+### Pros & Cons
 
-### Nursing (Left)
-1. Tap **+ Add Activity Type**
-2. **Name**: "Nursing (Left)"
-3. **Icon**: Choose 🤱 or "l.circle.fill"
-4. **Has Quantity**: Toggle **ON**
-5. **Unit**: "min" (minutes nursed)
-6. Tap **Save**
+Pros:
+- **Perfect for Apple Watch** - no typing required
+- Easy to see breakdown (5 formula, 3 fresh, 2 frozen today)
+- Forces you to specify type (can't forget)
+- Can set different default quantities per type
+ 
+Cons:
+- More initial setup
+- More activity types to scroll through
+- Slightly more taps on iPhone
+- 
 
-### Nursing (Right)
-1. Tap **+ Add Activity Type**
-2. **Name**: "Nursing (Right)"
-3. **Icon**: Choose 🤱 or "r.circle.fill"
-4. **Has Quantity**: Toggle **ON**
-5. **Unit**: "min"
-6. Tap **Save**
+## Hybrid Approach
 
-[SCREENSHOT: Both nursing activity types in list]
+You can combine both:
+- Use granular types for most common actions
+- Add a "Bottle - Other" with notes for rare cases
 
-!!! note "Why Separate Types?"
-    Tracking left and right separately helps identify patterns and ensure balanced feeding.
-
-## Step 4: Create "Solids" Activity Type
-
-For solid food tracking:
-
-1. Tap **+ Add Activity Type**
-2. **Name**: "Solids"
-3. **Icon**: Choose 🥄 (spoon emoji)
-4. **Has Quantity**: Toggle **OFF** (or ON with "servings" if desired)
-5. **Has Location**: Toggle **OFF**
-6. Tap **Save**
-
-[SCREENSHOT: Solids activity type]
-
-## Step 5: Track Your First Activity
-
-Now that you have activity types set up, let's track a feeding:
-
-1. From the caree detail view, tap the **Bottle** activity type
-2. You'll see the "Track Activity" form
-
-[SCREENSHOT: Track activity form for bottle]
-
-### Fill in Activity Details
-
-1. **Quantity**: Enter the amount (e.g., "3.5")
-   - Use the number pad to enter the value
-   - The unit "oz" is shown automatically
-2. **Date/Time**: Defaults to now, or tap to change
-3. **Notes** (optional): Add any relevant notes (e.g., "Took bottle eagerly", "Some spit-up")
-
-[SCREENSHOT: Entering quantity and notes]
-
-### Save the Activity
-
-1. Tap **Save** in the top-right corner
-2. The activity appears in the "Recent Activities" list
-3. You'll see: "Bottle • 3.5 oz • Just now"
-
-[SCREENSHOT: Activity in recent activities list]
-
-!!! success "First Activity Tracked!"
-    Your first activity is now synced to all your devices and visible to any caregivers you've shared this caree with.
-
-## Step 6: Track from Apple Watch
+## Track from Apple Watch
 
 The watch app makes tracking even faster:
 
@@ -148,7 +103,7 @@ The watch app makes tracking even faster:
 
 For activity types without quantity:
 1. Tap the activity type button (e.g., "Solids")
-2. Activity is tracked instantly
+2. Tap "Save". 
 3. You'll see a confirmation checkmark
 
 [SCREENSHOT: Watch confirmation checkmark]
