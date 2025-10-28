@@ -117,6 +117,13 @@ struct CareeListView: View {
             guard !Task.isCancelled else { return }
             await dataProvider.loadCarees(force: true) // Force refresh to remove deleted carees
         }
+        .overlay(alignment: .topTrailing) {
+            if dataProvider.isRefreshingCarees && !dataProvider.carees.isEmpty {
+                ProgressView()
+                    .scaleEffect(0.6)
+                    .padding(8)
+            }
+        }
     }
 
     // MARK: - Data Loading

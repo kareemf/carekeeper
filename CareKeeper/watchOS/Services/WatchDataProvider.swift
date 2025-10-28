@@ -15,13 +15,16 @@ class WatchDataProvider: ObservableObject {
 
     @Published var carees: [CareeSnapshot] = []
     @Published var isLoadingCarees = false
+    @Published var isRefreshingCarees = false
     @Published var careesError: Error?
 
     // Activity types loaded on-demand per caree (not upfront!)
     @Published var activityTypesByCaree: [UUID: [ActivityTypeSnapshot]] = [:]
+    @Published private(set) var refreshingActivityTypeCareeIDs: Set<UUID> = []
 
     // Activities loaded on-demand (recent only!)
     @Published var recentActivitiesByCaree: [UUID: [ActivitySnapshot]] = [:]
+    @Published private(set) var refreshingRecentActivityCareeIDs: Set<UUID> = []
 
     // Pending activities (for optimistic UI)
     @Published var pendingActivities: [ActivitySnapshot] = []
@@ -29,12 +32,48 @@ class WatchDataProvider: ObservableObject {
     // MARK: - Private Properties
 
     private let selectiveService = SelectiveCloudKitService()
+    private let cacheService: WatchCacheService
     private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data")
 
     // Task management for cancellation
     private var loadCareesTask: Task<Void, Never>?
     private var loadActivityTypesTask: Task<Void, Never>?
     private var loadActivitiesTask: Task<Void, Never>?
+
+    private var refreshedActivityTypesCareeIDs: Set<UUID> = []
+    private var refreshedRecentActivitiesCareeIDs: Set<UUID> = []
+
+    // MARK: - Init
+
+    init(cacheService: WatchCacheService = WatchCacheService()) {
+        self.cacheService = cacheService
+
+        let cachedCarees = cacheService.loadCarees()
+        self.carees = cachedCarees
+
+        // Preload cached per-caree data when available
+        for caree in cachedCarees {
+            let cachedActivityTypes = cacheService.loadActivityTypes(for: caree.id)
+            if !cachedActivityTypes.isEmpty {
+                activityTypesByCaree[caree.id] = cachedActivityTypes
+            }
+
+            let cachedActivities = cacheService.loadRecentActivities(for: caree.id)
+            if !cachedActivities.isEmpty {
+                recentActivitiesByCaree[caree.id] = cachedActivities
+            }
+        }
+    }
+
+    // MARK: - Refresh State Queries
+
+    func isRefreshingActivityTypes(for careeID: UUID) -> Bool {
+        refreshingActivityTypeCareeIDs.contains(careeID)
+    }
+
+    func isRefreshingRecentActivities(for careeID: UUID) -> Bool {
+        refreshingRecentActivityCareeIDs.contains(careeID)
+    }
 
     // MARK: - Caree Loading (Eager - Small Dataset)
 
@@ -49,28 +88,33 @@ class WatchDataProvider: ObservableObject {
             guard !Task.isCancelled else { return }
 
             // Skip if already loading, unless force refresh
-            if isLoadingCarees && !force {
+            if isRefreshingCarees && !force {
                 logger.info("⏭️ Skipping loadCarees - already loading")
                 return
             }
 
-            isLoadingCarees = true
+            isRefreshingCarees = true
+            if carees.isEmpty {
+                isLoadingCarees = true
+            }
             careesError = nil
             logger.info("📱 WatchDataProvider: Loading carees...")
+            defer {
+                isLoadingCarees = false
+                isRefreshingCarees = false
+            }
 
             do {
                 // Load carees (acceptable - small dataset)
                 var loadedCarees = try await selectiveService.fetchAllCarees()
 
                 guard !Task.isCancelled else {
-                    isLoadingCarees = false
                     return
                 }
 
                 // Load activity type COUNTS (not full objects)
                 for index in loadedCarees.indices {
                     guard !Task.isCancelled else {
-                        isLoadingCarees = false
                         return
                     }
 
@@ -83,11 +127,11 @@ class WatchDataProvider: ObservableObject {
                 }
 
                 guard !Task.isCancelled else {
-                    isLoadingCarees = false
                     return
                 }
 
                 carees = loadedCarees
+                cacheService.saveCarees(loadedCarees)
                 logger.info("✅ Loaded \(self.carees.count) carees")
 
             } catch {
@@ -95,8 +139,6 @@ class WatchDataProvider: ObservableObject {
                 logger.error("❌ Failed to load carees: \(error.localizedDescription)")
                 FileLogger.shared.exception(error, context: "WatchDataProvider.loadCarees() - Failed to load carees from CloudKit")
             }
-
-            isLoadingCarees = false
         }
 
         await loadCareesTask?.value
@@ -106,10 +148,16 @@ class WatchDataProvider: ObservableObject {
 
     /// Load activity types ONLY when user opens caree detail
     /// - Parameter careeID: ID of the caree
-    func loadActivityTypes(for careeID: UUID) async {
-        // Skip if already loaded
-        guard activityTypesByCaree[careeID] == nil else {
-            logger.info("Activity types already loaded for caree: \(careeID)")
+    func loadActivityTypes(for careeID: UUID, force: Bool = false) async {
+        if activityTypesByCaree[careeID] == nil {
+            let cachedTypes = cacheService.loadActivityTypes(for: careeID)
+            if !cachedTypes.isEmpty {
+                activityTypesByCaree[careeID] = cachedTypes
+            }
+        }
+
+        if refreshedActivityTypesCareeIDs.contains(careeID) && !force {
+            logger.info("⏭️ Skipping activity type refresh for caree \(careeID) - already refreshed")
             return
         }
 
@@ -125,6 +173,8 @@ class WatchDataProvider: ObservableObject {
             guard !Task.isCancelled else { return }
 
             logger.info("📱 Lazy loading activity types for caree: \(caree.name)")
+            refreshingActivityTypeCareeIDs.insert(careeID)
+            defer { refreshingActivityTypeCareeIDs.remove(careeID) }
 
             do {
                 let types = try await selectiveService.fetchActivityTypes(
@@ -135,13 +185,17 @@ class WatchDataProvider: ObservableObject {
                 guard !Task.isCancelled else { return }
 
                 activityTypesByCaree[careeID] = types
+                cacheService.saveActivityTypes(types, for: careeID)
+                refreshedActivityTypesCareeIDs.insert(careeID)
                 logger.info("✅ Loaded \(types.count) activity types")
 
             } catch {
                 logger.error("❌ Failed to load activity types: \(error.localizedDescription)")
                 FileLogger.shared.exception(error, context: "WatchDataProvider.loadActivityTypes() - Failed to load activity types for caree \(careeID)")
-                // Set empty array so we don't retry constantly
-                activityTypesByCaree[careeID] = []
+                // Preserve cached values when available
+                if activityTypesByCaree[careeID] == nil {
+                    activityTypesByCaree[careeID] = []
+                }
             }
         }
 
@@ -152,7 +206,19 @@ class WatchDataProvider: ObservableObject {
     /// - Parameters:
     ///   - careeID: ID of the caree
     ///   - hoursBack: How many hours of history (default 48)
-    func loadRecentActivities(for careeID: UUID, hoursBack: TimeInterval = 48 * 3600) async {
+    func loadRecentActivities(for careeID: UUID, hoursBack: TimeInterval = 48 * 3600, force: Bool = false) async {
+        if recentActivitiesByCaree[careeID] == nil {
+            let cachedActivities = cacheService.loadRecentActivities(for: careeID)
+            if !cachedActivities.isEmpty {
+                recentActivitiesByCaree[careeID] = mergedActivities(for: careeID, with: cachedActivities)
+            }
+        }
+
+        if refreshedRecentActivitiesCareeIDs.contains(careeID) && !force {
+            logger.info("⏭️ Skipping recent activities refresh for caree \(careeID) - already refreshed")
+            return
+        }
+
         guard let caree = carees.first(where: { $0.id == careeID }) else {
             logger.warning("Caree not found: \(careeID)")
             return
@@ -166,6 +232,8 @@ class WatchDataProvider: ObservableObject {
 
             logger.info("📱 Lazy loading recent activities for caree: \(caree.name)")
             MemoryMonitor.logMemoryUsage(context: "Before loadRecentActivities")
+            refreshingRecentActivityCareeIDs.insert(careeID)
+            defer { refreshingRecentActivityCareeIDs.remove(careeID) }
 
             do {
                 let activities = try await selectiveService.fetchRecentActivities(
@@ -177,10 +245,11 @@ class WatchDataProvider: ObservableObject {
                 guard !Task.isCancelled else { return }
 
                 // Merge with pending activities
-                let allActivities = (pendingActivities.filter { $0.careeID == careeID } + activities)
-                    .sorted { $0.dateTime > $1.dateTime }
+                let allActivities = mergedActivities(for: careeID, with: activities)
 
                 recentActivitiesByCaree[careeID] = allActivities
+                cacheService.saveRecentActivities(allActivities, for: careeID)
+                refreshedRecentActivitiesCareeIDs.insert(careeID)
                 logger.info("✅ Loaded \(activities.count) activities (+ \(self.pendingActivities.count) pending)")
                 MemoryMonitor.logMemoryUsage(context: "After loadRecentActivities")
 
@@ -235,6 +304,11 @@ class WatchDataProvider: ObservableObject {
                 // Update state to synced
                 await self.updateActivityState(activity.id, state: .synced)
                 await self.removePendingActivity(activity.id)
+                await MainActor.run {
+                    if let updated = self.recentActivitiesByCaree[activity.careeID] {
+                        self.cacheService.saveRecentActivities(updated, for: activity.careeID)
+                    }
+                }
 
                 self.logger.info("✅ Activity synced successfully")
 
@@ -280,6 +354,11 @@ class WatchDataProvider: ObservableObject {
 
                 // Update state to synced
                 await self.updateActivityState(activity.id, state: .synced)
+                await MainActor.run {
+                    if let updated = self.recentActivitiesByCaree[activity.careeID] {
+                        self.cacheService.saveRecentActivities(updated, for: activity.careeID)
+                    }
+                }
 
                 self.logger.info("✅ Activity updated successfully")
 
@@ -318,6 +397,14 @@ class WatchDataProvider: ObservableObject {
                     activity,
                     isShared: caree.isShared
                 )
+
+                await MainActor.run {
+                    if let updated = self.recentActivitiesByCaree[activity.careeID] {
+                        self.cacheService.saveRecentActivities(updated, for: activity.careeID)
+                    } else {
+                        self.cacheService.saveRecentActivities([], for: activity.careeID)
+                    }
+                }
 
                 self.logger.info("✅ Activity deleted successfully")
 
@@ -384,6 +471,19 @@ class WatchDataProvider: ObservableObject {
         pendingActivities.removeAll { $0.id == activityID }
     }
 
+    private func mergedActivities(for careeID: UUID, with activities: [ActivitySnapshot]) -> [ActivitySnapshot] {
+        var combined = pendingActivities.filter { $0.careeID == careeID }
+        var seen = Set(combined.map { $0.id })
+
+        for activity in activities where !seen.contains(activity.id) {
+            combined.append(activity)
+            seen.insert(activity.id)
+        }
+
+        combined.sort { $0.dateTime > $1.dateTime }
+        return combined
+    }
+
     // MARK: - Memory Management
 
     /// Clear cached data for carees not currently in use
@@ -392,6 +492,9 @@ class WatchDataProvider: ObservableObject {
     func clearUnusedCache(except currentCareeID: UUID?) {
         let keysToKeep = currentCareeID.map { Set([$0]) } ?? Set<UUID>()
 
+        let removedActivityTypeIDs = Set(activityTypesByCaree.keys).subtracting(keysToKeep)
+        let removedRecentActivityIDs = Set(recentActivitiesByCaree.keys).subtracting(keysToKeep)
+
         // Clear activity types for carees not in use
         let typesBeforeCount = activityTypesByCaree.count
         activityTypesByCaree = activityTypesByCaree.filter { keysToKeep.contains($0.key) }
@@ -399,6 +502,11 @@ class WatchDataProvider: ObservableObject {
         // Clear activities for carees not in use
         let activitiesBeforeCount = recentActivitiesByCaree.count
         recentActivitiesByCaree = recentActivitiesByCaree.filter { keysToKeep.contains($0.key) }
+
+        refreshedActivityTypesCareeIDs.subtract(removedActivityTypeIDs)
+        refreshedRecentActivitiesCareeIDs.subtract(removedRecentActivityIDs)
+        refreshingActivityTypeCareeIDs.subtract(removedActivityTypeIDs)
+        refreshingRecentActivityCareeIDs.subtract(removedRecentActivityIDs)
 
         let cleared = (typesBeforeCount - activityTypesByCaree.count) + (activitiesBeforeCount - recentActivitiesByCaree.count)
 
@@ -414,6 +522,10 @@ class WatchDataProvider: ObservableObject {
 
         activityTypesByCaree.removeAll()
         recentActivitiesByCaree.removeAll()
+        refreshedActivityTypesCareeIDs.removeAll()
+        refreshedRecentActivitiesCareeIDs.removeAll()
+        refreshingActivityTypeCareeIDs.removeAll()
+        refreshingRecentActivityCareeIDs.removeAll()
 
         // Keep carees loaded (small memory footprint)
         logger.info("✅ Cache cleared (kept \(self.carees.count) carees)")

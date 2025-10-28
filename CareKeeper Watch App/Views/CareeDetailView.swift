@@ -26,6 +26,10 @@ struct CareeDetailView: View {
         dataProvider.activityTypesByCaree[careeSnapshot.id] == nil
     }
 
+    private var isRefreshingActivityTypes: Bool {
+        dataProvider.isRefreshingActivityTypes(for: careeSnapshot.id)
+    }
+
     var body: some View {
         Group {
             if isLoadingActivityTypes {
@@ -88,6 +92,13 @@ struct CareeDetailView: View {
             }
 
             await loadTask?.value
+        }
+        .overlay(alignment: .topTrailing) {
+            if isRefreshingActivityTypes && !isLoadingActivityTypes {
+                ProgressView()
+                    .scaleEffect(0.6)
+                    .padding(8)
+            }
         }
         .onDisappear {
             loadTask?.cancel()

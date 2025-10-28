@@ -32,6 +32,10 @@ struct ActivityListView: View {
         dataProvider.recentActivitiesByCaree[careeSnapshot.id] == nil
     }
 
+    private var isRefreshing: Bool {
+        dataProvider.isRefreshingRecentActivities(for: careeSnapshot.id)
+    }
+
     var body: some View {
         Group {
             if isLoading {
@@ -142,7 +146,14 @@ struct ActivityListView: View {
         }
         .refreshable {
             guard !Task.isCancelled else { return }
-            await dataProvider.loadRecentActivities(for: careeSnapshot.id, hoursBack: hoursToLoad)
+            await dataProvider.loadRecentActivities(for: careeSnapshot.id, hoursBack: hoursToLoad, force: true)
+        }
+        .overlay(alignment: .topTrailing) {
+            if isRefreshing && !isLoading {
+                ProgressView()
+                    .scaleEffect(0.6)
+                    .padding(8)
+            }
         }
     }
 
@@ -185,7 +196,7 @@ struct ActivityListView: View {
         Button {
             hoursToLoad += 48 * 3600  // Add another 48h
             Task {
-                await dataProvider.loadRecentActivities(for: careeSnapshot.id, hoursBack: hoursToLoad)
+                await dataProvider.loadRecentActivities(for: careeSnapshot.id, hoursBack: hoursToLoad, force: true)
             }
         } label: {
             HStack {

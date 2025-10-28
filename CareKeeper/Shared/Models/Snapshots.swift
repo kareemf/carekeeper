@@ -21,7 +21,7 @@ enum SnapshotError: LocalizedError {
 /// and avoid triggering cascade fetches on relationships
 
 /// Immutable snapshot of a Caree for watch UI
-struct CareeSnapshot: Identifiable, Hashable, Sendable {
+struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
     let id: UUID
     let name: String
     let imageData: Data?
@@ -83,7 +83,7 @@ struct CareeSnapshot: Identifiable, Hashable, Sendable {
 }
 
 /// Immutable snapshot of an ActivityType for watch UI
-struct ActivityTypeSnapshot: Identifiable, Hashable, Sendable {
+struct ActivityTypeSnapshot: Identifiable, Hashable, Codable, Sendable {
     let id: UUID
     let name: String
     let icon: String
@@ -147,7 +147,7 @@ struct ActivityTypeSnapshot: Identifiable, Hashable, Sendable {
 }
 
 /// Immutable snapshot of an Activity for watch UI
-struct ActivitySnapshot: Identifiable, Hashable, Sendable {
+struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
     let id: UUID
     let dateTime: Date
     let notes: String?
@@ -161,11 +161,56 @@ struct ActivitySnapshot: Identifiable, Hashable, Sendable {
     // For optimistic UI
     var syncState: SyncState = .synced
 
-    enum SyncState: Hashable, Sendable {
+    enum SyncState: Hashable, Codable, Sendable {
         case pending
         case syncing
         case synced
         case failed(String)
+
+        private enum CodingKeys: String, CodingKey {
+            case state
+            case errorMessage
+        }
+
+        private enum State: String, Codable {
+            case pending
+            case syncing
+            case synced
+            case failed
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let state = try container.decode(State.self, forKey: .state)
+
+            switch state {
+            case .pending:
+                self = .pending
+            case .syncing:
+                self = .syncing
+            case .synced:
+                self = .synced
+            case .failed:
+                let message = try container.decodeIfPresent(String.self, forKey: .errorMessage) ?? "Unknown error"
+                self = .failed(message)
+            }
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .pending:
+                try container.encode(State.pending, forKey: .state)
+            case .syncing:
+                try container.encode(State.syncing, forKey: .state)
+            case .synced:
+                try container.encode(State.synced, forKey: .state)
+            case .failed(let message):
+                try container.encode(State.failed, forKey: .state)
+                try container.encode(message, forKey: .errorMessage)
+            }
+        }
     }
 
     /// Create snapshot from CloudKit record
