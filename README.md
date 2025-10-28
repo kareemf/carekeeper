@@ -1,6 +1,6 @@
 # CareKeeper
 
-A fast, collaborative activity tracking app for caregivers with iOS and watchOS companions. Built with SwiftUI and SwiftData, featuring CloudKit integration for seamless sharing between multiple caregivers.
+A simple yet flexible collaborative activity tracking app for caregivers on iOS with watchOS companion app. Built with SwiftUI and SwiftData, featuring CloudKit integration for sharing across devices and between multiple caregivers.
 
 ## Features
 
@@ -23,7 +23,7 @@ A fast, collaborative activity tracking app for caregivers with iOS and watchOS 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/carekeeper.git
+git clone https://github.com/kareemf/carekeeper.git
 cd carekeeper
 ```
 
@@ -77,7 +77,7 @@ open CareKeeper.xcodeproj
 
 #### Build from Command Line
 
-**iOS App:**
+##### iOS App
 ```bash
 # Build CareKeeper for iOS Simulator
 xcodebuild -project CareKeeper.xcodeproj \
@@ -86,7 +86,7 @@ xcodebuild -project CareKeeper.xcodeproj \
   build
 ```
 
-**watchOS App:**
+##### watchOS App
 ```bash
 # Build CareKeeper Watch App for Apple Watch Simulator
 xcodebuild -project CareKeeper.xcodeproj \
@@ -97,7 +97,7 @@ xcodebuild -project CareKeeper.xcodeproj \
 
 #### Install and Launch on Simulator
 
-**iOS App:**
+##### iOS App
 ```bash
 # Find the booted simulator
 xcrun simctl list devices | grep Booted
@@ -113,7 +113,7 @@ xcrun simctl install booted \
 xcrun simctl launch booted com.kareemf.CareKeeper
 ```
 
-**watchOS App:**
+##### watchOS App
 ```bash
 # Boot a paired Apple Watch simulator (if not already booted)
 xcrun simctl boot "Apple Watch Ultra 2 (49mm)"
@@ -166,7 +166,7 @@ CareKeeper/
 │   └── CareKeeperApp.swift            # Main app entry point
 ├── Models/
 │   ├── Caree.swift                    # Care recipient model
-│   ├── ActivityType.swift             # Activity type model (formerly Behavior)
+│   ├── ActivityType.swift             # Activity type model
 │   └── Activity.swift                 # Activity instance model
 ├── Views/
 │   ├── ContentView.swift              # Main tab view
@@ -182,7 +182,7 @@ CareKeeper/
 │   │   ├── TrackActivityView.swift
 │   │   ├── ActivityDetailView.swift
 │   │   └── ActivityRowView.swift
-│   └── Sharing/                       # CloudKit sharing (Phase 2)
+│   └── Sharing/                       # CloudKit sharing
 │       └── SharingView.swift
 └── Preview/
     ├── PreviewContainer.swift         # SwiftData container for previews
@@ -197,7 +197,7 @@ CareKeeper/
 - **ActivityType**: User-defined activity categories with configurable attributes
 - **Activity**: Individual activity instances with timestamp and optional data
 
-### Key Features
+### Tech Features
 
 - **SwiftData Integration**: Modern Core Data replacement with better SwiftUI integration
 - **CloudKit Sync**: Automatic synchronization across devices
@@ -280,7 +280,6 @@ All tests use in-memory SwiftData containers for fast, isolated execution.
 - Follow Apple's Swift API Design Guidelines
 - Use SwiftUI declarative patterns
 - Implement proper error handling
-- Write comprehensive unit tests
 
 ### Git Workflow
 
@@ -288,25 +287,9 @@ All tests use in-memory SwiftData containers for fast, isolated execution.
 - Descriptive commit messages
 - Feature branches for major changes
 
-## Architecture
-
-### MVVM + SwiftUI
-
-- **Models**: SwiftData entities with business logic
-- **Views**: SwiftUI views with minimal logic
-- **ViewModels**: When needed for complex state management
-- **Repository Pattern**: Data access abstraction (future enhancement)
-
-### Key Patterns
-
-- **Dependency Injection**: For testability
-- **Error Handling**: User-friendly error messages
-- **Offline-First**: Local storage with cloud sync
-- **Privacy by Design**: Encrypt sensitive data
-
 ## Documentation
 
-CareKeeper includes comprehensive documentation for both developers and users.
+CareKeeper includes documentation for both developers and users.
 
 ### For Developers
 
@@ -315,10 +298,6 @@ CareKeeper includes comprehensive documentation for both developers and users.
 - **Specifications** (`technical/specs/`): Detailed feature specifications (CloudKit migration, push notifications)
 - **Troubleshooting** (`technical/troubleshooting/`): Debugging guides and diagnostics
 - **Retrospectives** (`technical/retrospectives/`): Post-implementation reviews and refactoring plans
-
-**Quick Reference**:
-- `CLAUDE.md`: Development guidance for AI assistants and developers
-- `DEPLOYMENT.md`: Documentation site deployment guide
 
 ### For Users
 
@@ -355,7 +334,7 @@ pip3 install -r requirements.txt
 - iOS-only feature (available on iPhone and iPad)
 
 **Deployment**:
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions (Cloudflare Pages, GitHub Pages, etc.).
+See [ADR 006: Cloudflare Pages Documentation Hosting](technical/adr/006-cloudflare-pages-documentation-hosting.md) for deployment decision rationale and detailed instructions.
 
 **Screenshots**:
 Use the screenshot capture helper to add images to documentation:
@@ -388,9 +367,3 @@ Use the screenshot capture helper to add images to documentation:
 - 📧 [Create an issue](https://github.com/your-username/carekeeper/issues) for bug reports
 - 💡 [Start a discussion](https://github.com/your-username/carekeeper/discussions) for feature requests
 - 📖 [Check the wiki](https://github.com/your-username/carekeeper/wiki) for detailed documentation
-
-## Acknowledgments
-
-- Apple's sample code for CloudKit sharing
-- SwiftUI community for best practices
-- Original CareKeeper v1 for requirements and user insights
