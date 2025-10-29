@@ -12,8 +12,6 @@ struct HelpView: View {
     /// - Local: file:///path/to/site/index.html (for offline testing)
     let documentationURL: URL
 
-    @State private var isLoading = true
-    @State private var error: Error?
     @State private var canGoBack = false
     @State private var canGoForward = false
 
@@ -31,15 +29,13 @@ struct HelpView: View {
                 // WebView
                 WebView(
                     url: documentationURL,
-                    isLoading: $isLoading,
-                    error: $error,
                     canGoBack: $canGoBack,
                     canGoForward: $canGoForward,
                     coordinator: webViewCoordinator
                 )
 
                 // Loading overlay
-                if isLoading && error == nil {
+                if webViewCoordinator.isLoading && webViewCoordinator.error == nil {
                     VStack {
                         ProgressView()
                         Text(NSLocalizedString("Loading documentation...", comment: "Help loading message"))
@@ -50,7 +46,7 @@ struct HelpView: View {
                 }
 
                 // Error state
-                if let error = error {
+                if let error = webViewCoordinator.error {
                     errorView(error)
                 }
             }
@@ -110,7 +106,6 @@ struct HelpView: View {
                 .padding(.horizontal)
 
             Button(NSLocalizedString("Try Again", comment: "Retry loading help")) {
-                self.error = nil
                 webViewCoordinator.reload()
             }
             .buttonStyle(.bordered)
@@ -122,8 +117,6 @@ struct HelpView: View {
 /// UIViewRepresentable wrapper for WKWebView
 struct WebView: UIViewRepresentable {
     let url: URL
-    @Binding var isLoading: Bool
-    @Binding var error: Error?
     @Binding var canGoBack: Bool
     @Binding var canGoForward: Bool
     let coordinator: WebViewCoordinator

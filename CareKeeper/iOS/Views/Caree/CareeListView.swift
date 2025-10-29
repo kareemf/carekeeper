@@ -183,6 +183,12 @@ struct CareeListView: View {
 
         #if os(iOS)
         ToolbarItem(placement: .navigationBarTrailing) {
+            Button(action: { showingHelp = true }) {
+                Image(systemName: "questionmark.circle")
+            }
+        }
+
+        ToolbarItem(placement: .navigationBarTrailing) {
             backupRestoreMenu
         }
         #endif
@@ -195,12 +201,6 @@ struct CareeListView: View {
     #if os(iOS)
     private var backupRestoreMenu: some View {
         Menu {
-            Button(action: { showingHelp = true }) {
-                Label("Help", systemImage: "questionmark.circle")
-            }
-
-            Divider()
-
             Button(action: exportAllCarees) {
                 Label("Export Data", systemImage: "square.and.arrow.up")
             }
