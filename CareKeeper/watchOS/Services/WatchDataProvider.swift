@@ -45,20 +45,21 @@ class WatchDataProvider: ObservableObject {
 
     // MARK: - Init
 
-    init(cacheService: WatchCacheService = WatchCacheService()) {
-        self.cacheService = cacheService
+    init(cacheService: WatchCacheService? = nil) {
+        let resolvedCache = cacheService ?? WatchCacheService()
+        self.cacheService = resolvedCache
 
-        let cachedCarees = cacheService.loadCarees()
+        let cachedCarees = resolvedCache.loadCarees()
         self.carees = cachedCarees
 
         // Preload cached per-caree data when available
         for caree in cachedCarees {
-            let cachedActivityTypes = cacheService.loadActivityTypes(for: caree.id)
+            let cachedActivityTypes = resolvedCache.loadActivityTypes(for: caree.id)
             if !cachedActivityTypes.isEmpty {
                 activityTypesByCaree[caree.id] = cachedActivityTypes
             }
 
-            let cachedActivities = cacheService.loadRecentActivities(for: caree.id)
+            let cachedActivities = resolvedCache.loadRecentActivities(for: caree.id)
             if !cachedActivities.isEmpty {
                 recentActivitiesByCaree[caree.id] = cachedActivities
             }
