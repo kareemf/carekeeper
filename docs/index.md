@@ -12,7 +12,7 @@ CareKeeper helps caregivers track care activities for children, pets, or anyone 
 Prioritizes speed of data entry. Quick tracking inspired by Apple Workouts. Track an activity in seconds with customizable types, quantities, locations, and notes.
 
 #### watchOS Companion
-Track activities from your wrist. No need to pull out your phone—perfect for busy moments.
+Track activities from your wrist. No need to pull out your phone.
 
 ### Flexible
 Define your own taxonomy. Create custom activity types with icons, quantity units, and location tracking to match your care needs.
@@ -41,7 +41,6 @@ New to CareKeeper? Follow these tutorials to get up and running:
 ## Quick Links
 
 ### For New Users
-- [Getting Started Tutorial](tutorials/getting-started.md)
 - [How to Track an Activity](how-to/track-activity.md)
 - [Understanding Security & Privacy](explanation/security-privacy.md)
 
@@ -60,6 +59,7 @@ New to CareKeeper? Follow these tutorials to get up and running:
 ## About CareKeeper
 
 Have you ever asked yourself (or out loud) things like 
+
 * "How old is this bottle of milk"? 
 * "...and what kind of milk was it?" (since they can have variable shelf lives)
 * "When was the baby's last poop"?
