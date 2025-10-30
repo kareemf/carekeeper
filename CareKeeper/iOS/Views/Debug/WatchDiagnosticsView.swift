@@ -8,6 +8,8 @@ struct WatchDiagnosticsView: View {
     @State private var diagnosticFiles: [DiagnosticFile] = []
     @State private var isLoading = false
     @State private var shareItem: ShareItem?
+    @StateObject private var streamingSettings = WatchLogStreamingSettings()
+    @ObservedObject private var logStreamController = WatchLogStreamController.shared
 
     struct DiagnosticFile: Identifiable {
         let id = UUID()
@@ -25,6 +27,46 @@ struct WatchDiagnosticsView: View {
 
     var body: some View {
         List {
+            Section(header: Text("Log Streaming")) {
+                Picker("Streaming Level", selection: $streamingSettings.level) {
+                    ForEach(WatchLogStreamingLevel.allCases) { level in
+                        Text(level.displayName).tag(level)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                if streamingSettings.level != .off {
+                    if logStreamController.entries.isEmpty {
+                        Text("Streaming enabled, waiting for entries…")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    } else {
+                        let last = logStreamController.lastReceived ?? Date()
+                        Text("Last entry: \(last, style: .time)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+
+                        ForEach(logStreamController.entries.suffix(10)) { entry in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("[\(entry.severity.label)] \(entry.message)")
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                                    .lineLimit(2)
+
+                                Text("\(entry.file):\(entry.line) · \(entry.timestamp, style: .time)")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.vertical, 2)
+                        }
+                    }
+                } else {
+                    Text("Streaming disabled (no additional battery/network use).")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+
             if isLoading {
                 Section {
                     HStack {
@@ -161,6 +203,7 @@ struct WatchDiagnosticsView: View {
         guard let containerURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: CloudKitConfig.appGroupID
         ) else {
+            AppLogger.app.error("❌ WatchDiagnosticsView: App group container unavailable when loading diagnostics.")
             return []
         }
 
@@ -176,6 +219,7 @@ struct WatchDiagnosticsView: View {
                 includingPropertiesForKeys: [.creationDateKey, .fileSizeKey],
                 options: .skipsHiddenFiles
             ) else {
+                AppLogger.app.warning("⚠️ WatchDiagnosticsView: Failed to enumerate \(subdirURL.path)")
                 continue
             }
 
@@ -197,7 +241,14 @@ struct WatchDiagnosticsView: View {
         }
 
         // Sort by date (newest first)
-        return allFiles.sorted { $0.date > $1.date }
+        let sorted = allFiles.sorted { $0.date > $1.date }
+
+        if sorted.isEmpty {
+            let loggingAvailable = await MainActor.run { FileLogger.shared.isLoggingAvailable }
+            AppLogger.app.warning("⚠️ WatchDiagnosticsView: No diagnostic files found. FileLogger available? \(loggingAvailable)")
+        }
+
+        return sorted
     }
 
     private func shareAllDiagnostics() {

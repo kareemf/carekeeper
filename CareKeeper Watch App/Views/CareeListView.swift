@@ -10,6 +10,7 @@ import SwiftUI
 struct CareeListView: View {
 
     @StateObject private var dataProvider = WatchDataProvider()
+    @StateObject private var logStreamService = WatchLogStreamService.shared
     @State private var loadTask: Task<Void, Never>?
     @State private var error: Error?
 
@@ -17,6 +18,16 @@ struct CareeListView: View {
         NavigationStack {
             contentView
                 .navigationTitle("Carees")
+                .overlay(alignment: .topTrailing) {
+                    if logStreamService.streamingLevel != .off {
+                        Label(logStreamService.streamingLevel.displayName, systemImage: "waveform.path.ecg")
+                            .font(.caption2)
+                            .padding(6)
+                            .background(Color.blue.opacity(0.2))
+                            .clipShape(Capsule())
+                            .padding([.top, .trailing], 4)
+                    }
+                }
                 .task {
                     // Cancel previous task if view reappears
                     loadTask?.cancel()

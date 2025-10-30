@@ -87,54 +87,72 @@ class FileLogger {
         logger.info("📝 Creating log file: \(filename)")
         logger.info("   Full path: \(self.currentLogFile?.path ?? "nil")")
 
-        // Create file and get handle
-        if let logFile = currentLogFile {
-            logger.info("📝 Creating log file at: \(logFile.path)")
+        guard let logFile = currentLogFile else {
+            logInactiveWarningIfNeeded()
+            return
+        }
 
-            let created = FileManager.default.createFile(atPath: logFile.path, contents: nil)
-            if !created {
-                logger.error("❌ Failed to create log file at path: \(logFile.path)")
-                logger.error("   Check permissions and available disk space")
-                logInactiveWarningIfNeeded()
-                return
-            }
-            logger.info("✅ Log file created successfully")
+        logger.info("📝 Creating log file at: \(logFile.path)")
 
-            // Verify file exists
-            let fileExists = FileManager.default.fileExists(atPath: logFile.path)
-            logger.info("   File exists after creation: \(fileExists)")
+        let created = FileManager.default.createFile(atPath: logFile.path, contents: nil)
+        if !created {
+            logger.error("❌ Failed to create log file at path: \(logFile.path)")
+            logger.error("   Check permissions and available disk space")
+            logInactiveWarningIfNeeded()
+            currentLogHandle = nil
+            isReady = false
+            return
+        }
+        logger.info("✅ Log file created successfully")
 
-            do {
-                currentLogHandle = try FileHandle(forWritingTo: logFile)
-                logger.info("✅ FileHandle created successfully")
-            } catch {
-                logger.error("❌ Failed to create FileHandle: \(error.localizedDescription)")
-                logger.error("   File path: \(logFile.path)")
-                logInactiveWarningIfNeeded()
-                return
-            }
+        // Verify file exists
+        let fileExists = FileManager.default.fileExists(atPath: logFile.path)
+        logger.info("   File exists after creation: \(fileExists)")
 
-            // Write header
-            let header = """
-            ===========================================
-            CareKeeper Log - \(platform.uppercased())
-            Started: \(Date())
-            Platform: \(platform)
-            OS Version: \(ProcessInfo.processInfo.operatingSystemVersionString)
-            App Group: \(CloudKitConfig.appGroupID)
-            Container: \(containerURL.path)
-            ===========================================
+        do {
+            currentLogHandle = try FileHandle(forWritingTo: logFile)
+            logger.info("✅ FileHandle created successfully")
+        } catch {
+            logger.error("❌ Failed to create FileHandle: \(error.localizedDescription)")
+            logger.error("   File path: \(logFile.path)")
+            logInactiveWarningIfNeeded()
+            currentLogHandle = nil
+            isReady = false
+            return
+        }
 
-            """
-            writeToFile(header)
+        let header = """
+        ===========================================
+        CareKeeper Log - \(platform.uppercased())
+        Started: \(Date())
+        Platform: \(platform)
+        OS Version: \(ProcessInfo.processInfo.operatingSystemVersionString)
+        App Group: \(CloudKitConfig.appGroupID)
+        Container: \(logsURL.path)
+        ===========================================
+
+        """
+
+        do {
+            guard let handle = currentLogHandle else {
+                throw NSError(domain: "FileLogger", code: 0, userInfo: [NSLocalizedDescriptionKey: "File handle unavailable"])}
+            try handle.write(contentsOf: Data(header.utf8))
+            try handle.synchronize()
+            isReady = true
+            hasLoggedInactiveWarning = false
             logger.info("📝 Log file initialized: \(filename)")
             logger.info("   Full path: \(logFile.path)")
-
-            // Verify file has content after writing header
             if let attributes = try? FileManager.default.attributesOfItem(atPath: logFile.path),
                let fileSize = attributes[.size] as? Int {
                 logger.info("   File size after header: \(fileSize) bytes")
             }
+        } catch {
+            logger.error("❌ Failed to initialize log header: \(error.localizedDescription)")
+            logInactiveWarningIfNeeded()
+            try? currentLogHandle?.close()
+            currentLogHandle = nil
+            isReady = false
+            return
         }
 
         // Cleanup old logs
@@ -196,17 +214,25 @@ class FileLogger {
         // Also log to OSLog for Console.app
         logger.info("\(logLine)")
 
+#if os(watchOS)
+        WatchLogStreamService.shared.processLog(
+            severity: LogSeverity(loggerLevel: level),
+            message: message,
+            file: file,
+            function: function,
+            line: line
+        )
+#endif
+
         // Check if we need to rotate log file
         checkLogRotation()
     }
 
     private func writeToFile(_ content: String) {
-        guard isReady else {
+        guard isReady,
+              let handle = currentLogHandle,
+              let data = content.data(using: .utf8) else {
             logInactiveWarningIfNeeded()
-            return
-        }
-        guard let data = content.data(using: .utf8),
-              let handle = currentLogHandle else {
             return
         }
 
@@ -215,6 +241,10 @@ class FileLogger {
             try handle.synchronize() // Force write to disk immediately
         } catch {
             logger.error("❌ Failed to write to log file: \(error.localizedDescription)")
+            logInactiveWarningIfNeeded()
+            try? handle.close()
+            currentLogHandle = nil
+            isReady = false
         }
     }
 

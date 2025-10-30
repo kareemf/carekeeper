@@ -14,6 +14,7 @@ struct CareKeeperApp: App {
     @StateObject private var cloudKitService = CloudKitDataService()
     @StateObject private var notificationService = CloudKitNotificationService()
     @State private var cacheService: LocalCacheService?
+    private let watchLogStreamController = WatchLogStreamController.shared
 
     // Initialize diagnostics
     private let metricsManager = MetricsManager.shared

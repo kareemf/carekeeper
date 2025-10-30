@@ -20,16 +20,32 @@ final class WatchCacheService {
     private let logger = AppLogger.app
     private let isUsingFallbackDefaults: Bool
     private var hasLoggedFallbackWarning = false
+    private let containerURL: URL?
+    private let cacheDirectory: URL?
 
     // MARK: - Init
 
     init(userDefaults: UserDefaults? = UserDefaults(suiteName: CloudKitConfig.appGroupID)) {
-        if let providedDefaults = userDefaults {
+        containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: CloudKitConfig.appGroupID)
+        cacheDirectory = containerURL?.appendingPathComponent("watch-cache", isDirectory: true)
+
+        var fallbackReason: String?
+
+        if let providedDefaults = userDefaults, containerURL != nil {
             defaults = providedDefaults
             isUsingFallbackDefaults = false
         } else {
             defaults = .standard
             isUsingFallbackDefaults = true
+            fallbackReason = containerURL == nil ? "App group container unavailable" : "UserDefaults(suiteName:) returned nil"
+        }
+
+        if let cacheDirectory {
+            do {
+                try FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
+            } catch {
+                logger.error("❌ WatchCacheService failed to create cache directory: \(error.localizedDescription, privacy: .public)")
+            }
         }
 
         encoder = JSONEncoder()
@@ -39,13 +55,13 @@ final class WatchCacheService {
         decoder.dateDecodingStrategy = .iso8601
 
         if isUsingFallbackDefaults {
-            logFallbackWarning(reason: "UserDefaults(suiteName:) returned nil")
+            logFallbackWarning(reason: fallbackReason ?? "Unknown reason")
         }
     }
 
     // MARK: - Public API
 
-    var isAppGroupAvailable: Bool { !isUsingFallbackDefaults }
+    var isAppGroupAvailable: Bool { containerURL != nil }
 
     func loadCarees() -> [CareeSnapshot] {
         guard checkAvailability(for: "carees") else { return [] }
@@ -79,11 +95,14 @@ final class WatchCacheService {
 
     #if DEBUG
     func clearAll() {
-        defaults.removeObject(forKey: Keys.carees)
-
-        for key in defaults.dictionaryRepresentation().keys {
-            if key.hasPrefix(Keys.activityTypesPrefix) || key.hasPrefix(Keys.recentActivitiesPrefix) {
-                defaults.removeObject(forKey: key)
+        if let cacheDirectory {
+            do {
+                let fileURLs = try FileManager.default.contentsOfDirectory(at: cacheDirectory, includingPropertiesForKeys: nil)
+                for url in fileURLs {
+                    try FileManager.default.removeItem(at: url)
+                }
+            } catch {
+                logger.error("❌ WatchCacheService failed to clear cache directory: \(error.localizedDescription, privacy: .public)")
             }
         }
     }
@@ -102,24 +121,41 @@ final class WatchCacheService {
     private func encode<T>(_ value: T, forKey key: String) where T: Encodable {
         do {
             let data = try encoder.encode(value)
-            defaults.set(data, forKey: key)
+            guard let fileURL = cacheURL(for: key) else {
+                logFallbackWarning(reason: "Missing cache URL for key \(key)")
+                return
+            }
+
+            try data.write(to: fileURL, options: .atomic)
+            defaults.removeObject(forKey: key) // Clean up any legacy cache entries that might remain
         } catch {
             logger.error("❌ Failed to encode cache for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
         }
     }
 
     private func decode<T>(_ type: T.Type, forKey key: String) -> T where T: Decodable, T: ExpressibleByArrayLiteral {
-        guard let data = defaults.data(forKey: key) else {
+        guard let fileURL = cacheURL(for: key) else {
+            logFallbackWarning(reason: "Missing cache URL for key \(key)")
+            return []
+        }
+
+        guard FileManager.default.fileExists(atPath: fileURL.path) else {
             return []
         }
 
         do {
+            let data = try Data(contentsOf: fileURL)
             return try decoder.decode(T.self, from: data)
         } catch {
-            logger.error("❌ Failed to decode cache for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
-            defaults.removeObject(forKey: key)
+            logger.error("❌ Failed to decode cache file for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            try? FileManager.default.removeItem(at: fileURL)
             return []
         }
+    }
+
+    private func cacheURL(for key: String) -> URL? {
+        guard let cacheDirectory else { return nil }
+        return cacheDirectory.appendingPathComponent("\(key).json")
     }
 }
 

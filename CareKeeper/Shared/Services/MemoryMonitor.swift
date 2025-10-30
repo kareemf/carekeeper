@@ -31,13 +31,6 @@ struct MemoryMonitor {
 
         let usedMB = Double(info.resident_size) / 1024.0 / 1024.0
         logger.info("💾 Memory [\(context)]: \(String(format: "%.1f", usedMB)) MB")
-
-        // Warn if memory usage is high (>25MB on watch is concerning)
-        #if os(watchOS)
-        if usedMB > 25.0 {
-            logger.warning("⚠️ High memory usage on watchOS: \(String(format: "%.1f", usedMB)) MB")
-        }
-        #endif
     }
 
     /// Log memory usage with additional object count information
