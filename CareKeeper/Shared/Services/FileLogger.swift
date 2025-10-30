@@ -15,6 +15,10 @@ class FileLogger {
 
     private var currentLogFile: URL?
     private var currentLogHandle: FileHandle?
+    private var isReady = false
+    private var hasLoggedInactiveWarning = false
+
+    var isLoggingAvailable: Bool { isReady }
 
     private init() {
         setupLogFile()
@@ -27,6 +31,7 @@ class FileLogger {
     // MARK: - Setup
 
     private func setupLogFile() {
+        isReady = false
         logger.info("🚀 FileLogger.setupLogFile() started")
         logger.info("   App Group ID: \(CloudKitConfig.appGroupID)")
 
@@ -36,6 +41,7 @@ class FileLogger {
             logger.error("❌ Failed to access app group container for logging")
             logger.error("   App Group ID: \(CloudKitConfig.appGroupID)")
             logger.error("   This usually means the entitlement is not configured correctly")
+            logInactiveWarningIfNeeded()
             return
         }
 
@@ -63,6 +69,7 @@ class FileLogger {
             logger.info("   Directory exists: \(exists), isDirectory: \(isDirectory.boolValue)")
         } catch {
             logger.error("❌ Failed to create log directory: \(error.localizedDescription)")
+            logInactiveWarningIfNeeded()
             return
         }
 
@@ -88,6 +95,7 @@ class FileLogger {
             if !created {
                 logger.error("❌ Failed to create log file at path: \(logFile.path)")
                 logger.error("   Check permissions and available disk space")
+                logInactiveWarningIfNeeded()
                 return
             }
             logger.info("✅ Log file created successfully")
@@ -102,6 +110,7 @@ class FileLogger {
             } catch {
                 logger.error("❌ Failed to create FileHandle: \(error.localizedDescription)")
                 logger.error("   File path: \(logFile.path)")
+                logInactiveWarningIfNeeded()
                 return
             }
 
@@ -130,6 +139,13 @@ class FileLogger {
 
         // Cleanup old logs
         cleanupOldLogs(in: logsURL)
+
+        isReady = currentLogHandle != nil
+        if isReady {
+            hasLoggedInactiveWarning = false
+        } else {
+            logInactiveWarningIfNeeded()
+        }
     }
 
     // MARK: - Public Logging Methods
@@ -185,6 +201,10 @@ class FileLogger {
     }
 
     private func writeToFile(_ content: String) {
+        guard isReady else {
+            logInactiveWarningIfNeeded()
+            return
+        }
         guard let data = content.data(using: .utf8),
               let handle = currentLogHandle else {
             return
@@ -196,6 +216,13 @@ class FileLogger {
         } catch {
             logger.error("❌ Failed to write to log file: \(error.localizedDescription)")
         }
+    }
+
+    private func logInactiveWarningIfNeeded() {
+        guard !hasLoggedInactiveWarning else { return }
+        hasLoggedInactiveWarning = true
+        logger.error("⚠️ FileLogger inactive: app group container unavailable or log file not initialized.")
+        logger.error("   Verify App Group \(CloudKitConfig.appGroupID, privacy: .public) is enabled and accessible on this build.")
     }
 
     private func checkLogRotation() {

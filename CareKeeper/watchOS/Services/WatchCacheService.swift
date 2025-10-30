@@ -18,15 +18,18 @@ final class WatchCacheService {
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
     private let logger = AppLogger.app
+    private let isUsingFallbackDefaults: Bool
+    private var hasLoggedFallbackWarning = false
 
     // MARK: - Init
 
     init(userDefaults: UserDefaults? = UserDefaults(suiteName: CloudKitConfig.appGroupID)) {
         if let providedDefaults = userDefaults {
             defaults = providedDefaults
+            isUsingFallbackDefaults = false
         } else {
-            logger.warning("⚠️ WatchCacheService falling back to standard UserDefaults; app-group cache will not sync.")
             defaults = .standard
+            isUsingFallbackDefaults = true
         }
 
         encoder = JSONEncoder()
@@ -34,31 +37,43 @@ final class WatchCacheService {
 
         decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
+
+        if isUsingFallbackDefaults {
+            logFallbackWarning(reason: "UserDefaults(suiteName:) returned nil")
+        }
     }
 
     // MARK: - Public API
 
+    var isAppGroupAvailable: Bool { !isUsingFallbackDefaults }
+
     func loadCarees() -> [CareeSnapshot] {
-        decode([CareeSnapshot].self, forKey: Keys.carees)
+        guard checkAvailability(for: "carees") else { return [] }
+        return decode([CareeSnapshot].self, forKey: Keys.carees)
     }
 
     func saveCarees(_ carees: [CareeSnapshot]) {
+        guard checkAvailability(for: "carees") else { return }
         encode(carees, forKey: Keys.carees)
     }
 
     func loadActivityTypes(for careeID: UUID) -> [ActivityTypeSnapshot] {
-        decode([ActivityTypeSnapshot].self, forKey: activityTypesKey(for: careeID))
+        guard checkAvailability(for: "activityTypes_\(careeID.uuidString)") else { return [] }
+        return decode([ActivityTypeSnapshot].self, forKey: activityTypesKey(for: careeID))
     }
 
     func saveActivityTypes(_ activityTypes: [ActivityTypeSnapshot], for careeID: UUID) {
+        guard checkAvailability(for: "activityTypes_\(careeID.uuidString)") else { return }
         encode(activityTypes, forKey: activityTypesKey(for: careeID))
     }
 
     func loadRecentActivities(for careeID: UUID) -> [ActivitySnapshot] {
-        decode([ActivitySnapshot].self, forKey: recentActivitiesKey(for: careeID))
+        guard checkAvailability(for: "recentActivities_\(careeID.uuidString)") else { return [] }
+        return decode([ActivitySnapshot].self, forKey: recentActivitiesKey(for: careeID))
     }
 
     func saveRecentActivities(_ activities: [ActivitySnapshot], for careeID: UUID) {
+        guard checkAvailability(for: "recentActivities_\(careeID.uuidString)") else { return }
         encode(activities, forKey: recentActivitiesKey(for: careeID))
     }
 
@@ -105,5 +120,22 @@ final class WatchCacheService {
             defaults.removeObject(forKey: key)
             return []
         }
+    }
+}
+
+private extension WatchCacheService {
+    func checkAvailability(for key: String) -> Bool {
+        guard isAppGroupAvailable else {
+            logFallbackWarning(reason: "Attempted cache access for \(key)")
+            return false
+        }
+        return true
+    }
+
+    func logFallbackWarning(reason: String) {
+        guard !hasLoggedFallbackWarning else { return }
+        hasLoggedFallbackWarning = true
+        logger.warning("⚠️ WatchCacheService using fallback defaults. Context: \(reason)")
+        logger.warning("   Ensure app group \(CloudKitConfig.appGroupID, privacy: .public) is enabled for watch targets.")
     }
 }

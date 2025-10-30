@@ -49,6 +49,11 @@ class WatchDataProvider: ObservableObject {
         let resolvedCache = cacheService ?? WatchCacheService()
         self.cacheService = resolvedCache
 
+        guard resolvedCache.isAppGroupAvailable else {
+            logger.warning("⚠️ Watch cache disabled: app group container unavailable.")
+            return
+        }
+
         let cachedCarees = resolvedCache.loadCarees()
         self.carees = cachedCarees
 
@@ -132,7 +137,11 @@ class WatchDataProvider: ObservableObject {
                 }
 
                 carees = loadedCarees
-                cacheService.saveCarees(loadedCarees)
+                if cacheService.isAppGroupAvailable {
+                    cacheService.saveCarees(loadedCarees)
+                } else {
+                    logger.warning("⚠️ Skipping caree cache save: app group unavailable.")
+                }
                 logger.info("✅ Loaded \(self.carees.count) carees")
 
             } catch {
@@ -150,7 +159,7 @@ class WatchDataProvider: ObservableObject {
     /// Load activity types ONLY when user opens caree detail
     /// - Parameter careeID: ID of the caree
     func loadActivityTypes(for careeID: UUID, force: Bool = false) async {
-        if activityTypesByCaree[careeID] == nil {
+        if cacheService.isAppGroupAvailable, activityTypesByCaree[careeID] == nil {
             let cachedTypes = cacheService.loadActivityTypes(for: careeID)
             if !cachedTypes.isEmpty {
                 activityTypesByCaree[careeID] = cachedTypes
@@ -186,7 +195,11 @@ class WatchDataProvider: ObservableObject {
                 guard !Task.isCancelled else { return }
 
                 activityTypesByCaree[careeID] = types
-                cacheService.saveActivityTypes(types, for: careeID)
+                if cacheService.isAppGroupAvailable {
+                    cacheService.saveActivityTypes(types, for: careeID)
+                } else {
+                    logger.warning("⚠️ Skipping activity type cache save for \(careeID): app group unavailable.")
+                }
                 refreshedActivityTypesCareeIDs.insert(careeID)
                 logger.info("✅ Loaded \(types.count) activity types")
 
@@ -208,7 +221,7 @@ class WatchDataProvider: ObservableObject {
     ///   - careeID: ID of the caree
     ///   - hoursBack: How many hours of history (default 48)
     func loadRecentActivities(for careeID: UUID, hoursBack: TimeInterval = 48 * 3600, force: Bool = false) async {
-        if recentActivitiesByCaree[careeID] == nil {
+        if cacheService.isAppGroupAvailable, recentActivitiesByCaree[careeID] == nil {
             let cachedActivities = cacheService.loadRecentActivities(for: careeID)
             if !cachedActivities.isEmpty {
                 recentActivitiesByCaree[careeID] = mergedActivities(for: careeID, with: cachedActivities)
@@ -249,7 +262,11 @@ class WatchDataProvider: ObservableObject {
                 let allActivities = mergedActivities(for: careeID, with: activities)
 
                 recentActivitiesByCaree[careeID] = allActivities
-                cacheService.saveRecentActivities(allActivities, for: careeID)
+                if cacheService.isAppGroupAvailable {
+                    cacheService.saveRecentActivities(allActivities, for: careeID)
+                } else {
+                    logger.warning("⚠️ Skipping recent activity cache save for \(careeID): app group unavailable.")
+                }
                 refreshedRecentActivitiesCareeIDs.insert(careeID)
                 logger.info("✅ Loaded \(activities.count) activities (+ \(self.pendingActivities.count) pending)")
                 MemoryMonitor.logMemoryUsage(context: "After loadRecentActivities")
@@ -306,8 +323,10 @@ class WatchDataProvider: ObservableObject {
                 await self.updateActivityState(activity.id, state: .synced)
                 await self.removePendingActivity(activity.id)
                 await MainActor.run {
-                    if let updated = self.recentActivitiesByCaree[activity.careeID] {
+                    if self.cacheService.isAppGroupAvailable, let updated = self.recentActivitiesByCaree[activity.careeID] {
                         self.cacheService.saveRecentActivities(updated, for: activity.careeID)
+                    } else if !self.cacheService.isAppGroupAvailable {
+                        self.logger.warning("⚠️ Skipping recent activity cache save after create for \(activity.careeID): app group unavailable.")
                     }
                 }
 
@@ -356,8 +375,10 @@ class WatchDataProvider: ObservableObject {
                 // Update state to synced
                 await self.updateActivityState(activity.id, state: .synced)
                 await MainActor.run {
-                    if let updated = self.recentActivitiesByCaree[activity.careeID] {
+                    if self.cacheService.isAppGroupAvailable, let updated = self.recentActivitiesByCaree[activity.careeID] {
                         self.cacheService.saveRecentActivities(updated, for: activity.careeID)
+                    } else if !self.cacheService.isAppGroupAvailable {
+                        self.logger.warning("⚠️ Skipping recent activity cache save after update for \(activity.careeID): app group unavailable.")
                     }
                 }
 
@@ -400,10 +421,14 @@ class WatchDataProvider: ObservableObject {
                 )
 
                 await MainActor.run {
-                    if let updated = self.recentActivitiesByCaree[activity.careeID] {
-                        self.cacheService.saveRecentActivities(updated, for: activity.careeID)
+                    if self.cacheService.isAppGroupAvailable {
+                        if let updated = self.recentActivitiesByCaree[activity.careeID] {
+                            self.cacheService.saveRecentActivities(updated, for: activity.careeID)
+                        } else {
+                            self.cacheService.saveRecentActivities([], for: activity.careeID)
+                        }
                     } else {
-                        self.cacheService.saveRecentActivities([], for: activity.careeID)
+                        self.logger.warning("⚠️ Skipping recent activity cache save after delete for \(activity.careeID): app group unavailable.")
                     }
                 }
 
