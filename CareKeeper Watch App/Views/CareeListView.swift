@@ -18,16 +18,6 @@ struct CareeListView: View {
         NavigationStack {
             contentView
                 .navigationTitle("Carees")
-                .overlay(alignment: .topTrailing) {
-                    if logStreamService.streamingLevel != .off {
-                        Label(logStreamService.streamingLevel.displayName, systemImage: "waveform.path.ecg")
-                            .font(.caption2)
-                            .padding(6)
-                            .background(Color.blue.opacity(0.2))
-                            .clipShape(Capsule())
-                            .padding([.top, .trailing], 4)
-                    }
-                }
                 .task {
                     // Cancel previous task if view reappears
                     loadTask?.cancel()
@@ -40,6 +30,19 @@ struct CareeListView: View {
                     // Clean up when view disappears
                     loadTask?.cancel()
                     loadTask = nil
+                }
+                .toolbar {
+                    ToolbarItemGroup(placement: .topBarTrailing) {
+                        if dataProvider.isRefreshingCarees && !dataProvider.carees.isEmpty {
+                            ProgressView()
+                                .scaleEffect(0.6)
+                        }
+
+                        if logStreamService.streamingLevel != .off {
+                            Label(logStreamService.streamingLevel.displayName, systemImage: "waveform.path.ecg")
+                                .font(.caption2)
+                        }
+                    }
                 }
                 .errorAlert($error)
         }
@@ -127,13 +130,6 @@ struct CareeListView: View {
         .refreshable {
             guard !Task.isCancelled else { return }
             await dataProvider.loadCarees(force: true) // Force refresh to remove deleted carees
-        }
-        .overlay(alignment: .topTrailing) {
-            if dataProvider.isRefreshingCarees && !dataProvider.carees.isEmpty {
-                ProgressView()
-                    .scaleEffect(0.6)
-                    .padding(8)
-            }
         }
     }
 

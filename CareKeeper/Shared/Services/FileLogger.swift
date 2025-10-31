@@ -135,9 +135,11 @@ class FileLogger {
 
         do {
             guard let handle = currentLogHandle else {
-                throw NSError(domain: "FileLogger", code: 0, userInfo: [NSLocalizedDescriptionKey: "File handle unavailable"])}
+                throw NSError(domain: "FileLogger", code: 0, userInfo: [NSLocalizedDescriptionKey: "File handle unavailable"])
+            }
             try handle.write(contentsOf: Data(header.utf8))
             try handle.synchronize()
+            try handle.seekToEnd()
             isReady = true
             hasLoggedInactiveWarning = false
             logger.info("📝 Log file initialized: \(filename)")
@@ -237,6 +239,7 @@ class FileLogger {
         }
 
         do {
+            try handle.seekToEnd()
             try handle.write(contentsOf: data)
             try handle.synchronize() // Force write to disk immediately
         } catch {
