@@ -36,6 +36,13 @@ struct ActivityDetailView: View {
         return nil
     }
 
+    private var currentActivity: ActivitySnapshot {
+        if let refreshed = dataProvider.recentActivitiesByCaree[activitySnapshot.careeID]?.first(where: { $0.id == activitySnapshot.id }) {
+            return refreshed
+        }
+        return activitySnapshot
+    }
+
     private var editedDateTime: Date {
         Date().addingTimeInterval(-minutesAgo * 60)
     }
@@ -55,7 +62,7 @@ struct ActivityDetailView: View {
                         .fontWeight(.semibold)
 
                     // Sync state if not synced
-                    if activitySnapshot.syncState != .synced {
+                    if currentActivity.syncState != .synced {
                         syncStateBadge
                     }
                 }
@@ -66,13 +73,13 @@ struct ActivityDetailView: View {
                 detailsSection
                     .padding(.horizontal)
 
-                if isEditing || activitySnapshot.notes != nil || activitySnapshot.quantity != nil {
+                if isEditing || currentActivity.notes != nil || currentActivity.quantity != nil {
                     Divider()
                     additionalInfoSection
                         .padding(.horizontal)
                 }
 
-                if activitySnapshot.latitude != nil && activitySnapshot.longitude != nil {
+                if currentActivity.latitude != nil && currentActivity.longitude != nil {
                     Divider()
                     locationSection
                         .padding(.horizontal)
@@ -109,7 +116,7 @@ struct ActivityDetailView: View {
             }
             .padding(.vertical)
         }
-        .navigationTitle(Text(activitySnapshot.dateTime, style: .date))
+        .navigationTitle(Text(currentActivity.dateTime, style: .date))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -142,6 +149,13 @@ struct ActivityDetailView: View {
                     }
                 }
             }
+
+            ToolbarItemGroup(placement: .topBarLeading) {
+                if dataProvider.isRefreshingCarees || dataProvider.isRefreshingRecentActivities(for: currentActivity.careeID) {
+                    ProgressView()
+                        .scaleEffect(0.6)
+                }
+            }
         }
         .confirmationDialog(
             "Delete this activity?",
@@ -160,6 +174,10 @@ struct ActivityDetailView: View {
             }
         }
         .onAppear {
+            initializeEditingValues()
+        }
+        .onChange(of: dataProvider.recentActivitiesByCaree[currentActivity.careeID]) { _, _ in
+            guard !isEditing else { return }
             initializeEditingValues()
         }
     }
@@ -203,7 +221,7 @@ struct ActivityDetailView: View {
     private var syncStateBadge: some View {
         VStack(spacing: 8) {
             HStack(spacing: 4) {
-                switch activitySnapshot.syncState {
+                switch currentActivity.syncState {
                 case .pending:
                     Image(systemName: "clock")
                     Text("Pending")
@@ -226,7 +244,7 @@ struct ActivityDetailView: View {
             .cornerRadius(12)
 
             // Show error details for failed state
-            if case .failed(let errorMessage) = activitySnapshot.syncState {
+            if case .failed(let errorMessage) = currentActivity.syncState {
                 VStack(spacing: 8) {
                     Text(errorMessage)
                         .font(.caption2)
@@ -260,7 +278,7 @@ struct ActivityDetailView: View {
 
         Task {
             // Re-trigger the sync by calling trackActivity again
-            await dataProvider.trackActivity(activitySnapshot)
+            await dataProvider.trackActivity(currentActivity)
 
             await MainActor.run {
                 isRetrying = false
@@ -269,11 +287,11 @@ struct ActivityDetailView: View {
     }
 
     private func initializeEditingValues() {
-        editedNotes = activitySnapshot.notes ?? ""
-        editedQuantity = activitySnapshot.quantity ?? 0
+        editedNotes = currentActivity.notes ?? ""
+        editedQuantity = currentActivity.quantity ?? 0
 
         // Calculate minutes ago from current time
-        let timeDiff = Date().timeIntervalSince(activitySnapshot.dateTime)
+        let timeDiff = Date().timeIntervalSince(currentActivity.dateTime)
         minutesAgo = max(0, timeDiff / 60)
     }
 
@@ -298,19 +316,19 @@ struct ActivityDetailView: View {
 
         Task {
             // Use new location if captured, otherwise keep existing location
-            let latitude = captureNewLocation ? locationManager.location?.coordinate.latitude : activitySnapshot.latitude
-            let longitude = captureNewLocation ? locationManager.location?.coordinate.longitude : activitySnapshot.longitude
+            let latitude = captureNewLocation ? locationManager.location?.coordinate.latitude : currentActivity.latitude
+            let longitude = captureNewLocation ? locationManager.location?.coordinate.longitude : currentActivity.longitude
 
             // Create new activity snapshot with updated values
             let updatedActivity = ActivitySnapshot(
-                id: activitySnapshot.id,
+                id: currentActivity.id,
                 dateTime: editedDateTime,
                 notes: editedNotes.isEmpty ? nil : editedNotes,
-                quantity: activityType?.hasQuantity == true ? editedQuantity : activitySnapshot.quantity,
+                quantity: activityType?.hasQuantity == true ? editedQuantity : currentActivity.quantity,
                 latitude: latitude,
                 longitude: longitude,
-                activityTypeID: activitySnapshot.activityTypeID,
-                careeID: activitySnapshot.careeID
+                activityTypeID: currentActivity.activityTypeID,
+                careeID: currentActivity.careeID
             )
 
             // Update the activity (optimistic UI with background sync)
@@ -341,7 +359,7 @@ struct ActivityDetailView: View {
 
         Task {
             // Delete the activity using WatchDataProvider
-            await dataProvider.deleteActivity(activitySnapshot)
+            await dataProvider.deleteActivity(currentActivity)
 
             // Show success toast briefly before dismissing
             await MainActor.run {
@@ -407,7 +425,7 @@ struct ActivityDetailView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text(activitySnapshot.dateTime, style: .time)
+                    Text(currentActivity.dateTime, style: .time)
                         .font(.body)
                 }
 
@@ -417,7 +435,7 @@ struct ActivityDetailView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text(activitySnapshot.dateTime, style: .date)
+                    Text(currentActivity.dateTime, style: .date)
                         .font(.body)
                 }
             }
@@ -459,17 +477,17 @@ struct ActivityDetailView: View {
                             sensitivity: .medium
                         )
                     }
-                } else if let quantity = activitySnapshot.quantity {
+                } else if let quantity = currentActivity.quantity {
                     HStack {
                         Label("Quantity", systemImage: "number")
                             .font(.caption)
                             .foregroundColor(.secondary)
                         Spacer()
-                        if let unit = activityType?.quantityUnit {
-                            Text("\(String(format: "%.1f", quantity)) \(unit)")
-                                .font(.body)
-                        } else {
-                            Text(String(format: "%.1f", quantity))
+                    if let unit = activityType?.quantityUnit {
+                        Text("\(String(format: "%.1f", quantity)) \(unit)")
+                            .font(.body)
+                    } else {
+                        Text(String(format: "%.1f", quantity))
                                 .font(.body)
                         }
                     }
@@ -488,7 +506,7 @@ struct ActivityDetailView: View {
                         .padding()
                         .background(Color.gray.opacity(0.3))
                         .cornerRadius(8)
-                } else if let notes = activitySnapshot.notes, !notes.isEmpty {
+                } else if let notes = currentActivity.notes, !notes.isEmpty {
                     Text(notes)
                         .font(.body)
                         .foregroundColor(.primary)
@@ -504,14 +522,14 @@ struct ActivityDetailView: View {
     @ViewBuilder
     private var locationSection: some View {
         // Only show if activity type supports location OR if there's already a location
-        if activityType?.hasLocation == true || (activitySnapshot.latitude != nil && activitySnapshot.longitude != nil) {
+        if activityType?.hasLocation == true || (currentActivity.latitude != nil && currentActivity.longitude != nil) {
             VStack(alignment: .leading, spacing: 8) {
                 Label("Location", systemImage: "location")
                     .font(.caption)
                     .foregroundColor(.secondary)
 
                 // In edit mode, allow capturing new location
-                if isEditing && (activityType?.hasLocation == true || (activitySnapshot.latitude != nil && activitySnapshot.longitude != nil)) {
+                if isEditing && (activityType?.hasLocation == true || (currentActivity.latitude != nil && currentActivity.longitude != nil)) {
                     Toggle(isOn: $captureNewLocation) {
                         Text("Update Location")
                             .font(.body)
@@ -547,8 +565,8 @@ struct ActivityDetailView: View {
                 }
 
                 // Display current or existing location
-                if let latitude = (captureNewLocation ? locationManager.location?.coordinate.latitude : activitySnapshot.latitude),
-                   let longitude = (captureNewLocation ? locationManager.location?.coordinate.longitude : activitySnapshot.longitude) {
+                if let latitude = (captureNewLocation ? locationManager.location?.coordinate.latitude : currentActivity.latitude),
+                   let longitude = (captureNewLocation ? locationManager.location?.coordinate.longitude : currentActivity.longitude) {
                     Map(initialPosition: .region(
                         MKCoordinateRegion(
                             center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
@@ -563,7 +581,7 @@ struct ActivityDetailView: View {
                     Text("Lat: \(String(format: "%.6f", latitude)), Lon: \(String(format: "%.6f", longitude))")
                         .font(.caption2)
                         .foregroundColor(.secondary)
-                } else if !isEditing && activitySnapshot.latitude == nil {
+                } else if !isEditing && currentActivity.latitude == nil {
                     Text("No location recorded")
                         .font(.caption)
                         .foregroundColor(.secondary)
