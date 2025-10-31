@@ -55,7 +55,12 @@ struct CareeDetailView: View {
         }
         .navigationTitle(careeSnapshot.name)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                if dataProvider.isRefreshingCarees || (isRefreshingActivityTypes && !isLoadingActivityTypes) {
+                    ProgressView()
+                        .scaleEffect(0.6)
+                }
+
                 Button {
                     toggleNotifications()
                 } label: {
@@ -92,13 +97,6 @@ struct CareeDetailView: View {
             }
 
             await loadTask?.value
-        }
-        .overlay(alignment: .topTrailing) {
-            if isRefreshingActivityTypes && !isLoadingActivityTypes {
-                ProgressView()
-                    .scaleEffect(0.6)
-                    .padding(8)
-            }
         }
         .onDisappear {
             loadTask?.cancel()

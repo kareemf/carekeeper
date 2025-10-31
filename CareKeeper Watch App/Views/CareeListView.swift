@@ -33,7 +33,7 @@ struct CareeListView: View {
                 }
                 .toolbar {
                     ToolbarItemGroup(placement: .topBarTrailing) {
-                        if dataProvider.isRefreshingCarees && !dataProvider.carees.isEmpty {
+                        if dataProvider.isRefreshingCarees {
                             ProgressView()
                                 .scaleEffect(0.6)
                         }

@@ -49,7 +49,11 @@ struct ActivityListView: View {
         .navigationTitle("Activities")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                if dataProvider.isRefreshingCarees || (isRefreshing && !isLoading) {
+                    ProgressView()
+                        .scaleEffect(0.6)
+                }
                 filterButton
             }
         }
@@ -147,13 +151,6 @@ struct ActivityListView: View {
         .refreshable {
             guard !Task.isCancelled else { return }
             await dataProvider.loadRecentActivities(for: careeSnapshot.id, hoursBack: hoursToLoad, force: true)
-        }
-        .overlay(alignment: .topTrailing) {
-            if isRefreshing && !isLoading {
-                ProgressView()
-                    .scaleEffect(0.6)
-                    .padding(8)
-            }
         }
     }
 
