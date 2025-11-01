@@ -101,9 +101,6 @@ struct CareeDetailView: View {
         .onDisappear {
             loadTask?.cancel()
             loadTask = nil
-
-            // Clear cache for this caree to free memory
-            dataProvider.clearUnusedCache(except: nil)
         }
     }
 
