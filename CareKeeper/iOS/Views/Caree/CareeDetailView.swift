@@ -587,6 +587,14 @@ struct CareeDetailView: View {
             await sharedRecordsService.fetchSharedCarees()
             resolvedCaree = resolveCareeFromCache()
             isLoadingSharedCaree = false
+        } else {
+            do {
+                try await cloudKitService.refreshOwnedCareesFromCloudKit()
+                resolvedCaree = resolveCareeFromCache()
+            } catch {
+                logger.error("❌ Owned caree refresh failed: \(error.localizedDescription)")
+                self.error = error
+            }
         }
 
         // Check sync status (only relevant for owned carees; harmless for shared)
