@@ -114,6 +114,112 @@ class LocalCacheService: ObservableObject {
 
         scheduleRefresh(reason: "removeCachedActivity")
     }
+    
+    /// Replace a caree and all of its children in one pass.
+    /// Used when rehydrating from a full CloudKit backfill to avoid incremental drift.
+    func replaceCaree(
+        _ caree: Caree,
+        activityTypes: [ActivityType],
+        activities: [Activity],
+        activityTypeIDsByActivity: [UUID: UUID]
+    ) async throws {
+        logger.info("Replacing cached caree: \(caree.name)")
+
+        // Upsert the managed Caree instance
+        let managedCaree: Caree
+        if let existing = getCachedCaree(id: caree.id) {
+            existing.applyScalarUpdates(from: caree)
+            existing.isShared = caree.isShared
+            existing.isOwned = caree.isOwned
+            existing.lastSyncedAt = Date()
+            existing.cloudKitRecordID = "CD_Caree/\(caree.id.uuidString)"
+            managedCaree = existing
+        } else {
+            let newCaree = Caree(name: caree.name, image: caree.image, listOrder: caree.listOrder)
+            newCaree.id = caree.id
+            newCaree.dateCreated = caree.dateCreated
+            newCaree.isShared = caree.isShared
+            newCaree.isOwned = caree.isOwned
+            newCaree.lastSyncedAt = Date()
+            newCaree.cloudKitRecordID = "CD_Caree/\(caree.id.uuidString)"
+            modelContext.insert(newCaree)
+            managedCaree = newCaree
+        }
+
+        // Remove existing children so we can rebuild authoritative lists.
+        if let existingTypes = managedCaree.activityTypes {
+            for type in existingTypes {
+                modelContext.delete(type)
+            }
+        }
+        if let existingActivities = managedCaree.activities {
+            for activity in existingActivities {
+                modelContext.delete(activity)
+            }
+        }
+        managedCaree.activityTypes = []
+        managedCaree.activities = []
+
+        // Recreate activity types, preserving order.
+        var managedTypesByID: [UUID: ActivityType] = [:]
+        var managedTypeList: [ActivityType] = []
+        for type in activityTypes.sorted(by: { $0.listOrder < $1.listOrder }) {
+            let newType = ActivityType(
+                name: type.name,
+                icon: type.icon,
+                hasQuantity: type.hasQuantity,
+                quantityUnit: type.quantityUnit,
+                hasLocation: type.hasLocation,
+                listOrder: type.listOrder
+            )
+            newType.id = type.id
+            newType.dateCreated = type.dateCreated
+            newType.lastSyncedAt = Date()
+            newType.cloudKitRecordID = "CD_ActivityType/\(type.id.uuidString)"
+            newType.caree = managedCaree
+            modelContext.insert(newType)
+            managedTypesByID[newType.id] = newType
+            managedTypeList.append(newType)
+        }
+        managedCaree.activityTypes = managedTypeList
+
+        // Recreate activities, sorted newest-first for consistency with recentActivities.
+        var managedActivities: [Activity] = []
+        for activity in activities {
+            let newActivity = Activity(
+                dateTime: activity.dateTime,
+                notes: activity.notes,
+                quantity: activity.quantity,
+                latitude: activity.latitude,
+                longitude: activity.longitude
+            )
+            newActivity.id = activity.id
+            newActivity.dateCreated = activity.dateCreated
+            newActivity.lastSyncedAt = Date()
+            newActivity.cloudKitRecordID = "CD_Activity/\(activity.id.uuidString)"
+            newActivity.caree = managedCaree
+
+            if let activityTypeID = activityTypeIDsByActivity[activity.id],
+               let managedType = managedTypesByID[activityTypeID] {
+                newActivity.activityType = managedType
+                var typeActivities = managedType.activities ?? []
+                typeActivities.append(newActivity)
+                managedType.activities = typeActivities.sorted { $0.dateTime > $1.dateTime }
+            }
+
+            modelContext.insert(newActivity)
+            managedActivities.append(newActivity)
+        }
+
+        // Ensure caree and types have activities sorted by recency.
+        managedCaree.activities = managedActivities.sorted { $0.dateTime > $1.dateTime }
+        for type in managedTypeList {
+            type.activities = (type.activities ?? []).sorted { $0.dateTime > $1.dateTime }
+        }
+
+        try modelContext.save()
+        scheduleRefresh(reason: "replaceCaree")
+    }
 
     /// Cache an ActivityType in SwiftData
     /// - Parameters:

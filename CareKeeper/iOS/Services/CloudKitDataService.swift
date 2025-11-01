@@ -1056,17 +1056,17 @@ class CloudKitDataService: ObservableObject {
             for caree in careesByID.values.sorted(by: { $0.listOrder < $1.listOrder }) {
                 do {
                     let cacheCaree = cloneCareeForCaching(caree, isShared: false)
-                    try await cacheService.cacheCaree(cacheCaree, isShared: false)
-                    for at in (activityTypesByCaree[caree.id] ?? []) {
-                        try await cacheService.cacheActivityType(at, for: cacheCaree)
-                    }
-                    for activity in (activitiesByCaree[caree.id] ?? []) {
-                        guard let activityTypeID = activityTypeIDByActivity[activity.id] else {
-                            logger.warning("⚠️ Missing activity type reference for activity \(activity.id)")
-                            continue
-                        }
-                        try await cacheService.cacheActivity(activity, for: cacheCaree, activityTypeID: activityTypeID)
-                    }
+                    let types = activityTypesByCaree[caree.id] ?? []
+                    let activities = activitiesByCaree[caree.id] ?? []
+                    let mapping = Dictionary(uniqueKeysWithValues: activities.compactMap { activity in
+                        activityTypeIDByActivity[activity.id].map { (activity.id, $0) }
+                    })
+                    try await cacheService.replaceCaree(
+                        cacheCaree,
+                        activityTypes: types,
+                        activities: activities,
+                        activityTypeIDsByActivity: mapping
+                    )
                 } catch {
                     logger.warning("⚠️ Failed caching owned records: \(error.localizedDescription)")
                 }
