@@ -917,36 +917,30 @@ class CloudKitDataService: ObservableObject {
 
         // Carees
         let careeQuery = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
-        let (careeResults, _) = try await privateDB.records(matching: careeQuery, inZoneWith: zoneID)
-        var careeRecords: [CKRecord] = []
-        for (_, result) in careeResults {
-            switch result {
-            case .success(let record): careeRecords.append(record)
-            case .failure(let error): logger.warning("⚠️ Failed caree record fetch: \(error.localizedDescription)")
-            }
-        }
+        let careeRecords = try await fetchAllRecords(
+            query: careeQuery,
+            database: privateDB,
+            zoneID: zoneID,
+            recordType: "CD_Caree"
+        )
 
         // ActivityTypes
         let atQuery = CKQuery(recordType: "CD_ActivityType", predicate: NSPredicate(value: true))
-        let (atResults, _) = try await privateDB.records(matching: atQuery, inZoneWith: zoneID)
-        var atRecords: [CKRecord] = []
-        for (_, result) in atResults {
-            switch result {
-            case .success(let record): atRecords.append(record)
-            case .failure(let error): logger.warning("⚠️ Failed activity type record fetch: \(error.localizedDescription)")
-            }
-        }
+        let atRecords = try await fetchAllRecords(
+            query: atQuery,
+            database: privateDB,
+            zoneID: zoneID,
+            recordType: "CD_ActivityType"
+        )
 
         // Activities
         let aQuery = CKQuery(recordType: "CD_Activity", predicate: NSPredicate(value: true))
-        let (aResults, _) = try await privateDB.records(matching: aQuery, inZoneWith: zoneID)
-        var aRecords: [CKRecord] = []
-        for (_, result) in aResults {
-            switch result {
-            case .success(let record): aRecords.append(record)
-            case .failure(let error): logger.warning("⚠️ Failed activity record fetch: \(error.localizedDescription)")
-            }
-        }
+        let aRecords = try await fetchAllRecords(
+            query: aQuery,
+            database: privateDB,
+            zoneID: zoneID,
+            recordType: "CD_Activity"
+        )
 
         // Convert and cache
         guard let cacheService = cacheService else {
@@ -1076,6 +1070,55 @@ class CloudKitDataService: ObservableObject {
         // No explicit refreshPublishedProperties call needed; the batch coalesces a single refresh.
         NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
         logger.info("✅ Owned records refreshed and cache updated")
+    }
+
+    private func fetchAllRecords(
+        query: CKQuery,
+        database: CKDatabase,
+        zoneID: CKRecordZone.ID,
+        recordType: String,
+        desiredKeys: [String]? = nil,
+        resultsLimit: Int = CKQueryOperation.maximumResults
+    ) async throws -> [CKRecord] {
+        var records: [CKRecord] = []
+        var cursor: CKQueryOperation.Cursor?
+
+        var batchIndex = 0
+
+        repeat {
+            let matchResults: [(CKRecord.ID, Result<CKRecord, Error>)]
+            let nextCursor: CKQueryOperation.Cursor?
+
+            if let cursor = cursor {
+                (matchResults, nextCursor) = try await database.records(
+                    continuingMatchFrom: cursor,
+                    desiredKeys: desiredKeys,
+                    resultsLimit: resultsLimit
+                )
+            } else {
+                (matchResults, nextCursor) = try await database.records(
+                    matching: query,
+                    inZoneWith: zoneID,
+                    desiredKeys: desiredKeys,
+                    resultsLimit: resultsLimit
+                )
+            }
+
+            for (_, result) in matchResults {
+                switch result {
+                case .success(let record):
+                    records.append(record)
+                case .failure(let error):
+                    logger.warning("⚠️ Failed \(recordType) record fetch: \(error.localizedDescription)")
+                }
+            }
+
+            batchIndex += 1
+            cursor = nextCursor
+        } while cursor != nil
+
+        logger.info("📥 Fetched \(records.count) \(recordType) records (\(batchIndex) batch\(batchIndex == 1 ? "" : "es"))")
+        return records
     }
 
     private func cloneCareeForCaching(_ caree: Caree, isShared: Bool) -> Caree {
