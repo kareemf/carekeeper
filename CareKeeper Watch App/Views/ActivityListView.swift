@@ -72,8 +72,6 @@ struct ActivityListView: View {
 
                 MemoryMonitor.logMemoryUsage(context: "ActivityListView - After Load")
             }
-
-            await loadTask?.value
         }
         .onDisappear {
             loadTask?.cancel()

@@ -95,8 +95,6 @@ struct CareeDetailView: View {
 
                 MemoryMonitor.logMemoryUsage(context: "CareeDetailView - After Load ActivityTypes")
             }
-
-            await loadTask?.value
         }
         .onDisappear {
             loadTask?.cancel()
