@@ -33,7 +33,7 @@ All planned phases (0-3) have been completed. The watchOS app has been completel
 ### Phase 1: Selective CloudKit Queries ✅
 **New Files:**
 - `Snapshots.swift` - Immutable value types (CareeSnapshot, ActivityTypeSnapshot, ActivitySnapshot)
-- `SelectiveCloudKitService.swift` - Time-filtered queries (48h) with 100 activity cap
+- `SelectiveCloudKitService.swift` - Time-filtered queries (24h) with 100 activity cap
 - `WatchDataProvider.swift` - Lazy loading state manager with task cancellation
 
 **Key Optimization:**
@@ -44,7 +44,7 @@ let activities = caree.activities  // Could be 1000s of records
 // After: Load only recent for ONE caree when requested
 let activities = try await selectiveService.fetchRecentActivities(
     for: careeID,
-    hoursBack: 48 * 3600,  // Last 48h only
+    hoursBack: 24 * 3600,  // Last 24h only
     resultsLimit: 100       // Hard cap
 )
 ```
@@ -154,7 +154,7 @@ CareeDetailView
   1. Load carees only (small)
   2. Load activity types when caree tapped (on-demand)
   3. Load activities when list opened (on-demand)
-  4. Only last 48h with 100 record cap
+  4. Only last 24h with 100 record cap
 
 ---
 

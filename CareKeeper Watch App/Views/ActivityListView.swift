@@ -3,7 +3,7 @@ import SwiftUI
 /// ActivityListView rebuilt with lazy loading and pagination
 /// Key features:
 /// - Lazy loads activities when view appears (not upfront)
-/// - Only loads last 48h by default
+/// - Only loads last 24h by default
 /// - Pagination: "Load Older" button for more history
 /// - Uses snapshots instead of SwiftData models
 /// - Task cancellation and memory cleanup
@@ -14,7 +14,7 @@ struct ActivityListView: View {
 
     @EnvironmentObject private var dataProvider: WatchDataProvider
     @State private var loadTask: Task<Void, Never>?
-    @State private var hoursToLoad: TimeInterval = 48 * 3600  // Start with 48h
+    @State private var hoursToLoad: TimeInterval = 24 * 3600  // Start with 24h
     @State private var filterActivityTypeID: UUID? = nil
 
     private var activities: [ActivitySnapshot] {
@@ -103,7 +103,7 @@ struct ActivityListView: View {
                 Text("No Matching Activities")
                     .font(.headline)
 
-                Text("No activities found for this type in the last 48 hours")
+                Text("No activities found for this type in the last 24 hours")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -118,7 +118,7 @@ struct ActivityListView: View {
                 Text("No (Recent) Activities")
                     .font(.headline)
 
-                Text("Activities tracked in the last 48 hours will appear here")
+                Text("Activities tracked in the last 24 hours will appear here")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -189,7 +189,7 @@ struct ActivityListView: View {
 
     private var loadMoreButton: some View {
         Button {
-            hoursToLoad += 48 * 3600  // Add another 48h
+            hoursToLoad += 24 * 3600  // Add another 24h
             Task {
                 await dataProvider.loadRecentActivities(for: careeSnapshot.id, hoursBack: hoursToLoad, force: true)
             }

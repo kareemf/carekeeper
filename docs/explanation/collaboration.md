@@ -318,13 +318,13 @@ For large shared carees (hundreds of activities):
 - Background refresh keeps data current
 
 **watchOS:**
-- Loads only last 48 hours of activities
+- Loads only last 24 hours of activities
 - Limits to 100 activities per caree
 - Clears cache on view disappear
 - Optimized for memory constraints
 
 !!! note "watchOS Limitations"
-    If you need full history on watch, view on iPhone instead. The 48-hour window is intentional for performance.
+    If you need full history on watch, view on iPhone instead. The 24-hour window is intentional for performance.
 
 ### Data Consistency
 

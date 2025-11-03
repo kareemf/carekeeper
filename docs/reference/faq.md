@@ -331,14 +331,14 @@ Without iCloud, CareKeeper cannot function.
 
 ## Technical Questions
 
-### Why does the watch app only show 48 hours of activities?
+### Why does the watch app only show 24 hours of activities?
 
 **Memory optimization.** Apple Watch has limited memory (~30-50MB for apps). Loading full activity history would:
 - Use too much memory
 - Cause crashes
 - Slow down the app
 
-48 hours covers recent activities while keeping the watch app fast and reliable. View full history on iPhone.
+24 hours covers recent activities while keeping the watch app fast and reliable. View full history on iPhone if you need more history.
 
 ---
 

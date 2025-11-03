@@ -124,14 +124,14 @@ The app uses SwiftData with three main model entities:
 
 - **WatchDataProvider** (watchOS only): Snapshot-based data provider
   - Direct CloudKit communication via SelectiveCloudKitService
-  - Lazy loading strategy: carees eager, activity types on-demand, activities on-demand (48h window)
+  - Lazy loading strategy: carees eager, activity types on-demand, activities on-demand (24h window)
   - Memory management with cache clearing (`clearUnusedCache`, `clearAllCache`) and task cancellation
   - Optimistic UI with sync state tracking (pending → syncing → synced/failed)
   - No SwiftData - uses immutable snapshots (CareeSnapshot, ActivityTypeSnapshot, ActivitySnapshot)
   - Background sync with Task.detached, restores UI on failure
 
 - **SelectiveCloudKitService** (watchOS only): Watch-optimized CloudKit queries
-  - Aggressive filtering: 48-hour activity window, 100 activities max, 50 activity types max
+  - Aggressive filtering: 24-hour activity window, 100 activities max, 50 activity types max
   - Retry logic with exponential backoff (2s, 4s, 8s) for transient errors
   - Zone discovery for shared database queries (searches all zones)
   - Lightweight count queries without loading full objects
@@ -204,7 +204,7 @@ The app uses SwiftData with three main model entities:
 **Loading Strategy**: Lazy loading with aggressive limits
 - Carees: Eager (small dataset, ~20 typical)
 - Activity types: On-demand when user opens caree detail
-- Activities: On-demand with 48-hour window, 100 max per caree
+- Activities: On-demand with 24-hour window, 100 max per caree
 - Active cache clearing on view disappear
 
 **Data Models**: Immutable snapshots, flat structure

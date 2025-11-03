@@ -28,7 +28,7 @@ Based on Apple's official guidance (WWDC 2021 - "There and back again: Data tran
 6. ❌ **Memory pressure**: Too much data for watchOS constraints
 
 ### Solution Strategy:
-- ✅ **Selective queries**: Load only recent data (last 48 hours)
+- ✅ **Selective queries**: Load only recent data (last 24 hours)
 - ✅ **Hard limits**: Cap at 100 activities per query
 - ✅ **Lazy loading**: Load activity types/activities on-demand, not upfront
 - ✅ **Immutable snapshots**: No SwiftData relationships in views
@@ -71,7 +71,7 @@ Based on Apple's official guidance (WWDC 2021 - "There and back again: Data tran
 
 **Key Constants**:
 ```swift
-static let activityHistoryHours: TimeInterval = 48 * 3600  // 48 hours
+static let activityHistoryHours: TimeInterval = 24 * 3600  // 24 hours
 static let maxActivitiesPerCaree = 100
 static let maxActivityTypes = 50
 ```
@@ -153,7 +153,7 @@ static let maxActivityTypes = 50
    - Task cancellation guards
 
 3. **ActivityListView**
-   - Lazy load recent activities (48h default)
+   - Lazy load recent activities (24h default)
    - Pagination: "Load Older" button for more history
    - Task cancellation
 
@@ -217,7 +217,7 @@ static let maxActivityTypes = 50
 |---------|----------|
 | Over-fetching data | Selective queries with hard limits (100 activities max) |
 | Eager loading | Lazy loading (activity types on caree tap, activities on list open) |
-| Unlimited history | Time-based filter (last 48h) + pagination |
+| Unlimited history | Time-based filter (last 24h) + pagination |
 | Unsafe relationships | Immutable snapshots (no SwiftData relationships in UI) |
 | Missing cancellation | Task cancellation guards on all async operations |
 | Complex Combine | Explicit async/await, minimal publishers |
@@ -242,7 +242,7 @@ static let maxActivityTypes = 50
 
 **Reasoning**:
 - Apple warns: "~10k entities may never complete syncing on watch"
-- Watch users only need recent data (last 48 hours typical)
+- Watch users only need recent data (last 24 hours typical)
 - Pagination available for older history if needed
 - Dramatically reduces memory footprint
 
@@ -357,7 +357,7 @@ CareKeeper/ (iOS)
 - Simpler debugging and testing
 - Better performance (no fetch cascades)
 
-### Why 48 Hours Default?
+### Why 24 Hours Default?
 - Covers typical caregiver use case (recent activity tracking)
 - Small enough to load quickly
 - Pagination available for older history
@@ -392,7 +392,7 @@ If refactor doesn't improve stability:
 - [ ] Crash rate: <1% of sessions
 - [ ] Memory usage: <30MB peak
 - [ ] Time to load carees: <2s
-- [ ] Data fetched: Only last 48h activities (~100 max)
+- [ ] Data fetched: Only last 24h activities (~100 max)
 
 ---
 

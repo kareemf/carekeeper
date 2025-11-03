@@ -5,7 +5,7 @@ Accepted
 
 ## Context
 watchOS has severe memory constraints (~30MB typical, ~50MB max) compared to iOS (~200-400MB). The iOS dual-container SwiftData architecture would be too memory-intensive for watchOS. Requirements:
-- Display carees and recent activities (48-hour window)
+- Display carees and recent activities (24-hour window)
 - Track new activities with Digital Crown input
 - Minimize memory footprint
 - Avoid accidental relationship traversal (memory spikes)
@@ -15,14 +15,14 @@ watchOS has severe memory constraints (~30MB typical, ~50MB max) compared to iOS
 Implement a direct CloudKit architecture with immutable snapshots:
 1. **No SwiftData**: Skip ModelContainer initialization entirely
 2. **WatchDataProvider**: Single data source with lazy loading
-3. **SelectiveCloudKitService**: Aggressive query limits (48h, 100 activities max)
+3. **SelectiveCloudKitService**: Aggressive query limits (24h, 100 activities max)
 4. **Immutable Snapshots**: CareeSnapshot, ActivityTypeSnapshot, ActivitySnapshot
 5. **Manual Cache Management**: Explicit `clearUnusedCache()` and `clearAllCache()` methods
 
 Loading strategy:
 - Carees: Eager (small dataset, ~20 typical)
 - Activity types: On-demand when user opens caree detail
-- Activities: On-demand with 48-hour window, 100 max per caree
+- Activities: On-demand with 24-hour window, 100 max per caree
 - Clear cache on view disappear
 
 ## Consequences
@@ -35,7 +35,7 @@ Loading strategy:
 - **Clear cache lifecycle**: Explicit cache management tied to views
 
 ### Negative
-- **Limited history**: Only 48 hours of activities (vs full history on iOS)
+- **Limited history**: Only 24 hours of activities (vs full history on iOS)
 - **Manual cache management**: Developer must call clearCache methods
 - **Code duplication**: Separate data layer from iOS
 - **No automatic updates**: Must manually refresh after mutations

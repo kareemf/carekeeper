@@ -222,8 +222,8 @@ The watch app is optimized for memory:
 - Loads activities on demand
 - Caches recently accessed data
 
-!!! note "48-Hour Window"
-    For performance, the watch app shows activities from the last 48 hours. View full history on iPhone.
+!!! note "24-Hour Window"
+    For performance, the watch app shows activities from the last 24 hours. View full history on iPhone for older records.
 
 ## Related Guides
 
