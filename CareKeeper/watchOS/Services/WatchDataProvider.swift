@@ -111,30 +111,21 @@ class WatchDataProvider: ObservableObject {
             }
 
             do {
-                // Load carees (acceptable - small dataset)
-                var loadedCarees = try await selectiveService.fetchAllCarees()
-
-                guard !Task.isCancelled else {
-                    return
-                }
-
-                // Load activity type COUNTS (not full objects)
-                for index in loadedCarees.indices {
-                    guard !Task.isCancelled else {
-                        return
+                let loadedCarees = try await Task.detached(priority: .utility) { [selectiveService] () -> [CareeSnapshot] in
+                    var results = try await selectiveService.fetchAllCarees()
+                    for index in results.indices {
+                        try Task.checkCancellation()
+                        let caree = results[index]
+                        let count = try await selectiveService.fetchActivityTypeCount(
+                            for: caree.id,
+                            isShared: caree.isShared
+                        )
+                        results[index].activityTypeCount = count
                     }
+                    return results
+                }.value
 
-                    let caree = loadedCarees[index]
-                    let count = try await selectiveService.fetchActivityTypeCount(
-                        for: caree.id,
-                        isShared: caree.isShared
-                    )
-                    loadedCarees[index].activityTypeCount = count
-                }
-
-                guard !Task.isCancelled else {
-                    return
-                }
+                guard !Task.isCancelled else { return }
 
                 carees = loadedCarees
                 if cacheService.isAppGroupAvailable {
@@ -144,14 +135,14 @@ class WatchDataProvider: ObservableObject {
                 }
                 logger.info("✅ Loaded \(self.carees.count) carees")
 
+            } catch is CancellationError {
+                logger.info("⏹️ loadCarees cancelled")
             } catch {
                 careesError = error
                 logger.error("❌ Failed to load carees: \(error.localizedDescription)")
                 FileLogger.shared.exception(error, context: "WatchDataProvider.loadCarees() - Failed to load carees from CloudKit")
             }
         }
-
-        await loadCareesTask?.value
     }
 
     // MARK: - Lazy Loading (On-Demand)
@@ -250,11 +241,13 @@ class WatchDataProvider: ObservableObject {
             defer { refreshingRecentActivityCareeIDs.remove(careeID) }
 
             do {
-                let activities = try await selectiveService.fetchRecentActivities(
-                    for: careeID,
-                    isShared: caree.isShared,
-                    hoursBack: hoursBack
-                )
+                let activities = try await Task.detached(priority: .utility) { [selectiveService] () -> [ActivitySnapshot] in
+                    try await selectiveService.fetchRecentActivities(
+                        for: careeID,
+                        isShared: caree.isShared,
+                        hoursBack: hoursBack
+                    )
+                }.value
 
                 guard !Task.isCancelled else { return }
 
@@ -271,6 +264,8 @@ class WatchDataProvider: ObservableObject {
                 logger.info("✅ Loaded \(activities.count) activities (+ \(self.pendingActivities.count) pending)")
                 MemoryMonitor.logMemoryUsage(context: "After loadRecentActivities")
 
+            } catch is CancellationError {
+                logger.info("⏹️ loadRecentActivities cancelled for caree \(careeID)")
             } catch {
                 logger.error("❌ Failed to load activities: \(error.localizedDescription)")
                 FileLogger.shared.exception(error, context: "WatchDataProvider.loadRecentActivities() - Failed to load activities for caree \(careeID)")
