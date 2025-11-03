@@ -17,11 +17,23 @@ class FileLogger {
     private var currentLogHandle: FileHandle?
     private var isReady = false
     private var hasLoggedInactiveWarning = false
+    private var loggingEnabled: Bool
 
-    var isLoggingAvailable: Bool { isReady }
+    var isLoggingAvailable: Bool { isReady && loggingEnabled }
 
     private init() {
-        setupLogFile()
+#if os(watchOS)
+        let defaults = UserDefaults(suiteName: CloudKitConfig.appGroupID)
+        loggingEnabled = defaults?.bool(forKey: SharedDefaultsKeys.watchFileLoggingEnabled) ?? false
+#else
+        loggingEnabled = true
+#endif
+
+        if loggingEnabled {
+            setupLogFile()
+        } else {
+            logger.info("🛑 FileLogger disabled via watchFileLoggingEnabled flag")
+        }
     }
 
     deinit {
@@ -31,6 +43,7 @@ class FileLogger {
     // MARK: - Setup
 
     private func setupLogFile() {
+        guard loggingEnabled else { return }
         isReady = false
         logger.info("🚀 FileLogger.setupLogFile() started")
         logger.info("   App Group ID: \(CloudKitConfig.appGroupID)")
@@ -206,6 +219,7 @@ class FileLogger {
     // MARK: - Private Methods
 
     private func log(level: String, message: String, file: String, function: String, line: Int) {
+        guard loggingEnabled else { return }
         let timestamp = ISO8601DateFormatter().string(from: Date())
         let filename = (file as NSString).lastPathComponent
 
@@ -327,4 +341,24 @@ class FileLogger {
             return date1 > date2
         }
     }
+
+#if os(watchOS)
+    func setLoggingEnabled(_ enabled: Bool) {
+        guard loggingEnabled != enabled else { return }
+        loggingEnabled = enabled
+        UserDefaults(suiteName: CloudKitConfig.appGroupID)?.set(enabled, forKey: SharedDefaultsKeys.watchFileLoggingEnabled)
+
+        if loggingEnabled {
+            logger.info("✅ FileLogger enabled via toggle")
+            setupLogFile()
+        } else {
+            logger.info("🛑 FileLogger disabled via toggle")
+            try? currentLogHandle?.close()
+            currentLogHandle = nil
+            currentLogFile = nil
+            isReady = false
+            hasLoggedInactiveWarning = false
+        }
+    }
+#endif
 }

@@ -9,6 +9,7 @@ final class WatchLogStreamController: NSObject, ObservableObject, WCSessionDeleg
 
     @Published private(set) var entries: [WatchLogEntry] = []
     @Published private(set) var lastReceived: Date?
+    @Published private(set) var fileLoggingEnabled: Bool
 
     private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-log-stream-controller")
     private var session: WCSession?
@@ -35,6 +36,8 @@ final class WatchLogStreamController: NSObject, ObservableObject, WCSessionDeleg
     private let maxEntries = 200
 
     private override init() {
+        let defaults = UserDefaults(suiteName: CloudKitConfig.appGroupID)
+        self.fileLoggingEnabled = defaults?.bool(forKey: SharedDefaultsKeys.watchFileLoggingEnabled) ?? false
         super.init()
 
         if WCSession.isSupported() {
@@ -69,14 +72,38 @@ final class WatchLogStreamController: NSObject, ObservableObject, WCSessionDeleg
         }
     }
 
-    func enqueueFromDefaults() {
-        guard let defaults = UserDefaults(suiteName: CloudKitConfig.appGroupID),
-              let raw = defaults.string(forKey: SharedDefaultsKeys.watchLogStreamingLevel),
-              let level = WatchLogStreamingLevel(rawValue: raw) else {
-            sendLevelUpdate(.off)
-            return
+    func sendFileLoggingEnabled(_ enabled: Bool) {
+        self.fileLoggingEnabled = enabled
+
+        guard let session = session, session.activationState == .activated else { return }
+        let payload: [String: Any] = ["fileLoggingEnabled": enabled]
+
+        if session.isReachable {
+            session.sendMessage(payload, replyHandler: nil) { [weak self] error in
+                self?.logger.error("❌ Failed to send file logging flag: \(error.localizedDescription, privacy: .public)")
+            }
+        } else {
+            do {
+                try session.updateApplicationContext(payload)
+            } catch {
+                logger.error("❌ Failed to update application context for file logging: \(error.localizedDescription, privacy: .public)")
+            }
         }
-        sendLevelUpdate(level)
+    }
+
+    func enqueueFromDefaults() {
+        let defaults = UserDefaults(suiteName: CloudKitConfig.appGroupID)
+
+        if let raw = defaults?.string(forKey: SharedDefaultsKeys.watchLogStreamingLevel),
+           let level = WatchLogStreamingLevel(rawValue: raw) {
+            sendLevelUpdate(level)
+        } else {
+            sendLevelUpdate(.off)
+        }
+
+        let fileLoggingEnabled = defaults?.bool(forKey: SharedDefaultsKeys.watchFileLoggingEnabled) ?? false
+        self.fileLoggingEnabled = fileLoggingEnabled
+        sendFileLoggingEnabled(fileLoggingEnabled)
     }
 
     // MARK: - WCSessionDelegate
@@ -119,6 +146,10 @@ final class WatchLogStreamController: NSObject, ObservableObject, WCSessionDeleg
            let level = WatchLogStreamingLevel(rawValue: rawValue) {
             // Persist incoming level so UI reflects watch-originated changes (if any)
             UserDefaults(suiteName: CloudKitConfig.appGroupID)?.set(level.rawValue, forKey: SharedDefaultsKeys.watchLogStreamingLevel)
+        }
+        if let enabled = payload["fileLoggingEnabled"] as? Bool {
+            UserDefaults(suiteName: CloudKitConfig.appGroupID)?.set(enabled, forKey: SharedDefaultsKeys.watchFileLoggingEnabled)
+            fileLoggingEnabled = enabled
         }
 
         if let entry = WatchLogEntry(dictionary: payload) {

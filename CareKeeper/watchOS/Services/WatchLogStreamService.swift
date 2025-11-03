@@ -134,6 +134,9 @@ final class WatchLogStreamService: NSObject, ObservableObject, WCSessionDelegate
            let level = WatchLogStreamingLevel(rawValue: rawValue) {
             updateLevel(level)
         }
+        if let enabled = message["fileLoggingEnabled"] as? Bool {
+            FileLogger.shared.setLoggingEnabled(enabled)
+        }
     }
 
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
@@ -141,12 +144,18 @@ final class WatchLogStreamService: NSObject, ObservableObject, WCSessionDelegate
            let level = WatchLogStreamingLevel(rawValue: rawValue) {
             updateLevel(level)
         }
+        if let enabled = userInfo["fileLoggingEnabled"] as? Bool {
+            FileLogger.shared.setLoggingEnabled(enabled)
+        }
     }
 
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
         if let rawValue = applicationContext["logStreamingLevel"] as? String,
            let level = WatchLogStreamingLevel(rawValue: rawValue) {
             updateLevel(level)
+        }
+        if let enabled = applicationContext["fileLoggingEnabled"] as? Bool {
+            FileLogger.shared.setLoggingEnabled(enabled)
         }
     }
 }

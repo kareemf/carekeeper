@@ -4,7 +4,7 @@ import os.log
 
 /// Watch-optimized CloudKit queries with aggressive filtering
 /// Key optimizations:
-/// - Time-based filters (last 48h for activities)
+/// - Time-based filters (last 24h for activities)
 /// - Hard result limits (100 activities max)
 /// - On-demand loading (activity types loaded per caree, not upfront)
 /// - Lightweight count queries (avoids loading full objects)
@@ -13,8 +13,8 @@ class SelectiveCloudKitService {
 
     // MARK: - Configuration
 
-    /// Only load activities from last 48 hours (configurable)
-    static let activityHistoryHours: TimeInterval = 48 * 3600
+    /// Only load activities from last 24 hours (configurable)
+    static let activityHistoryHours: TimeInterval = 24 * 3600
 
     /// Maximum activities to load per caree (hard limit to prevent memory issues)
     static let maxActivitiesPerCaree = 100
@@ -200,7 +200,7 @@ class SelectiveCloudKitService {
     ///   - careeID: ID of the caree
     ///   - activityTypeID: Optional filter by activity type
     ///   - isShared: Whether this is a shared caree
-    ///   - hoursBack: How many hours of history to load (default 48)
+    ///   - hoursBack: How many hours of history to load (default 24)
     /// - Returns: Array of activity snapshots (max 100)
     func fetchRecentActivities(
         for careeID: UUID,

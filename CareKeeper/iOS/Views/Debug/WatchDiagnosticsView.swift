@@ -28,6 +28,12 @@ struct WatchDiagnosticsView: View {
     var body: some View {
         List {
             Section(header: Text("Log Streaming")) {
+                Toggle("Enable File Logger", isOn: $streamingSettings.isFileLoggerEnabled)
+                    .toggleStyle(.switch)
+                Text("File logger is off by default to avoid extra disk usage on watchOS. Enable only when you need local log files.")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+
                 Picker("Streaming Level", selection: $streamingSettings.level) {
                     ForEach(WatchLogStreamingLevel.allCases) { level in
                         Text(level.displayName).tag(level)

@@ -210,8 +210,8 @@ class WatchDataProvider: ObservableObject {
     /// Load recent activities ONLY when user opens activity list
     /// - Parameters:
     ///   - careeID: ID of the caree
-    ///   - hoursBack: How many hours of history (default 48)
-    func loadRecentActivities(for careeID: UUID, hoursBack: TimeInterval = 48 * 3600, force: Bool = false) async {
+    ///   - hoursBack: How many hours of history (default 24)
+    func loadRecentActivities(for careeID: UUID, hoursBack: TimeInterval = 24 * 3600, force: Bool = false) async {
         if cacheService.isAppGroupAvailable, recentActivitiesByCaree[careeID] == nil {
             let cachedActivities = cacheService.loadRecentActivities(for: careeID)
             if !cachedActivities.isEmpty {

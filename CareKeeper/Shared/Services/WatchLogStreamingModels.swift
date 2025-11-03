@@ -2,6 +2,7 @@ import Foundation
 
 enum SharedDefaultsKeys {
     static let watchLogStreamingLevel = "watchLogStreamingLevel"
+    static let watchFileLoggingEnabled = "watchFileLoggingEnabled"
 }
 
 enum LogSeverity: Int, Comparable, Codable {
