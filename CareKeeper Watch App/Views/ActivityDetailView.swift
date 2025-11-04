@@ -16,6 +16,7 @@ struct ActivityDetailView: View {
     @State private var editedNotes: String = ""
     @State private var editedQuantity: Double = 0
     @State private var minutesAgo: Double = 0
+    @State private var useCustomTime = false
     @State private var captureNewLocation: Bool = false
     @State private var isSaving = false
     @State private var showingDeleteConfirmation = false
@@ -289,6 +290,7 @@ struct ActivityDetailView: View {
     private func initializeEditingValues() {
         editedNotes = currentActivity.notes ?? ""
         editedQuantity = currentActivity.quantity ?? 0
+        useCustomTime = false
 
         // Calculate minutes ago from current time
         let timeDiff = Date().timeIntervalSince(currentActivity.dateTime)
@@ -300,8 +302,7 @@ struct ActivityDetailView: View {
         withAnimation {
             isEditing = true
         }
-        // Focus time input when entering edit mode
-        timeInputFocused = true
+        timeInputFocused = false
     }
 
     private func cancelEditing() {
@@ -315,20 +316,23 @@ struct ActivityDetailView: View {
         isSaving = true
 
         Task {
+            let baseActivity = currentActivity
+            let shouldAdjustTime = useCustomTime
+
             // Use new location if captured, otherwise keep existing location
-            let latitude = captureNewLocation ? locationManager.location?.coordinate.latitude : currentActivity.latitude
-            let longitude = captureNewLocation ? locationManager.location?.coordinate.longitude : currentActivity.longitude
+            let latitude = captureNewLocation ? locationManager.location?.coordinate.latitude : baseActivity.latitude
+            let longitude = captureNewLocation ? locationManager.location?.coordinate.longitude : baseActivity.longitude
 
             // Create new activity snapshot with updated values
             let updatedActivity = ActivitySnapshot(
-                id: currentActivity.id,
-                dateTime: editedDateTime,
+                id: baseActivity.id,
+                dateTime: shouldAdjustTime ? editedDateTime : baseActivity.dateTime,
                 notes: editedNotes.isEmpty ? nil : editedNotes,
-                quantity: activityType?.hasQuantity == true ? editedQuantity : currentActivity.quantity,
+                quantity: activityType?.hasQuantity == true ? editedQuantity : baseActivity.quantity,
                 latitude: latitude,
                 longitude: longitude,
-                activityTypeID: currentActivity.activityTypeID,
-                careeID: currentActivity.careeID
+                activityTypeID: baseActivity.activityTypeID,
+                careeID: baseActivity.careeID
             )
 
             // Update the activity (optimistic UI with background sync)
@@ -382,41 +386,70 @@ struct ActivityDetailView: View {
     private var detailsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             if isEditing {
-                // Editable time with crown control
+                // Editable time guarded by toggle to avoid accidental crown changes
                 VStack(alignment: .leading, spacing: 8) {
                     Label("Time", systemImage: "clock")
                         .font(.caption)
                         .foregroundColor(.secondary)
 
-                    VStack(spacing: 4) {
-                        HStack {
-                            Text(editedDateTime, style: .time)
-                                .font(.title3)
-                                .fontWeight(.semibold)
-                            Spacer()
-                        }
-
-                        HStack {
-                            Text("\(Int(minutesAgo)) min ago")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                            Spacer()
-                        }
+                    Toggle(isOn: $useCustomTime) {
+                        Text(useCustomTime ? "Custom" : "Recorded")
+                            .font(.body)
                     }
-                    .padding()
-                    .background(Color.gray.opacity(0.3))
-                    .cornerRadius(8)
-                    .focusable(true)
-                    .focused($timeInputFocused)
-                    .digitalCrownRotation(
-                        $minutesAgo,
-                        from: 0,
-                        through: 1440,
-                        by: 1,
-                        sensitivity: .low,
-                        isContinuous: false,
-                        isHapticFeedbackEnabled: true
-                    )
+                    .onChange(of: useCustomTime) { _, newValue in
+                        timeInputFocused = newValue
+                    }
+
+                    if useCustomTime {
+                        VStack(spacing: 4) {
+                            HStack {
+                                Text(editedDateTime, style: .time)
+                                    .font(.title3)
+                                    .fontWeight(.semibold)
+                                Spacer()
+                            }
+
+                            HStack {
+                                Text("\(Int(minutesAgo)) min ago")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                            }
+                        }
+                        .padding()
+                        .background(Color.gray.opacity(0.3))
+                        .cornerRadius(8)
+                        .focusable(true)
+                        .focused($timeInputFocused)
+                        .digitalCrownRotation(
+                            $minutesAgo,
+                            from: 0,
+                            through: 1440,
+                            by: 1,
+                            sensitivity: .low,
+                            isContinuous: false,
+                            isHapticFeedbackEnabled: true
+                        )
+                    } else {
+                        VStack(spacing: 4) {
+                            HStack {
+                                Text(currentActivity.dateTime, style: .time)
+                                    .font(.title3)
+                                    .fontWeight(.semibold)
+                                Spacer()
+                            }
+
+                            HStack {
+                                Text(currentActivity.dateTime, style: .date)
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                            }
+                        }
+                        .padding()
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(8)
+                    }
                 }
             } else {
                 // Time

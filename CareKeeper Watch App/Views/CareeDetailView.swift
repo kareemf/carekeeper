@@ -13,7 +13,6 @@ struct CareeDetailView: View {
 
     @EnvironmentObject private var dataProvider: WatchDataProvider
     @State private var loadTask: Task<Void, Never>?
-    @State private var showingTrackActivity = false
 
     @StateObject private var notificationPrefs = UserNotificationPreferences.shared
     @StateObject private var notificationService = UserNotificationService.shared
@@ -38,19 +37,13 @@ struct CareeDetailView: View {
                 gettingStartedView
             } else {
                 TabView {
-                    // Track tab
-                    VStack {
-                        Spacer()
-                        trackActivityButton
-                        Spacer()
-                    }
-                    .containerBackground(.background, for: .tabView)
+                    trackSelectionTab
+                        .containerBackground(.background, for: .tabView)
 
-                    // Activities tab
-                    activitiesTab
+                    activitiesShortcutTab
                         .containerBackground(.background, for: .tabView)
                 }
-                .tabViewStyle(.verticalPage)
+                .tabViewStyle(.page(indexDisplayMode: .automatic))
             }
         }
         .navigationTitle(careeSnapshot.name)
@@ -67,16 +60,6 @@ struct CareeDetailView: View {
                     Image(systemName: notificationPrefs.isEnabled(for: careeSnapshot.id) ? "bell.fill" : "bell.slash")
                         .foregroundColor(notificationPrefs.isEnabled(for: careeSnapshot.id) ? .blue : .gray)
                 }
-            }
-        }
-        .sheet(isPresented: $showingTrackActivity) {
-            // Show activity types to select from
-            if !activityTypes.isEmpty {
-                TrackActivitySelectionView(
-                    careeSnapshot: careeSnapshot,
-                    activityTypes: activityTypes
-                )
-                .environmentObject(dataProvider)
             }
         }
         .task {
@@ -135,25 +118,28 @@ struct CareeDetailView: View {
         }
     }
 
-    private var trackActivityButton: some View {
-        Button(action: { showingTrackActivity = true }) {
-            VStack(spacing: 8) {
-                Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 40))
-                Text("Track")
-                    .font(.title3)
-                    .fontWeight(.semibold)
+    private var trackSelectionTab: some View {
+        List(activityTypes) { activityType in
+            NavigationLink {
+                TrackActivityView(
+                    careeSnapshot: careeSnapshot,
+                    activityTypeSnapshot: activityType
+                )
+                .environmentObject(dataProvider)
+            } label: {
+                HStack(spacing: 12) {
+                    ActivityTypeIconView(icon: activityType.icon)
+                        .font(.title3)
+                    Text(activityType.name)
+                        .font(.headline)
+                }
+                .padding(.vertical, 4)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 24)
-            .foregroundColor(.white)
-            .background(Color.green.opacity(0.8))
-            .cornerRadius(12)
         }
-        .padding(.horizontal, 12)
+        .listStyle(.carousel)
     }
 
-    private var activitiesTab: some View {
+    private var activitiesShortcutTab: some View {
         NavigationLink {
             ActivityListView(careeSnapshot: careeSnapshot, activityTypes: activityTypes)
                 .environmentObject(dataProvider)
@@ -194,45 +180,6 @@ struct CareeDetailView: View {
             }
             // Note: watchOS doesn't have Settings deep linking like iOS,
             // so we silently fail if permission is denied
-        }
-    }
-}
-
-/// Activity type selection view for tracking
-struct TrackActivitySelectionView: View {
-    let careeSnapshot: CareeSnapshot
-    let activityTypes: [ActivityTypeSnapshot]
-
-    @EnvironmentObject private var dataProvider: WatchDataProvider
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            List(activityTypes) { activityType in
-                NavigationLink {
-                    TrackActivityView(
-                        careeSnapshot: careeSnapshot,
-                        activityTypeSnapshot: activityType
-                    )
-                    .environmentObject(dataProvider)
-                } label: {
-                    HStack {
-                        ActivityTypeIconView(icon: activityType.icon)
-                            .font(.title3)
-                        Text(activityType.name)
-                            .font(.headline)
-                    }
-                }
-            }
-            .navigationTitle("Track Activity")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-            }
         }
     }
 }
