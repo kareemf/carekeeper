@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import os.log
+import os.signpost
 
 /// Watch-optimized data provider using selective CloudKit queries
 /// Key features:
@@ -34,6 +35,8 @@ class WatchDataProvider: ObservableObject {
     private let selectiveService = SelectiveCloudKitService()
     private let cacheService: WatchCacheService
     private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data")
+    private let signposter = OSSignposter(logger: Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data-signpost"))
+    private let activitiesChunkSize = 20
 
     // Task management for cancellation
     private var loadCareesTask: Task<Void, Never>?
@@ -92,10 +95,13 @@ class WatchDataProvider: ObservableObject {
 
         loadCareesTask = Task {
             guard !Task.isCancelled else { return }
+            let signpostID = signposter.makeSignpostID()
+            let interval = signposter.beginInterval("loadCarees", id: signpostID)
 
             // Skip if already loading, unless force refresh
             if isRefreshingCarees && !force {
                 logger.info("⏭️ Skipping loadCarees - already loading")
+                signposter.endInterval("loadCarees", interval)
                 return
             }
 
@@ -108,9 +114,11 @@ class WatchDataProvider: ObservableObject {
             defer {
                 isLoadingCarees = false
                 isRefreshingCarees = false
+                signposter.endInterval("loadCarees", interval)
             }
 
             do {
+                signposter.emitEvent("loadCarees.fetch-start", id: signpostID)
                 let loadedCarees = try await Task.detached(priority: .utility) { [selectiveService] () -> [CareeSnapshot] in
                     var results = try await selectiveService.fetchAllCarees()
                     for index in results.indices {
@@ -124,6 +132,7 @@ class WatchDataProvider: ObservableObject {
                     }
                     return results
                 }.value
+                signposter.emitEvent("loadCarees.fetch-end", id: signpostID)
 
                 guard !Task.isCancelled else { return }
 
@@ -137,10 +146,12 @@ class WatchDataProvider: ObservableObject {
 
             } catch is CancellationError {
                 logger.info("⏹️ loadCarees cancelled")
+                signposter.emitEvent("loadCarees.cancelled", id: signpostID)
             } catch {
                 careesError = error
                 logger.error("❌ Failed to load carees: \(error.localizedDescription)")
                 FileLogger.shared.exception(error, context: "WatchDataProvider.loadCarees() - Failed to load carees from CloudKit")
+                signposter.emitEvent("loadCarees.error", id: signpostID)
             }
         }
     }
@@ -172,16 +183,23 @@ class WatchDataProvider: ObservableObject {
 
         loadActivityTypesTask = Task {
             guard !Task.isCancelled else { return }
+            let signpostID = signposter.makeSignpostID()
+            let interval = signposter.beginInterval("loadActivityTypes", id: signpostID)
 
             logger.info("📱 Lazy loading activity types for caree: \(caree.name)")
             refreshingActivityTypeCareeIDs.insert(careeID)
-            defer { refreshingActivityTypeCareeIDs.remove(careeID) }
+            defer {
+                refreshingActivityTypeCareeIDs.remove(careeID)
+                signposter.endInterval("loadActivityTypes", interval)
+            }
 
             do {
+                signposter.emitEvent("loadActivityTypes.fetch-start", id: signpostID)
                 let types = try await selectiveService.fetchActivityTypes(
                     for: careeID,
                     isShared: caree.isShared
                 )
+                signposter.emitEvent("loadActivityTypes.fetch-end", id: signpostID)
 
                 guard !Task.isCancelled else { return }
 
@@ -201,6 +219,7 @@ class WatchDataProvider: ObservableObject {
                 if activityTypesByCaree[careeID] == nil {
                     activityTypesByCaree[careeID] = []
                 }
+                signposter.emitEvent("loadActivityTypes.error", id: signpostID)
             }
         }
 
@@ -234,13 +253,19 @@ class WatchDataProvider: ObservableObject {
 
         loadActivitiesTask = Task {
             guard !Task.isCancelled else { return }
+            let signpostID = signposter.makeSignpostID()
+            let interval = signposter.beginInterval("loadRecentActivities", id: signpostID)
 
             logger.info("📱 Lazy loading recent activities for caree: \(caree.name)")
             MemoryMonitor.logMemoryUsage(context: "Before loadRecentActivities")
             refreshingRecentActivityCareeIDs.insert(careeID)
-            defer { refreshingRecentActivityCareeIDs.remove(careeID) }
+            defer {
+                refreshingRecentActivityCareeIDs.remove(careeID)
+                signposter.endInterval("loadRecentActivities", interval)
+            }
 
             do {
+                signposter.emitEvent("loadRecent.fetch-start", id: signpostID)
                 let activities = try await Task.detached(priority: .utility) { [selectiveService] () -> [ActivitySnapshot] in
                     try await selectiveService.fetchRecentActivities(
                         for: careeID,
@@ -248,15 +273,23 @@ class WatchDataProvider: ObservableObject {
                         hoursBack: hoursBack
                     )
                 }.value
+                signposter.emitEvent("loadRecent.fetch-end", id: signpostID)
 
                 guard !Task.isCancelled else { return }
 
-                // Merge with pending activities
-                let allActivities = mergedActivities(for: careeID, with: activities)
+                let pendingForCaree = pendingActivities.filter { $0.careeID == careeID }
+                let mergedActivities = await Task.detached(priority: .utility) {
+                    mergeActivitiesForCaching(pending: pendingForCaree, fetched: activities)
+                }.value
+                signposter.emitEvent("loadRecent.merge", id: signpostID)
 
-                recentActivitiesByCaree[careeID] = allActivities
+                try Task.checkCancellation()
+
+                await applyRecentActivities(mergedActivities, to: careeID)
+                signposter.emitEvent("loadRecent.apply", id: signpostID)
+
                 if cacheService.isAppGroupAvailable {
-                    cacheService.saveRecentActivities(allActivities, for: careeID)
+                    cacheService.saveRecentActivities(mergedActivities, for: careeID)
                 } else {
                     logger.warning("⚠️ Skipping recent activity cache save for \(careeID): app group unavailable.")
                 }
@@ -266,10 +299,12 @@ class WatchDataProvider: ObservableObject {
 
             } catch is CancellationError {
                 logger.info("⏹️ loadRecentActivities cancelled for caree \(careeID)")
+                signposter.emitEvent("loadRecent.cancelled", id: signpostID)
             } catch {
                 logger.error("❌ Failed to load activities: \(error.localizedDescription)")
                 FileLogger.shared.exception(error, context: "WatchDataProvider.loadRecentActivities() - Failed to load activities for caree \(careeID)")
                 // Keep existing data if available
+                signposter.emitEvent("loadRecent.error", id: signpostID)
             }
         }
 
@@ -492,17 +527,33 @@ class WatchDataProvider: ObservableObject {
         pendingActivities.removeAll { $0.id == activityID }
     }
 
-    private func mergedActivities(for careeID: UUID, with activities: [ActivitySnapshot]) -> [ActivitySnapshot] {
-        var combined = pendingActivities.filter { $0.careeID == careeID }
-        var seen = Set(combined.map { $0.id })
-
-        for activity in activities where !seen.contains(activity.id) {
-            combined.append(activity)
-            seen.insert(activity.id)
+    private func applyRecentActivities(_ activities: [ActivitySnapshot], to careeID: UUID) async {
+        guard activitiesChunkSize > 0 else {
+            recentActivitiesByCaree[careeID] = activities
+            return
         }
 
-        combined.sort { $0.dateTime > $1.dateTime }
-        return combined
+        var rolling: [ActivitySnapshot] = []
+        rolling.reserveCapacity(activities.count)
+
+        for activity in activities {
+            rolling.append(activity)
+            if rolling.count % activitiesChunkSize == 0 {
+                recentActivitiesByCaree[careeID] = rolling
+                signposter.emitEvent("loadRecent.chunk")
+                await Task.yield()
+            }
+        }
+
+        if rolling.count % activitiesChunkSize != 0 {
+            recentActivitiesByCaree[careeID] = rolling
+            signposter.emitEvent("loadRecent.chunk-final")
+        }
+    }
+
+    private func mergedActivities(for careeID: UUID, with activities: [ActivitySnapshot]) -> [ActivitySnapshot] {
+        let pendingForCaree = pendingActivities.filter { $0.careeID == careeID }
+        return mergeActivitiesForCaching(pending: pendingForCaree, fetched: activities)
     }
 
     // MARK: - Memory Management
@@ -563,4 +614,17 @@ class WatchDataProvider: ObservableObject {
 
         logger.info("🛑 Cancelled all running tasks")
     }
+}
+
+private func mergeActivitiesForCaching(pending: [ActivitySnapshot], fetched: [ActivitySnapshot]) -> [ActivitySnapshot] {
+    var combined = pending
+    var seen = Set(combined.map { $0.id })
+
+    for activity in fetched where !seen.contains(activity.id) {
+        combined.append(activity)
+        seen.insert(activity.id)
+    }
+
+    combined.sort { $0.dateTime > $1.dateTime }
+    return combined
 }
