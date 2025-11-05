@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0528DF617C4AF144E8F485D2 /* WatchLogStreamService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BC30D96EF96B93D47032F6 /* WatchLogStreamService.swift */; };
 		07E476CC1FB5FA111AF2DA60 /* CareKeeperWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F6079C2D611AE02903EA9 /* CareKeeperWidgetBundle.swift */; };
 		08B8FF3C5031A3F49BE3DFAC /* CloudKitRetryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785FA28D76B619F588FF3D80 /* CloudKitRetryService.swift */; };
 		0C83CF568B6644CF371FE573 /* CloudKitSyncMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5370AF5DE7F498E397A75893 /* CloudKitSyncMonitor.swift */; };
@@ -40,7 +39,6 @@
 		40B93AE1CC8FDB6BF919A33F /* Snapshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7775B2FAAD7AFC371698ED /* Snapshots.swift */; };
 		43367A6015A77A4F542337C5 /* XCUIElementExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532BD9A9DD1376130D5EECB7 /* XCUIElementExtensions.swift */; };
 		4469F92AF412F9D4A677B7AB /* ShareParticipantsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C24B649353E3AEDC5F4C93D5 /* ShareParticipantsView.swift */; };
-		4592C10D67CECB7839D0B197 /* WatchLogStreamController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8868C8AF4EBFCADF3B9099A2 /* WatchLogStreamController.swift */; };
 		46B3202086651EC9FB1E6329 /* ActivityTrackingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5920D4FC9751E0A79BC5C4BD /* ActivityTrackingUITests.swift */; };
 		473FDD28D1C5C998701E4284 /* CloudKitZoneDiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A489DE4566A279A9CD7AEB7 /* CloudKitZoneDiscoveryService.swift */; };
 		4815CAEA30CBE24FADAAD0FA /* CloudKitRetryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785FA28D76B619F588FF3D80 /* CloudKitRetryService.swift */; };
@@ -85,7 +83,6 @@
 		A71150726AA40C05A80312C3 /* CareeListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110225D18E7ECADB0C65749C /* CareeListRowView.swift */; };
 		A73D21E0043A5AE81096215E /* WatchDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BCEBD704F9701E5F4440BD /* WatchDataProvider.swift */; };
 		A7E024A5B00557BC8A73D316 /* CareKeeperWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF8AB3750E092280F6B93E1 /* CareKeeperWatchApp.swift */; };
-		AB8466A182BF92BFB7FA1C5C /* WatchLogStreamingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF945AAD5534A28090D8C41 /* WatchLogStreamingModels.swift */; };
 		AF665F36FF101BE3FB4C58C2 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA88B88D62AF42A8D039CEF /* Activity.swift */; };
 		B15ADBDF1A6B9648ADC050A5 /* UserNotificationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B286401A6A22BB4AED15B7 /* UserNotificationPreferences.swift */; };
 		B5006A5BB5364BB6C913F338 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE48EB682E50DF9AB2518345 /* LocationManager.swift */; };
@@ -106,10 +103,8 @@
 		DD39EE6D934D4373C14E86EA /* CloudSharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01E9F52871581DD633FCE80 /* CloudSharingView.swift */; };
 		DD767D182D049F0F3637E62B /* ActivityTypeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96A6784B396063FE17BEC14 /* ActivityTypeUITests.swift */; };
 		DE4108F4D16876C2387A2541 /* TrackActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB799BD4D39BD6CEAB99CBC /* TrackActivityView.swift */; };
-		E0667B8C1875197AE5FA4747 /* WatchLogStreamingSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4820A0C522B6411B25867E68 /* WatchLogStreamingSettings.swift */; };
 		E133DFD237FAC2AB60072D84 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F4AFF9F279FD468529AC8C /* CareeListView.swift */; };
 		E5A238654E741E8FFFA199EB /* SnapshotCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054BD6209D8813C92EC12F97 /* SnapshotCodableTests.swift */; };
-		E66E8ADCB5F9EA3D5A6C71A0 /* WatchLogStreamingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF945AAD5534A28090D8C41 /* WatchLogStreamingModels.swift */; };
 		E9FF674C7F63F8593717F45D /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBFD8ECE39C3D7E485F22C08 /* PreviewContainer.swift */; };
 		EA293094D4ABC52691EAE9FA /* ActivityTypeIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED05DD2188ACDFC8B05CE91 /* ActivityTypeIconView.swift */; };
 		EAF7DBB5B30AB1C88A5AD9A7 /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD1EFD76B0B5CDD774547C41 /* ActivityDetailView.swift */; };
@@ -195,12 +190,10 @@
 		21723E30B697002E61F47A31 /* CareKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperApp.swift; sourceTree = "<group>"; };
 		259C7037CC970D88FF512FA5 /* CareeShareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeShareButton.swift; sourceTree = "<group>"; };
 		2606EF2CF9DC30ED71920DFB /* CloudKitSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncService.swift; sourceTree = "<group>"; };
-		30BC30D96EF96B93D47032F6 /* WatchLogStreamService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchLogStreamService.swift; sourceTree = "<group>"; };
 		30F4015C2BC2F6B99E499249 /* CloudKitConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitConfig.swift; sourceTree = "<group>"; };
 		39B9C9FF21B8739B2795815D /* ImportProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportProgressView.swift; sourceTree = "<group>"; };
 		3D048976DFEF3092C2BD1B19 /* SyncStatusIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusIndicator.swift; sourceTree = "<group>"; };
 		453B098EAF3B2DCBDF614CAE /* LocalCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalCacheService.swift; sourceTree = "<group>"; };
-		4820A0C522B6411B25867E68 /* WatchLogStreamingSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchLogStreamingSettings.swift; sourceTree = "<group>"; };
 		532BD9A9DD1376130D5EECB7 /* XCUIElementExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCUIElementExtensions.swift; sourceTree = "<group>"; };
 		5370AF5DE7F498E397A75893 /* CloudKitSyncMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncMonitor.swift; sourceTree = "<group>"; };
 		55F08D9E981ECDC8A5194BE4 /* ShareAcceptanceNotifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareAcceptanceNotifier.swift; sourceTree = "<group>"; };
@@ -223,7 +216,6 @@
 		8437D59195E6520DF4FF83E4 /* SharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingView.swift; sourceTree = "<group>"; };
 		850E95460BA25DE867600209 /* CloudKitSharedRecordsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSharedRecordsService.swift; sourceTree = "<group>"; };
 		864595D44F7F815E63F99B04 /* CloudKitDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitDataService.swift; sourceTree = "<group>"; };
-		8868C8AF4EBFCADF3B9099A2 /* WatchLogStreamController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchLogStreamController.swift; sourceTree = "<group>"; };
 		896A15EFFAAFEF3EC31F83BA /* CloudKitSharingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSharingService.swift; sourceTree = "<group>"; };
 		8A15DD7991742E0B0DA3CCA2 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = WebKit.framework; sourceTree = "<group>"; };
 		909E249A28330C66DACA9391 /* CareeImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeImportService.swift; sourceTree = "<group>"; };
@@ -231,7 +223,6 @@
 		97C3E57DFB34FB3E1A7DDCFA /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
 		9848D72C9BBFC2CAB5E6D661 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		9A489DE4566A279A9CD7AEB7 /* CloudKitZoneDiscoveryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitZoneDiscoveryService.swift; sourceTree = "<group>"; };
-		9AF945AAD5534A28090D8C41 /* WatchLogStreamingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchLogStreamingModels.swift; sourceTree = "<group>"; };
 		9B7775B2FAAD7AFC371698ED /* Snapshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snapshots.swift; sourceTree = "<group>"; };
 		9C3F6079C2D611AE02903EA9 /* CareKeeperWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWidgetBundle.swift; sourceTree = "<group>"; };
 		A6555DB259153675DB8F72BA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -326,7 +317,6 @@
 				B72D787FBD712217235C66AD /* SelectiveCloudKitService.swift */,
 				5CF447B47F331C1AC5E93FB9 /* WatchCacheService.swift */,
 				01BCEBD704F9701E5F4440BD /* WatchDataProvider.swift */,
-				30BC30D96EF96B93D47032F6 /* WatchLogStreamService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -395,7 +385,6 @@
 				12A931C81A5ED3A43CBAECAC /* MetricsManager.swift */,
 				D4B286401A6A22BB4AED15B7 /* UserNotificationPreferences.swift */,
 				831C541FA572C54096F3E1A6 /* UserNotificationService.swift */,
-				9AF945AAD5534A28090D8C41 /* WatchLogStreamingModels.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -596,8 +585,6 @@
 				2606EF2CF9DC30ED71920DFB /* CloudKitSyncService.swift */,
 				9A489DE4566A279A9CD7AEB7 /* CloudKitZoneDiscoveryService.swift */,
 				453B098EAF3B2DCBDF614CAE /* LocalCacheService.swift */,
-				8868C8AF4EBFCADF3B9099A2 /* WatchLogStreamController.swift */,
-				4820A0C522B6411B25867E68 /* WatchLogStreamingSettings.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -847,9 +834,6 @@
 				B15ADBDF1A6B9648ADC050A5 /* UserNotificationPreferences.swift in Sources */,
 				BC087EC89957428C624AEDD1 /* UserNotificationService.swift in Sources */,
 				40348EDB7BA96A56EB929C2B /* WatchDiagnosticsView.swift in Sources */,
-				4592C10D67CECB7839D0B197 /* WatchLogStreamController.swift in Sources */,
-				E66E8ADCB5F9EA3D5A6C71A0 /* WatchLogStreamingModels.swift in Sources */,
-				E0667B8C1875197AE5FA4747 /* WatchLogStreamingSettings.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -913,8 +897,6 @@
 				160B2638A4473314114B5C65 /* UserNotificationService.swift in Sources */,
 				FB7D487A9C010985940C6607 /* WatchCacheService.swift in Sources */,
 				A73D21E0043A5AE81096215E /* WatchDataProvider.swift in Sources */,
-				0528DF617C4AF144E8F485D2 /* WatchLogStreamService.swift in Sources */,
-				AB8466A182BF92BFB7FA1C5C /* WatchLogStreamingModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

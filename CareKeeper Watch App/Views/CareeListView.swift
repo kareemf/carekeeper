@@ -10,7 +10,6 @@ import SwiftUI
 struct CareeListView: View {
 
     @StateObject private var dataProvider = WatchDataProvider()
-    @StateObject private var logStreamService = WatchLogStreamService.shared
     @State private var loadTask: Task<Void, Never>?
     @State private var error: Error?
 
@@ -38,10 +37,6 @@ struct CareeListView: View {
                                 .scaleEffect(0.6)
                         }
 
-                        if logStreamService.streamingLevel != .off {
-                            Label(logStreamService.streamingLevel.displayName, systemImage: "waveform.path.ecg")
-                                .font(.caption2)
-                        }
                     }
                 }
                 .errorAlert($error)

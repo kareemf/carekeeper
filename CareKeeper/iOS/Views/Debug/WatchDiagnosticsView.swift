@@ -8,9 +8,6 @@ struct WatchDiagnosticsView: View {
     @State private var diagnosticFiles: [DiagnosticFile] = []
     @State private var isLoading = false
     @State private var shareItem: ShareItem?
-    @StateObject private var streamingSettings = WatchLogStreamingSettings()
-    @ObservedObject private var logStreamController = WatchLogStreamController.shared
-
     struct DiagnosticFile: Identifiable {
         let id = UUID()
         let url: URL
@@ -27,50 +24,11 @@ struct WatchDiagnosticsView: View {
 
     var body: some View {
         List {
-            Section(header: Text("Log Streaming")) {
-                Toggle("Enable File Logger", isOn: $streamingSettings.isFileLoggerEnabled)
-                    .toggleStyle(.switch)
-                Text("File logger is off by default to avoid extra disk usage on watchOS. Enable only when you need local log files.")
+            Section(header: Text("Watch Logging")) {
+                Text("Real-time log streaming is temporarily disabled to prioritize watchOS performance. Use MetricKit diagnostics or Xcode for deeper investigation.")
                     .font(.caption2)
                     .foregroundColor(.secondary)
-
-                Picker("Streaming Level", selection: $streamingSettings.level) {
-                    ForEach(WatchLogStreamingLevel.allCases) { level in
-                        Text(level.displayName).tag(level)
-                    }
-                }
-                .pickerStyle(.segmented)
-
-                if streamingSettings.level != .off {
-                    if logStreamController.entries.isEmpty {
-                        Text("Streaming enabled, waiting for entries…")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    } else {
-                        let last = logStreamController.lastReceived ?? Date()
-                        Text("Last entry: \(last, style: .time)")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-
-                        ForEach(logStreamController.entries.suffix(10)) { entry in
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("[\(entry.severity.label)] \(entry.message)")
-                                    .font(.caption)
-                                    .fontWeight(.semibold)
-                                    .lineLimit(2)
-
-                                Text("\(entry.file):\(entry.line) · \(entry.timestamp, style: .time)")
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(.vertical, 2)
-                        }
-                    }
-                } else {
-                    Text("Streaming disabled (no additional battery/network use).")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                    .padding(.vertical, 4)
             }
 
             if isLoading {

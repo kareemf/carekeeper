@@ -1,5 +1,7 @@
 # Watch Log Streaming & Diagnostics Enhancements
 
+> **Status (2025-11-04):** This initiative is paused. File-based logging and real-time streaming were removed from the app to eliminate their performance overhead on watchOS. The plan remains here for future reference if we revisit the feature.
+
 ## Context
 - The watch caches CloudKit snapshots in the shared app-group. When the container is unavailable, both the cache and the existing file-based `FileLogger` fail silently, making it hard to diagnose issues.
 - We want an optional log streaming channel to the paired iPhone and improved diagnostics so we can understand failures quickly.
