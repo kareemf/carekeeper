@@ -37,6 +37,7 @@ class WatchDataProvider: ObservableObject {
     private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data")
     private let signposter = OSSignposter(logger: Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data-signpost"))
     private let activitiesChunkSize = 20
+    private let careeRefreshThrottleInterval: TimeInterval = 45
 
     // Task management for cancellation
     private var loadCareesTask: Task<Void, Never>?
@@ -45,6 +46,7 @@ class WatchDataProvider: ObservableObject {
 
     private var refreshedActivityTypesCareeIDs: Set<UUID> = []
     private var refreshedRecentActivitiesCareeIDs: Set<UUID> = []
+    private var lastCareesRefreshDate: Date?
 
     // MARK: - Init
 
@@ -92,6 +94,14 @@ class WatchDataProvider: ObservableObject {
     func loadCarees(force: Bool = false) async {
         // Cancel any existing task
         loadCareesTask?.cancel()
+
+        if !force,
+           !carees.isEmpty,
+           let lastRefresh = lastCareesRefreshDate,
+           Date().timeIntervalSince(lastRefresh) < careeRefreshThrottleInterval {
+            logger.info("⏭️ Throttling loadCarees - refreshed recently")
+            return
+        }
 
         loadCareesTask = Task {
             guard !Task.isCancelled else { return }
@@ -142,6 +152,7 @@ class WatchDataProvider: ObservableObject {
                 } else {
                     logger.warning("⚠️ Skipping caree cache save: app group unavailable.")
                 }
+                lastCareesRefreshDate = Date()
                 logger.info("✅ Loaded \(self.carees.count) carees")
 
             } catch is CancellationError {
