@@ -105,6 +105,50 @@ let activityType = watchDataProvider.activityTypeCache[careeId]?
     .first { $0.id == activity.activityTypeId }
 ```
 
+### Architecture Overview
+
+Snapshots participate in a broader caching and optimistic-update pipeline:
+
+```mermaid
+graph TD
+    CK[CloudKit Records<br/>CD_Caree, CD_ActivityType, CD_Activity]
+    Svc[SelectiveCloudKitService<br/>CKRecord ➜ Snapshot]
+    Cache[WatchCacheService<br/>App-Group JSON Cache]
+    Provider[WatchDataProvider<br/>Published State + Optimistic Updates]
+    Views[[SwiftUI Views<br/>CareeList/Detail, ActivityList, Track]]
+
+    CK -->|fetch| Svc
+    Svc -->|snapshot structs| Provider
+    Provider -->|persist snapshots| Cache
+    Cache -->|warm start| Provider
+    Provider --> Views
+    Views -->|user intents| Provider
+    Provider -->|background sync| Svc
+```
+
+- `SelectiveCloudKitService` always converts CloudKit rows into snapshot structs and can optionally omit heavy fields (e.g., caree photo assets) during routine fetches.
+- `WatchDataProvider` owns the in-memory snapshot dictionaries/arrays exposed to SwiftUI. It merges cached snapshots on launch, injects optimistic entries (pending/syncing/synced), and triggers background network work to reconcile state.
+- `WatchCacheService` stores snapshots as JSON inside the shared app group so a cold launch can render immediately without waiting for CloudKit. Snapshots now carry zone metadata, allowing the provider to fetch additional assets (like photos) on demand.
+
+### Snapshot Flow
+
+1. **Cold launch**: `WatchDataProvider` seeds its published state from `WatchCacheService`.
+2. **Incremental refresh**: `SelectiveCloudKitService.fetchAllCarees(includeImages: false)` retrieves lightweight snapshots. The provider merges in any cached photo data and only fetches missing assets when necessary.
+3. **Manual/forced refresh**: The user taps refresh (or pull-to-refresh). The provider bypasses throttling, does a full fetch (including assets), and overwrites cached snapshots.
+4. **Optimistic writes**: When the user tracks/edits/deletes an activity, the provider updates the snapshot immediately, marks it `pending`/`syncing`, and then runs the CloudKit operation. Success updates the snapshot to `synced`; failure stores a descriptive `failed(error)` state so the UI can warn the user.
+
+### Snapshot vs. SwiftData Entities
+
+| Aspect | SwiftData Entity (iOS) | Snapshot (watchOS) |
+| --- | --- | --- |
+| Type | Reference type managed by `ModelContext` | Plain Swift struct |
+| Relationships | `@Relationship` graph, lazy loaded | No relationships; hold UUID references |
+| Lifecycle | Backed by persistent store (SQLite + CoreData stack) | Lives in memory + JSON cache; no CoreData |
+| Mutation | In-place via context | Create a new value / mutate copy |
+| Sync | SwiftData + CloudKit integration handles conflicts | Explicit: `WatchDataProvider` reconciles with CloudKit |
+| Use case | Rich editing, automatic view updates via `@Query` | Lightweight read/modify for watch UI + optimistic caching |
+| Testability | Needs model container or mocks | Simple struct init in tests/previews |
+
 ## Alternatives Considered
 1. **Use SwiftData models on watchOS**:
    - ❌ Requires ModelContainer (memory overhead)
