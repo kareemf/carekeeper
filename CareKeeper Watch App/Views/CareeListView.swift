@@ -193,6 +193,10 @@ struct CareeRowView: View {
 struct ProfileImageView: View {
     let imageData: Data?
 
+    private var cacheKey: Int {
+        imageData?.hashValue ?? 0
+    }
+
     var body: some View {
         Group {
             if let imageData = imageData,
@@ -209,6 +213,7 @@ struct ProfileImageView: View {
         }
         .frame(width: 50, height: 50)
         .clipShape(Circle())
+        .id(cacheKey)
     }
 }
 
