@@ -226,7 +226,7 @@ class CloudKitDataService: ObservableObject {
             }
 
             if let imageData = imageData {
-                let normalizedImageData = downsampleImageIfNeeded(imageData)
+                let normalizedImageData: Data = downsampleImageIfNeeded(imageData) ?? imageData
                 let asset = try converter.createImageAsset(from: normalizedImageData)
                 existingRecord["CD_image_ckAsset"] = asset
                 caree.image = normalizedImageData
