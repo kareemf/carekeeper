@@ -107,11 +107,16 @@ struct CareeEditView: View {
                 }
 
                 if showWatchRefreshReminder {
-                    Text(NSLocalizedString("Watch app users: perform a manual refresh to load the new image.", comment: "Watch refresh reminder after caree photo update"))
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
+                    Label {
+                        Text(NSLocalizedString("Watch app users: perform a manual refresh to load the new image.", comment: "Watch refresh reminder after caree photo update"))
+                            .multilineTextAlignment(.center)
+                    } icon: {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                    }
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                    .labelStyle(.titleAndIcon)
+                    .padding(.horizontal)
                 }
             }
             
