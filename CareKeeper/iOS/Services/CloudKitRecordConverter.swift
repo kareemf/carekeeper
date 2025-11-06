@@ -1,5 +1,8 @@
 import Foundation
 import CloudKit
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// Converts between domain models (Caree, ActivityType, Activity) and CloudKit CKRecords
 /// Handles CKAsset creation for images, parent references, and field mapping

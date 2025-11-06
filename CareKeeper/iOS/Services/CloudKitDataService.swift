@@ -1,6 +1,9 @@
 import Foundation
 import CloudKit
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// Single source of truth for all CloudKit data operations
 /// Replaces direct SwiftData+CloudKit sync with explicit CRUD operations
@@ -27,6 +30,9 @@ class CloudKitDataService: ObservableObject {
     private let logger = AppLogger.cloudkit
     private let maxRetries = 3
     private let retryDelay: TimeInterval = 2.0
+#if canImport(UIKit)
+    private let careeImageMaxDimension: CGFloat = 256
+#endif
 
     // MARK: - Public Services (for unified API)
 
@@ -154,11 +160,13 @@ class CloudKitDataService: ObservableObject {
             try await ensureCustomZoneExists()
 
             // Create domain model
+            let normalizedImageData = downsampleImageIfNeeded(imageData)
+
             let caree = Caree(name: name, listOrder: listOrder)
-            caree.image = imageData
+            caree.image = normalizedImageData
 
             // Convert to CKRecord in custom zone
-            let record = try await converter.careeToRecord(caree, imageData: imageData, zoneID: zoneID)
+            let record = try await converter.careeToRecord(caree, imageData: normalizedImageData, zoneID: zoneID)
 
             // Save to CloudKit private database
             let savedRecord = try await saveWithRetry(record, to: container.privateCloudDatabase)
@@ -218,8 +226,10 @@ class CloudKitDataService: ObservableObject {
             }
 
             if let imageData = imageData {
-                let asset = try converter.createImageAsset(from: imageData)
+                let normalizedImageData = downsampleImageIfNeeded(imageData)
+                let asset = try converter.createImageAsset(from: normalizedImageData)
                 existingRecord["CD_image_ckAsset"] = asset
+                caree.image = normalizedImageData
             }
 
             if let listOrder = listOrder {
@@ -1273,6 +1283,31 @@ class CloudKitDataService: ObservableObject {
         }
 
         throw lastError ?? DataServiceError.maxRetriesExceeded
+    }
+
+    // MARK: - Image Handling
+
+    private func downsampleImageIfNeeded(_ data: Data?) -> Data? {
+        guard let data = data else { return nil }
+#if canImport(UIKit)
+        guard let image = UIImage(data: data) else { return data }
+
+        let maxDimension = max(image.size.width, image.size.height)
+        guard maxDimension > careeImageMaxDimension else { return data }
+
+        let scale = careeImageMaxDimension / maxDimension
+        let targetSize = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+
+        let rendererFormat = UIGraphicsImageRendererFormat.default()
+        rendererFormat.scale = 1
+        let renderer = UIGraphicsImageRenderer(size: targetSize, format: rendererFormat)
+        let resizedData = renderer.jpegData(withCompressionQuality: 0.75) { _ in
+            image.draw(in: CGRect(origin: .zero, size: targetSize))
+        }
+        return resizedData
+#else
+        return data
+#endif
     }
 }
 
