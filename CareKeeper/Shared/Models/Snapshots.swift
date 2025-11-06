@@ -158,7 +158,15 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
     }
 
     static func == (lhs: CareeSnapshot, rhs: CareeSnapshot) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id &&
+        lhs.name == rhs.name &&
+        lhs.imageData == rhs.imageData &&
+        lhs.isShared == rhs.isShared &&
+        lhs.listOrder == rhs.listOrder &&
+        lhs.dateCreated == rhs.dateCreated &&
+        lhs.activityTypeCount == rhs.activityTypeCount &&
+        lhs.zoneName == rhs.zoneName &&
+        lhs.zoneOwnerName == rhs.zoneOwnerName
     }
 }
 

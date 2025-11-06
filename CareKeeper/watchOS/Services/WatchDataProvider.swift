@@ -583,8 +583,6 @@ class WatchDataProvider: ObservableObject {
                     isShared: snapshot.isShared
                 ) {
                     carees[index] = snapshot.updating(imageData: data)
-                } else if forceRefresh {
-                    carees[index] = snapshot.updating(imageData: nil)
                 }
             } catch {
                 logger.error("❌ Failed to fetch caree image for \(snapshot.id): \(error.localizedDescription)")
