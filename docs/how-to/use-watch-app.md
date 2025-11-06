@@ -225,6 +225,9 @@ The watch app is optimized for memory:
 !!! note "24-Hour Window"
     For performance, the watch app shows activities from the last 24 hours. View full history on iPhone for older records.
 
+!!! note "Caree Photos"
+    Caree photos are aggressively cached on watchOS to reduce downloads. If you update a caree’s image on iPhone, tap the refresh button in the watch caree list to pull the new picture.
+
 ## Related Guides
 
 - [How to Track an Activity](track-activity.md)

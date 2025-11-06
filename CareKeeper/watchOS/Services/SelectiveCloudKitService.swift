@@ -41,14 +41,16 @@ class SelectiveCloudKitService {
 
     // MARK: - Caree Queries (Small Dataset - Load All)
 
+    private let careeNonImageKeys = ["CD_name", "CD_listOrder", "CD_dateCreated"]
+
     /// Load all carees (both owned and shared)
     /// This is acceptable because caree count should be small (<20 typically)
-    func fetchAllCarees() async throws -> [CareeSnapshot] {
+    func fetchAllCarees(includeImages: Bool = false) async throws -> [CareeSnapshot] {
         logger.info("🔍 Fetching all carees (selective: owned + shared)")
         MemoryMonitor.logMemoryUsage(context: "Before fetchAllCarees")
 
-        async let ownedCarees = fetchOwnedCarees()
-        async let sharedCarees = fetchSharedCarees()
+        async let ownedCarees = fetchOwnedCarees(includeImages: includeImages)
+        async let sharedCarees = fetchSharedCarees(includeImages: includeImages)
 
         let (owned, shared) = try await (ownedCarees, sharedCarees)
         let allCarees = owned + shared
@@ -63,7 +65,7 @@ class SelectiveCloudKitService {
         return allCarees
     }
 
-    private func fetchOwnedCarees() async throws -> [CareeSnapshot] {
+    private func fetchOwnedCarees(includeImages: Bool) async throws -> [CareeSnapshot] {
         let database = container.privateCloudDatabase
         let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
         query.sortDescriptors = [NSSortDescriptor(key: "CD_listOrder", ascending: true)]
@@ -72,7 +74,11 @@ class SelectiveCloudKitService {
         let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
 
         let (results, _) = try await retryableRequest(operation: "fetchOwnedCarees") {
-            try await database.records(matching: query, inZoneWith: zoneID)
+            try await database.records(
+                matching: query,
+                inZoneWith: zoneID,
+                desiredKeys: includeImages ? nil : careeNonImageKeys
+            )
         }
 
         return try results.compactMap { _, result in
@@ -81,7 +87,7 @@ class SelectiveCloudKitService {
         }
     }
 
-    private func fetchSharedCarees() async throws -> [CareeSnapshot] {
+    private func fetchSharedCarees(includeImages: Bool) async throws -> [CareeSnapshot] {
         let database = container.sharedCloudDatabase
 
         // Shared database requires zone-specific queries (no zone-wide queries!)
@@ -94,18 +100,22 @@ class SelectiveCloudKitService {
 
         for zone in zones {
             // Skip default zone
-            if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
+                if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
 
-            logger.info("🔍 Querying shared carees in zone: \(zone.zoneID.zoneName)")
+                logger.info("🔍 Querying shared carees in zone: \(zone.zoneID.zoneName)")
 
-            let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
-            let (matchResults, _) = try await retryableRequest(operation: "fetchSharedCarees(zone: \(zone.zoneID.zoneName))") {
-                try await database.records(matching: query, inZoneWith: zone.zoneID)
-            }
+                let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
+                let (matchResults, _) = try await retryableRequest(operation: "fetchSharedCarees(zone: \(zone.zoneID.zoneName))") {
+                    try await database.records(
+                        matching: query,
+                        inZoneWith: zone.zoneID,
+                        desiredKeys: includeImages ? nil : careeNonImageKeys
+                    )
+                }
 
-            for (_, result) in matchResults {
-                if let record = try? result.get() {
-                    if let caree = try? CareeSnapshot(from: record, isShared: true) {
+                for (_, result) in matchResults {
+                    if let record = try? result.get() {
+                        if let caree = try? CareeSnapshot(from: record, isShared: true) {
                         allCarees.append(caree)
                     }
                 }
@@ -294,6 +304,20 @@ class SelectiveCloudKitService {
         )
 
         return activities
+    }
+
+    func fetchCareeImage(for careeID: UUID, zoneID: CKRecordZone.ID, isShared: Bool) async throws -> Data? {
+        let database = isShared ? container.sharedCloudDatabase : container.privateCloudDatabase
+        let recordID = CKRecord.ID(recordName: "CD_Caree/\(careeID.uuidString)", zoneID: zoneID)
+
+        return try await retryableRequest(operation: "fetchCareeImage") {
+            let record = try await database.record(for: recordID)
+            if let asset = record["CD_image_ckAsset"] as? CKAsset,
+               let url = asset.fileURL {
+                return try? Data(contentsOf: url)
+            }
+            return nil
+        }
     }
 
     // MARK: - Activity Type Count (Efficient Aggregation)

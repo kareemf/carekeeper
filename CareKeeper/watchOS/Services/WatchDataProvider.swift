@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import CloudKit
 import os.log
 import os.signpost
 
@@ -129,8 +130,8 @@ class WatchDataProvider: ObservableObject {
 
             do {
                 signposter.emitEvent("loadCarees.fetch-start", id: signpostID)
-                let loadedCarees = try await Task.detached(priority: .utility) { [selectiveService] () -> [CareeSnapshot] in
-                    var results = try await selectiveService.fetchAllCarees()
+                let loadedCarees = try await Task.detached(priority: .utility) { [selectiveService, force] () -> [CareeSnapshot] in
+                    var results = try await selectiveService.fetchAllCarees(includeImages: force)
                     for index in results.indices {
                         try Task.checkCancellation()
                         let caree = results[index]
@@ -146,9 +147,15 @@ class WatchDataProvider: ObservableObject {
 
                 guard !Task.isCancelled else { return }
 
-                carees = loadedCarees
+                var mergedCarees = mergeCareesWithCachedImages(loadedCarees, allowCacheFallback: !force)
+
+                if force || mergedCarees.contains(where: { $0.imageData == nil }) {
+                    await fetchMissingCareeImages(into: &mergedCarees, forceRefresh: force)
+                }
+
+                carees = mergedCarees
                 if cacheService.isAppGroupAvailable {
-                    cacheService.saveCarees(loadedCarees)
+                    cacheService.saveCarees(mergedCarees)
                 } else {
                     logger.warning("⚠️ Skipping caree cache save: app group unavailable.")
                 }
@@ -565,6 +572,42 @@ class WatchDataProvider: ObservableObject {
     private func mergedActivities(for careeID: UUID, with activities: [ActivitySnapshot]) -> [ActivitySnapshot] {
         let pendingForCaree = pendingActivities.filter { $0.careeID == careeID }
         return mergeActivitiesForCaching(pending: pendingForCaree, fetched: activities)
+    }
+
+    private func mergeCareesWithCachedImages(_ carees: [CareeSnapshot], allowCacheFallback: Bool) -> [CareeSnapshot] {
+        guard allowCacheFallback, cacheService.isAppGroupAvailable else { return carees }
+
+        let cachedCarees = cacheService.loadCarees()
+        let cachedByID = Dictionary(uniqueKeysWithValues: cachedCarees.map { ($0.id, $0) })
+
+        return carees.map { caree in
+            guard caree.imageData == nil,
+                  let cached = cachedByID[caree.id],
+                  let cachedImage = cached.imageData else {
+                return caree
+            }
+            return caree.updating(imageData: cachedImage)
+        }
+    }
+
+    private func fetchMissingCareeImages(into carees: inout [CareeSnapshot], forceRefresh: Bool) async {
+        for index in carees.indices {
+            let snapshot = carees[index]
+            let needsFetch = forceRefresh || snapshot.imageData == nil
+            guard needsFetch else { continue }
+
+            let zoneID = CKRecordZone.ID(zoneName: snapshot.zoneName, ownerName: snapshot.zoneOwnerName)
+
+            do {
+                if let data = try await selectiveService.fetchCareeImage(for: snapshot.id, zoneID: zoneID, isShared: snapshot.isShared) {
+                    carees[index] = snapshot.updating(imageData: data)
+                } else if forceRefresh {
+                    carees[index] = snapshot.updating(imageData: nil)
+                }
+            } catch {
+                logger.error("❌ Failed to fetch caree image for \(snapshot.id): \(error.localizedDescription)")
+            }
+        }
     }
 
     // MARK: - Memory Management

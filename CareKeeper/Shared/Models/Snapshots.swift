@@ -28,6 +28,8 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
     let isShared: Bool
     let listOrder: Int
     let dateCreated: Date
+    let zoneName: String
+    let zoneOwnerName: String?
 
     // Pre-loaded count, NOT a relationship!
     // This prevents accessing caree.activityTypes which can trigger crashes
@@ -60,6 +62,8 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
         self.isShared = isShared
         self.listOrder = (record["CD_listOrder"] as? Int) ?? 0
         self.dateCreated = (record["CD_dateCreated"] as? Date) ?? Date()
+        self.zoneName = record.recordID.zoneID.zoneName
+        self.zoneOwnerName = record.recordID.zoneID.ownerName
     }
 
     /// Create snapshot from SwiftData Caree model
@@ -70,7 +74,61 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
         self.isShared = caree.isShared
         self.listOrder = caree.listOrder
         self.dateCreated = caree.dateCreated
+        self.zoneName = CloudKitConfig.zoneName
+        self.zoneOwnerName = nil
         // Count must be set separately to avoid relationship access
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case imageData
+        case isShared
+        case listOrder
+        case dateCreated
+        case activityTypeCount
+        case zoneName
+        case zoneOwnerName
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        imageData = try container.decodeIfPresent(Data.self, forKey: .imageData)
+        isShared = try container.decode(Bool.self, forKey: .isShared)
+        listOrder = try container.decode(Int.self, forKey: .listOrder)
+        dateCreated = try container.decode(Date.self, forKey: .dateCreated)
+        activityTypeCount = try container.decodeIfPresent(Int.self, forKey: .activityTypeCount) ?? 0
+        zoneName = try container.decodeIfPresent(String.self, forKey: .zoneName) ?? CloudKitConfig.zoneName
+        zoneOwnerName = try container.decodeIfPresent(String.self, forKey: .zoneOwnerName)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encodeIfPresent(imageData, forKey: .imageData)
+        try container.encode(isShared, forKey: .isShared)
+        try container.encode(listOrder, forKey: .listOrder)
+        try container.encode(dateCreated, forKey: .dateCreated)
+        try container.encode(activityTypeCount, forKey: .activityTypeCount)
+        try container.encode(zoneName, forKey: .zoneName)
+        try container.encodeIfPresent(zoneOwnerName, forKey: .zoneOwnerName)
+    }
+
+    func updating(imageData: Data?) -> CareeSnapshot {
+        CareeSnapshot(
+            id: id,
+            name: name,
+            imageData: imageData,
+            isShared: isShared,
+            listOrder: listOrder,
+            dateCreated: dateCreated,
+            zoneName: zoneName,
+            zoneOwnerName: zoneOwnerName,
+            activityTypeCount: activityTypeCount
+        )
     }
 
     func hash(into hasher: inout Hasher) {

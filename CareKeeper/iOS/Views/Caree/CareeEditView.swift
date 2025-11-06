@@ -13,6 +13,7 @@ struct CareeEditView: View {
     @State private var error: Error?
     @State private var shakeField: Bool = false
     @State private var isSaving = false
+    @State private var showWatchRefreshReminder = false
     @FocusState private var isNameFieldFocused: Bool
     
     private let logger = AppLogger.cloudkit
@@ -104,6 +105,14 @@ struct CareeEditView: View {
                          NSLocalizedString("Change Photo", comment: "Change photo button"))
                         .font(.caption)
                 }
+
+                if showWatchRefreshReminder {
+                    Text(NSLocalizedString("Watch app users: perform a manual refresh to load the new image.", comment: "Watch refresh reminder after caree photo update"))
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
             }
             
             Spacer()
@@ -135,6 +144,7 @@ struct CareeEditView: View {
             case .success(let data):
                 DispatchQueue.main.async {
                     self.imageData = data
+                    self.showWatchRefreshReminder = true
                 }
             case .failure(let error):
                 DispatchQueue.main.async {
