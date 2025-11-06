@@ -562,7 +562,8 @@ class WatchDataProvider: ObservableObject {
         return carees.map { caree in
             guard caree.imageData == nil,
                   let cached = cachedByID[caree.id],
-                  let cachedImage = cached.imageData else {
+                  let cachedImage = cached.imageData,
+                  cached.changeTag == caree.changeTag else {
                 return caree
             }
             return caree.updating(imageData: cachedImage)

@@ -21,6 +21,7 @@ final class SnapshotCodableTests: XCTestCase {
             name: "Jamie",
             imageData: Data("avatar".utf8),
             isShared: true,
+            changeTag: "abcd",
             listOrder: 2,
             dateCreated: Date(timeIntervalSince1970: 1_700_000_000),
             activityTypeCount: 4
@@ -32,6 +33,7 @@ final class SnapshotCodableTests: XCTestCase {
         XCTAssertEqual(decoded.id, snapshot.id)
         XCTAssertEqual(decoded.name, snapshot.name)
         XCTAssertEqual(decoded.imageData, snapshot.imageData)
+        XCTAssertEqual(decoded.changeTag, snapshot.changeTag)
         XCTAssertEqual(decoded.isShared, snapshot.isShared)
         XCTAssertEqual(decoded.listOrder, snapshot.listOrder)
         XCTAssertEqual(decoded.activityTypeCount, snapshot.activityTypeCount)

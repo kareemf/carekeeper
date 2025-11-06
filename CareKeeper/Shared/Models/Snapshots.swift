@@ -25,6 +25,7 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
     let id: UUID
     let name: String
     let imageData: Data?
+    let changeTag: String?
     let isShared: Bool
     let listOrder: Int
     let dateCreated: Date
@@ -40,6 +41,7 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
         name: String,
         imageData: Data?,
         isShared: Bool,
+        changeTag: String? = nil,
         listOrder: Int,
         dateCreated: Date,
         zoneName: String = CloudKitConfig.zoneName,
@@ -49,6 +51,7 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
         self.id = id
         self.name = name
         self.imageData = imageData
+        self.changeTag = changeTag
         self.isShared = isShared
         self.listOrder = listOrder
         self.dateCreated = dateCreated
@@ -84,6 +87,7 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
         self.isShared = isShared
         self.listOrder = (record["CD_listOrder"] as? Int) ?? 0
         self.dateCreated = (record["CD_dateCreated"] as? Date) ?? Date()
+        self.changeTag = record.recordChangeTag
         self.zoneName = record.recordID.zoneID.zoneName
         self.zoneOwnerName = record.recordID.zoneID.ownerName
     }
@@ -95,6 +99,7 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
             name: caree.name,
             imageData: caree.image,
             isShared: caree.isShared,
+            changeTag: nil,
             listOrder: caree.listOrder,
             dateCreated: caree.dateCreated
         )
@@ -105,6 +110,7 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
         case id
         case name
         case imageData
+        case changeTag
         case isShared
         case listOrder
         case dateCreated
@@ -118,6 +124,7 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
         id = try container.decode(UUID.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         imageData = try container.decodeIfPresent(Data.self, forKey: .imageData)
+        changeTag = try container.decodeIfPresent(String.self, forKey: .changeTag)
         isShared = try container.decode(Bool.self, forKey: .isShared)
         listOrder = try container.decode(Int.self, forKey: .listOrder)
         dateCreated = try container.decode(Date.self, forKey: .dateCreated)
@@ -131,6 +138,7 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encodeIfPresent(imageData, forKey: .imageData)
+        try container.encodeIfPresent(changeTag, forKey: .changeTag)
         try container.encode(isShared, forKey: .isShared)
         try container.encode(listOrder, forKey: .listOrder)
         try container.encode(dateCreated, forKey: .dateCreated)
@@ -145,6 +153,7 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
             name: name,
             imageData: imageData,
             isShared: isShared,
+            changeTag: changeTag,
             listOrder: listOrder,
             dateCreated: dateCreated,
             zoneName: zoneName,
@@ -161,6 +170,7 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
         lhs.id == rhs.id &&
         lhs.name == rhs.name &&
         lhs.imageData == rhs.imageData &&
+        lhs.changeTag == rhs.changeTag &&
         lhs.isShared == rhs.isShared &&
         lhs.listOrder == rhs.listOrder &&
         lhs.dateCreated == rhs.dateCreated &&
