@@ -596,10 +596,13 @@ class WatchDataProvider: ObservableObject {
             let needsFetch = forceRefresh || snapshot.imageData == nil
             guard needsFetch else { continue }
 
-            let zoneID = CKRecordZone.ID(zoneName: snapshot.zoneName, ownerName: snapshot.zoneOwnerName)
-
             do {
-                if let data = try await selectiveService.fetchCareeImage(for: snapshot.id, zoneID: zoneID, isShared: snapshot.isShared) {
+                if let data = try await selectiveService.fetchCareeImage(
+                    for: snapshot.id,
+                    zoneName: snapshot.zoneName,
+                    zoneOwnerName: snapshot.zoneOwnerName,
+                    isShared: snapshot.isShared
+                ) {
                     carees[index] = snapshot.updating(imageData: data)
                 } else if forceRefresh {
                     carees[index] = snapshot.updating(imageData: nil)

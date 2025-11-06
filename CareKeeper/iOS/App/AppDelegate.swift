@@ -106,8 +106,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         logger.info("📱 User tapped notification")
 
         // Handle notification tap via UserNotificationService
-        let service = await UserNotificationService.shared
-        if let ids = await service.handleNotificationTap(response) {
+        let service = UserNotificationService.shared
+        if let ids = service.handleNotificationTap(response) {
             logger.info("🔗 Deep linking to activity: \(ids.activityID ?? UUID()) for caree: \(ids.careeID ?? UUID())")
 
             // Post notification for deep linking

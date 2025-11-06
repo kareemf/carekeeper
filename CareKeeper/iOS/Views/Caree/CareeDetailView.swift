@@ -279,7 +279,7 @@ struct CareeDetailView: View {
             isLoadingSharedCaree = false
         }
         // Also re-resolve when the in-memory shared list changes
-        .onChange(of: sharedRecordsService.sharedCarees) { _ in
+        .onChange(of: sharedRecordsService.sharedCarees) { _, _ in
             resolvedCaree = resolveCareeFromCache()
             isLoadingSharedCaree = false
         }

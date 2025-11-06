@@ -189,7 +189,7 @@ class SelectiveCloudKitService {
                 )
             }
 
-            activityTypes = try matchResults.compactMap { _, result in
+            activityTypes = matchResults.compactMap { _, result in
                 try? ActivityTypeSnapshot(from: result.get())
             }
         }
@@ -293,9 +293,9 @@ class SelectiveCloudKitService {
                 )
             }
 
-            activities = try matchResults.compactMap { _, result in
+            activities = matchResults.compactMap { _, result in
                 try? ActivitySnapshot(from: result.get())
-            }
+        }
         }
 
         logger.info("✅ Loaded \(activities.count) recent activities (capped at \(Self.maxActivitiesPerCaree))")
@@ -308,15 +308,33 @@ class SelectiveCloudKitService {
         return activities
     }
 
-    func fetchCareeImage(for careeID: UUID, zoneID: CKRecordZone.ID, isShared: Bool) async throws -> Data? {
+    func fetchCareeImage(for careeID: UUID, zoneName: String, zoneOwnerName: String?, isShared: Bool) async throws -> Data? {
         let database = isShared ? container.sharedCloudDatabase : container.privateCloudDatabase
+
+        let zoneID: CKRecordZone.ID
+        if isShared {
+            let zones = try await retryableRequest(operation: "fetchSharedZones") {
+                try await database.allRecordZones()
+            }
+            guard let matchedZone = zones.first(where: { zone in
+                zone.zoneID.zoneName == zoneName &&
+                (zoneOwnerName == nil || zone.zoneID.ownerName == zoneOwnerName)
+            }) else {
+                logger.warning("⚠️ Shared zone \(zoneName) not found when fetching caree image")
+                return nil
+            }
+            zoneID = matchedZone.zoneID
+        } else {
+            zoneID = CKRecordZone.ID(zoneName: zoneName)
+        }
+
         let recordID = CKRecord.ID(recordName: "CD_Caree/\(careeID.uuidString)", zoneID: zoneID)
 
         return try await retryableRequest(operation: "fetchCareeImage") {
             let record = try await database.record(for: recordID)
             if let asset = record["CD_image_ckAsset"] as? CKAsset,
                let url = asset.fileURL {
-                return try? Data(contentsOf: url)
+                return try Data(contentsOf: url)
             }
             return nil
         }
