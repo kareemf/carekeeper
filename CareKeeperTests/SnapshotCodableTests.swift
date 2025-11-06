@@ -75,7 +75,9 @@ final class SnapshotCodableTests: XCTestCase {
             latitude: 37.334_900,
             longitude: -122.009_020,
             activityTypeID: UUID(),
-            careeID: UUID()
+            careeID: UUID(),
+            dateCreated: Date(timeIntervalSince1970: 1_700_100_000),
+            syncState: .synced
         )
         snapshot.syncState = .failed("Network timeout")
 
@@ -121,5 +123,38 @@ final class SnapshotCodableTests: XCTestCase {
                 XCTFail("Unexpected state mapping: \(state) -> \(decoded)")
             }
         }
+    }
+
+    func testActivitySnapshotEqualityDetectsFieldUpdates() {
+        let careeID = UUID()
+        let typeID = UUID()
+        let createdDate = Date(timeIntervalSince1970: 1_700_300_000)
+        let base = ActivitySnapshot(
+            id: UUID(),
+            dateTime: Date(timeIntervalSince1970: 1_700_400_000),
+            notes: "Original",
+            quantity: 1.0,
+            latitude: 37.0,
+            longitude: -122.0,
+            activityTypeID: typeID,
+            careeID: careeID,
+            dateCreated: createdDate,
+            syncState: .synced
+        )
+
+        let updated = ActivitySnapshot(
+            id: base.id,
+            dateTime: base.dateTime.addingTimeInterval(60),
+            notes: "Updated",
+            quantity: 2.0,
+            latitude: base.latitude,
+            longitude: base.longitude,
+            activityTypeID: typeID,
+            careeID: careeID,
+            dateCreated: createdDate,
+            syncState: .syncing
+        )
+
+        XCTAssertNotEqual(base, updated)
     }
 }

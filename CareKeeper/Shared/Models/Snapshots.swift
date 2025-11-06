@@ -363,7 +363,7 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
         self.syncState = .synced
     }
 
-    /// Create new activity (for tracking on watch)
+    /// Create new activity (for tracking on watch or updating existing)
     init(
         id: UUID = UUID(),
         dateTime: Date,
@@ -372,7 +372,9 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
         latitude: Double? = nil,
         longitude: Double? = nil,
         activityTypeID: UUID,
-        careeID: UUID
+        careeID: UUID,
+        dateCreated: Date = Date(),
+        syncState: SyncState = .pending
     ) {
         self.id = id
         self.dateTime = dateTime
@@ -382,8 +384,8 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
         self.longitude = longitude
         self.activityTypeID = activityTypeID
         self.careeID = careeID
-        self.dateCreated = Date()
-        self.syncState = .pending
+        self.dateCreated = dateCreated
+        self.syncState = syncState
     }
 
     func hash(into hasher: inout Hasher) {
@@ -391,6 +393,15 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
     }
 
     static func == (lhs: ActivitySnapshot, rhs: ActivitySnapshot) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id &&
+        lhs.dateTime == rhs.dateTime &&
+        lhs.notes == rhs.notes &&
+        lhs.quantity == rhs.quantity &&
+        lhs.latitude == rhs.latitude &&
+        lhs.longitude == rhs.longitude &&
+        lhs.activityTypeID == rhs.activityTypeID &&
+        lhs.careeID == rhs.careeID &&
+        lhs.dateCreated == rhs.dateCreated &&
+        lhs.syncState == rhs.syncState
     }
 }

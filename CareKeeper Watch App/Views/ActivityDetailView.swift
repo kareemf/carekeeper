@@ -332,7 +332,9 @@ struct ActivityDetailView: View {
                 latitude: latitude,
                 longitude: longitude,
                 activityTypeID: baseActivity.activityTypeID,
-                careeID: baseActivity.careeID
+                careeID: baseActivity.careeID,
+                dateCreated: baseActivity.dateCreated,
+                syncState: baseActivity.syncState
             )
 
             // Update the activity (optimistic UI with background sync)
