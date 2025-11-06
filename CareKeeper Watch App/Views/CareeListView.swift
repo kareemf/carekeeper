@@ -36,7 +36,12 @@ struct CareeListView: View {
                             ProgressView()
                                 .scaleEffect(0.6)
                         }
-
+                        Button {
+                            Task { await dataProvider.loadCarees(force: true) }
+                        } label: {
+                            Image(systemName: "arrow.clockwise")
+                        }
+                        .disabled(dataProvider.isRefreshingCarees)
                     }
                 }
                 .errorAlert($error)

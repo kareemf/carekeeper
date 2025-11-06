@@ -37,7 +37,7 @@ class WatchDataProvider: ObservableObject {
     private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data")
     private let signposter = OSSignposter(logger: Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data-signpost"))
     private let activitiesChunkSize = 20
-    private let careeRefreshThrottleInterval: TimeInterval = 45
+    private let careeRefreshThrottleInterval: TimeInterval = 60
 
     // Task management for cancellation
     private var loadCareesTask: Task<Void, Never>?
