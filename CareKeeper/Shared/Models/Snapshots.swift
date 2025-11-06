@@ -35,6 +35,28 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
     // This prevents accessing caree.activityTypes which can trigger crashes
     var activityTypeCount: Int = 0
 
+    init(
+        id: UUID,
+        name: String,
+        imageData: Data?,
+        isShared: Bool,
+        listOrder: Int,
+        dateCreated: Date,
+        zoneName: String = CloudKitConfig.zoneName,
+        zoneOwnerName: String? = nil,
+        activityTypeCount: Int = 0
+    ) {
+        self.id = id
+        self.name = name
+        self.imageData = imageData
+        self.isShared = isShared
+        self.listOrder = listOrder
+        self.dateCreated = dateCreated
+        self.zoneName = zoneName
+        self.zoneOwnerName = zoneOwnerName
+        self.activityTypeCount = activityTypeCount
+    }
+
     /// Create snapshot from CloudKit record
     init(from record: CKRecord, isShared: Bool) throws {
         // Extract ID from record name (format: "CD_Caree/UUID")
@@ -68,14 +90,14 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
 
     /// Create snapshot from SwiftData Caree model
     init(from caree: Caree) {
-        self.id = caree.id
-        self.name = caree.name
-        self.imageData = caree.image
-        self.isShared = caree.isShared
-        self.listOrder = caree.listOrder
-        self.dateCreated = caree.dateCreated
-        self.zoneName = CloudKitConfig.zoneName
-        self.zoneOwnerName = nil
+        self.init(
+            id: caree.id,
+            name: caree.name,
+            imageData: caree.image,
+            isShared: caree.isShared,
+            listOrder: caree.listOrder,
+            dateCreated: caree.dateCreated
+        )
         // Count must be set separately to avoid relationship access
     }
 
