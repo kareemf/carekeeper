@@ -37,7 +37,6 @@ class WatchDataProvider: ObservableObject {
     private let cacheService: WatchCacheService
     private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data")
     private let signposter = OSSignposter(logger: Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data-signpost"))
-    private let activitiesChunkSize = 20
     private let careeRefreshThrottleInterval: TimeInterval = 60
 
     // Task management for cancellation
@@ -545,28 +544,8 @@ class WatchDataProvider: ObservableObject {
         pendingActivities.removeAll { $0.id == activityID }
     }
 
-    private func applyRecentActivities(_ activities: [ActivitySnapshot], to careeID: UUID) async {
-        guard activitiesChunkSize > 0 else {
-            recentActivitiesByCaree[careeID] = activities
-            return
-        }
-
-        var rolling: [ActivitySnapshot] = []
-        rolling.reserveCapacity(activities.count)
-
-        for activity in activities {
-            rolling.append(activity)
-            if rolling.count % activitiesChunkSize == 0 {
-                recentActivitiesByCaree[careeID] = rolling
-                signposter.emitEvent("loadRecent.chunk")
-                await Task.yield()
-            }
-        }
-
-        if rolling.count % activitiesChunkSize != 0 {
-            recentActivitiesByCaree[careeID] = rolling
-            signposter.emitEvent("loadRecent.chunk-final")
-        }
+    private func applyRecentActivities(_ activities: [ActivitySnapshot], to careeID: UUID) {
+        recentActivitiesByCaree[careeID] = activities
     }
 
     private func mergedActivities(for careeID: UUID, with activities: [ActivitySnapshot]) -> [ActivitySnapshot] {
