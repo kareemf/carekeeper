@@ -35,13 +35,13 @@ struct CareeListView: View {
                         if dataProvider.isRefreshingCarees {
                             ProgressView()
                                 .scaleEffect(0.6)
+                        } else {
+                            Button {
+                                Task { await dataProvider.loadCarees(force: true) }
+                            } label: {
+                                Image(systemName: "arrow.clockwise")
+                            }
                         }
-                        Button {
-                            Task { await dataProvider.loadCarees(force: true) }
-                        } label: {
-                            Image(systemName: "arrow.clockwise")
-                        }
-                        .disabled(dataProvider.isRefreshingCarees)
                     }
                 }
                 .errorAlert($error)
