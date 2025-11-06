@@ -73,11 +73,12 @@ class SelectiveCloudKitService {
         // Query from the custom app zone (matches iOS app)
         let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
 
+        let nonImageKeys = careeNonImageKeys
         let (results, _) = try await retryableRequest(operation: "fetchOwnedCarees") {
             try await database.records(
                 matching: query,
                 inZoneWith: zoneID,
-                desiredKeys: includeImages ? nil : careeNonImageKeys
+                desiredKeys: includeImages ? nil : nonImageKeys
             )
         }
 
@@ -105,11 +106,12 @@ class SelectiveCloudKitService {
                 logger.info("🔍 Querying shared carees in zone: \(zone.zoneID.zoneName)")
 
                 let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
+                let nonImageKeys = careeNonImageKeys
                 let (matchResults, _) = try await retryableRequest(operation: "fetchSharedCarees(zone: \(zone.zoneID.zoneName))") {
                     try await database.records(
                         matching: query,
                         inZoneWith: zone.zoneID,
-                        desiredKeys: includeImages ? nil : careeNonImageKeys
+                        desiredKeys: includeImages ? nil : nonImageKeys
                     )
                 }
 
