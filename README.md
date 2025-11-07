@@ -43,20 +43,26 @@ xcodegen generate
 
 > **Note**: If you don't use XcodeGen, you can still use the pre-generated `.xcodeproj` file directly.
 
-### 3. Configure Git Hooks (Optional but Recommended)
+### 3. Configure Git Hooks
 
-This project includes a pre-commit hook that automatically runs XcodeGen before each commit, ensuring the Xcode project stays in sync with `project.yml`.
+This project includes Git hooks that run checks before every commit:
+
+1. `git-secrets` — prevents accidental commits of credentials/keys.
+2. `xcodegen` — regenerates the Xcode project to keep it aligned with `project.yml`.
+
+Install the dependencies:
+
+```bash
+brew install git-secrets xcodegen
+```
+
+Then point Git at the repo-local hooks directory:
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-The pre-commit hook will:
-- Check if XcodeGen is installed
-- Regenerate the Xcode project if needed
-- Automatically stage any project file changes
-
-> **Note**: This step requires XcodeGen to be installed (see step 2).
+The pre-commit hook will fail (with actionable messaging) if `git-secrets` or `xcodegen` is missing, or if the secrets scan/xcodegen run surfaces issues. Re-run your commit after addressing the feedback.
 
 ### 4. Open in Xcode
 
