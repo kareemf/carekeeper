@@ -65,6 +65,8 @@ fastlane/test_output
 
 iOSInjectionProject/
 
+**/Config.plist
+
 ### Objective-C Patch ###
 
 ### OSX ###

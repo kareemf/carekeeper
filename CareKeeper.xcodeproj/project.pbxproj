@@ -85,10 +85,12 @@
 		A7E024A5B00557BC8A73D316 /* CareKeeperWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF8AB3750E092280F6B93E1 /* CareKeeperWatchApp.swift */; };
 		AF665F36FF101BE3FB4C58C2 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA88B88D62AF42A8D039CEF /* Activity.swift */; };
 		B15ADBDF1A6B9648ADC050A5 /* UserNotificationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B286401A6A22BB4AED15B7 /* UserNotificationPreferences.swift */; };
+		B1666EB3F661492D8DD89D67 /* Config.default.plist in Resources */ = {isa = PBXBuildFile; fileRef = B6182A16262A89EDA6C4D5BB /* Config.default.plist */; };
 		B5006A5BB5364BB6C913F338 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE48EB682E50DF9AB2518345 /* LocationManager.swift */; };
 		B8A32EC2156D4341717BC8C1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D301F33E67563B268F54354F /* AppDelegate.swift */; };
 		BB58354CD68A976EC43C11CC /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA88B88D62AF42A8D039CEF /* Activity.swift */; };
 		BC087EC89957428C624AEDD1 /* UserNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C541FA572C54096F3E1A6 /* UserNotificationService.swift */; };
+		BDA3DF780CBF40157D0D811F /* Config.default.plist in Resources */ = {isa = PBXBuildFile; fileRef = B6182A16262A89EDA6C4D5BB /* Config.default.plist */; };
 		BFD29868C4BDA100D939500F /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74AAF2CA7657295C86F2D04 /* ActivityType.swift */; };
 		C4DFEE735BA7A25655DDA5B5 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64492941EF7F5D103F0861FA /* Caree.swift */; };
 		C9C32C228668877A98E7F501 /* CareeImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909E249A28330C66DACA9391 /* CareeImportService.swift */; };
@@ -235,6 +237,7 @@
 		AE5953B6E09F3D41DCD28FB3 /* CareeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeEditView.swift; sourceTree = "<group>"; };
 		B01E9F52871581DD633FCE80 /* CloudSharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSharingView.swift; sourceTree = "<group>"; };
 		B513542CE8B64599249C0038 /* ShakeEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeEffect.swift; sourceTree = "<group>"; };
+		B6182A16262A89EDA6C4D5BB /* Config.default.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Config.default.plist; sourceTree = "<group>"; };
 		B72D787FBD712217235C66AD /* SelectiveCloudKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectiveCloudKitService.swift; sourceTree = "<group>"; };
 		B8F4AFF9F279FD468529AC8C /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
 		B9427CFA7993E809BA9C6AD5 /* ActivityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTests.swift; sourceTree = "<group>"; };
@@ -485,6 +488,7 @@
 		9171B4629E9C53C256019BC4 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				B6182A16262A89EDA6C4D5BB /* Config.default.plist */,
 				2162820E6C0E8811DBA1F646 /* Components */,
 				7EF1F959229D3A62306DB03A /* Models */,
 				5A025A5D7A487212583DA815 /* Services */,
@@ -750,6 +754,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2AE6F0B5667E58000BF31695 /* Assets.xcassets in Resources */,
+				BDA3DF780CBF40157D0D811F /* Config.default.plist in Resources */,
 				805AB8CA18C75280907BB24A /* Preview Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -759,6 +764,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9577A1CBFF2D0CA7A596DF2E /* Assets.xcassets in Resources */,
+				B1666EB3F661492D8DD89D67 /* Config.default.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

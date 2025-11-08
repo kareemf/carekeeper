@@ -64,13 +64,29 @@ git config core.hooksPath .githooks
 
 The pre-commit hook will fail (with actionable messaging) if `git-secrets` or `xcodegen` is missing, or if the secrets scan/xcodegen run surfaces issues. Re-run your commit after addressing the feedback.
 
-### 4. Open in Xcode
+### 4. Create `Config.plist`
+
+Runtime CloudKit/App Group identifiers now live in `CareKeeper/Shared/Config.plist`. A default template ships in the repo; copy and customize it before building:
+
+```bash
+cp CareKeeper/Shared/Config.default.plist CareKeeper/Shared/Config.plist
+```
+
+Edit the new file and set:
+
+- `CLOUDKIT_CONTAINER_ID` – your CloudKit container (e.g., `iCloud.com.example.CareKeeper`)
+- `APP_GROUP_IDENTIFIER` – your shared app group for iOS/watchOS
+- `ZONE_NAME` – optional custom zone name (defaults to `com.example.carekeeper.zone`)
+
+`Config.plist` is git-ignored so you can keep local values without affecting the repo.
+
+### 5. Open in Xcode
 
 ```bash
 open CareKeeper.xcodeproj
 ```
 
-### 5. Configure CloudKit
+### 6. Configure CloudKit
 
 1. In Xcode, select your project in the navigator
 2. Select the CareKeeper target
@@ -79,7 +95,7 @@ open CareKeeper.xcodeproj
 5. Enable "CloudKit" capability
 6. Select or create a CloudKit container
 
-### 6. Build and Run
+### 7. Build and Run
 
 #### Build from Command Line
 
