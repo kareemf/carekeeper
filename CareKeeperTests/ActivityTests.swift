@@ -1,7 +1,7 @@
-import XCTest
-import SwiftData
-import CoreLocation
 @testable import CareKeeperV2
+import CoreLocation
+import SwiftData
+import XCTest
 
 @MainActor
 final class ActivityTests: XCTestCase {
@@ -12,7 +12,7 @@ final class ActivityTests: XCTestCase {
         let schema = Schema([
             Caree.self,
             ActivityType.self,
-            Activity.self
+            Activity.self,
         ])
 
         let modelConfiguration = ModelConfiguration(
@@ -156,7 +156,10 @@ final class ActivityTests: XCTestCase {
 
         XCTAssertEqual(activity.activityType?.name, "Feeding", "Should be linked to activity type")
         XCTAssertEqual(activity.caree?.name, "Test Caree", "Should be linked to caree")
-        XCTAssertTrue(activityType.activities?.contains(where: { $0.id == activity.id }) ?? false, "Activity type should have activity")
+        XCTAssertTrue(
+            activityType.activities?.contains(where: { $0.id == activity.id }) ?? false,
+            "Activity type should have activity"
+        )
         XCTAssertTrue(caree.activities?.contains(where: { $0.id == activity.id }) ?? false, "Caree should have activity")
     }
 
@@ -212,7 +215,7 @@ final class ActivityTests: XCTestCase {
         let location = activity.location
 
         XCTAssertNotNil(location, "Location should not be nil")
-        if let location = location {
+        if let location {
             XCTAssertEqual(location.coordinate.latitude, 37.7749, accuracy: 0.0001, "Latitude should match")
             XCTAssertEqual(location.coordinate.longitude, -122.4194, accuracy: 0.0001, "Longitude should match")
         }

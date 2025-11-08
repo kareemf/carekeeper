@@ -1,6 +1,6 @@
-import SwiftUI
-import SwiftData
 import Combine
+import SwiftData
+import SwiftUI
 
 struct CareeListView: View {
     @Environment(\.modelContext) private var modelContext
@@ -29,7 +29,7 @@ struct CareeListView: View {
     }
 
     private var pendingDeletionIncludesShared: Bool {
-        pendingDeletionCarees.contains(where: { $0.isShared })
+        pendingDeletionCarees.contains(where: \.isShared)
     }
 
     private var pendingDeletionIncludesOwned: Bool {
@@ -37,35 +37,47 @@ struct CareeListView: View {
     }
 
     private var deleteConfirmationTitle: String {
-        if pendingDeletionIncludesShared && !pendingDeletionIncludesOwned {
-            return NSLocalizedString("Leave Shared Caree?", comment: "Leave shared caree confirmation title")
+        if pendingDeletionIncludesShared, !pendingDeletionIncludesOwned {
+            NSLocalizedString("Leave Shared Caree?", comment: "Leave shared caree confirmation title")
         } else if pendingDeletionIncludesShared {
-            return NSLocalizedString("Remove Carees?", comment: "Mixed delete confirmation title")
+            NSLocalizedString("Remove Carees?", comment: "Mixed delete confirmation title")
         } else {
-            return NSLocalizedString("Delete Caree?", comment: "Delete caree confirmation title")
+            NSLocalizedString("Delete Caree?", comment: "Delete caree confirmation title")
         }
     }
 
     private var deleteConfirmationPrimaryButtonTitle: String {
-        if pendingDeletionIncludesShared && !pendingDeletionIncludesOwned {
-            return NSLocalizedString("Leave Share", comment: "Leave shared caree confirmation button")
+        if pendingDeletionIncludesShared, !pendingDeletionIncludesOwned {
+            NSLocalizedString("Leave Share", comment: "Leave shared caree confirmation button")
         } else if pendingDeletionIncludesShared {
-            return NSLocalizedString("Continue", comment: "Mixed delete confirmation button")
+            NSLocalizedString("Continue", comment: "Mixed delete confirmation button")
         } else {
-            return NSLocalizedString("Delete", comment: "Delete caree confirmation button")
+            NSLocalizedString("Delete", comment: "Delete caree confirmation button")
         }
     }
 
     private var deleteConfirmationMessageText: String {
         switch (pendingDeletionIncludesOwned, pendingDeletionIncludesShared) {
         case (false, false):
-            return NSLocalizedString("This will delete all activity types and activities. This cannot be undone.", comment: "Delete caree confirmation message")
+            NSLocalizedString(
+                "This will delete all activity types and activities. This cannot be undone.",
+                comment: "Delete caree confirmation message"
+            )
         case (true, false):
-            return NSLocalizedString("This will delete all activity types and activities. This cannot be undone.", comment: "Delete caree confirmation message")
+            NSLocalizedString(
+                "This will delete all activity types and activities. This cannot be undone.",
+                comment: "Delete caree confirmation message"
+            )
         case (false, true):
-            return NSLocalizedString("You will no longer receive updates for this shared caree. Other participants will retain access.", comment: "Leave shared caree confirmation message")
+            NSLocalizedString(
+                "You will no longer receive updates for this shared caree. Other participants will retain access.",
+                comment: "Leave shared caree confirmation message"
+            )
         case (true, true):
-            return NSLocalizedString("Owned carees will be deleted for everyone. Shared carees will be removed from your list.", comment: "Mixed delete confirmation message")
+            NSLocalizedString(
+                "Owned carees will be deleted for everyone. Shared carees will be removed from your list.",
+                comment: "Mixed delete confirmation message"
+            )
         }
     }
 
@@ -81,18 +93,18 @@ struct CareeListView: View {
         // Only show full-screen loading if:
         // 1. Initial load is happening, AND
         // 2. Cache is empty (no content to show yet)
-        return initialLoading && allCarees.isEmpty
+        initialLoading && allCarees.isEmpty
     }
 
     // Backup/Restore (iOS only)
     #if os(iOS)
-    @State private var showingExport = false
-    @State private var exportFileURL: URL?
-    @State private var showingImport = false
-    @State private var isImporting = false
-    @State private var importProgress: ImportProgress = .idle
-    @State private var importService: CareeImportService?
-    @State private var showingHelp = false
+        @State private var showingExport = false
+        @State private var exportFileURL: URL?
+        @State private var showingImport = false
+        @State private var isImporting = false
+        @State private var importProgress: ImportProgress = .idle
+        @State private var importService: CareeImportService?
+        @State private var showingHelp = false
     #endif
     
     var body: some View {
@@ -128,7 +140,7 @@ struct CareeListView: View {
                 showingHelp: $showingHelp
             ))
             .task(initializeTask)
-            .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { _ in
+            .onReceive(cloudKitService.$cacheService.compactMap(\.self)) { _ in
                 Task {
                     await refreshAllCarees(initial: allCarees.isEmpty)
                 }
@@ -182,15 +194,15 @@ struct CareeListView: View {
         }
 
         #if os(iOS)
-        ToolbarItem(placement: .navigationBarTrailing) {
-            Button(action: { showingHelp = true }) {
-                Image(systemName: "questionmark.circle")
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: { showingHelp = true }) {
+                    Image(systemName: "questionmark.circle")
+                }
             }
-        }
 
-        ToolbarItem(placement: .navigationBarTrailing) {
-            backupRestoreMenu
-        }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                backupRestoreMenu
+            }
         #endif
 
         ToolbarItem(placement: .navigationBarTrailing) {
@@ -199,27 +211,27 @@ struct CareeListView: View {
     }
 
     #if os(iOS)
-    private var backupRestoreMenu: some View {
-        Menu {
-            Button(action: exportAllCarees) {
-                Label("Export Data", systemImage: "square.and.arrow.up")
-            }
+        private var backupRestoreMenu: some View {
+            Menu {
+                Button(action: exportAllCarees) {
+                    Label("Export Data", systemImage: "square.and.arrow.up")
+                }
 
-            Button(action: { showingImport = true }) {
-                Label("Import Data", systemImage: "square.and.arrow.down")
-            }
+                Button(action: { showingImport = true }) {
+                    Label("Import Data", systemImage: "square.and.arrow.down")
+                }
 
-            Divider()
+                Divider()
 
-            NavigationLink {
-                WatchDiagnosticsView()
+                NavigationLink {
+                    WatchDiagnosticsView()
+                } label: {
+                    Label("Watch Diagnostics", systemImage: "chart.bar.doc.horizontal")
+                }
             } label: {
-                Label("Watch Diagnostics", systemImage: "chart.bar.doc.horizontal")
+                Image(systemName: "ellipsis.circle")
             }
-        } label: {
-            Image(systemName: "ellipsis.circle")
         }
-    }
     #endif
 
     private var addButton: some View {
@@ -257,9 +269,9 @@ struct CareeListView: View {
     private func initializeTask() async {
         // Initialize import service
         #if os(iOS)
-        if importService == nil {
-            importService = CareeImportService(cloudKitService: cloudKitService)
-        }
+            if importService == nil {
+                importService = CareeImportService(cloudKitService: cloudKitService)
+            }
         #endif
 
         // Initial data load (unified)
@@ -304,10 +316,12 @@ struct CareeListView: View {
                 .font(.title2)
                 .fontWeight(.medium)
 
-            Text(NSLocalizedString("Create your first caree and set up activity types to start tracking.",
-                                 comment: "Empty state description"))
-                .multilineTextAlignment(.center)
-                .foregroundColor(.secondary)
+            Text(NSLocalizedString(
+                "Create your first caree and set up activity types to start tracking.",
+                comment: "Empty state description"
+            ))
+            .multilineTextAlignment(.center)
+            .foregroundColor(.secondary)
 
             Button(NSLocalizedString("Add Caree", comment: "CTA button in empty state")) {
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
@@ -326,7 +340,7 @@ struct CareeListView: View {
                 NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
                     CareeListRowView(
                         caree: caree,
-                        isShared: caree.isShared  // Use cache metadata
+                        isShared: caree.isShared // Use cache metadata
                     )
                 }
                 .transition(.asymmetric(
@@ -343,11 +357,11 @@ struct CareeListView: View {
         .refreshable {
             await refreshAllCarees()
         }
-        .animation(.easeInOut(duration: 0.3), value: allCarees.map { $0.id })
+        .animation(.easeInOut(duration: 0.3), value: allCarees.map(\.id))
     }
 
     private func updateAllCarees() {
-        guard let cacheService = cacheService else {
+        guard let cacheService else {
             allCarees = []
             return
         }
@@ -359,7 +373,7 @@ struct CareeListView: View {
     }
 
     private func refreshAllCarees(initial: Bool = false) async {
-        guard let cacheService = cacheService else { return }
+        guard let cacheService else { return }
 
         if initial {
             await MainActor.run { initialLoading = true }
@@ -443,7 +457,7 @@ struct CareeListView: View {
     private func moveCarees(from source: IndexSet, to destination: Int) {
         // Only allow reordering of my carees (not shared carees)
         // Shared carees maintain the owner's listOrder
-        guard let cacheService = cacheService else { return }
+        guard let cacheService else { return }
 
         var ownedCarees = cacheService.myCarees
         let originalIDs = ownedCarees.map(\.id)
@@ -476,60 +490,60 @@ struct CareeListView: View {
     // MARK: - Backup/Restore
 
     #if os(iOS)
-    private func exportAllCarees() {
-        do {
-            let exportService = CareeExportService()
-            let filename = exportService.generateFilename(careeCount: allCarees.count)
-            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
+        private func exportAllCarees() {
+            do {
+                let exportService = CareeExportService()
+                let filename = exportService.generateFilename(careeCount: allCarees.count)
+                let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
 
-            try exportService.exportAllCarees(to: tempURL, modelContext: modelContext)
+                try exportService.exportAllCarees(to: tempURL, modelContext: modelContext)
 
-            exportFileURL = tempURL
-            showingExport = true
-        } catch {
-            self.error = AppError.saveFailed("Export failed: \(error.localizedDescription)")
-        }
-    }
-
-    private func handleImport(result: Result<URL, Error>) {
-        switch result {
-        case .success(let url):
-            guard let importService = importService else {
-                error = AppError.saveFailed("Import service not initialized")
-                return
+                exportFileURL = tempURL
+                showingExport = true
+            } catch {
+                self.error = AppError.saveFailed("Export failed: \(error.localizedDescription)")
             }
+        }
 
-            isImporting = true
+        private func handleImport(result: Result<URL, Error>) {
+            switch result {
+            case let .success(url):
+                guard let importService else {
+                    error = AppError.saveFailed("Import service not initialized")
+                    return
+                }
 
-            Task {
-                do {
-                    // Start accessing security-scoped resource
-                    guard url.startAccessingSecurityScopedResource() else {
-                        throw AppError.invalidInput("Unable to access file")
-                    }
-                    defer { url.stopAccessingSecurityScopedResource() }
+                isImporting = true
 
-                    try await importService.importFromJSON(at: url)
+                Task {
+                    do {
+                        // Start accessing security-scoped resource
+                        guard url.startAccessingSecurityScopedResource() else {
+                            throw AppError.invalidInput("Unable to access file")
+                        }
+                        defer { url.stopAccessingSecurityScopedResource() }
 
-                    // Refresh UI
-                    await refreshAllCarees()
+                        try await importService.importFromJSON(at: url)
 
-                    await MainActor.run {
-                        isImporting = false
-                    }
-                } catch {
-                    await MainActor.run {
-                        self.error = AppError.saveFailed("Import failed: \(error.localizedDescription)")
-                        isImporting = false
-                        importService.progress = .idle
+                        // Refresh UI
+                        await refreshAllCarees()
+
+                        await MainActor.run {
+                            isImporting = false
+                        }
+                    } catch {
+                        await MainActor.run {
+                            self.error = AppError.saveFailed("Import failed: \(error.localizedDescription)")
+                            isImporting = false
+                            importService.progress = .idle
+                        }
                     }
                 }
-            }
 
-        case .failure(let error):
-            self.error = AppError.saveFailed("Failed to select file: \(error.localizedDescription)")
+            case let .failure(error):
+                self.error = AppError.saveFailed("Failed to select file: \(error.localizedDescription)")
+            }
         }
-    }
     #endif
 
     // MARK: - Helpers
@@ -562,7 +576,7 @@ struct CareeListView: View {
 
             if Task.isCancelled { return }
 
-            if let cacheService = cacheService {
+            if let cacheService {
                 await cacheService.refreshPublishedProperties()
             }
         } catch {
@@ -583,48 +597,48 @@ struct CareeListView: View {
 // MARK: - View Modifiers
 
 #if os(iOS)
-struct BackupRestoreSheets: ViewModifier {
-    @Binding var showingExport: Bool
-    let exportFileURL: URL?
-    @Binding var showingImport: Bool
-    @Binding var isImporting: Bool
-    let importProgress: ImportProgress
-    let handleImport: (Result<URL, Error>) -> Void
-    @Binding var showingHelp: Bool
+    struct BackupRestoreSheets: ViewModifier {
+        @Binding var showingExport: Bool
+        let exportFileURL: URL?
+        @Binding var showingImport: Bool
+        @Binding var isImporting: Bool
+        let importProgress: ImportProgress
+        let handleImport: (Result<URL, Error>) -> Void
+        @Binding var showingHelp: Bool
 
-    func body(content: Content) -> some View {
-        content
-            .sheet(isPresented: $showingExport) {
-                if let exportFileURL = exportFileURL {
-                    ShareSheet(items: [exportFileURL])
+        func body(content: Content) -> some View {
+            content
+                .sheet(isPresented: $showingExport) {
+                    if let exportFileURL {
+                        ShareSheet(items: [exportFileURL])
+                    }
                 }
-            }
-            .fileImporter(
-                isPresented: $showingImport,
-                allowedContentTypes: [.json],
-                onCompletion: handleImport
-            )
-            .sheet(isPresented: $isImporting) {
-                ImportProgressView(progress: importProgress)
-            }
-            .sheet(isPresented: $showingHelp) {
-                HelpView()
-            }
+                .fileImporter(
+                    isPresented: $showingImport,
+                    allowedContentTypes: [.json],
+                    onCompletion: handleImport
+                )
+                .sheet(isPresented: $isImporting) {
+                    ImportProgressView(progress: importProgress)
+                }
+                .sheet(isPresented: $showingHelp) {
+                    HelpView()
+                }
+        }
     }
-}
 #else
-struct BackupRestoreSheets: ViewModifier {
-    @Binding var showingExport: Bool
-    let exportFileURL: URL?
-    @Binding var showingImport: Bool
-    @Binding var isImporting: Bool
-    let importProgress: ImportProgress
-    let handleImport: (Result<URL, Error>) -> Void
+    struct BackupRestoreSheets: ViewModifier {
+        @Binding var showingExport: Bool
+        let exportFileURL: URL?
+        @Binding var showingImport: Bool
+        @Binding var isImporting: Bool
+        let importProgress: ImportProgress
+        let handleImport: (Result<URL, Error>) -> Void
 
-    func body(content: Content) -> some View {
-        content
+        func body(content: Content) -> some View {
+            content
+        }
     }
-}
 #endif
 
 struct DataObservers: ViewModifier {
@@ -638,25 +652,25 @@ struct DataObservers: ViewModifier {
     let onUpdate: () -> Void
 
     private var myCareesPublisher: AnyPublisher<[Caree], Never> {
-        if let cacheService = cacheService {
-            return cacheService.$myCarees.eraseToAnyPublisher()
+        if let cacheService {
+            cacheService.$myCarees.eraseToAnyPublisher()
         } else {
-            return Just([]).eraseToAnyPublisher()
+            Just([]).eraseToAnyPublisher()
         }
     }
 
     private var sharedCareesPublisher: AnyPublisher<[Caree], Never> {
-        if let cacheService = cacheService {
-            return cacheService.$sharedCarees.eraseToAnyPublisher()
+        if let cacheService {
+            cacheService.$sharedCarees.eraseToAnyPublisher()
         } else {
-            return Just([]).eraseToAnyPublisher()
+            Just([]).eraseToAnyPublisher()
         }
     }
 
     func body(content: Content) -> some View {
         content
             .onReceive(sharedRecordsService.$error) { newError in
-                if let newError = newError {
+                if let newError {
                     onError(newError)
                 }
             }
@@ -681,21 +695,21 @@ struct ImportProgressObserver: ViewModifier {
     let onImportProgress: (ImportProgress) -> Void
 
     private var importProgressPublisher: AnyPublisher<ImportProgress, Never> {
-        if let importService = importService {
-            return importService.$progress.eraseToAnyPublisher()
+        if let importService {
+            importService.$progress.eraseToAnyPublisher()
         } else {
-            return Just(.idle).eraseToAnyPublisher()
+            Just(.idle).eraseToAnyPublisher()
         }
     }
 
     func body(content: Content) -> some View {
         #if os(iOS)
-        content
-            .onReceive(importProgressPublisher) { progress in
-                onImportProgress(progress)
-            }
+            content
+                .onReceive(importProgressPublisher) { progress in
+                    onImportProgress(progress)
+                }
         #else
-        content
+            content
         #endif
     }
 }

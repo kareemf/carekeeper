@@ -1,8 +1,8 @@
-import Foundation
-import SwiftUI
 import CloudKit
+import Foundation
 import os.log
 import os.signpost
+import SwiftUI
 
 /// Watch-optimized data provider using selective CloudKit queries
 /// Key features:
@@ -12,7 +12,6 @@ import os.signpost
 /// - Error resilience (show stale data on failure)
 @MainActor
 class WatchDataProvider: ObservableObject {
-
     // MARK: - Published State
 
     @Published var carees: [CareeSnapshot] = []
@@ -105,7 +104,8 @@ class WatchDataProvider: ObservableObject {
         if !force,
            !carees.isEmpty,
            let lastRefresh = lastCareesRefreshDate,
-           Date().timeIntervalSince(lastRefresh) < careeRefreshThrottleInterval {
+           Date().timeIntervalSince(lastRefresh) < careeRefreshThrottleInterval
+        {
             logger.info("⏭️ Throttling loadCarees - refreshed recently")
             return
         }
@@ -116,7 +116,7 @@ class WatchDataProvider: ObservableObject {
             let interval = signposter.beginInterval("loadCarees", id: signpostID)
 
             // Skip if already loading, unless force refresh
-            if isRefreshingCarees && !force {
+            if isRefreshingCarees, !force {
                 logger.info("⏭️ Skipping loadCarees - already loading")
                 signposter.endInterval("loadCarees", interval)
                 return
@@ -136,19 +136,20 @@ class WatchDataProvider: ObservableObject {
 
             do {
                 signposter.emitEvent("loadCarees.fetch-start", id: signpostID)
-                let loadedCarees = try await Task.detached(priority: .utility) { [selectiveService, force] () -> [CareeSnapshot] in
-                    var results = try await selectiveService.fetchAllCarees(includeImages: force)
-                    for index in results.indices {
-                        try Task.checkCancellation()
-                        let caree = results[index]
-                        let count = try await selectiveService.fetchActivityTypeCount(
-                            for: caree.id,
-                            isShared: caree.isShared
-                        )
-                        results[index].activityTypeCount = count
-                    }
-                    return results
-                }.value
+                let loadedCarees = try await Task
+                    .detached(priority: .utility) { [selectiveService, force] () -> [CareeSnapshot] in
+                        var results = try await selectiveService.fetchAllCarees(includeImages: force)
+                        for index in results.indices {
+                            try Task.checkCancellation()
+                            let caree = results[index]
+                            let count = try await selectiveService.fetchActivityTypeCount(
+                                for: caree.id,
+                                isShared: caree.isShared
+                            )
+                            results[index].activityTypeCount = count
+                        }
+                        return results
+                    }.value
                 signposter.emitEvent("loadCarees.fetch-end", id: signpostID)
 
                 guard !Task.isCancelled else { return }
@@ -174,7 +175,10 @@ class WatchDataProvider: ObservableObject {
             } catch {
                 careesError = error
                 logger.error("❌ Failed to load carees: \(error.localizedDescription)")
-                FileLogger.shared.exception(error, context: "WatchDataProvider.loadCarees() - Failed to load carees from CloudKit")
+                FileLogger.shared.exception(
+                    error,
+                    context: "WatchDataProvider.loadCarees() - Failed to load carees from CloudKit"
+                )
                 signposter.emitEvent("loadCarees.error", id: signpostID)
             }
         }
@@ -194,7 +198,8 @@ class WatchDataProvider: ObservableObject {
 
         if !force,
            let lastRefresh = lastActivityTypesRefreshDates[careeID],
-           Date().timeIntervalSince(lastRefresh) < perCareeRefreshThrottleInterval {
+           Date().timeIntervalSince(lastRefresh) < perCareeRefreshThrottleInterval
+        {
             logger.info("⏭️ Throttling activity type refresh for caree \(careeID) - refreshed recently")
             return
         }
@@ -240,7 +245,10 @@ class WatchDataProvider: ObservableObject {
 
             } catch {
                 logger.error("❌ Failed to load activity types: \(error.localizedDescription)")
-                FileLogger.shared.exception(error, context: "WatchDataProvider.loadActivityTypes() - Failed to load activity types for caree \(careeID)")
+                FileLogger.shared.exception(
+                    error,
+                    context: "WatchDataProvider.loadActivityTypes() - Failed to load activity types for caree \(careeID)"
+                )
                 // Preserve cached values when available
                 if activityTypesByCaree[careeID] == nil {
                     activityTypesByCaree[careeID] = []
@@ -266,7 +274,8 @@ class WatchDataProvider: ObservableObject {
 
         if !force,
            let lastRefresh = lastRecentActivitiesRefreshDates[careeID],
-           Date().timeIntervalSince(lastRefresh) < perCareeRefreshThrottleInterval {
+           Date().timeIntervalSince(lastRefresh) < perCareeRefreshThrottleInterval
+        {
             logger.info("⏭️ Throttling recent activities refresh for caree \(careeID) - refreshed recently")
             return
         }
@@ -330,7 +339,10 @@ class WatchDataProvider: ObservableObject {
                 signposter.emitEvent("loadRecent.cancelled", id: signpostID)
             } catch {
                 logger.error("❌ Failed to load activities: \(error.localizedDescription)")
-                FileLogger.shared.exception(error, context: "WatchDataProvider.loadRecentActivities() - Failed to load activities for caree \(careeID)")
+                FileLogger.shared.exception(
+                    error,
+                    context: "WatchDataProvider.loadRecentActivities() - Failed to load activities for caree \(careeID)"
+                )
                 // Keep existing data if available
                 signposter.emitEvent("loadRecent.error", id: signpostID)
             }
@@ -365,7 +377,7 @@ class WatchDataProvider: ObservableObject {
 
         // 2. Upload to CloudKit (async)
         Task.detached { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
 
             do {
                 // Update state to syncing
@@ -384,7 +396,10 @@ class WatchDataProvider: ObservableObject {
                     if self.cacheService.isAppGroupAvailable, let updated = self.recentActivitiesByCaree[activity.careeID] {
                         self.cacheService.saveRecentActivities(updated, for: activity.careeID)
                     } else if !self.cacheService.isAppGroupAvailable {
-                        self.logger.warning("⚠️ Skipping recent activity cache save after create for \(activity.careeID): app group unavailable.")
+                        self.logger
+                            .warning(
+                                "⚠️ Skipping recent activity cache save after create for \(activity.careeID): app group unavailable."
+                            )
                     }
                 }
 
@@ -395,7 +410,10 @@ class WatchDataProvider: ObservableObject {
                 await self.updateActivityState(activity.id, state: .failed(error.localizedDescription))
                 self.logger.error("❌ Failed to sync activity: \(error.localizedDescription)")
                 await MainActor.run {
-                    FileLogger.shared.exception(error, context: "WatchDataProvider.trackActivity() - Failed to sync activity to CloudKit")
+                    FileLogger.shared.exception(
+                        error,
+                        context: "WatchDataProvider.trackActivity() - Failed to sync activity to CloudKit"
+                    )
                 }
             }
         }
@@ -418,7 +436,7 @@ class WatchDataProvider: ObservableObject {
 
         // 2. Upload to CloudKit (async)
         Task.detached { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
 
             do {
                 // Update state to syncing
@@ -436,7 +454,10 @@ class WatchDataProvider: ObservableObject {
                     if self.cacheService.isAppGroupAvailable, let updated = self.recentActivitiesByCaree[activity.careeID] {
                         self.cacheService.saveRecentActivities(updated, for: activity.careeID)
                     } else if !self.cacheService.isAppGroupAvailable {
-                        self.logger.warning("⚠️ Skipping recent activity cache save after update for \(activity.careeID): app group unavailable.")
+                        self.logger
+                            .warning(
+                                "⚠️ Skipping recent activity cache save after update for \(activity.careeID): app group unavailable."
+                            )
                     }
                 }
 
@@ -447,7 +468,10 @@ class WatchDataProvider: ObservableObject {
                 await self.updateActivityState(activity.id, state: .failed(error.localizedDescription))
                 self.logger.error("❌ Failed to update activity: \(error.localizedDescription)")
                 await MainActor.run {
-                    FileLogger.shared.exception(error, context: "WatchDataProvider.updateActivity() - Failed to update activity in CloudKit")
+                    FileLogger.shared.exception(
+                        error,
+                        context: "WatchDataProvider.updateActivity() - Failed to update activity in CloudKit"
+                    )
                 }
             }
         }
@@ -469,7 +493,7 @@ class WatchDataProvider: ObservableObject {
 
         // 2. Delete from CloudKit (async)
         Task.detached { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
 
             do {
                 // Delete from CloudKit
@@ -486,7 +510,10 @@ class WatchDataProvider: ObservableObject {
                             self.cacheService.saveRecentActivities([], for: activity.careeID)
                         }
                     } else {
-                        self.logger.warning("⚠️ Skipping recent activity cache save after delete for \(activity.careeID): app group unavailable.")
+                        self.logger
+                            .warning(
+                                "⚠️ Skipping recent activity cache save after delete for \(activity.careeID): app group unavailable."
+                            )
                     }
                 }
 
@@ -497,7 +524,10 @@ class WatchDataProvider: ObservableObject {
                 await self.restoreActivityToUI(activity)
                 self.logger.error("❌ Failed to delete activity: \(error.localizedDescription)")
                 await MainActor.run {
-                    FileLogger.shared.exception(error, context: "WatchDataProvider.deleteActivity() - Failed to delete activity from CloudKit")
+                    FileLogger.shared.exception(
+                        error,
+                        context: "WatchDataProvider.deleteActivity() - Failed to delete activity from CloudKit"
+                    )
                 }
             }
         }
@@ -506,7 +536,8 @@ class WatchDataProvider: ObservableObject {
     private func updateActivityData(_ activity: ActivitySnapshot) {
         // Update in recent activities
         if var existing = recentActivitiesByCaree[activity.careeID],
-           let index = existing.firstIndex(where: { $0.id == activity.id }) {
+           let index = existing.firstIndex(where: { $0.id == activity.id })
+        {
             existing[index] = activity
             recentActivitiesByCaree[activity.careeID] = existing
         }
@@ -574,7 +605,8 @@ class WatchDataProvider: ObservableObject {
             guard caree.imageData == nil,
                   let cached = cachedByID[caree.id],
                   let cachedImage = cached.imageData,
-                  cached.changeTag == caree.changeTag else {
+                  cached.changeTag == caree.changeTag
+            else {
                 return caree
             }
             return caree.updating(imageData: cachedImage)
@@ -664,7 +696,7 @@ class WatchDataProvider: ObservableObject {
 
 private func mergeActivitiesForCaching(pending: [ActivitySnapshot], fetched: [ActivitySnapshot]) -> [ActivitySnapshot] {
     var combined = pending
-    var seen = Set(combined.map { $0.id })
+    var seen = Set(combined.map(\.id))
 
     for activity in fetched where !seen.contains(activity.id) {
         combined.append(activity)

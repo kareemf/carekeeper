@@ -1,6 +1,6 @@
-import SwiftUI
-import SwiftData
 import Combine
+import SwiftData
+import SwiftUI
 
 struct CareeDetailView: View {
     @Environment(\.modelContext) private var modelContext
@@ -148,24 +148,24 @@ struct CareeDetailView: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         HStack(spacing: 16) {
                             #if os(iOS)
-                            // Notification toggle button
-                            Button {
-                                toggleNotifications(for: caree)
-                            } label: {
-                                Image(systemName: notificationPrefs.isEnabled(for: caree.id) ? "bell.fill" : "bell.slash")
-                            }
+                                // Notification toggle button
+                                Button {
+                                    toggleNotifications(for: caree)
+                                } label: {
+                                    Image(systemName: notificationPrefs.isEnabled(for: caree.id) ? "bell.fill" : "bell.slash")
+                                }
 
-                            CareeShareButton(
-                                caree: caree,
-                                isSynced: isSyncedToCloudKit ?? false,
-                                isMyCaree: isMyCaree
-                            )
+                                CareeShareButton(
+                                    caree: caree,
+                                    isSynced: isSyncedToCloudKit ?? false,
+                                    isMyCaree: isMyCaree
+                                )
 
-                            Button {
-                                exportCaree(caree)
-                            } label: {
-                                Image(systemName: "square.and.arrow.up.on.square")
-                            }
+                                Button {
+                                    exportCaree(caree)
+                                } label: {
+                                    Image(systemName: "square.and.arrow.up.on.square")
+                                }
                             #endif
 
                             Button(NSLocalizedString("Edit", comment: "Edit button")) {
@@ -197,7 +197,10 @@ struct CareeDetailView: View {
                         activityTypeToDelete = nil
                     }
                 } message: {
-                    Text(NSLocalizedString("This will also delete all associated activities. This cannot be undone.", comment: "Delete activity type confirmation message"))
+                    Text(NSLocalizedString(
+                        "This will also delete all associated activities. This cannot be undone.",
+                        comment: "Delete activity type confirmation message"
+                    ))
                 }
                 .confirmationDialog(
                     NSLocalizedString("Delete Activity?", comment: "Delete activity confirmation title"),
@@ -228,7 +231,10 @@ struct CareeDetailView: View {
                     }
                     Button(NSLocalizedString("Cancel", comment: "Cancel button"), role: .cancel) {}
                 } message: {
-                    Text(NSLocalizedString("Please enable notifications in Settings to receive activity alerts.", comment: "Permission alert message"))
+                    Text(NSLocalizedString(
+                        "Please enable notifications in Settings to receive activity alerts.",
+                        comment: "Permission alert message"
+                    ))
                 }
                 #endif
             } else {
@@ -268,7 +274,7 @@ struct CareeDetailView: View {
                 isLoadingSharedCaree = false
             }
         }
-        .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { _ in
+        .onReceive(cloudKitService.$cacheService.compactMap(\.self)) { _ in
             Task {
                 await handleCacheServiceAttachment()
             }
@@ -383,31 +389,35 @@ struct CareeDetailView: View {
             profileImageView(for: caree)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) Activity Types",
-                                     comment: "Activity types count"))
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                Text(NSLocalizedString(
+                    "\(caree.activityTypes?.count ?? 0) Activity Types",
+                    comment: "Activity types count"
+                ))
+                .font(.subheadline)
+                .foregroundColor(.secondary)
 
-                Text(NSLocalizedString("\(caree.activities?.count ?? 0) Activities",
-                                     comment: "Total activities count"))
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                Text(NSLocalizedString(
+                    "\(caree.activities?.count ?? 0) Activities",
+                    comment: "Total activities count"
+                ))
+                .font(.subheadline)
+                .foregroundColor(.secondary)
             }
 
             Spacer()
 
             #if os(iOS)
-            // Indicator on the right:
-            if isMyCaree {
-                // Owned: show CloudKit sync status indicator
-                syncStatusIndicator
-            } else {
-                // Shared: show shared icon (matches CareeListView behavior)
-                Image(systemName: "person.2.fill")
-                    .font(.title3)
-                    .foregroundColor(.secondary)
-                    .accessibilityLabel(Text(NSLocalizedString("Shared Caree", comment: "Shared caree indicator")))
-            }
+                // Indicator on the right:
+                if isMyCaree {
+                    // Owned: show CloudKit sync status indicator
+                    syncStatusIndicator
+                } else {
+                    // Shared: show shared icon (matches CareeListView behavior)
+                    Image(systemName: "person.2.fill")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                        .accessibilityLabel(Text(NSLocalizedString("Shared Caree", comment: "Shared caree indicator")))
+                }
             #endif
         }
     }
@@ -524,11 +534,13 @@ struct CareeDetailView: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 
-                Text(NSLocalizedString("This list will be populated once you start tracking activities.",
-                                     comment: "Empty activities description"))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
+                Text(NSLocalizedString(
+                    "This list will be populated once you start tracking activities.",
+                    comment: "Empty activities description"
+                ))
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
             }
             .padding()
             .background(Color(.systemGray6))
@@ -546,11 +558,13 @@ struct CareeDetailView: View {
             Text(NSLocalizedString("Getting Started", comment: "Getting started title"))
                 .font(.headline)
 
-            Text(NSLocalizedString("Once you've configured your first activity type, you'll be able to track new activities and view recent ones here.",
-                                 comment: "No activity types guidance"))
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
+            Text(NSLocalizedString(
+                "Once you've configured your first activity type, you'll be able to track new activities and view recent ones here.",
+                comment: "No activity types guidance"
+            ))
+            .font(.subheadline)
+            .foregroundColor(.secondary)
+            .multilineTextAlignment(.center)
 
             Button(NSLocalizedString("Add Activity Type", comment: "Add activity type CTA")) {
                 showingAddActivityType = true

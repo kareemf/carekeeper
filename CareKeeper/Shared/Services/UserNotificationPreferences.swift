@@ -5,7 +5,6 @@ import SwiftUI
 /// Stores preferences in app group UserDefaults for iOS/watchOS sync
 @MainActor
 class UserNotificationPreferences: ObservableObject {
-
     // MARK: - Shared Instance
 
     static let shared = UserNotificationPreferences()
@@ -51,7 +50,10 @@ class UserNotificationPreferences: ObservableObject {
             self.appGroupDefaults = appGroupDefaults
             self.isUsingFallbackDefaults = false
         } else {
-            self.logger.error("⚠️ Failed to resolve app-group UserDefaults (\(CloudKitConfig.appGroupID, privacy: .public)); falling back to standard defaults.")
+            self.logger
+                .error(
+                    "⚠️ Failed to resolve app-group UserDefaults (\(CloudKitConfig.appGroupID, privacy: .public)); falling back to standard defaults."
+                )
             self.appGroupDefaults = .standard
             self.isUsingFallbackDefaults = true
         }
@@ -80,11 +82,11 @@ class UserNotificationPreferences: ObservableObject {
         careePreferences = preferences
 
         // If enabling a caree, ensure global notifications are enabled
-        if enabled && !notificationsEnabled {
+        if enabled, !notificationsEnabled {
             notificationsEnabled = true
         }
 
-        if isUsingFallbackDefaults && !hasLoggedFallbackWarning {
+        if isUsingFallbackDefaults, !hasLoggedFallbackWarning {
             logger.warning("⚠️ Notification preferences are using fallback defaults; settings will not sync via app group.")
             hasLoggedFallbackWarning = true
         }
@@ -106,7 +108,7 @@ class UserNotificationPreferences: ObservableObject {
     /// - Returns: Array of UUID strings for carees with notifications enabled
     func enabledCareeIDs() -> [String] {
         guard notificationsEnabled else { return [] }
-        return careePreferences.filter { $0.value }.map { $0.key }
+        return careePreferences.filter(\.value).map(\.key)
     }
 
     /// Remove preferences for a deleted caree

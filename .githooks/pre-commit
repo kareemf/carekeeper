@@ -1,22 +1,47 @@
 #!/bin/bash
 
-# Pre-commit hook that performs two safety checks:
-# 1. Runs git-secrets to prevent committing credentials/secrets.
-# 2. Regenerates the Xcode project via xcodegen (staging files if needed).
-
+# Pre-commit hook enforcing: swiftformat, swiftlint, git-secrets, xcodegen.
 set -euo pipefail
 
-echo "Running git-secrets scan..."
+require_tool() {
+    local tool="$1"
+    local install="$2"
+    if ! command -v "$tool" &> /dev/null; then
+        cat <<EOM
+Error: $tool is not installed.
+Install it with: $install
+EOM
+        exit 1
+    fi
+}
 
-if ! command -v git-secrets &> /dev/null; then
-    cat <<'EOF'
-Error: git-secrets is not installed.
-Install it (macOS) with: brew install git-secrets
-Project policy requires secrets scanning before every commit.
-EOF
+require_tool swiftformat "brew install swiftformat"
+require_tool swiftlint "brew install swiftlint"
+require_tool git-secrets "brew install git-secrets"
+require_tool xcodegen "brew install xcodegen"
+
+echo "Running swiftformat (auto-fix)..."
+swiftformat . >/dev/null
+git add -u
+
+echo "Running swiftformat (lint mode)..."
+if ! swiftformat --lint . >/dev/null; then
+    cat <<'EOM'
+swiftformat detected remaining formatting issues.
+Run `swiftformat .` to apply fixes before committing.
+EOM
     exit 1
 fi
+echo "✓ swiftformat checks passed"
 
+echo "Running swiftlint..."
+if ! swiftlint --strict >/dev/null; then
+    echo "swiftlint rejected this commit."
+    exit 1
+fi
+echo "✓ swiftlint passed"
+
+echo "Running git-secrets scan..."
 if ! git secrets --pre_commit_hook -- "$@"; then
     echo "git-secrets rejected this commit."
     exit 1
@@ -24,16 +49,7 @@ fi
 echo "✓ git-secrets passed"
 
 echo "Running xcodegen..."
-
-# Check if xcodegen is installed
-if ! command -v xcodegen &> /dev/null; then
-    echo "Error: xcodegen is not installed"
-    echo "Install it with: brew install xcodegen"
-    exit 1
-fi
-
-# Run xcodegen
-if ! xcodegen; then
+if ! xcodegen >/dev/null; then
     echo "Error: xcodegen failed"
     exit 1
 fi

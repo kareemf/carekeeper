@@ -1,11 +1,10 @@
-import Foundation
 import CloudKit
+import Foundation
 import os.log
 
 /// Shared retry logic for CloudKit operations with exponential backoff
 /// Handles transient errors automatically with configurable retry attempts
 class CloudKitRetryService {
-
     // MARK: - Configuration
 
     /// Maximum retry attempts for transient errors (default: 3)
@@ -45,7 +44,7 @@ class CloudKitRetryService {
     ) async throws -> T {
         var lastError: Error?
 
-        for attempt in 0..<maxRetries {
+        for attempt in 0 ..< maxRetries {
             do {
                 logger.info("☁️ \(operation) (attempt \(attempt + 1)/\(self.maxRetries))")
                 let result = try await block()
@@ -66,7 +65,7 @@ class CloudKitRetryService {
                 logger.error("❌ \(operation) failed (attempt \(attempt + 1)/\(self.maxRetries)): \(error.localizedDescription)")
 
                 // Log CKError details for debugging
-                if let ckError = ckError {
+                if let ckError {
                     logger.error("   CKError code: \(ckError.code.rawValue)")
                     logger.error("   Is retryable: \(isRetryable)")
 
@@ -90,7 +89,7 @@ class CloudKitRetryService {
                 // Calculate exponential backoff delay
                 // Use CloudKit's suggested delay if available, otherwise exponential backoff
                 let delay: TimeInterval
-                if let ckError = ckError, let retryAfter = ckError.retryAfterSeconds {
+                if let ckError, let retryAfter = ckError.retryAfterSeconds {
                     delay = retryAfter
                     logger.info("⏳ Using CloudKit suggested delay: \(delay)s")
                 } else {
@@ -118,9 +117,9 @@ extension CKError {
     var isRetryable: Bool {
         switch code {
         case .networkFailure, .networkUnavailable, .serviceUnavailable, .requestRateLimited, .zoneBusy:
-            return true
+            true
         default:
-            return false
+            false
         }
     }
 }

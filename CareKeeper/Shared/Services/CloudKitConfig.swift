@@ -10,7 +10,8 @@ enum CloudKitConfig {
     private static func loadPlist(named name: String) -> [String: Any]? {
         guard let url = Bundle.main.url(forResource: name, withExtension: "plist"),
               let data = try? Data(contentsOf: url),
-              let dict = try? PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any] else {
+              let dict = try? PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any]
+        else {
             return nil
         }
         return dict

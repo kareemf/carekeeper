@@ -10,9 +10,9 @@ final class Caree {
     var dateCreated: Date = Date()
 
     // Cache metadata (for Pure CloudKit migration)
-    var isShared: Bool = false  // True if this is a shared caree (not owned by user)
-    var isOwned: Bool = true     // True if this caree is owned by user
-    var lastSyncedAt: Date?      // Last time this record was synced from CloudKit
+    var isShared: Bool = false // True if this is a shared caree (not owned by user)
+    var isOwned: Bool = true // True if this caree is owned by user
+    var lastSyncedAt: Date? // Last time this record was synced from CloudKit
     var cloudKitRecordID: String? // CloudKit record ID for tracking
 
     // Relationships
@@ -36,6 +36,7 @@ final class Caree {
 }
 
 // MARK: - Computed Properties
+
 extension Caree {
     var sortedActivityTypes: [ActivityType] {
         (activityTypes ?? []).sorted { $0.listOrder < $1.listOrder }
@@ -47,6 +48,7 @@ extension Caree {
 }
 
 // MARK: - CloudKit Configuration
+
 extension Caree {
     static func configureCloudKitSchema() {
         // All fields use CloudKit's infrastructure-level encryption.
@@ -56,13 +58,14 @@ extension Caree {
 }
 
 // MARK: - Property Update Helpers
+
 private protocol PropertyUpdatable: AnyObject {
     associatedtype ModelType = Self
-    static func makeUpdater<T>(_ keyPath: ReferenceWritableKeyPath<Self, T>) -> (Self, Self) -> Void
+    static func makeUpdater(_ keyPath: ReferenceWritableKeyPath<Self, some Any>) -> (Self, Self) -> Void
 }
 
 private extension PropertyUpdatable {
-    static func makeUpdater<T>(_ keyPath: ReferenceWritableKeyPath<Self, T>) -> (Self, Self) -> Void {
+    static func makeUpdater(_ keyPath: ReferenceWritableKeyPath<Self, some Any>) -> (Self, Self) -> Void {
         { dest, src in
             dest[keyPath: keyPath] = src[keyPath: keyPath]
         }
@@ -76,7 +79,7 @@ extension Caree: PropertyUpdatable {
         makeUpdater(\.name),
         makeUpdater(\.image),
         makeUpdater(\.listOrder),
-        makeUpdater(\.dateCreated)
+        makeUpdater(\.dateCreated),
     ]
 
     func applyScalarUpdates(from other: Caree) {

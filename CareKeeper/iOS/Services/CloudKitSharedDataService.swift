@@ -1,6 +1,6 @@
-import SwiftUI
-import SwiftData
 import CloudKit
+import SwiftData
+import SwiftUI
 
 /// Service for CRUD operations on ActivityTypes and Activities in CloudKit shared database
 /// Used when non-owners need to create/edit/delete data on shared carees
@@ -141,7 +141,10 @@ class CloudKitSharedDataService: ObservableObject {
         // Fetch the existing record
         guard let record = try await findActivityTypeRecord(activityType, in: zoneID) else {
             // ActivityType not found in shared database - probably already deleted by another participant
-            logger.info("ℹ️ ActivityType not found in shared database (likely already deleted by another participant): \(activityType.name)")
+            logger
+                .info(
+                    "ℹ️ ActivityType not found in shared database (likely already deleted by another participant): \(activityType.name)"
+                )
 
             // Remove from local cache to ensure consistency
             if let cache = cacheService {
@@ -296,7 +299,10 @@ class CloudKitSharedDataService: ObservableObject {
         // Fetch the existing record
         guard let record = try await findActivityRecord(activity, in: zoneID) else {
             // Activity not found in shared database - probably already deleted by another participant
-            logger.info("ℹ️ Activity not found in shared database (likely already deleted by another participant): \(activity.dateTime)")
+            logger
+                .info(
+                    "ℹ️ Activity not found in shared database (likely already deleted by another participant): \(activity.dateTime)"
+                )
 
             // Remove from local cache to ensure consistency
             if let cache = cacheService {
@@ -340,7 +346,7 @@ class CloudKitSharedDataService: ObservableObject {
 
     /// Find the zone ID for a shared caree
     private func findZoneID(for caree: Caree) async throws -> CKRecordZone.ID? {
-        return try await zoneDiscovery.findZone(for: caree.id)
+        try await zoneDiscovery.findZone(for: caree.id)
     }
 
     /// Find an existing ActivityType record in the shared database
@@ -356,9 +362,9 @@ class CloudKitSharedDataService: ObservableObject {
             if let first = results.first {
                 let (_, result) = first
                 switch result {
-                case .success(let record):
+                case let .success(record):
                     return record
-                case .failure(let error):
+                case let .failure(error):
                     throw error
                 }
             }
@@ -383,9 +389,9 @@ class CloudKitSharedDataService: ObservableObject {
             if let first = results.first {
                 let (_, result) = first
                 switch result {
-                case .success(let record):
+                case let .success(record):
                     return record
-                case .failure(let error):
+                case let .failure(error):
                     throw error
                 }
             }
@@ -398,7 +404,11 @@ class CloudKitSharedDataService: ObservableObject {
     }
 
     /// Convert ActivityType to CKRecord with parent reference (CRITICAL for sharing)
-    private func convertActivityTypeToRecord(_ activityType: ActivityType, caree: Caree, zoneID: CKRecordZone.ID) async throws -> CKRecord {
+    private func convertActivityTypeToRecord(
+        _ activityType: ActivityType,
+        caree: Caree,
+        zoneID: CKRecordZone.ID
+    ) async throws -> CKRecord {
         // Fetch the parent Caree record from shared database (needed for parent reference)
         let sharedDatabase = container.sharedCloudDatabase
         let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
@@ -420,7 +430,12 @@ class CloudKitSharedDataService: ObservableObject {
     }
 
     /// Convert Activity to CKRecord with parent reference (CRITICAL for sharing)
-    private func convertActivityToRecord(_ activity: Activity, caree: Caree, activityType: ActivityType, zoneID: CKRecordZone.ID) async throws -> CKRecord {
+    private func convertActivityToRecord(
+        _ activity: Activity,
+        caree: Caree,
+        activityType: ActivityType,
+        zoneID: CKRecordZone.ID
+    ) async throws -> CKRecord {
         // Fetch parent records from shared database (needed for parent references)
         let sharedDatabase = container.sharedCloudDatabase
         let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
@@ -429,9 +444,10 @@ class CloudKitSharedDataService: ObservableObject {
         let parentCareeRecord = try await retryService.retryableRequest(operation: "fetchCareeRecord(\(caree.id))") {
             try await sharedDatabase.record(for: careeRecordID)
         }
-        let activityTypeRecord = try await retryService.retryableRequest(operation: "fetchActivityTypeRecord(\(activityType.id))") {
-            try await sharedDatabase.record(for: activityTypeRecordID)
-        }
+        let activityTypeRecord = try await retryService
+            .retryableRequest(operation: "fetchActivityTypeRecord(\(activityType.id))") {
+                try await sharedDatabase.record(for: activityTypeRecordID)
+            }
 
         // Build the record directly in the correct zone via the converter
         let record = try converter.activityToRecord(

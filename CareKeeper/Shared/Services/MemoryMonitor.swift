@@ -3,8 +3,7 @@ import os.log
 
 /// Monitors and logs memory usage at critical checkpoints
 /// Helps identify memory pressure issues on watchOS
-struct MemoryMonitor {
-
+enum MemoryMonitor {
     private static let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "memory")
 
     /// Log current memory usage with context
@@ -74,11 +73,11 @@ struct MemoryMonitor {
         }
 
         #if os(watchOS)
-        // watchOS has stricter limits
-        return usedMB > 25.0
+            // watchOS has stricter limits
+            return usedMB > 25.0
         #else
-        // iOS can handle more
-        return usedMB > 100.0
+            // iOS can handle more
+            return usedMB > 100.0
         #endif
     }
 

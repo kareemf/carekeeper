@@ -8,7 +8,6 @@ import SwiftUI
 /// - No Combine subscriptions (explicit async/await)
 /// - Safe rendering (no relationship access like caree.activityTypes)
 struct CareeListView: View {
-
     @StateObject private var dataProvider = WatchDataProvider()
     @State private var loadTask: Task<Void, Never>?
     @State private var error: Error?
@@ -50,7 +49,7 @@ struct CareeListView: View {
 
     @ViewBuilder
     private var contentView: some View {
-        if dataProvider.isLoadingCarees && dataProvider.carees.isEmpty {
+        if dataProvider.isLoadingCarees, dataProvider.carees.isEmpty {
             // Loading state (only if no cached data)
             loadingView
         } else if let error = dataProvider.careesError, dataProvider.carees.isEmpty {
@@ -199,8 +198,9 @@ struct ProfileImageView: View {
 
     var body: some View {
         Group {
-            if let imageData = imageData,
-               let uiImage = UIImage(data: imageData) {
+            if let imageData,
+               let uiImage = UIImage(data: imageData)
+            {
                 Image(uiImage: uiImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)

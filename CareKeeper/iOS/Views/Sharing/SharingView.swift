@@ -1,6 +1,6 @@
-import SwiftUI
-import SwiftData
 import CloudKit
+import SwiftData
+import SwiftUI
 
 struct SharingView: View {
     @Environment(\.modelContext) private var modelContext
@@ -24,13 +24,13 @@ struct SharingView: View {
     
     // Combined list of all carees (private + shared)
     private var allCarees: [Caree] {
-        return myCarees + sharedRecordsService.sharedCarees
+        myCarees + sharedRecordsService.sharedCarees
     }
 
     var body: some View {
         NavigationView {
             Group {
-                if isInitialLoad && allCarees.isEmpty {
+                if isInitialLoad, allCarees.isEmpty {
                     // Show full-screen loading only on first load with empty cache
                     // Otherwise, show cached content and refresh in background
                     VStack(spacing: 16) {
@@ -42,61 +42,70 @@ struct SharingView: View {
                     List {
                         // Shared by Me section
                         if !sharedByMe.isEmpty {
-                    Section {
-                        ForEach(sharedByMe) { caree in
-                            NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
-                                SharedByMeRowView(
-                                    caree: caree,
-                                    share: sharesByCareeID[caree.id]
-                                )
-                            }
-                        }
-                    } header: {
-                        Text(NSLocalizedString("Shared by Me", comment: "Shared by me section header"))
-                    }
-                } else {
-                    Section {
-                        emptyStateView(
-                            icon: "person.2",
-                            message: NSLocalizedString("You haven't shared any carees yet", comment: "Empty shared by me message")
-                        )
-                    } header: {
-                        Text(NSLocalizedString("Shared by Me", comment: "Shared by me section header"))
-                    }
-                }
-
-                // Shared with Me section
-                if !sharedWithMe.isEmpty {
-                    Section {
-                        ForEach(sharedWithMe) { caree in
-                            NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
-                                SharedWithMeRowView(
-                                    caree: caree,
-                                    share: sharesByCareeID[caree.id]
-                                )
-                            }
-                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                Button(role: .destructive) {
-                                    careeToStopSharing = caree
-                                    showingStopSharingConfirmation = true
-                                } label: {
-                                    Label(NSLocalizedString("Stop Sharing", comment: "Stop sharing button"), systemImage: "xmark.circle")
+                            Section {
+                                ForEach(sharedByMe) { caree in
+                                    NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
+                                        SharedByMeRowView(
+                                            caree: caree,
+                                            share: sharesByCareeID[caree.id]
+                                        )
+                                    }
                                 }
+                            } header: {
+                                Text(NSLocalizedString("Shared by Me", comment: "Shared by me section header"))
+                            }
+                        } else {
+                            Section {
+                                emptyStateView(
+                                    icon: "person.2",
+                                    message: NSLocalizedString(
+                                        "You haven't shared any carees yet",
+                                        comment: "Empty shared by me message"
+                                    )
+                                )
+                            } header: {
+                                Text(NSLocalizedString("Shared by Me", comment: "Shared by me section header"))
                             }
                         }
-                    } header: {
-                        Text(NSLocalizedString("Shared with Me", comment: "Shared with me section header"))
-                    }
-                } else {
-                    Section {
-                        emptyStateView(
-                            icon: "person.crop.circle.badge.questionmark",
-                            message: NSLocalizedString("No one has shared a caree with you yet", comment: "Empty shared with me message")
-                        )
-                    } header: {
-                        Text(NSLocalizedString("Shared with Me", comment: "Shared with me section header"))
-                    }
-                }
+
+                        // Shared with Me section
+                        if !sharedWithMe.isEmpty {
+                            Section {
+                                ForEach(sharedWithMe) { caree in
+                                    NavigationLink(destination: CareeDetailView(careeID: caree.id)) {
+                                        SharedWithMeRowView(
+                                            caree: caree,
+                                            share: sharesByCareeID[caree.id]
+                                        )
+                                    }
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                        Button(role: .destructive) {
+                                            careeToStopSharing = caree
+                                            showingStopSharingConfirmation = true
+                                        } label: {
+                                            Label(
+                                                NSLocalizedString("Stop Sharing", comment: "Stop sharing button"),
+                                                systemImage: "xmark.circle"
+                                            )
+                                        }
+                                    }
+                                }
+                            } header: {
+                                Text(NSLocalizedString("Shared with Me", comment: "Shared with me section header"))
+                            }
+                        } else {
+                            Section {
+                                emptyStateView(
+                                    icon: "person.crop.circle.badge.questionmark",
+                                    message: NSLocalizedString(
+                                        "No one has shared a caree with you yet",
+                                        comment: "Empty shared with me message"
+                                    )
+                                )
+                            } header: {
+                                Text(NSLocalizedString("Shared with Me", comment: "Shared with me section header"))
+                            }
+                        }
                     }
                 }
             }
@@ -113,7 +122,7 @@ struct SharingView: View {
                 }
             }
             .overlay {
-                if isRefreshingShares && !isInitialLoad {
+                if isRefreshingShares, !isInitialLoad {
                     VStack {
                         Spacer()
                         HStack {
@@ -147,7 +156,10 @@ struct SharingView: View {
                     careeToStopSharing = nil
                 }
             } message: {
-                Text(NSLocalizedString("You will no longer have access to this caree and its activities.", comment: "Stop sharing confirmation message"))
+                Text(NSLocalizedString(
+                    "You will no longer have access to this caree and its activities.",
+                    comment: "Stop sharing confirmation message"
+                ))
             }
         }
         .task {
@@ -168,7 +180,7 @@ struct SharingView: View {
             }
         }
         .onReceive(sharedRecordsService.$error) { newError in
-            if let newError = newError {
+            if let newError {
                 error = newError
             }
         }
@@ -280,8 +292,8 @@ private struct SharedByMeRowView: View {
                 if let share {
                     let participantCount = sharingService.fetchParticipants(for: share).count
                     Text(participantCount == 1
-                         ? NSLocalizedString("1 person", comment: "Participant count singular")
-                         : String(format: NSLocalizedString("%d people", comment: "Participant count plural"), participantCount))
+                        ? NSLocalizedString("1 person", comment: "Participant count singular")
+                        : String(format: NSLocalizedString("%d people", comment: "Participant count plural"), participantCount))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -317,7 +329,10 @@ private struct SharedWithMeRowView: View {
 
                 if let share {
                     let owner = share.owner
-                    let ownerName = owner.userIdentity.nameComponents?.formatted(.name(style: .short)) ?? NSLocalizedString("Unknown", comment: "Unknown owner")
+                    let ownerName = owner.userIdentity.nameComponents?.formatted(.name(style: .short)) ?? NSLocalizedString(
+                        "Unknown",
+                        comment: "Unknown owner"
+                    )
                     Text(String(format: NSLocalizedString("Shared by %@", comment: "Shared by owner name"), ownerName))
                         .font(.subheadline)
                         .foregroundColor(.secondary)

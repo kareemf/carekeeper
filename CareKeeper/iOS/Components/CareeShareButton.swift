@@ -1,6 +1,6 @@
-import SwiftUI
-import SwiftData
 import CloudKit
+import SwiftData
+import SwiftUI
 
 struct CareeShareButton: View {
     let caree: Caree
@@ -25,9 +25,9 @@ struct CareeShareButton: View {
             // Pre-share validation
             if !isMyCaree {
                 isShared = true
-               Task {
+                Task {
                     await prepareNonOwnedShare()
-                } 
+                }
             } else if !isSynced {
                 showingSyncAlert = true
             } else {
@@ -41,8 +41,8 @@ struct CareeShareButton: View {
                     .scaleEffect(0.8)
             } else {
                 Image(systemName: isShared
-                      ? "person.crop.circle.badge.checkmark"
-                      : "square.and.arrow.up")
+                    ? "person.crop.circle.badge.checkmark"
+                    : "square.and.arrow.up")
             }
         }
         .disabled(isLoading)
@@ -52,10 +52,13 @@ struct CareeShareButton: View {
         ) {
             Button(NSLocalizedString("OK", comment: "OK button"), role: .cancel) {}
         } message: {
-            Text(NSLocalizedString("This caree hasn't synced to iCloud yet. Please wait a moment or pull down to refresh, then try again.", comment: "Sync alert message"))
+            Text(NSLocalizedString(
+                "This caree hasn't synced to iCloud yet. Please wait a moment or pull down to refresh, then try again.",
+                comment: "Sync alert message"
+            ))
         }
         .sheet(isPresented: $showingShareSheet) {
-            if let share = share {
+            if let share {
                 CloudSharingView(
                     share: share,
                     container: container,

@@ -89,7 +89,7 @@ class CareeImportService: ObservableObject {
 
     /// Import a single activity type
     private func importActivityType(_ exported: ExportedActivityType, caree: Caree) async throws -> ActivityType {
-        return try await cloudKitService.createActivityType(
+        try await cloudKitService.createActivityType(
             for: caree,
             name: exported.name,
             icon: exported.icon,
@@ -129,7 +129,7 @@ enum ImportProgress: Equatable {
         switch self {
         case .idle, .reading:
             return 0
-        case .importing(let current, let total):
+        case let .importing(current, total):
             guard total > 0 else { return 0 }
             return Double(current) / Double(total)
         case .completed:
@@ -142,15 +142,15 @@ enum ImportProgress: Equatable {
     var description: String {
         switch self {
         case .idle:
-            return "Ready to import"
+            "Ready to import"
         case .reading:
-            return "Reading file..."
-        case .importing(let current, let total):
-            return "Importing \(current) of \(total) records..."
-        case .completed(let count):
-            return "Imported \(count) records successfully"
-        case .failed(let error):
-            return "Import failed: \(error)"
+            "Reading file..."
+        case let .importing(current, total):
+            "Importing \(current) of \(total) records..."
+        case let .completed(count):
+            "Imported \(count) records successfully"
+        case let .failed(error):
+            "Import failed: \(error)"
         }
     }
 }

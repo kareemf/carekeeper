@@ -1,6 +1,6 @@
-import XCTest
-import SwiftData
 @testable import CareKeeperV2
+import SwiftData
+import XCTest
 
 @MainActor
 final class CareeTests: XCTestCase {
@@ -11,7 +11,7 @@ final class CareeTests: XCTestCase {
         let schema = Schema([
             Caree.self,
             ActivityType.self,
-            Activity.self
+            Activity.self,
         ])
 
         let modelConfiguration = ModelConfiguration(

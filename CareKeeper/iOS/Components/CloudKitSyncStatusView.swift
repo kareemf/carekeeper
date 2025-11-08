@@ -7,20 +7,20 @@ struct CloudKitSyncStatusView: View {
     let size: Size
 
     enum Size {
-        case small  // For list rows (caption)
+        case small // For list rows (caption)
         case medium // For headers (body)
 
         var font: Font {
             switch self {
-            case .small: return .caption
-            case .medium: return .body
+            case .small: .caption
+            case .medium: .body
             }
         }
 
         var scale: CGFloat {
             switch self {
-            case .small: return 0.7
-            case .medium: return 0.7
+            case .small: 0.7
+            case .medium: 0.7
             }
         }
     }
@@ -30,7 +30,7 @@ struct CloudKitSyncStatusView: View {
             if isChecking {
                 ProgressView()
                     .scaleEffect(size.scale)
-            } else if let isSynced = isSynced {
+            } else if let isSynced {
                 Image(systemName: isSynced ? "icloud.and.arrow.up.fill" : "icloud.slash")
                     .foregroundColor(isSynced ? .white : .gray.opacity(0.3))
                     .font(size.font)

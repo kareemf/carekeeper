@@ -1,13 +1,12 @@
 import Foundation
 import UserNotifications
 #if os(iOS)
-import UIKit
+    import UIKit
 #endif
 
 /// Service for managing user-facing push notifications
 @MainActor
 class UserNotificationService: ObservableObject {
-
     // MARK: - Shared Instance
 
     static let shared = UserNotificationService()
@@ -43,7 +42,7 @@ class UserNotificationService: ObservableObject {
     // MARK: - Notification Types
 
     enum NotificationType: String {
-        case newActivity = "newActivity"
+        case newActivity
     }
 
     // MARK: - Initialization
@@ -86,9 +85,9 @@ class UserNotificationService: ObservableObject {
     /// Open iOS Settings app to notification settings
     func openSettings() {
         #if os(iOS)
-        if let url = URL(string: UIApplication.openSettingsURLString) {
-            UIApplication.shared.open(url)
-        }
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url)
+            }
         #endif
     }
 
@@ -153,7 +152,7 @@ class UserNotificationService: ObservableObject {
         content.userInfo = [
             UserInfoKeys.activityID: activityID.uuidString,
             UserInfoKeys.careeID: careeID.uuidString,
-            UserInfoKeys.type: NotificationType.newActivity.rawValue
+            UserInfoKeys.type: NotificationType.newActivity.rawValue,
         ]
 
         // Create request with unique identifier
@@ -181,7 +180,8 @@ class UserNotificationService: ObservableObject {
         guard let activityIDString = userInfo[UserInfoKeys.activityID] as? String,
               let activityID = UUID(uuidString: activityIDString),
               let careeIDString = userInfo[UserInfoKeys.careeID] as? String,
-              let careeID = UUID(uuidString: careeIDString) else {
+              let careeID = UUID(uuidString: careeIDString)
+        else {
             return nil
         }
 

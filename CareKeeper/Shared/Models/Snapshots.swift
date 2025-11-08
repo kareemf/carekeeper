@@ -1,5 +1,5 @@
-import Foundation
 import CloudKit
+import Foundation
 
 // MARK: - Snapshot Errors
 
@@ -8,8 +8,8 @@ enum SnapshotError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .invalidInput(let message):
-            return message
+        case let .invalidInput(message):
+            message
         }
     }
 }
@@ -64,7 +64,8 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
     init(from record: CKRecord, isShared: Bool) throws {
         // Extract ID from record name (format: "CD_Caree/UUID")
         guard let idString = record.recordID.recordName.components(separatedBy: "/").last,
-              let id = UUID(uuidString: idString) else {
+              let id = UUID(uuidString: idString)
+        else {
             throw SnapshotError.invalidInput("Invalid caree record ID: \(record.recordID.recordName)")
         }
 
@@ -78,7 +79,8 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
         // Load image from CKAsset (using CD_image_ckAsset field)
         if let imageAsset = record["CD_image_ckAsset"] as? CKAsset,
            let imageURL = imageAsset.fileURL,
-           let imageData = try? Data(contentsOf: imageURL) {
+           let imageData = try? Data(contentsOf: imageURL)
+        {
             self.imageData = imageData
         } else {
             self.imageData = nil
@@ -168,15 +170,15 @@ struct CareeSnapshot: Identifiable, Hashable, Codable, Sendable {
 
     static func == (lhs: CareeSnapshot, rhs: CareeSnapshot) -> Bool {
         lhs.id == rhs.id &&
-        lhs.name == rhs.name &&
-        lhs.imageData == rhs.imageData &&
-        lhs.changeTag == rhs.changeTag &&
-        lhs.isShared == rhs.isShared &&
-        lhs.listOrder == rhs.listOrder &&
-        lhs.dateCreated == rhs.dateCreated &&
-        lhs.activityTypeCount == rhs.activityTypeCount &&
-        lhs.zoneName == rhs.zoneName &&
-        lhs.zoneOwnerName == rhs.zoneOwnerName
+            lhs.name == rhs.name &&
+            lhs.imageData == rhs.imageData &&
+            lhs.changeTag == rhs.changeTag &&
+            lhs.isShared == rhs.isShared &&
+            lhs.listOrder == rhs.listOrder &&
+            lhs.dateCreated == rhs.dateCreated &&
+            lhs.activityTypeCount == rhs.activityTypeCount &&
+            lhs.zoneName == rhs.zoneName &&
+            lhs.zoneOwnerName == rhs.zoneOwnerName
     }
 }
 
@@ -196,7 +198,8 @@ struct ActivityTypeSnapshot: Identifiable, Hashable, Codable, Sendable {
     init(from record: CKRecord) throws {
         // Extract ID from record name (format: "CD_ActivityType/UUID")
         guard let idString = record.recordID.recordName.components(separatedBy: "/").last,
-              let id = UUID(uuidString: idString) else {
+              let id = UUID(uuidString: idString)
+        else {
             throw SnapshotError.invalidInput("Invalid activity type record ID: \(record.recordID.recordName)")
         }
 
@@ -207,7 +210,8 @@ struct ActivityTypeSnapshot: Identifiable, Hashable, Codable, Sendable {
         // Extract caree ID from reference
         guard let careeRef = record["CD_caree"] as? CKRecord.Reference,
               let careeIDString = careeRef.recordID.recordName.components(separatedBy: "/").last,
-              let careeID = UUID(uuidString: careeIDString) else {
+              let careeID = UUID(uuidString: careeIDString)
+        else {
             throw SnapshotError.invalidInput("Invalid caree reference in activity type")
         }
 
@@ -326,7 +330,7 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
                 try container.encode(State.syncing, forKey: .state)
             case .synced:
                 try container.encode(State.synced, forKey: .state)
-            case .failed(let message):
+            case let .failed(message):
                 try container.encode(State.failed, forKey: .state)
                 try container.encode(message, forKey: .errorMessage)
             }
@@ -337,7 +341,8 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
     init(from record: CKRecord) throws {
         // Extract ID from record name (format: "CD_Activity/UUID")
         guard let idString = record.recordID.recordName.components(separatedBy: "/").last,
-              let id = UUID(uuidString: idString) else {
+              let id = UUID(uuidString: idString)
+        else {
             throw SnapshotError.invalidInput("Invalid activity record ID: \(record.recordID.recordName)")
         }
 
@@ -348,14 +353,16 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
         // Extract activity type ID from reference
         guard let typeRef = record["CD_activityType"] as? CKRecord.Reference,
               let typeIDString = typeRef.recordID.recordName.components(separatedBy: "/").last,
-              let typeID = UUID(uuidString: typeIDString) else {
+              let typeID = UUID(uuidString: typeIDString)
+        else {
             throw SnapshotError.invalidInput("Invalid activity type reference")
         }
 
         // Extract caree ID from reference
         guard let careeRef = record["CD_caree"] as? CKRecord.Reference,
               let careeIDString = careeRef.recordID.recordName.components(separatedBy: "/").last,
-              let careeID = UUID(uuidString: careeIDString) else {
+              let careeID = UUID(uuidString: careeIDString)
+        else {
             throw SnapshotError.invalidInput("Invalid caree reference in activity")
         }
 
@@ -416,14 +423,14 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
 
     static func == (lhs: ActivitySnapshot, rhs: ActivitySnapshot) -> Bool {
         lhs.id == rhs.id &&
-        lhs.dateTime == rhs.dateTime &&
-        lhs.notes == rhs.notes &&
-        lhs.quantity == rhs.quantity &&
-        lhs.latitude == rhs.latitude &&
-        lhs.longitude == rhs.longitude &&
-        lhs.activityTypeID == rhs.activityTypeID &&
-        lhs.careeID == rhs.careeID &&
-        lhs.dateCreated == rhs.dateCreated &&
-        lhs.syncState == rhs.syncState
+            lhs.dateTime == rhs.dateTime &&
+            lhs.notes == rhs.notes &&
+            lhs.quantity == rhs.quantity &&
+            lhs.latitude == rhs.latitude &&
+            lhs.longitude == rhs.longitude &&
+            lhs.activityTypeID == rhs.activityTypeID &&
+            lhs.careeID == rhs.careeID &&
+            lhs.dateCreated == rhs.dateCreated &&
+            lhs.syncState == rhs.syncState
     }
 }

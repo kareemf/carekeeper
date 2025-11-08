@@ -1,7 +1,7 @@
 // @see https://developer.apple.com/documentation/coredata/accepting-share-invitations-in-a-swiftui-app
 
-import UIKit
 import CloudKit
+import UIKit
 
 extension Notification.Name {
     static let cloudKitShareAccepted = Notification.Name("CloudKitShareAccepted")
@@ -11,8 +11,10 @@ extension Notification.Name {
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private let logger = AppLogger.sharing
     // @see https://developer.apple.com/documentation/coredata/accepting-share-invitations-in-a-swiftui-app
-    func windowScene(_ windowScene: UIWindowScene,
-                     userDidAcceptCloudKitShareWith cloudKitShareMetadata: CKShare.Metadata) {
+    func windowScene(
+        _ windowScene: UIWindowScene,
+        userDidAcceptCloudKitShareWith cloudKitShareMetadata: CKShare.Metadata
+    ) {
         let container = CKContainer(identifier: CloudKitConfig.containerID)
 
         Task {
@@ -36,7 +38,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func acceptShare(with metadata: CKShare.Metadata, in container: CKContainer) async throws -> CKShare {
         try await withCheckedThrowingContinuation { continuation in
             container.accept(metadata) { acceptedShare, error in
-                if let error = error {
+                if let error {
                     continuation.resume(throwing: error)
                 } else if let share = acceptedShare {
                     continuation.resume(returning: share)

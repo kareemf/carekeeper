@@ -1,8 +1,7 @@
-import XCTest
 @testable import CareKeeperV2
+import XCTest
 
 final class SnapshotCodableTests: XCTestCase {
-
     private let encoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
@@ -105,7 +104,7 @@ final class SnapshotCodableTests: XCTestCase {
             .pending,
             .syncing,
             .synced,
-            .failed("Server error")
+            .failed("Server error"),
         ]
 
         for state in states {

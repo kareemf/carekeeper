@@ -35,7 +35,7 @@ struct HelpView: View {
                 )
 
                 // Loading overlay
-                if webViewCoordinator.isLoading && webViewCoordinator.error == nil {
+                if webViewCoordinator.isLoading, webViewCoordinator.error == nil {
                     VStack {
                         ProgressView()
                         Text(NSLocalizedString("Loading documentation...", comment: "Help loading message"))
@@ -190,7 +190,11 @@ class WebViewCoordinator: NSObject, WKNavigationDelegate, ObservableObject {
     }
 
     // Handle external links (optional: open in Safari for external domains)
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+    func webView(
+        _ webView: WKWebView,
+        decidePolicyFor navigationAction: WKNavigationAction,
+        decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+    ) {
         // Allow all navigation for now (documentation is self-contained)
         // In the future, could add logic to open external links in Safari
         decisionHandler(.allow)

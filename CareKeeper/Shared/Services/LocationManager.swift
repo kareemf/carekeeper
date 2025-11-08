@@ -20,7 +20,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     /// Request location permission and start updating location
     func startUpdating() {
-        guard authorizationStatus != .denied && authorizationStatus != .restricted else {
+        guard authorizationStatus != .denied, authorizationStatus != .restricted else {
             self.error = AppError.locationPermissionDenied
             return
         }
@@ -41,7 +41,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     /// Get current location once (useful for activity tracking)
     func requestLocation() {
-        guard authorizationStatus != .denied && authorizationStatus != .restricted else {
+        guard authorizationStatus != .denied, authorizationStatus != .restricted else {
             self.error = AppError.locationPermissionDenied
             return
         }

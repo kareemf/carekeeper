@@ -1,5 +1,5 @@
-import SwiftUI
 import PhotosUI
+import SwiftUI
 
 struct CareeEditView: View {
     @Environment(\.modelContext) private var modelContext
@@ -25,7 +25,7 @@ struct CareeEditView: View {
 
     init(caree: Caree? = nil) {
         self.caree = caree
-        if let caree = caree {
+        if let caree {
             _name = State(initialValue: caree.name)
             _imageData = State(initialValue: caree.image)
         }
@@ -51,8 +51,8 @@ struct CareeEditView: View {
                 }
             }
             .navigationTitle(isEditing ?
-                           NSLocalizedString("Edit Caree", comment: "Edit caree navigation title") :
-                           NSLocalizedString("Add Caree", comment: "Add caree navigation title"))
+                NSLocalizedString("Edit Caree", comment: "Edit caree navigation title") :
+                NSLocalizedString("Add Caree", comment: "Add caree navigation title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -100,16 +100,19 @@ struct CareeEditView: View {
                     selection: $selectedPhotoItem,
                     matching: .images
                 ) {
-                    Text(imageData == nil ? 
-                         NSLocalizedString("Add Photo", comment: "Add photo button") :
-                         NSLocalizedString("Change Photo", comment: "Change photo button"))
+                    Text(imageData == nil ?
+                        NSLocalizedString("Add Photo", comment: "Add photo button") :
+                        NSLocalizedString("Change Photo", comment: "Change photo button"))
                         .font(.caption)
                 }
 
                 if showWatchRefreshReminder {
                     Label {
-                        Text(NSLocalizedString("Watch app users: perform a manual refresh to load the new image.", comment: "Watch refresh reminder after caree photo update"))
-                            .multilineTextAlignment(.center)
+                        Text(NSLocalizedString(
+                            "Watch app users: perform a manual refresh to load the new image.",
+                            comment: "Watch refresh reminder after caree photo update"
+                        ))
+                        .multilineTextAlignment(.center)
                     } icon: {
                         Image(systemName: "exclamationmark.triangle.fill")
                     }
@@ -127,7 +130,7 @@ struct CareeEditView: View {
     
     private var profileImageView: some View {
         Group {
-            if let imageData = imageData, let uiImage = UIImage(data: imageData) {
+            if let imageData, let uiImage = UIImage(data: imageData) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -142,16 +145,16 @@ struct CareeEditView: View {
     }
     
     private func loadSelectedPhoto(from item: PhotosPickerItem?) {
-        guard let item = item else { return }
+        guard let item else { return }
         
         item.loadTransferable(type: Data.self) { result in
             switch result {
-            case .success(let data):
+            case let .success(data):
                 DispatchQueue.main.async {
                     self.imageData = data
                     self.showWatchRefreshReminder = true
                 }
-            case .failure(let error):
+            case let .failure(error):
                 DispatchQueue.main.async {
                     self.error = error
                 }

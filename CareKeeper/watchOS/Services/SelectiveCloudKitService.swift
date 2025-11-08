@@ -1,5 +1,5 @@
-import Foundation
 import CloudKit
+import Foundation
 import os.log
 
 /// Watch-optimized CloudKit queries with aggressive filtering
@@ -10,7 +10,6 @@ import os.log
 /// - Lightweight count queries (avoids loading full objects)
 @MainActor
 class SelectiveCloudKitService {
-
     // MARK: - Configuration
 
     /// Only load activities from last 24 hours (configurable)
@@ -101,23 +100,23 @@ class SelectiveCloudKitService {
 
         for zone in zones {
             // Skip default zone
-                if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
+            if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
 
-                logger.info("🔍 Querying shared carees in zone: \(zone.zoneID.zoneName)")
+            logger.info("🔍 Querying shared carees in zone: \(zone.zoneID.zoneName)")
 
-                let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
-                let nonImageKeys = careeNonImageKeys
-                let (matchResults, _) = try await retryableRequest(operation: "fetchSharedCarees(zone: \(zone.zoneID.zoneName))") {
-                    try await database.records(
-                        matching: query,
-                        inZoneWith: zone.zoneID,
-                        desiredKeys: includeImages ? nil : nonImageKeys
-                    )
-                }
+            let query = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
+            let nonImageKeys = careeNonImageKeys
+            let (matchResults, _) = try await retryableRequest(operation: "fetchSharedCarees(zone: \(zone.zoneID.zoneName))") {
+                try await database.records(
+                    matching: query,
+                    inZoneWith: zone.zoneID,
+                    desiredKeys: includeImages ? nil : nonImageKeys
+                )
+            }
 
-                for (_, result) in matchResults {
-                    if let record = try? result.get() {
-                        if let caree = try? CareeSnapshot(from: record, isShared: true) {
+            for (_, result) in matchResults {
+                if let record = try? result.get() {
+                    if let caree = try? CareeSnapshot(from: record, isShared: true) {
                         allCarees.append(caree)
                     }
                 }
@@ -160,7 +159,10 @@ class SelectiveCloudKitService {
             for zone in zones {
                 if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
 
-                let (matchResults, _) = try await retryableRequest(operation: "fetchActivityTypes(zone: \(zone.zoneID.zoneName))") {
+                let (
+                    matchResults,
+                    _
+                ) = try await retryableRequest(operation: "fetchActivityTypes(zone: \(zone.zoneID.zoneName))") {
                     try await database.records(
                         matching: query,
                         inZoneWith: zone.zoneID,
@@ -171,7 +173,8 @@ class SelectiveCloudKitService {
 
                 for (_, result) in matchResults {
                     if let record = try? result.get(),
-                       let activityType = try? ActivityTypeSnapshot(from: record) {
+                       let activityType = try? ActivityTypeSnapshot(from: record)
+                    {
                         activityTypes.append(activityType)
                     }
                 }
@@ -221,7 +224,7 @@ class SelectiveCloudKitService {
         hoursBack: TimeInterval? = nil
     ) async throws -> [ActivitySnapshot] {
         let hours = hoursBack ?? Self.activityHistoryHours
-        logger.info("🔍 Fetching recent activities (last \(hours/3600)h) for caree: \(careeID)")
+        logger.info("🔍 Fetching recent activities (last \(hours / 3600)h) for caree: \(careeID)")
         MemoryMonitor.logMemoryUsage(context: "Before fetchRecentActivities")
 
         let database = isShared ? container.sharedCloudDatabase : container.privateCloudDatabase
@@ -235,7 +238,7 @@ class SelectiveCloudKitService {
         var predicateArgs: [Any] = [careeReference, cutoffDate]
 
         // Optionally filter by activity type
-        if let activityTypeID = activityTypeID {
+        if let activityTypeID {
             let typeRecordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityTypeID.uuidString)")
             let typeReference = CKRecord.Reference(recordID: typeRecordID, action: .none)
             predicateFormat += " AND CD_activityType == %@"
@@ -256,7 +259,10 @@ class SelectiveCloudKitService {
             for zone in zones {
                 if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
 
-                let (matchResults, _) = try await retryableRequest(operation: "fetchRecentActivities(zone: \(zone.zoneID.zoneName))") {
+                let (
+                    matchResults,
+                    _
+                ) = try await retryableRequest(operation: "fetchRecentActivities(zone: \(zone.zoneID.zoneName))") {
                     try await database.records(
                         matching: query,
                         inZoneWith: zone.zoneID,
@@ -267,7 +273,8 @@ class SelectiveCloudKitService {
 
                 for (_, result) in matchResults {
                     if let record = try? result.get(),
-                       let activity = try? ActivitySnapshot(from: record) {
+                       let activity = try? ActivitySnapshot(from: record)
+                    {
                         activities.append(activity)
                     }
                 }
@@ -295,7 +302,7 @@ class SelectiveCloudKitService {
 
             activities = matchResults.compactMap { _, result in
                 try? ActivitySnapshot(from: result.get())
-        }
+            }
         }
 
         logger.info("✅ Loaded \(activities.count) recent activities (capped at \(Self.maxActivitiesPerCaree))")
@@ -318,7 +325,7 @@ class SelectiveCloudKitService {
             }
             guard let matchedZone = zones.first(where: { zone in
                 zone.zoneID.zoneName == zoneName &&
-                (zoneOwnerName == nil || zone.zoneID.ownerName == zoneOwnerName)
+                    (zoneOwnerName == nil || zone.zoneID.ownerName == zoneOwnerName)
             }) else {
                 logger.warning("⚠️ Shared zone \(zoneName) not found when fetching caree image")
                 return nil
@@ -333,7 +340,8 @@ class SelectiveCloudKitService {
         return try await retryableRequest(operation: "fetchCareeImage") {
             let record = try await database.record(for: recordID)
             if let asset = record["CD_image_ckAsset"] as? CKAsset,
-               let url = asset.fileURL {
+               let url = asset.fileURL
+            {
                 return try Data(contentsOf: url)
             }
             return nil
@@ -367,7 +375,10 @@ class SelectiveCloudKitService {
             for zone in zones {
                 if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
 
-                let (matchResults, _) = try await retryableRequest(operation: "fetchActivityTypeCount(zone: \(zone.zoneID.zoneName))") {
+                let (
+                    matchResults,
+                    _
+                ) = try await retryableRequest(operation: "fetchActivityTypeCount(zone: \(zone.zoneID.zoneName))") {
                     try await database.records(
                         matching: query,
                         inZoneWith: zone.zoneID,

@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct ActivityTypeRowView: View {
     let activityType: ActivityType
@@ -7,7 +7,7 @@ struct ActivityTypeRowView: View {
     @Query private var allActivities: [Activity]
 
     private var activitiesCount: Int {
-        allActivities.filter { $0.activityType?.id == activityType.id }.count
+        allActivities.count(where: { $0.activityType?.id == activityType.id })
     }
 
     var body: some View {
@@ -23,17 +23,21 @@ struct ActivityTypeRowView: View {
                 
                 HStack(spacing: 12) {
                     if activityType.hasQuantity {
-                        Label(activityType.quantityUnit ?? NSLocalizedString("Quantity", comment: "Quantity label"), 
-                              systemImage: "number")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        Label(
+                            activityType.quantityUnit ?? NSLocalizedString("Quantity", comment: "Quantity label"),
+                            systemImage: "number"
+                        )
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                     }
                     
                     if activityType.hasLocation {
-                        Label(NSLocalizedString("Location", comment: "Location label"), 
-                              systemImage: "location")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        Label(
+                            NSLocalizedString("Location", comment: "Location label"),
+                            systemImage: "location"
+                        )
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                     }
                 }
             }

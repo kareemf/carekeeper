@@ -1,7 +1,7 @@
-import SwiftUI
-import Network
 import CloudKit
 import Combine
+import Network
+import SwiftUI
 
 @MainActor
 @Observable
@@ -16,54 +16,54 @@ class CloudKitSyncMonitor {
         var displayMessage: String {
             switch self {
             case .idle:
-                return NSLocalizedString("Synced", comment: "Sync status: idle")
+                NSLocalizedString("Synced", comment: "Sync status: idle")
             case .syncing:
-                return NSLocalizedString("Syncing...", comment: "Sync status: syncing")
+                NSLocalizedString("Syncing...", comment: "Sync status: syncing")
             case .offline:
-                return NSLocalizedString("Offline", comment: "Sync status: offline")
+                NSLocalizedString("Offline", comment: "Sync status: offline")
             case .checking:
-                return NSLocalizedString("Checking...", comment: "Sync status: checking")
+                NSLocalizedString("Checking...", comment: "Sync status: checking")
             case .accountIssue:
-                return NSLocalizedString("Syncing Issue", comment: "Sync status: account issue")
+                NSLocalizedString("Syncing Issue", comment: "Sync status: account issue")
             }
         }
 
         var systemImage: String {
             switch self {
             case .idle:
-                return "icloud"
+                "icloud"
             case .syncing:
-                return "arrow.triangle.2.circlepath"
+                "arrow.triangle.2.circlepath"
             case .offline:
-                return "wifi.slash"
+                "wifi.slash"
             case .checking:
-                return "icloud.and.arrow.up.and.arrow.down"
+                "icloud.and.arrow.up.and.arrow.down"
             case .accountIssue:
-                return "exclamationmark.icloud"
+                "exclamationmark.icloud"
             }
         }
 
         var color: Color {
             switch self {
             case .idle:
-                return .secondary
+                .secondary
             case .syncing:
-                return .blue
+                .blue
             case .offline:
-                return .orange
+                .orange
             case .checking:
-                return .blue
+                .blue
             case .accountIssue:
-                return .red
+                .red
             }
         }
 
         var isTappable: Bool {
             switch self {
             case .offline, .accountIssue:
-                return true
+                true
             default:
-                return false
+                false
             }
         }
     }
@@ -98,7 +98,7 @@ class CloudKitSyncMonitor {
 
         // Observe CloudKitDataService.syncStatus
         cloudKitService.$syncStatus
-            .sink { [weak self] syncStatus in
+            .sink { [weak self] _ in
                 Task { @MainActor in
                     self?.updateStatus()
                 }
@@ -145,7 +145,10 @@ class CloudKitSyncMonitor {
         let isSharedRecordsLoading = sharedRecordsService?.isLoading ?? false
         let isCacheLoading = cacheService?.isLoading ?? false
 
-        AppLogger.cloudkit.debug("🔄 SyncMonitor: updateStatus - CloudKit: \(isCloudKitSyncing), SharedRecords: \(isSharedRecordsLoading), Cache: \(isCacheLoading), Current: \(String(describing: self.status))")
+        AppLogger.cloudkit
+            .debug(
+                "🔄 SyncMonitor: updateStatus - CloudKit: \(isCloudKitSyncing), SharedRecords: \(isSharedRecordsLoading), Cache: \(isCacheLoading), Current: \(String(describing: self.status))"
+            )
 
         if isCloudKitSyncing || isSharedRecordsLoading || isCacheLoading {
             AppLogger.cloudkit.debug("🔄 SyncMonitor: Setting status to .syncing")
@@ -162,7 +165,7 @@ class CloudKitSyncMonitor {
     private func setupNetworkMonitoring() {
         monitor.pathUpdateHandler = { [weak self] path in
             Task { @MainActor in
-                guard let self = self else { return }
+                guard let self else { return }
                 if path.status == .satisfied {
                     // When network comes back, just update status based on service activity
                     // Don't automatically check CloudKit account (causes false accountIssue in simulator)

@@ -1,11 +1,10 @@
-import SwiftUI
-import MapKit
 import CoreLocation
+import MapKit
+import SwiftUI
 
 /// ActivityDetailView rebuilt with snapshots
 /// Supports editing notes, quantity, time, and location
 struct ActivityDetailView: View {
-
     let activitySnapshot: ActivitySnapshot
 
     @EnvironmentObject private var dataProvider: WatchDataProvider
@@ -38,7 +37,9 @@ struct ActivityDetailView: View {
     }
 
     private var currentActivity: ActivitySnapshot {
-        if let refreshed = dataProvider.recentActivitiesByCaree[activitySnapshot.careeID]?.first(where: { $0.id == activitySnapshot.id }) {
+        if let refreshed = dataProvider.recentActivitiesByCaree[activitySnapshot.careeID]?
+            .first(where: { $0.id == activitySnapshot.id })
+        {
             return refreshed
         }
         return activitySnapshot
@@ -78,7 +79,7 @@ struct ActivityDetailView: View {
                         .padding(.horizontal)
                 }
 
-                if currentActivity.latitude != nil && currentActivity.longitude != nil {
+                if currentActivity.latitude != nil, currentActivity.longitude != nil {
                     Divider()
                     locationSection
                         .padding(.horizontal)
@@ -243,7 +244,7 @@ struct ActivityDetailView: View {
             .cornerRadius(12)
 
             // Show error details for failed state
-            if case .failed(let errorMessage) = currentActivity.syncState {
+            if case let .failed(errorMessage) = currentActivity.syncState {
                 VStack(spacing: 8) {
                     Text(errorMessage)
                         .font(.caption2)
@@ -516,11 +517,11 @@ struct ActivityDetailView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                         Spacer()
-                    if let unit = activityType?.quantityUnit {
-                        Text("\(String(format: "%.1f", quantity)) \(unit)")
-                            .font(.body)
-                    } else {
-                        Text(String(format: "%.1f", quantity))
+                        if let unit = activityType?.quantityUnit {
+                            Text("\(String(format: "%.1f", quantity)) \(unit)")
+                                .font(.body)
+                        } else {
+                            Text(String(format: "%.1f", quantity))
                                 .font(.body)
                         }
                     }
@@ -535,7 +536,7 @@ struct ActivityDetailView: View {
 
                 if isEditing {
                     TextField("Optional notes", text: $editedNotes, axis: .vertical)
-                        .lineLimit(2...4)
+                        .lineLimit(2 ... 4)
                         .padding()
                         .background(Color.gray.opacity(0.3))
                         .cornerRadius(8)
@@ -562,7 +563,9 @@ struct ActivityDetailView: View {
                     .foregroundColor(.secondary)
 
                 // In edit mode, allow capturing new location
-                if isEditing && (activityType?.hasLocation == true || (currentActivity.latitude != nil && currentActivity.longitude != nil)) {
+                if isEditing,
+                   activityType?.hasLocation == true || (currentActivity.latitude != nil && currentActivity.longitude != nil)
+                {
                     Toggle(isOn: $captureNewLocation) {
                         Text("Update Location")
                             .font(.body)
@@ -599,7 +602,9 @@ struct ActivityDetailView: View {
 
                 // Display current or existing location
                 if let latitude = (captureNewLocation ? locationManager.location?.coordinate.latitude : currentActivity.latitude),
-                   let longitude = (captureNewLocation ? locationManager.location?.coordinate.longitude : currentActivity.longitude) {
+                   let longitude = (captureNewLocation ? locationManager.location?.coordinate.longitude : currentActivity
+                       .longitude)
+                {
                     Map(initialPosition: .region(
                         MKCoordinateRegion(
                             center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
@@ -614,7 +619,7 @@ struct ActivityDetailView: View {
                     Text("Lat: \(String(format: "%.6f", latitude)), Lon: \(String(format: "%.6f", longitude))")
                         .font(.caption2)
                         .foregroundColor(.secondary)
-                } else if !isEditing && currentActivity.latitude == nil {
+                } else if !isEditing, currentActivity.latitude == nil {
                     Text("No location recorded")
                         .font(.caption)
                         .foregroundColor(.secondary)

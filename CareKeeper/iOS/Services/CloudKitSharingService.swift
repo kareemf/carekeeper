@@ -1,6 +1,6 @@
-import SwiftUI
-import SwiftData
 import CloudKit
+import SwiftData
+import SwiftUI
 
 @MainActor
 class CloudKitSharingService: ObservableObject {
@@ -80,7 +80,10 @@ class CloudKitSharingService: ObservableObject {
 
             if verifiedCount < activityTypeCount {
                 logger.error("❌ Only \(verifiedCount)/\(activityTypeCount) ActivityTypes found in CloudKit")
-                throw AppError.invalidInput("Some activity types haven't synced to CloudKit yet. \(verifiedCount)/\(activityTypeCount) activity types synced. Please wait a moment and try again.")
+                throw AppError
+                    .invalidInput(
+                        "Some activity types haven't synced to CloudKit yet. \(verifiedCount)/\(activityTypeCount) activity types synced. Please wait a moment and try again."
+                    )
             }
 
             if missingParents > 0 {
@@ -98,7 +101,10 @@ class CloudKitSharingService: ObservableObject {
 
             if verifiedCount < activityCount {
                 logger.error("❌ Only \(verifiedCount)/\(activityCount) Activities found in CloudKit")
-                throw AppError.invalidInput("Some activities haven't synced to CloudKit yet. \(verifiedCount)/\(activityCount) activities synced. Please wait a moment and try again.")
+                throw AppError
+                    .invalidInput(
+                        "Some activities haven't synced to CloudKit yet. \(verifiedCount)/\(activityCount) activities synced. Please wait a moment and try again."
+                    )
             }
 
             if missingParents > 0 {
@@ -126,8 +132,9 @@ class CloudKitSharingService: ObservableObject {
 
             // Check if save was successful
             if let shareResult = saveResults.saveResults[share.recordID],
-               case .success(let savedShare) = shareResult,
-               let finalShare = savedShare as? CKShare {
+               case let .success(savedShare) = shareResult,
+               let finalShare = savedShare as? CKShare
+            {
                 logger.info("✅ Share created successfully")
                 return finalShare
             } else {
@@ -142,7 +149,7 @@ class CloudKitSharingService: ObservableObject {
     // MARK: - Permission Checks
 
     func isOwner(of share: CKShare) -> Bool {
-        return share.owner == share.currentUserParticipant
+        share.owner == share.currentUserParticipant
     }
 
     func canDelete(caree: Caree, in modelContext: ModelContext) async -> Bool {
@@ -197,13 +204,13 @@ class CloudKitSharingService: ObservableObject {
     }
 
     func fetchParticipants(for share: CKShare) -> [CKShare.Participant] {
-        return share.participants.filter { $0 != share.owner }
+        share.participants.filter { $0 != share.owner }
     }
 
     // MARK: - Share URL
 
     func getShareURL(for share: CKShare) -> URL? {
-        return share.url
+        share.url
     }
 
     // MARK: - Verification Helpers
@@ -224,7 +231,7 @@ class CloudKitSharingService: ObservableObject {
         repeat {
             let (results, nextCursor): ([(CKRecord.ID, Result<CKRecord, Error>)], CKQueryOperation.Cursor?)
 
-            if let cursor = cursor {
+            if let cursor {
                 // Continue from previous cursor
                 (results, nextCursor) = try await container.privateCloudDatabase.records(
                     continuingMatchFrom: cursor,
@@ -244,7 +251,7 @@ class CloudKitSharingService: ObservableObject {
             cursor = nextCursor
 
             for (_, result) in results {
-                if case .success(let record) = result {
+                if case let .success(record) = result {
                     verifiedCount += 1
                     if record.parent == nil {
                         missingParentCount += 1
@@ -278,7 +285,7 @@ class CloudKitSharingService: ObservableObject {
         repeat {
             let (results, nextCursor): ([(CKRecord.ID, Result<CKRecord, Error>)], CKQueryOperation.Cursor?)
 
-            if let cursor = cursor {
+            if let cursor {
                 // Continue from previous cursor
                 (results, nextCursor) = try await container.privateCloudDatabase.records(
                     continuingMatchFrom: cursor,
@@ -298,7 +305,7 @@ class CloudKitSharingService: ObservableObject {
             cursor = nextCursor
 
             for (_, result) in results {
-                if case .success(let record) = result {
+                if case let .success(record) = result {
                     verifiedCount += 1
                     if record.parent == nil {
                         missingParentCount += 1

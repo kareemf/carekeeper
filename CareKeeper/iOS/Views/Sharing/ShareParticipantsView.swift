@@ -1,5 +1,5 @@
-import SwiftUI
 import CloudKit
+import SwiftUI
 
 struct ShareParticipantsView: View {
     let share: CKShare
@@ -40,7 +40,10 @@ struct ShareParticipantsView: View {
             } header: {
                 Text(NSLocalizedString("Share Link", comment: "Share link section header"))
             } footer: {
-                Text(NSLocalizedString("Share this link to invite others to collaborate on this caree.", comment: "Share link footer"))
+                Text(NSLocalizedString(
+                    "Share this link to invite others to collaborate on this caree.",
+                    comment: "Share link footer"
+                ))
             }
         }
         .navigationTitle(NSLocalizedString("Manage Sharing", comment: "Manage sharing title"))

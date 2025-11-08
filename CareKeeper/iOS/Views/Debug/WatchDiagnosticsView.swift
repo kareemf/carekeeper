@@ -4,7 +4,6 @@ import UniformTypeIdentifiers
 /// Debug view to read and share diagnostic data from watchOS app
 /// Reads MetricKit payloads exported to app group by MetricsManager
 struct WatchDiagnosticsView: View {
-
     @State private var diagnosticFiles: [DiagnosticFile] = []
     @State private var isLoading = false
     @State private var shareItem: ShareItem?
@@ -13,7 +12,7 @@ struct WatchDiagnosticsView: View {
         let url: URL
         let filename: String
         let date: Date
-        let type: String  // "diagnostic" or "metric"
+        let type: String // "diagnostic" or "metric"
         let size: Int64
     }
 
@@ -25,10 +24,12 @@ struct WatchDiagnosticsView: View {
     var body: some View {
         List {
             Section(header: Text("Watch Logging")) {
-                Text("Real-time log streaming is temporarily disabled to prioritize watchOS performance. Use MetricKit diagnostics or Xcode for deeper investigation.")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                    .padding(.vertical, 4)
+                Text(
+                    "Real-time log streaming is temporarily disabled to prioritize watchOS performance. Use MetricKit diagnostics or Xcode for deeper investigation."
+                )
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .padding(.vertical, 4)
             }
 
             if isLoading {
@@ -49,10 +50,12 @@ struct WatchDiagnosticsView: View {
                         Text("No Diagnostics Found")
                             .font(.headline)
 
-                        Text("Diagnostic data from your watch will appear here.\n\n• Real-time logs write immediately\n• MetricKit diagnostics arrive in 24-48h (device on charger)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
+                        Text(
+                            "Diagnostic data from your watch will appear here.\n\n• Real-time logs write immediately\n• MetricKit diagnostics arrive in 24-48h (device on charger)"
+                        )
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
                     }
                     .padding()
                 }
@@ -129,10 +132,10 @@ struct WatchDiagnosticsView: View {
                 Text(file.date, style: .date)
                     .font(.caption2)
                     .foregroundColor(.secondary)
-                + Text(" · ")
+                    + Text(" · ")
                     .font(.caption2)
                     .foregroundColor(.secondary)
-                + Text(file.date, style: .time)
+                    + Text(file.date, style: .time)
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
@@ -190,7 +193,8 @@ struct WatchDiagnosticsView: View {
             for fileURL in files {
                 guard let resourceValues = try? fileURL.resourceValues(forKeys: [.creationDateKey, .fileSizeKey]),
                       let date = resourceValues.creationDate,
-                      let size = resourceValues.fileSize else {
+                      let size = resourceValues.fileSize
+                else {
                     continue
                 }
 
@@ -216,11 +220,12 @@ struct WatchDiagnosticsView: View {
     }
 
     private func shareAllDiagnostics() {
-        let urls = diagnosticFiles.map { $0.url }
+        let urls = diagnosticFiles.map(\.url)
         guard !urls.isEmpty else { return }
 
         // Create a temporary directory with all files
-        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("diagnostics-export-\(Date().timeIntervalSince1970)")
+        let tempDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("diagnostics-export-\(Date().timeIntervalSince1970)")
 
         do {
             try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)

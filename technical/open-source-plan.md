@@ -37,7 +37,7 @@
 
 ## 8. Testing & Build Instructions
 - Verify `xcodebuild` commands succeed from a clean clone; script them (and simulator install steps) in README.
-- Add GitHub Actions CI that runs: unit tests + `git-secrets`, `gitleaks`, `trufflehog` scans (matching the initial audit tooling). If we later add a linter, ensure it’s both a pre-commit step and documented in README.
+- ✅ SwiftFormat + SwiftLint configs added, pre-commit hook + README updated. Next: add GitHub Actions CI that runs unit tests, `swiftlint`, `swiftformat --lint`, and the secret scanners (`git-secrets`, `gitleaks`, `trufflehog`).
 
 ## 9. Community & Governance
 - Add CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, and PR/issue templates; include instructions to run hooks (`git config core.hooksPath .githooks`).

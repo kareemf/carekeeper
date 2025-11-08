@@ -3,7 +3,6 @@ import Foundation
 /// Persists watch snapshots to the shared app-group so data survives relaunches.
 @MainActor
 final class WatchCacheService {
-
     // MARK: - Nested Types
 
     private enum Keys {
@@ -44,7 +43,10 @@ final class WatchCacheService {
             do {
                 try FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
             } catch {
-                logger.error("❌ WatchCacheService failed to create cache directory: \(error.localizedDescription, privacy: .public)")
+                logger
+                    .error(
+                        "❌ WatchCacheService failed to create cache directory: \(error.localizedDescription, privacy: .public)"
+                    )
             }
         }
 
@@ -94,18 +96,24 @@ final class WatchCacheService {
     }
 
     #if DEBUG
-    func clearAll() {
-        if let cacheDirectory {
-            do {
-                let fileURLs = try FileManager.default.contentsOfDirectory(at: cacheDirectory, includingPropertiesForKeys: nil)
-                for url in fileURLs {
-                    try FileManager.default.removeItem(at: url)
+        func clearAll() {
+            if let cacheDirectory {
+                do {
+                    let fileURLs = try FileManager.default.contentsOfDirectory(
+                        at: cacheDirectory,
+                        includingPropertiesForKeys: nil
+                    )
+                    for url in fileURLs {
+                        try FileManager.default.removeItem(at: url)
+                    }
+                } catch {
+                    logger
+                        .error(
+                            "❌ WatchCacheService failed to clear cache directory: \(error.localizedDescription, privacy: .public)"
+                        )
                 }
-            } catch {
-                logger.error("❌ WatchCacheService failed to clear cache directory: \(error.localizedDescription, privacy: .public)")
             }
         }
-    }
     #endif
 
     // MARK: - Helpers
@@ -118,7 +126,7 @@ final class WatchCacheService {
         Keys.recentActivitiesPrefix + careeID.uuidString
     }
 
-    private func encode<T>(_ value: T, forKey key: String) where T: Encodable {
+    private func encode(_ value: some Encodable, forKey key: String) {
         do {
             let data = try encoder.encode(value)
             guard let fileURL = cacheURL(for: key) else {
@@ -129,7 +137,10 @@ final class WatchCacheService {
             try data.write(to: fileURL, options: .atomic)
             defaults.removeObject(forKey: key) // Clean up any legacy cache entries that might remain
         } catch {
-            logger.error("❌ Failed to encode cache for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            logger
+                .error(
+                    "❌ Failed to encode cache for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)"
+                )
         }
     }
 
@@ -147,7 +158,10 @@ final class WatchCacheService {
             let data = try Data(contentsOf: fileURL)
             return try decoder.decode(T.self, from: data)
         } catch {
-            logger.error("❌ Failed to decode cache file for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            logger
+                .error(
+                    "❌ Failed to decode cache file for key \(key, privacy: .public): \(error.localizedDescription, privacy: .public)"
+                )
             try? FileManager.default.removeItem(at: fileURL)
             return []
         }

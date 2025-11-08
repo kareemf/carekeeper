@@ -1,15 +1,14 @@
-import Foundation
 import CloudKit
+import Foundation
 import SwiftUI
 #if canImport(UIKit)
-import UIKit
+    import UIKit
 #endif
 
 /// Single source of truth for all CloudKit data operations
 /// Replaces direct SwiftData+CloudKit sync with explicit CRUD operations
 @MainActor
 class CloudKitDataService: ObservableObject {
-
     // MARK: - Published Properties
 
     @Published var isSyncing = false
@@ -30,9 +29,9 @@ class CloudKitDataService: ObservableObject {
     private let logger = AppLogger.cloudkit
     private let maxRetries = 3
     private let retryDelay: TimeInterval = 2.0
-#if canImport(UIKit)
-    private let careeImageMaxDimension: CGFloat = 256
-#endif
+    #if canImport(UIKit)
+        private let careeImageMaxDimension: CGFloat = 256
+    #endif
 
     // MARK: - Public Services (for unified API)
 
@@ -48,7 +47,7 @@ class CloudKitDataService: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            guard let self = self else { return }
+            guard let self else { return }
             Task { @MainActor in
                 do {
                     try await self.refreshOwnedCareesFromCloudKit()
@@ -98,14 +97,14 @@ class CloudKitDataService: ObservableObject {
 
     enum DeletionProgress: Equatable {
         case idle
-        case deleting(Double)  // Progress from 0.0 to 1.0
+        case deleting(Double) // Progress from 0.0 to 1.0
 
         var progress: Double {
             switch self {
             case .idle:
-                return 0.0
-            case .deleting(let value):
-                return value
+                0.0
+            case let .deleting(value):
+                value
             }
         }
 
@@ -119,7 +118,7 @@ class CloudKitDataService: ObservableObject {
 
     /// Get the appropriate database for a record based on whether it's shared
     private func database(for isShared: Bool) -> CKDatabase {
-        return isShared ? container.sharedCloudDatabase : container.privateCloudDatabase
+        isShared ? container.sharedCloudDatabase : container.privateCloudDatabase
     }
 
     // MARK: - Zone Management
@@ -181,7 +180,7 @@ class CloudKitDataService: ObservableObject {
             let syncedCaree = try await converter.recordToCaree(savedRecord)
 
             // Cache the caree if cache service is available
-            if let cacheService = cacheService {
+            if let cacheService {
                 try await cacheService.cacheCaree(syncedCaree, isShared: false)
                 logger.info("✅ Caree cached locally")
                 await cacheService.refreshPublishedProperties()
@@ -212,7 +211,8 @@ class CloudKitDataService: ObservableObject {
 
         do {
             if isShared {
-                throw AppError.invalidInput("updateCaree for shared records is not supported here. Use CloudKitSharedDataService.")
+                throw AppError
+                    .invalidInput("updateCaree for shared records is not supported here. Use CloudKitSharedDataService.")
             }
             let db = database(for: isShared)
 
@@ -221,18 +221,18 @@ class CloudKitDataService: ObservableObject {
             let existingRecord = try await fetchWithRetry(recordID: recordID, from: db)
 
             // Update fields
-            if let name = name {
+            if let name {
                 existingRecord["CD_name"] = name as CKRecordValue
             }
 
-            if let imageData = imageData {
+            if let imageData {
                 let normalizedImageData: Data = downsampleImageIfNeeded(imageData) ?? imageData
                 let asset = try converter.createImageAsset(from: normalizedImageData)
                 existingRecord["CD_image_ckAsset"] = asset
                 caree.image = normalizedImageData
             }
 
-            if let listOrder = listOrder {
+            if let listOrder {
                 existingRecord["CD_listOrder"] = listOrder as CKRecordValue
             }
 
@@ -244,7 +244,7 @@ class CloudKitDataService: ObservableObject {
             caree.applyScalarUpdates(from: updatedCaree)
 
             // Update cache if available
-            if let cacheService = cacheService {
+            if let cacheService {
                 try await cacheService.updateCachedCaree(caree)
                 logger.info("✅ Caree cache updated")
             }
@@ -267,7 +267,8 @@ class CloudKitDataService: ObservableObject {
 
         do {
             if isShared {
-                throw AppError.invalidInput("deleteCaree for shared records is not supported here. Use CloudKitSharedDataService.")
+                throw AppError
+                    .invalidInput("deleteCaree for shared records is not supported here. Use CloudKitSharedDataService.")
             }
             let db = database(for: isShared)
 
@@ -290,7 +291,7 @@ class CloudKitDataService: ObservableObject {
 
             // Collect all activities across all activity types
             for (_, result) in activityTypeResults {
-                if case .success(let record) = result {
+                if case let .success(record) = result {
                     activityTypeIDs.append(record.recordID)
 
                     // Step 2: Query for all Activities belonging to this ActivityType
@@ -303,7 +304,7 @@ class CloudKitDataService: ObservableObject {
                     let (activityResults, _) = try await db.records(matching: activityQuery, inZoneWith: zoneID)
 
                     for (_, activityResult) in activityResults {
-                        if case .success(let activityRecord) = activityResult {
+                        if case let .success(activityRecord) = activityResult {
                             allActivityIDs.append(activityRecord.recordID)
                         }
                     }
@@ -345,8 +346,9 @@ class CloudKitDataService: ObservableObject {
 
             // Remove from cache if cache service is available
             deletionProgress = .deleting(0.9)
-            if let cacheService = cacheService,
-               let cachedCaree = cacheService.getCachedCaree(id: caree.id) {
+            if let cacheService,
+               let cachedCaree = cacheService.getCachedCaree(id: caree.id)
+            {
                 try await cacheService.removeCachedCaree(cachedCaree)
                 logger.info("✅ Caree removed from cache")
             }
@@ -403,14 +405,14 @@ class CloudKitDataService: ObservableObject {
         var carees: [Caree] = []
         for (_, result) in matchResults {
             switch result {
-            case .success(let record):
+            case let .success(record):
                 do {
                     let caree = try await converter.recordToCaree(record)
                     carees.append(caree)
                 } catch {
                     logger.warning("Failed to convert Caree record: \(error.localizedDescription)")
                 }
-            case .failure(let error):
+            case let .failure(error):
                 logger.warning("Failed to fetch Caree record: \(error.localizedDescription)")
             }
         }
@@ -436,7 +438,8 @@ class CloudKitDataService: ObservableObject {
 
         do {
             if isShared {
-                throw AppError.invalidInput("createActivityType for shared records is not supported here. Use CloudKitSharedDataService.")
+                throw AppError
+                    .invalidInput("createActivityType for shared records is not supported here. Use CloudKitSharedDataService.")
             }
             let db = database(for: isShared)
 
@@ -470,8 +473,9 @@ class CloudKitDataService: ObservableObject {
             let syncedActivityType = try converter.recordToActivityType(savedRecord)
 
             // Cache the activity type if cache service is available
-            if let cacheService = cacheService,
-               let cachedCaree = cacheService.getCachedCaree(id: caree.id) {
+            if let cacheService,
+               let cachedCaree = cacheService.getCachedCaree(id: caree.id)
+            {
                 try await cacheService.cacheActivityType(syncedActivityType, for: cachedCaree)
                 logger.info("✅ ActivityType cached locally")
             }
@@ -503,7 +507,8 @@ class CloudKitDataService: ObservableObject {
 
         do {
             if isShared {
-                throw AppError.invalidInput("updateActivityType for shared records is not supported here. Use CloudKitSharedDataService.")
+                throw AppError
+                    .invalidInput("updateActivityType for shared records is not supported here. Use CloudKitSharedDataService.")
             }
             let db = database(for: isShared)
 
@@ -512,22 +517,22 @@ class CloudKitDataService: ObservableObject {
             let existingRecord = try await fetchWithRetry(recordID: recordID, from: db)
 
             // Update fields
-            if let name = name {
+            if let name {
                 existingRecord["CD_name"] = name as CKRecordValue
             }
-            if let icon = icon {
+            if let icon {
                 existingRecord["CD_icon"] = icon as CKRecordValue
             }
-            if let hasQuantity = hasQuantity {
+            if let hasQuantity {
                 existingRecord["CD_hasQuantity"] = (hasQuantity ? 1 : 0) as CKRecordValue
             }
-            if let quantityUnit = quantityUnit {
+            if let quantityUnit {
                 existingRecord["CD_quantityUnit"] = quantityUnit as CKRecordValue
             }
-            if let hasLocation = hasLocation {
+            if let hasLocation {
                 existingRecord["CD_hasLocation"] = (hasLocation ? 1 : 0) as CKRecordValue
             }
-            if let listOrder = listOrder {
+            if let listOrder {
                 existingRecord["CD_listOrder"] = listOrder as CKRecordValue
             }
 
@@ -539,8 +544,9 @@ class CloudKitDataService: ObservableObject {
             activityType.applyScalarUpdates(from: updatedActivityType)
 
             // Update cache if available - first get the cached caree
-            if let cacheService = cacheService,
-               let cachedCaree = cacheService.getCachedCaree(id: caree.id) {
+            if let cacheService,
+               let cachedCaree = cacheService.getCachedCaree(id: caree.id)
+            {
                 try await cacheService.cacheActivityType(activityType, for: cachedCaree)
                 logger.info("✅ ActivityType cache updated")
             }
@@ -561,7 +567,8 @@ class CloudKitDataService: ObservableObject {
 
         do {
             if isShared {
-                throw AppError.invalidInput("deleteActivityType for shared records is not supported here. Use CloudKitSharedDataService.")
+                throw AppError
+                    .invalidInput("deleteActivityType for shared records is not supported here. Use CloudKitSharedDataService.")
             }
             let db = database(for: isShared)
             let recordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)", zoneID: zoneID)
@@ -569,7 +576,7 @@ class CloudKitDataService: ObservableObject {
             try await deleteWithRetry(recordID: recordID, from: db)
 
             // Remove from cache if cache service is available
-            if let cacheService = cacheService {
+            if let cacheService {
                 try await cacheService.removeCachedActivityType(activityType)
                 logger.info("✅ ActivityType removed from cache")
             }
@@ -601,7 +608,8 @@ class CloudKitDataService: ObservableObject {
 
         do {
             if isShared {
-                throw AppError.invalidInput("createActivity for shared records is not supported here. Use CloudKitSharedDataService.")
+                throw AppError
+                    .invalidInput("createActivity for shared records is not supported here. Use CloudKitSharedDataService.")
             }
             let db = database(for: isShared)
 
@@ -642,8 +650,9 @@ class CloudKitDataService: ObservableObject {
             let syncedActivity = try converter.recordToActivity(savedRecord)
 
             // Cache the activity if cache service is available
-            if let cacheService = cacheService,
-               let cachedCaree = cacheService.getCachedCaree(id: caree.id) {
+            if let cacheService,
+               let cachedCaree = cacheService.getCachedCaree(id: caree.id)
+            {
                 // Find cached activity type
                 let cachedActivityTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
                 if let cachedActivityType = cachedActivityTypes.first(where: { $0.id == activityType.id }) {
@@ -679,7 +688,8 @@ class CloudKitDataService: ObservableObject {
 
         do {
             if isShared {
-                throw AppError.invalidInput("updateActivity for shared records is not supported here. Use CloudKitSharedDataService.")
+                throw AppError
+                    .invalidInput("updateActivity for shared records is not supported here. Use CloudKitSharedDataService.")
             }
             let db = database(for: isShared)
 
@@ -688,19 +698,19 @@ class CloudKitDataService: ObservableObject {
             let existingRecord = try await fetchWithRetry(recordID: recordID, from: db)
 
             // Update fields
-            if let dateTime = dateTime {
+            if let dateTime {
                 existingRecord["CD_dateTime"] = dateTime as CKRecordValue
             }
-            if let notes = notes {
+            if let notes {
                 existingRecord["CD_notes"] = notes as CKRecordValue
             }
-            if let quantity = quantity {
+            if let quantity {
                 existingRecord["CD_quantity"] = quantity as CKRecordValue
             }
-            if let latitude = latitude {
+            if let latitude {
                 existingRecord["CD_latitude"] = latitude as CKRecordValue
             }
-            if let longitude = longitude {
+            if let longitude {
                 existingRecord["CD_longitude"] = longitude as CKRecordValue
             }
 
@@ -712,8 +722,9 @@ class CloudKitDataService: ObservableObject {
             activity.applyScalarUpdates(from: updatedActivity)
 
             // Update cache if available
-            if let cacheService = cacheService,
-               let cachedCaree = cacheService.getCachedCaree(id: caree.id) {
+            if let cacheService,
+               let cachedCaree = cacheService.getCachedCaree(id: caree.id)
+            {
                 let cachedActivityTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
                 if let cachedActivityType = cachedActivityTypes.first(where: { $0.id == activityType.id }) {
                     try await cacheService.cacheActivity(activity, for: cachedCaree, activityTypeID: cachedActivityType.id)
@@ -737,7 +748,8 @@ class CloudKitDataService: ObservableObject {
 
         do {
             if isShared {
-                throw AppError.invalidInput("deleteActivity for shared records is not supported here. Use CloudKitSharedDataService.")
+                throw AppError
+                    .invalidInput("deleteActivity for shared records is not supported here. Use CloudKitSharedDataService.")
             }
             let db = database(for: isShared)
             let recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)", zoneID: zoneID)
@@ -745,7 +757,7 @@ class CloudKitDataService: ObservableObject {
             try await deleteWithRetry(recordID: recordID, from: db)
 
             // Remove from cache if cache service is available
-            if let cacheService = cacheService {
+            if let cacheService {
                 try await cacheService.removeCachedActivity(activity)
                 logger.info("✅ Activity removed from cache")
             }
@@ -772,7 +784,7 @@ class CloudKitDataService: ObservableObject {
         hasLocation: Bool,
         listOrder: Int
     ) async throws -> ActivityType {
-        guard let sharedDataService = sharedDataService else {
+        guard let sharedDataService else {
             throw AppError.invalidInput("Shared data service not configured")
         }
 
@@ -802,7 +814,7 @@ class CloudKitDataService: ObservableObject {
 
     /// Unified updateActivityType that routes based on caree.isShared
     func updateActivityType(activityType: ActivityType, caree: Caree) async throws {
-        guard let sharedDataService = sharedDataService else {
+        guard let sharedDataService else {
             throw AppError.invalidInput("Shared data service not configured")
         }
 
@@ -826,7 +838,7 @@ class CloudKitDataService: ObservableObject {
 
     /// Unified deleteActivityType that routes based on caree.isShared
     func deleteActivityType(activityType: ActivityType, caree: Caree) async throws {
-        guard let sharedDataService = sharedDataService else {
+        guard let sharedDataService else {
             throw AppError.invalidInput("Shared data service not configured")
         }
 
@@ -847,7 +859,7 @@ class CloudKitDataService: ObservableObject {
         latitude: Double?,
         longitude: Double?
     ) async throws -> Activity {
-        guard let sharedDataService = sharedDataService else {
+        guard let sharedDataService else {
             throw AppError.invalidInput("Shared data service not configured")
         }
 
@@ -877,7 +889,7 @@ class CloudKitDataService: ObservableObject {
 
     /// Unified updateActivity that routes based on caree.isShared
     func updateActivity(activity: Activity, caree: Caree, activityType: ActivityType) async throws {
-        guard let sharedDataService = sharedDataService else {
+        guard let sharedDataService else {
             throw AppError.invalidInput("Shared data service not configured")
         }
 
@@ -901,7 +913,7 @@ class CloudKitDataService: ObservableObject {
 
     /// Unified deleteActivity that routes based on caree.isShared
     func deleteActivity(activity: Activity, caree: Caree) async throws {
-        guard let sharedDataService = sharedDataService else {
+        guard let sharedDataService else {
             throw AppError.invalidInput("Shared data service not configured")
         }
 
@@ -953,7 +965,7 @@ class CloudKitDataService: ObservableObject {
         )
 
         // Convert and cache
-        guard let cacheService = cacheService else {
+        guard let cacheService else {
             logger.info("ℹ️ No cacheService; skipping cache update")
             NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
             return
@@ -986,7 +998,8 @@ class CloudKitDataService: ObservableObject {
                 if let careeRef = record["CD_caree"] as? CKRecord.Reference,
                    let careeIDStr = careeRef.recordID.recordName.split(separator: "/").last,
                    let careeID = UUID(uuidString: String(careeIDStr)),
-                   careesByID[careeID] != nil {
+                   careesByID[careeID] != nil
+                {
                     activityTypesByCaree[careeID, default: []].append(at)
                 }
             } catch {
@@ -1003,7 +1016,8 @@ class CloudKitDataService: ObservableObject {
                 if let atRef = record["CD_activityType"] as? CKRecord.Reference,
                    let atIDStr = atRef.recordID.recordName.split(separator: "/").last,
                    let atID = UUID(uuidString: String(atIDStr)),
-                   activityTypesByID[atID] != nil {
+                   activityTypesByID[atID] != nil
+                {
                     activityTypeIDByActivity[activity.id] = atID
                 }
 
@@ -1011,7 +1025,8 @@ class CloudKitDataService: ObservableObject {
                 if let careeRef = record["CD_caree"] as? CKRecord.Reference,
                    let careeIDStr = careeRef.recordID.recordName.split(separator: "/").last,
                    let careeID = UUID(uuidString: String(careeIDStr)),
-                   careesByID[careeID] != nil {
+                   careesByID[careeID] != nil
+                {
                     activitiesByCaree[careeID, default: []].append(activity)
                 }
             } catch {
@@ -1032,7 +1047,8 @@ class CloudKitDataService: ObservableObject {
 
             for activity in activities {
                 if let activityTypeID = activityTypeIDByActivity[activity.id],
-                   let activityType = activityTypesByID[activityTypeID] {
+                   let activityType = activityTypesByID[activityTypeID]
+                {
                     activity.activityType = activityType
                     var activitiesForType = activityType.activities ?? []
                     activitiesForType.append(activity)
@@ -1099,7 +1115,7 @@ class CloudKitDataService: ObservableObject {
             let matchResults: [(CKRecord.ID, Result<CKRecord, Error>)]
             let nextCursor: CKQueryOperation.Cursor?
 
-            if let cursor = cursor {
+            if let cursor {
                 (matchResults, nextCursor) = try await database.records(
                     continuingMatchFrom: cursor,
                     desiredKeys: desiredKeys,
@@ -1116,9 +1132,9 @@ class CloudKitDataService: ObservableObject {
 
             for (_, result) in matchResults {
                 switch result {
-                case .success(let record):
+                case let .success(record):
                     records.append(record)
-                case .failure(let error):
+                case let .failure(error):
                     logger.warning("⚠️ Failed \(recordType) record fetch: \(error.localizedDescription)")
                 }
             }
@@ -1288,26 +1304,26 @@ class CloudKitDataService: ObservableObject {
     // MARK: - Image Handling
 
     private func downsampleImageIfNeeded(_ data: Data?) -> Data? {
-        guard let data = data else { return nil }
-#if canImport(UIKit)
-        guard let image = UIImage(data: data) else { return data }
+        guard let data else { return nil }
+        #if canImport(UIKit)
+            guard let image = UIImage(data: data) else { return data }
 
-        let maxDimension = max(image.size.width, image.size.height)
-        guard maxDimension > careeImageMaxDimension else { return data }
+            let maxDimension = max(image.size.width, image.size.height)
+            guard maxDimension > careeImageMaxDimension else { return data }
 
-        let scale = careeImageMaxDimension / maxDimension
-        let targetSize = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+            let scale = careeImageMaxDimension / maxDimension
+            let targetSize = CGSize(width: image.size.width * scale, height: image.size.height * scale)
 
-        let rendererFormat = UIGraphicsImageRendererFormat.default()
-        rendererFormat.scale = 1
-        let renderer = UIGraphicsImageRenderer(size: targetSize, format: rendererFormat)
-        let resizedData = renderer.jpegData(withCompressionQuality: 0.75) { _ in
-            image.draw(in: CGRect(origin: .zero, size: targetSize))
-        }
-        return resizedData
-#else
-        return data
-#endif
+            let rendererFormat = UIGraphicsImageRendererFormat.default()
+            rendererFormat.scale = 1
+            let renderer = UIGraphicsImageRenderer(size: targetSize, format: rendererFormat)
+            let resizedData = renderer.jpegData(withCompressionQuality: 0.75) { _ in
+                image.draw(in: CGRect(origin: .zero, size: targetSize))
+            }
+            return resizedData
+        #else
+            return data
+        #endif
     }
 }
 
@@ -1320,12 +1336,12 @@ enum DataServiceError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .syncVerificationFailed(let recordID):
-            return "Failed to verify sync for record: \(recordID)"
+        case let .syncVerificationFailed(recordID):
+            "Failed to verify sync for record: \(recordID)"
         case .maxRetriesExceeded:
-            return "Maximum retry attempts exceeded. Please check your network connection."
-        case .parentRecordNotFound(let careeID):
-            return "Parent caree record not found: \(careeID)"
+            "Maximum retry attempts exceeded. Please check your network connection."
+        case let .parentRecordNotFound(careeID):
+            "Parent caree record not found: \(careeID)"
         }
     }
 }

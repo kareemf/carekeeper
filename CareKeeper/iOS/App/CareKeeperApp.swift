@@ -1,7 +1,7 @@
-import SwiftUI
-import SwiftData
 import CloudKit
 import CoreData
+import SwiftData
+import SwiftUI
 
 @main
 struct CareKeeperApp: App {
@@ -22,7 +22,7 @@ struct CareKeeperApp: App {
         let schema = Schema([
             Caree.self,
             ActivityType.self,
-            Activity.self
+            Activity.self,
         ])
 
         // Check if running UI tests
@@ -132,7 +132,7 @@ struct CareKeeperApp: App {
         let schema = Schema([
             Caree.self,
             ActivityType.self,
-            Activity.self
+            Activity.self,
         ])
 
         do {

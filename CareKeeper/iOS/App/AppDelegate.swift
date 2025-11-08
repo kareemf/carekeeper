@@ -1,13 +1,16 @@
 // https://developer.apple.com/documentation/coredata/accepting-share-invitations-in-a-swiftui-app
 
-import UIKit
 import CloudKit
+import UIKit
 import UserNotifications
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     private let logger = AppLogger.cloudkit
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
         // Register for remote notifications to receive CloudKit notifications
         application.registerForRemoteNotifications()
 
@@ -17,10 +20,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
-    func application(_ application: UIApplication, configurationForConnecting
-        connectingSceneSession: UISceneSession,
-        options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-
+    func application(
+        _ application: UIApplication,
+        configurationForConnecting connectingSceneSession: UISceneSession,
+        
+        options: UIScene.ConnectionOptions
+    ) -> UISceneConfiguration {
         let config = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
         config.delegateClass = SceneDelegate.self
         return config
@@ -28,8 +33,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // MARK: - CloudKit Notifications
     
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        
+    func application(
+        _ application: UIApplication,
+        didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+        fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+    ) {
         // Handle CloudKit notifications
         guard let notification = CKNotification(fromRemoteNotificationDictionary: userInfo) else {
             completionHandler(.noData)
@@ -88,14 +96,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 // MARK: - UNUserNotificationCenterDelegate
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
-
     /// Called when a notification is delivered while the app is in the foreground
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
         // Show notification even when app is in foreground
-        return [.banner, .sound, .badge]
+        [.banner, .sound, .badge]
     }
 
     /// Called when the user interacts with a notification
@@ -118,7 +125,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                     object: nil,
                     userInfo: [
                         "activityID": ids.activityID as Any,
-                        "careeID": ids.careeID as Any
+                        "careeID": ids.careeID as Any,
                     ]
                 )
             }

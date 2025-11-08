@@ -8,13 +8,12 @@ import SwiftUI
 /// - Uses snapshots instead of SwiftData models
 /// - Task cancellation and memory cleanup
 struct ActivityListView: View {
-
     let careeSnapshot: CareeSnapshot
     let activityTypes: [ActivityTypeSnapshot]
 
     @EnvironmentObject private var dataProvider: WatchDataProvider
     @State private var loadTask: Task<Void, Never>?
-    @State private var hoursToLoad: TimeInterval = 24 * 3600  // Start with 24h
+    @State private var hoursToLoad: TimeInterval = 24 * 3600 // Start with 24h
     @State private var filterActivityTypeID: UUID? = nil
 
     private var activities: [ActivitySnapshot] {
@@ -157,7 +156,8 @@ struct ActivityListView: View {
             cycleFilter()
         } label: {
             if let filterID = filterActivityTypeID,
-               let activityType = activityTypes.first(where: { $0.id == filterID }) {
+               let activityType = activityTypes.first(where: { $0.id == filterID })
+            {
                 // Filtering by specific type
                 HStack(spacing: 4) {
                     ActivityTypeIconView(icon: activityType.icon)
@@ -174,13 +174,14 @@ struct ActivityListView: View {
 
     private func cycleFilter() {
         if let currentFilterID = filterActivityTypeID,
-           let currentIndex = activityTypes.firstIndex(where: { $0.id == currentFilterID }) {
+           let currentIndex = activityTypes.firstIndex(where: { $0.id == currentFilterID })
+        {
             // Move to next type, or back to "All" if at end
             let nextIndex = currentIndex + 1
             if nextIndex < activityTypes.count {
                 filterActivityTypeID = activityTypes[nextIndex].id
             } else {
-                filterActivityTypeID = nil  // Back to "All"
+                filterActivityTypeID = nil // Back to "All"
             }
         } else {
             // Currently showing all, move to first type
@@ -190,7 +191,7 @@ struct ActivityListView: View {
 
     private var loadMoreButton: some View {
         Button {
-            hoursToLoad += 24 * 3600  // Add another 24h
+            hoursToLoad += 24 * 3600 // Add another 24h
             Task {
                 await dataProvider.loadRecentActivities(for: careeSnapshot.id, hoursBack: hoursToLoad, force: true)
             }
@@ -243,13 +244,14 @@ struct ActivityRowView: View {
             // Metadata row: quantity and location
             HStack(spacing: 12) {
                 if let quantity = activity.quantity,
-                   let unit = activityType?.quantityUnit {
+                   let unit = activityType?.quantityUnit
+                {
                     Label("\(String(format: "%.1f", quantity)) \(unit)", systemImage: "number")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
 
-                if activity.latitude != nil && activity.longitude != nil {
+                if activity.latitude != nil, activity.longitude != nil {
                     Label("Location", systemImage: "location.fill")
                         .font(.caption)
                         .foregroundColor(.secondary)

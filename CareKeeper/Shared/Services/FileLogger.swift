@@ -4,7 +4,6 @@ import os.log
 /// Minimal logger placeholder while file logging is disabled.
 @MainActor
 final class FileLogger {
-
     static let shared = FileLogger()
 
     private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "file-logger")
@@ -43,6 +42,9 @@ final class FileLogger {
 
     private func log(_ message: String, level: OSLogType, file: String, function: String, line: Int) {
         let filename = URL(fileURLWithPath: file).lastPathComponent
-        logger.log(level: level, "\(filename, privacy: .public):\(line) \(function, privacy: .public) — \(message, privacy: .public)")
+        logger.log(
+            level: level,
+            "\(filename, privacy: .public):\(line) \(function, privacy: .public) — \(message, privacy: .public)"
+        )
     }
 }

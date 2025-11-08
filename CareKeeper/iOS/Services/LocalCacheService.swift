@@ -6,7 +6,6 @@ import SwiftUI
 /// Provides fast offline access and @Published properties for SwiftUI
 @MainActor
 class LocalCacheService: ObservableObject {
-
     // MARK: - Published Properties
 
     @Published var myCarees: [Caree] = []
@@ -200,7 +199,8 @@ class LocalCacheService: ObservableObject {
             newActivity.caree = managedCaree
 
             if let activityTypeID = activityTypeIDsByActivity[activity.id],
-               let managedType = managedTypesByID[activityTypeID] {
+               let managedType = managedTypesByID[activityTypeID]
+            {
                 newActivity.activityType = managedType
                 var typeActivities = managedType.activities ?? []
                 typeActivities.append(newActivity)
@@ -344,6 +344,7 @@ class LocalCacheService: ObservableObject {
         try modelContext.save()
         scheduleRefresh(reason: "cacheActivity")
     }
+
     // MARK: - Cache Read Operations
 
     func getCachedCaree(id: UUID) -> Caree? {
@@ -370,15 +371,15 @@ class LocalCacheService: ObservableObject {
     }
 
     func getCachedActivityTypes(for caree: Caree) -> [ActivityType] {
-        return caree.sortedActivityTypes
+        caree.sortedActivityTypes
     }
 
     func getCachedActivities(for caree: Caree) -> [Activity] {
-        return caree.recentActivities
+        caree.recentActivities
     }
 
     func isCacheStale(lastSyncedAt: Date?) -> Bool {
-        guard let lastSyncedAt = lastSyncedAt else {
+        guard let lastSyncedAt else {
             return true
         }
         let age = Date().timeIntervalSince(lastSyncedAt)
@@ -400,7 +401,7 @@ class LocalCacheService: ObservableObject {
 
         let label = reason ?? "unknown"
         refreshTask = Task { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             do {
                 try await Task.sleep(nanoseconds: UInt64(self.refreshDebounceInterval * 1_000_000_000))
             } catch {

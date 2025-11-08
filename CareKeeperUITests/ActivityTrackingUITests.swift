@@ -216,7 +216,7 @@ final class ActivityTrackingUITests: XCTestCase {
 
             // Find and delete an activity
             let cells = app.cells
-            if cells.count > 0 {
+            if !cells.isEmpty {
                 let firstCell = cells.element(boundBy: 0)
                 firstCell.swipeLeft()
 
@@ -248,7 +248,7 @@ final class ActivityTrackingUITests: XCTestCase {
 
             // Find and attempt to delete
             let cells = app.cells
-            if cells.count > 0 {
+            if !cells.isEmpty {
                 let cellCount = cells.count
 
                 let firstCell = cells.element(boundBy: 0)

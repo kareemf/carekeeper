@@ -1,11 +1,10 @@
-import Foundation
 import CloudKit
+import Foundation
 import os.log
 
 /// Shared zone discovery logic for CloudKit shared database operations
 /// Finds zones containing specific records (carees, activity types, activities)
 class CloudKitZoneDiscoveryService {
-
     // MARK: - Properties
 
     private let container: CKContainer

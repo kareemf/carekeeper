@@ -7,15 +7,19 @@ struct ContentView: View {
         TabView(selection: $selectedTab) {
             CareeListView()
                 .tabItem {
-                    Label(NSLocalizedString("Carees", comment: "Tab title for carees list"), 
-                          systemImage: "person.crop.rectangle.stack")
+                    Label(
+                        NSLocalizedString("Carees", comment: "Tab title for carees list"),
+                        systemImage: "person.crop.rectangle.stack"
+                    )
                 }
                 .tag(0)
             
             SharingView()
                 .tabItem {
-                    Label(NSLocalizedString("Shared", comment: "Tab title for shared carees"),
-                          systemImage: "person.2")
+                    Label(
+                        NSLocalizedString("Shared", comment: "Tab title for shared carees"),
+                        systemImage: "person.2"
+                    )
                 }
                 .tag(1)
         }

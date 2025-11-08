@@ -1,13 +1,12 @@
-import Foundation
 import CloudKit
+import Foundation
 #if canImport(UIKit)
-import UIKit
+    import UIKit
 #endif
 
 /// Converts between domain models (Caree, ActivityType, Activity) and CloudKit CKRecords
 /// Handles CKAsset creation for images, parent references, and field mapping
 class CloudKitRecordConverter {
-
     private let logger = AppLogger.cloudkit
     private let fileManager = FileManager.default
 
@@ -26,14 +25,13 @@ class CloudKitRecordConverter {
         zoneID: CKRecordZone.ID? = nil,
         existingRecord: CKRecord? = nil
     ) async throws -> CKRecord {
-        let recordID: CKRecord.ID
-        if let existing = existingRecord {
-            recordID = existing.recordID
+        let recordID: CKRecord.ID = if let existing = existingRecord {
+            existing.recordID
         } else {
-            if let zoneID = zoneID {
-                recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
+            if let zoneID {
+                CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
             } else {
-                recordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
+                CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)")
             }
         }
 
@@ -46,7 +44,7 @@ class CloudKitRecordConverter {
         record["CD_dateCreated"] = caree.dateCreated as CKRecordValue
 
         // Handle image as CKAsset (using CD_image_ckAsset field to avoid BYTES/Asset type conflict)
-        if let imageData = imageData {
+        if let imageData {
             do {
                 let asset = try createImageAsset(from: imageData)
                 record["CD_image_ckAsset"] = asset
@@ -77,14 +75,13 @@ class CloudKitRecordConverter {
         zoneID: CKRecordZone.ID? = nil,
         existingRecord: CKRecord? = nil
     ) throws -> CKRecord {
-        let recordID: CKRecord.ID
-        if let existing = existingRecord {
-            recordID = existing.recordID
+        let recordID: CKRecord.ID = if let existing = existingRecord {
+            existing.recordID
         } else {
-            if let zoneID = zoneID {
-                recordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)", zoneID: zoneID)
+            if let zoneID {
+                CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)", zoneID: zoneID)
             } else {
-                recordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)")
+                CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)")
             }
         }
 
@@ -126,14 +123,13 @@ class CloudKitRecordConverter {
         zoneID: CKRecordZone.ID? = nil,
         existingRecord: CKRecord? = nil
     ) throws -> CKRecord {
-        let recordID: CKRecord.ID
-        if let existing = existingRecord {
-            recordID = existing.recordID
+        let recordID: CKRecord.ID = if let existing = existingRecord {
+            existing.recordID
         } else {
-            if let zoneID = zoneID {
-                recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)", zoneID: zoneID)
+            if let zoneID {
+                CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)", zoneID: zoneID)
             } else {
-                recordID = CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)")
+                CKRecord.ID(recordName: "CD_Activity/\(activity.id.uuidString)")
             }
         }
 
@@ -177,7 +173,8 @@ class CloudKitRecordConverter {
 
         guard let cdId = record["CD_id"] as? String,
               let uuid = UUID(uuidString: cdId),
-              let name = record["CD_name"] as? String else {
+              let name = record["CD_name"] as? String
+        else {
             logger.error("Caree record missing required fields: \(record.recordID.recordName)")
             throw ConversionError.missingRequiredField(recordType: "CD_Caree", field: "CD_id or CD_name")
         }
@@ -217,7 +214,8 @@ class CloudKitRecordConverter {
 
         guard let cdId = record["CD_id"] as? String,
               let uuid = UUID(uuidString: cdId),
-              let name = record["CD_name"] as? String else {
+              let name = record["CD_name"] as? String
+        else {
             logger.error("ActivityType record missing required fields: \(record.recordID.recordName)")
             throw ConversionError.missingRequiredField(recordType: "CD_ActivityType", field: "CD_id or CD_name")
         }
@@ -249,7 +247,8 @@ class CloudKitRecordConverter {
 
         guard let cdId = record["CD_id"] as? String,
               let uuid = UUID(uuidString: cdId),
-              let dateTime = record["CD_dateTime"] as? Date else {
+              let dateTime = record["CD_dateTime"] as? Date
+        else {
             logger.error("Activity record missing required fields: \(record.recordID.recordName)")
             throw ConversionError.missingRequiredField(recordType: "CD_Activity", field: "CD_id or CD_dateTime")
         }
@@ -343,14 +342,14 @@ enum ConversionError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .invalidRecordType(let expected, let actual):
-            return "Invalid record type: expected \(expected), got \(actual)"
-        case .missingRequiredField(let recordType, let field):
-            return "Missing required field '\(field)' in \(recordType) record"
-        case .assetCreationFailed(let reason):
-            return "Failed to create CKAsset: \(reason)"
-        case .assetLoadFailed(let reason):
-            return "Failed to load data from CKAsset: \(reason)"
+        case let .invalidRecordType(expected, actual):
+            "Invalid record type: expected \(expected), got \(actual)"
+        case let .missingRequiredField(recordType, field):
+            "Missing required field '\(field)' in \(recordType) record"
+        case let .assetCreationFailed(reason):
+            "Failed to create CKAsset: \(reason)"
+        case let .assetLoadFailed(reason):
+            "Failed to load data from CKAsset: \(reason)"
         }
     }
 }

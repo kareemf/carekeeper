@@ -25,43 +25,47 @@ struct CareeListRowView: View {
                 }
 
                 HStack(spacing: 12) {
-                    Text(NSLocalizedString("\(caree.activityTypes?.count ?? 0) Activity Types",
-                                         comment: "Activity types count in caree row"))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    Text(NSLocalizedString(
+                        "\(caree.activityTypes?.count ?? 0) Activity Types",
+                        comment: "Activity types count in caree row"
+                    ))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
 
                     Text("•")
                         .font(.caption)
                         .foregroundColor(.secondary)
 
-                    Text(NSLocalizedString("\(caree.activities?.count ?? 0) Activities",
-                                         comment: "Activities count in caree row"))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    Text(NSLocalizedString(
+                        "\(caree.activities?.count ?? 0) Activities",
+                        comment: "Activities count in caree row"
+                    ))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
 
                     #if os(iOS)
-                    // Show share icon for shared carees, sync status for owned carees
-                    if isShared {
-                        // This caree is shared with me - show share icon
-                        Text("•")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        // Show share icon for shared carees, sync status for owned carees
+                        if isShared {
+                            // This caree is shared with me - show share icon
+                            Text("•")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
 
-                        Image(systemName: "person.2.fill")
-                            .font(.caption)
-                            .foregroundColor(.blue)
-                    } else if isCheckingSync || isSyncedToCloudKit != nil {
-                        // This is my caree - show CloudKit sync status
-                        Text("•")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                            Image(systemName: "person.2.fill")
+                                .font(.caption)
+                                .foregroundColor(.blue)
+                        } else if isCheckingSync || isSyncedToCloudKit != nil {
+                            // This is my caree - show CloudKit sync status
+                            Text("•")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
 
-                        CloudKitSyncStatusView(
-                            isChecking: isCheckingSync,
-                            isSynced: isSyncedToCloudKit,
-                            size: .small
-                        )
-                    }
+                            CloudKitSyncStatusView(
+                                isChecking: isCheckingSync,
+                                isSynced: isSyncedToCloudKit,
+                                size: .small
+                            )
+                        }
                     #endif
                 }
             }

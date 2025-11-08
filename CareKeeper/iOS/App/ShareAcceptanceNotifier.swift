@@ -1,6 +1,6 @@
+import CloudKit
 import Foundation
 import SwiftUI
-import CloudKit
 
 @MainActor
 final class ShareAcceptanceNotifier: ObservableObject {
@@ -18,7 +18,7 @@ final class ShareAcceptanceNotifier: ObservableObject {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 self.alertTitle = NSLocalizedString("Share Accepted", comment: "Share accepted title")
                 self.alertMessage = NSLocalizedString("The shared data will sync shortly.", comment: "Share accepted message")
                 self.isPresentingAlert = true
@@ -33,7 +33,7 @@ final class ShareAcceptanceNotifier: ObservableObject {
             // Extract needed info before hopping to avoid capturing non-Sendable values
             let error = notification.object as? Error
             Task { @MainActor [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 self.alertTitle = NSLocalizedString("Failed To Accept Share", comment: "Failed To Accept Share alert title")
                 self.alertMessage = error?.localizedDescription
                     ?? NSLocalizedString("An unknown error occurred.", comment: "Unknown error")

@@ -70,7 +70,7 @@ class CloudKitParentReferenceService: ObservableObject {
 
         for (_, result) in results {
             switch result {
-            case .success(let record):
+            case let .success(record):
                 // Check if parent is already set correctly
                 if record.parent?.recordID != parentRecord.recordID {
                     logger.info("     Setting parent for ActivityType: \(record["CD_name"] as? String ?? "Unknown")")
@@ -81,7 +81,7 @@ class CloudKitParentReferenceService: ObservableObject {
                 } else {
                     logger.info("     ActivityType already has correct parent: \(record["CD_name"] as? String ?? "Unknown")")
                 }
-            case .failure(let error):
+            case let .failure(error):
                 logger.warning("     Failed to fetch ActivityType record: \(error.localizedDescription)")
             }
         }
@@ -98,8 +98,9 @@ class CloudKitParentReferenceService: ObservableObject {
                 switch result {
                 case .success:
                     logger.info("     ✅ Saved parent reference for: \(recordID.recordName)")
-                case .failure(let error):
-                    logger.error("     ❌ Failed to save parent reference for \(recordID.recordName): \(error.localizedDescription)")
+                case let .failure(error):
+                    logger
+                        .error("     ❌ Failed to save parent reference for \(recordID.recordName): \(error.localizedDescription)")
                 }
             }
         }
@@ -121,7 +122,7 @@ class CloudKitParentReferenceService: ObservableObject {
 
         for (_, result) in results {
             switch result {
-            case .success(let record):
+            case let .success(record):
                 // Check if parent is already set correctly
                 if record.parent?.recordID != parentRecord.recordID {
                     logger.info("     Setting parent for Activity: \(record["CD_dateTime"] as? Date ?? Date())")
@@ -132,7 +133,7 @@ class CloudKitParentReferenceService: ObservableObject {
                 } else {
                     logger.info("     Activity already has correct parent: \(record["CD_dateTime"] as? Date ?? Date())")
                 }
-            case .failure(let error):
+            case let .failure(error):
                 logger.warning("     Failed to fetch Activity record: \(error.localizedDescription)")
             }
         }
@@ -149,8 +150,9 @@ class CloudKitParentReferenceService: ObservableObject {
                 switch result {
                 case .success:
                     logger.info("     ✅ Saved parent reference for: \(recordID.recordName)")
-                case .failure(let error):
-                    logger.error("     ❌ Failed to save parent reference for \(recordID.recordName): \(error.localizedDescription)")
+                case let .failure(error):
+                    logger
+                        .error("     ❌ Failed to save parent reference for \(recordID.recordName): \(error.localizedDescription)")
                 }
             }
         }
@@ -175,10 +177,13 @@ class CloudKitParentReferenceService: ObservableObject {
         let activityTypePredicateRef = CKRecord.Reference(recordID: parentRecord.recordID, action: .none)
         let activityTypePredicate = NSPredicate(format: "CD_caree == %@", activityTypePredicateRef)
         let activityTypeQuery = CKQuery(recordType: "CD_ActivityType", predicate: activityTypePredicate)
-        let (activityTypeResults, _) = try await container.privateCloudDatabase.records(matching: activityTypeQuery, inZoneWith: zoneID)
+        let (activityTypeResults, _) = try await container.privateCloudDatabase.records(
+            matching: activityTypeQuery,
+            inZoneWith: zoneID
+        )
 
         for (_, result) in activityTypeResults {
-            if case .success(let record) = result {
+            if case let .success(record) = result {
                 activityTypeCount += 1
                 if record.parent?.recordID != parentRecord.recordID {
                     missingParents += 1
@@ -194,7 +199,7 @@ class CloudKitParentReferenceService: ObservableObject {
         let (activityResults, _) = try await container.privateCloudDatabase.records(matching: activityQuery, inZoneWith: zoneID)
 
         for (_, result) in activityResults {
-            if case .success(let record) = result {
+            if case let .success(record) = result {
                 activityCount += 1
                 if record.parent?.recordID != parentRecord.recordID {
                     missingParents += 1

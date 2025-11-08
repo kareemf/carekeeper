@@ -1,5 +1,5 @@
-import SwiftUI
 import CoreLocation
+import SwiftUI
 
 /// TrackActivityView rebuilt with optimistic UI and snapshots
 /// Key changes:
@@ -102,153 +102,153 @@ struct TrackActivityView: View {
 
     private var formFields: some View {
         VStack(spacing: 12) {
-                    // Quantity section
-                    if activityTypeSnapshot.hasQuantity {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(activityTypeSnapshot.quantityUnit ?? "Quantity")
-                                .font(.caption)
+            // Quantity section
+            if activityTypeSnapshot.hasQuantity {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(activityTypeSnapshot.quantityUnit ?? "Quantity")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    HStack {
+                        Text(String(format: "%.1f", quantity))
+                            .font(.title2)
+                            .fontWeight(.semibold)
+
+                        if let unit = activityTypeSnapshot.quantityUnit {
+                            Text(unit)
+                                .font(.title3)
                                 .foregroundColor(.secondary)
-
-                            HStack {
-                                Text(String(format: "%.1f", quantity))
-                                    .font(.title2)
-                                    .fontWeight(.semibold)
-
-                                if let unit = activityTypeSnapshot.quantityUnit {
-                                    Text(unit)
-                                        .font(.title3)
-                                        .foregroundColor(.secondary)
-                                }
-
-                                Spacer()
-                            }
-                            .padding()
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(8)
-                            .focusable(true)
-                            .digitalCrownRotation(
-                                $quantity,
-                                from: 0,
-                                through: 100,
-                                by: 0.5,
-                                sensitivity: .medium
-                            )
-                        }
-                    }
-
-                    // Time section
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Time")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-
-                        Toggle(isOn: $useCustomTime) {
-                            Text(useCustomTime ? "Custom" : "Now")
-                                .font(.body)
-                        }
-                        .onChange(of: useCustomTime) { _, newValue in
-                            if newValue {
-                                // Focus time input when custom time is enabled
-                                timeInputFocused = true
-                            }
                         }
 
-                        if useCustomTime {
-                            VStack(spacing: 8) {
-                                HStack {
-                                    Text(timeText)
-                                        .font(.title2)
-                                        .fontWeight(.semibold)
-                                    Spacer()
-                                }
-
-                                HStack {
-                                    Text("\(Int(minutesAgo)) min ago")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                    Spacer()
-                                }
-                            }
-                            .padding()
-                            .background(Color.gray.opacity(0.3))
-                            .cornerRadius(8)
-                            .focusable(true)
-                            .focused($timeInputFocused)
-                            .digitalCrownRotation(
-                                $minutesAgo,
-                                from: 0,
-                                through: 1440, // 24 hours
-                                by: 1,
-                                sensitivity: .low,
-                                isContinuous: false,
-                                isHapticFeedbackEnabled: true
-                            )
-                        }
+                        Spacer()
                     }
                     .padding()
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(8)
+                    .focusable(true)
+                    .digitalCrownRotation(
+                        $quantity,
+                        from: 0,
+                        through: 100,
+                        by: 0.5,
+                        sensitivity: .medium
+                    )
+                }
+            }
 
-                    // Location section
-                    if activityTypeSnapshot.hasLocation {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Location")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+            // Time section
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Time")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
 
-                            Toggle(isOn: $includeLocation) {
-                                Text("Include Location")
-                                    .font(.body)
-                            }
-
-                            if includeLocation {
-                                if locationManager.location != nil {
-                                    Text("📍 Location captured")
-                                        .font(.caption)
-                                        .foregroundColor(.green)
-                                } else if locationManager.isUpdating {
-                                    HStack {
-                                        ProgressView()
-                                            .scaleEffect(0.8)
-                                        Text("Getting location...")
-                                            .font(.caption)
-                                    }
-                                } else if locationManager.authorizationStatus == .denied {
-                                    Text("Location access denied")
-                                        .font(.caption)
-                                        .foregroundColor(.red)
-                                } else {
-                                    Text("Tap to request location")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                        }
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(8)
-                        .onChange(of: includeLocation) { _, enabled in
-                            if enabled {
-                                locationManager.requestLocation()
-                            }
-                        }
-                    }
-
-                    // Notes section
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Notes")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-
-                        TextField("Optional notes", text: $notes, axis: .vertical)
-                            .lineLimit(2...4)
-                            .padding()
-                            .background(Color.gray.opacity(0.3))
-                            .cornerRadius(8)
+                Toggle(isOn: $useCustomTime) {
+                    Text(useCustomTime ? "Custom" : "Now")
+                        .font(.body)
+                }
+                .onChange(of: useCustomTime) { _, newValue in
+                    if newValue {
+                        // Focus time input when custom time is enabled
+                        timeInputFocused = true
                     }
                 }
-                .padding(.horizontal)
+
+                if useCustomTime {
+                    VStack(spacing: 8) {
+                        HStack {
+                            Text(timeText)
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                            Spacer()
+                        }
+
+                        HStack {
+                            Text("\(Int(minutesAgo)) min ago")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                        }
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.3))
+                    .cornerRadius(8)
+                    .focusable(true)
+                    .focused($timeInputFocused)
+                    .digitalCrownRotation(
+                        $minutesAgo,
+                        from: 0,
+                        through: 1440, // 24 hours
+                        by: 1,
+                        sensitivity: .low,
+                        isContinuous: false,
+                        isHapticFeedbackEnabled: true
+                    )
+                }
+            }
+            .padding()
+            .background(Color.gray.opacity(0.2))
+            .cornerRadius(8)
+
+            // Location section
+            if activityTypeSnapshot.hasLocation {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Location")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    Toggle(isOn: $includeLocation) {
+                        Text("Include Location")
+                            .font(.body)
+                    }
+
+                    if includeLocation {
+                        if locationManager.location != nil {
+                            Text("📍 Location captured")
+                                .font(.caption)
+                                .foregroundColor(.green)
+                        } else if locationManager.isUpdating {
+                            HStack {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                Text("Getting location...")
+                                    .font(.caption)
+                            }
+                        } else if locationManager.authorizationStatus == .denied {
+                            Text("Location access denied")
+                                .font(.caption)
+                                .foregroundColor(.red)
+                        } else {
+                            Text("Tap to request location")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                .padding()
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(8)
+                .onChange(of: includeLocation) { _, enabled in
+                    if enabled {
+                        locationManager.requestLocation()
+                    }
+                }
+            }
+
+            // Notes section
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Notes")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                TextField("Optional notes", text: $notes, axis: .vertical)
+                    .lineLimit(2 ... 4)
+                    .padding()
+                    .background(Color.gray.opacity(0.3))
+                    .cornerRadius(8)
+            }
         }
+        .padding(.horizontal)
+    }
 
     // MARK: - Actions
 
@@ -260,8 +260,10 @@ struct TrackActivityView: View {
         Task {
             let dateTime = useCustomTime ? Date().addingTimeInterval(-Double(minutesAgo) * 60) : Date()
             let activityQuantity = activityTypeSnapshot.hasQuantity ? quantity : nil
-            let latitude = (includeLocation && activityTypeSnapshot.hasLocation) ? locationManager.location?.coordinate.latitude : nil
-            let longitude = (includeLocation && activityTypeSnapshot.hasLocation) ? locationManager.location?.coordinate.longitude : nil
+            let latitude = (includeLocation && activityTypeSnapshot.hasLocation) ? locationManager.location?.coordinate
+                .latitude : nil
+            let longitude = (includeLocation && activityTypeSnapshot.hasLocation) ? locationManager.location?.coordinate
+                .longitude : nil
 
             // Create activity snapshot
             let activity = ActivitySnapshot(

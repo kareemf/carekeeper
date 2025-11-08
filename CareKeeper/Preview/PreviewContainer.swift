@@ -1,5 +1,5 @@
-import SwiftData
 import Foundation
+import SwiftData
 
 @MainActor
 class PreviewContainer {
@@ -7,7 +7,7 @@ class PreviewContainer {
         let schema = Schema([
             Caree.self,
             ActivityType.self,
-            Activity.self
+            Activity.self,
         ])
         
         let configuration = ModelConfiguration(

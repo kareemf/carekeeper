@@ -1,6 +1,6 @@
-import SwiftUI
-import SwiftData
 import MapKit
+import SwiftData
+import SwiftUI
 
 struct ActivityDetailView: View {
     @Environment(\.dismiss) private var dismiss
@@ -18,11 +18,12 @@ struct ActivityDetailView: View {
 
     // Get the specific activity from cache
     private var activity: Activity? {
-        guard let cacheService = cacheService else { return nil }
+        guard let cacheService else { return nil }
         // Search through all cached carees (owned + shared) for the activity
         for caree in cacheService.myCarees + cacheService.sharedCarees {
             if let activities = caree.activities,
-               let activity = activities.first(where: { $0.id == activityID }) {
+               let activity = activities.first(where: { $0.id == activityID })
+            {
                 return activity
             }
         }
@@ -32,7 +33,7 @@ struct ActivityDetailView: View {
     @State private var isEditing = false
     @State private var editingNotes: String = ""
     @State private var editingQuantity: String = ""
-    @State private var editingDateTime: Date = Date()
+    @State private var editingDateTime: Date = .init()
     @State private var showingDeleteConfirmation = false
     @State private var error: Error?
     @State private var isSaving = false
@@ -43,7 +44,7 @@ struct ActivityDetailView: View {
     
     var body: some View {
         Group {
-            if let activity = activity {
+            if let activity {
                 NavigationView {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 20) {
@@ -88,8 +89,10 @@ struct ActivityDetailView: View {
                                         Button(role: .destructive) {
                                             showingDeleteConfirmation = true
                                         } label: {
-                                            Label(NSLocalizedString("Delete Activity", comment: "Delete activity button"),
-                                                  systemImage: "trash")
+                                            Label(
+                                                NSLocalizedString("Delete Activity", comment: "Delete activity button"),
+                                                systemImage: "trash"
+                                            )
                                         }
                                     } label: {
                                         Image(systemName: "ellipsis.circle")
@@ -118,7 +121,7 @@ struct ActivityDetailView: View {
                     // Refresh cache to load activities
                     try? await cacheService?.refreshCache()
                 }
-                .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { cache in
+                .onReceive(cloudKitService.$cacheService.compactMap(\.self)) { cache in
                     Task {
                         try? await cache.refreshCache()
                         await MainActor.run {
@@ -149,9 +152,11 @@ struct ActivityDetailView: View {
                     .fontWeight(.medium)
 
                 if isEditing {
-                    DatePicker(NSLocalizedString("When", comment: "Date picker label"),
-                              selection: $editingDateTime,
-                              displayedComponents: [.date, .hourAndMinute])
+                    DatePicker(
+                        NSLocalizedString("When", comment: "Date picker label"),
+                        selection: $editingDateTime,
+                        displayedComponents: [.date, .hourAndMinute]
+                    )
                 } else {
                     Text(activity.formattedDateTime)
                         .font(.subheadline)
@@ -171,10 +176,13 @@ struct ActivityDetailView: View {
                     .font(.headline)
 
                 if isEditing {
-                    TextField(NSLocalizedString("Add notes...", comment: "Notes placeholder"),
-                             text: $editingNotes, axis: .vertical)
-                        .textFieldStyle(.roundedBorder)
-                        .lineLimit(3...6)
+                    TextField(
+                        NSLocalizedString("Add notes...", comment: "Notes placeholder"),
+                        text: $editingNotes,
+                        axis: .vertical
+                    )
+                    .textFieldStyle(.roundedBorder)
+                    .lineLimit(3 ... 6)
                 } else {
                     if let notes = activity.notes, !notes.isEmpty {
                         Text(notes)
@@ -196,10 +204,12 @@ struct ActivityDetailView: View {
 
                     if isEditing {
                         HStack {
-                            TextField(NSLocalizedString("Amount", comment: "Quantity placeholder"),
-                                     text: $editingQuantity)
-                                .keyboardType(.decimalPad)
-                                .textFieldStyle(.roundedBorder)
+                            TextField(
+                                NSLocalizedString("Amount", comment: "Quantity placeholder"),
+                                text: $editingQuantity
+                            )
+                            .keyboardType(.decimalPad)
+                            .textFieldStyle(.roundedBorder)
 
                             if let unit = activity.activityType?.quantityUnit {
                                 Text(unit)
@@ -246,11 +256,13 @@ struct ActivityDetailView: View {
                     openInMaps(for: activity)
                 }
 
-                Text(String(format: "%.6f, %.6f",
-                           location.coordinate.latitude,
-                           location.coordinate.longitude))
-                    .font(.body)
-                    .fontDesign(.monospaced)
+                Text(String(
+                    format: "%.6f, %.6f",
+                    location.coordinate.latitude,
+                    location.coordinate.longitude
+                ))
+                .font(.body)
+                .fontDesign(.monospaced)
 
                 Text(NSLocalizedString("Tap to view in Maps", comment: "Maps CTA"))
                     .font(.caption)
@@ -314,7 +326,7 @@ struct ActivityDetailView: View {
         guard let location = activity.location else { return }
 
         let url = URL(string: "http://maps.apple.com/?ll=\(location.coordinate.latitude),\(location.coordinate.longitude)")
-        if let url = url {
+        if let url {
             UIApplication.shared.open(url)
         }
     }

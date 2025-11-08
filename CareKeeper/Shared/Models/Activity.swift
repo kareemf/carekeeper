@@ -1,6 +1,6 @@
+import CoreLocation
 import Foundation
 import SwiftData
-import CoreLocation
 
 @Model
 final class Activity {
@@ -13,7 +13,7 @@ final class Activity {
     var dateCreated: Date = Date()
 
     // Cache metadata (for Pure CloudKit migration)
-    var lastSyncedAt: Date?      // Last time this record was synced from CloudKit
+    var lastSyncedAt: Date? // Last time this record was synced from CloudKit
     var cloudKitRecordID: String? // CloudKit record ID for tracking
 
     // Relationships
@@ -44,13 +44,14 @@ final class Activity {
 }
 
 // MARK: - Computed Properties
+
 extension Activity {
     var hasLocation: Bool {
         latitude != nil && longitude != nil
     }
     
     var location: CLLocation? {
-        guard let latitude = latitude, let longitude = longitude else { return nil }
+        guard let latitude, let longitude else { return nil }
         return CLLocation(latitude: latitude, longitude: longitude)
     }
     
@@ -62,13 +63,14 @@ extension Activity {
     }
     
     var formattedQuantity: String? {
-        guard let quantity = quantity else { return nil }
+        guard let quantity else { return nil }
         let unit = activityType?.quantityUnit ?? ""
         return "\(quantity) \(unit)".trimmingCharacters(in: .whitespaces)
     }
 }
 
 // MARK: - CloudKit Configuration
+
 extension Activity {
     static func configureCloudKitSchema() {
         // All fields use CloudKit's infrastructure-level encryption (in transit and at rest).
@@ -83,13 +85,14 @@ extension Activity {
 }
 
 // MARK: - Property Update Helpers
+
 private protocol PropertyUpdatable: AnyObject {
     associatedtype ModelType = Self
-    static func makeUpdater<T>(_ keyPath: ReferenceWritableKeyPath<Self, T>) -> (Self, Self) -> Void
+    static func makeUpdater(_ keyPath: ReferenceWritableKeyPath<Self, some Any>) -> (Self, Self) -> Void
 }
 
 private extension PropertyUpdatable {
-    static func makeUpdater<T>(_ keyPath: ReferenceWritableKeyPath<Self, T>) -> (Self, Self) -> Void {
+    static func makeUpdater(_ keyPath: ReferenceWritableKeyPath<Self, some Any>) -> (Self, Self) -> Void {
         { dest, src in
             dest[keyPath: keyPath] = src[keyPath: keyPath]
         }
@@ -105,7 +108,7 @@ extension Activity: PropertyUpdatable {
         makeUpdater(\.quantity),
         makeUpdater(\.latitude),
         makeUpdater(\.longitude),
-        makeUpdater(\.dateCreated)
+        makeUpdater(\.dateCreated),
     ]
 
     func applyScalarUpdates(from other: Activity) {

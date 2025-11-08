@@ -1,6 +1,6 @@
-import WidgetKit
-import SwiftUI
 import SwiftData
+import SwiftUI
+import WidgetKit
 
 struct CareKeeperWidget: Widget {
     let kind: String = "CareKeeperWidget"
@@ -13,18 +13,18 @@ struct CareKeeperWidget: Widget {
         .configurationDisplayName("CareKeeper")
         .description("Quick access to track activities")
         #if os(watchOS)
-        .supportedFamilies([
-            .accessoryCircular,
-            .accessoryRectangular,
-            .accessoryInline,
-            .accessoryCorner
-        ])
+            .supportedFamilies([
+                .accessoryCircular,
+                .accessoryRectangular,
+                .accessoryInline,
+                .accessoryCorner,
+            ])
         #else
-        .supportedFamilies([
-            .accessoryCircular,
-            .accessoryRectangular,
-            .accessoryInline
-        ])
+                .supportedFamilies([
+                    .accessoryCircular,
+                    .accessoryRectangular,
+                    .accessoryInline,
+                ])
         #endif
     }
 }
@@ -36,11 +36,11 @@ struct Provider: TimelineProvider {
         SimpleEntry(date: Date())
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
+    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
         completion(SimpleEntry(date: Date()))
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
+    func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> Void) {
         let entry = SimpleEntry(date: Date())
 
         // Update once per day (widget is just a launcher, no dynamic data)
@@ -72,8 +72,8 @@ struct CareKeeperWidgetView: View {
         case .accessoryInline:
             InlineView(entry: entry)
         #if os(watchOS)
-        case .accessoryCorner:
-            CornerView(entry: entry)
+            case .accessoryCorner:
+                CornerView(entry: entry)
         #endif
         default:
             Text("CK")

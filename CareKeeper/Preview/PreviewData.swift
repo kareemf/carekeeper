@@ -4,7 +4,6 @@ import UIKit
 
 @MainActor
 struct PreviewData {
-    
     static func addSampleData(to context: ModelContext) {
         // Create sample carees
         let babyCaree = Caree(name: "Baby Emma", listOrder: 0)
@@ -111,9 +110,7 @@ struct PreviewData {
     }
     
     // Static sample data for individual previews
-    static let sampleCaree: Caree = {
-        Caree(name: "Sample Caree")
-    }()
+    static let sampleCaree: Caree = .init(name: "Sample Caree")
     
     static let sampleCareeWithImage: Caree = {
         let caree = Caree(name: "Caree with Photo")
@@ -174,19 +171,19 @@ struct PreviewData {
     
     private static func createSampleImageData() -> Data? {
         #if os(iOS)
-        // Create a simple colored circle as sample image data
-        let size = CGSize(width: 100, height: 100)
-        let renderer = UIGraphicsImageRenderer(size: size)
+            // Create a simple colored circle as sample image data
+            let size = CGSize(width: 100, height: 100)
+            let renderer = UIGraphicsImageRenderer(size: size)
 
-        let image = renderer.image { context in
-            context.cgContext.setFillColor(UIColor.systemBlue.cgColor)
-            context.cgContext.fillEllipse(in: CGRect(origin: .zero, size: size))
-        }
+            let image = renderer.image { context in
+                context.cgContext.setFillColor(UIColor.systemBlue.cgColor)
+                context.cgContext.fillEllipse(in: CGRect(origin: .zero, size: size))
+            }
 
-        return image.pngData()
+            return image.pngData()
         #else
-        // watchOS doesn't support UIGraphicsImageRenderer
-        return nil
+            // watchOS doesn't support UIGraphicsImageRenderer
+            return nil
         #endif
     }
 }

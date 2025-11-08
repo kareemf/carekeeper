@@ -8,7 +8,6 @@ import SwiftUI
 /// - Memory cleanup when leaving view
 /// - No relationship access (caree.activityTypes, etc.)
 struct CareeDetailView: View {
-
     let careeSnapshot: CareeSnapshot
 
     @EnvironmentObject private var dataProvider: WatchDataProvider

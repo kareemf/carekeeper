@@ -1,5 +1,5 @@
-import SwiftUI
 import CloudKit
+import SwiftUI
 import UIKit
 
 struct CloudSharingView: UIViewControllerRepresentable {
@@ -46,7 +46,7 @@ struct CloudSharingView: UIViewControllerRepresentable {
         }
 
         func itemTitle(for csc: UICloudSharingController) -> String? {
-            return "Caree"
+            "Caree"
         }
 
         func cloudSharingControllerDidStopSharing(_ csc: UICloudSharingController) {

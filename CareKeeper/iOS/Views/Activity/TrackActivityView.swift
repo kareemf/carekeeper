@@ -1,5 +1,5 @@
-import SwiftUI
 import CoreLocation
+import SwiftUI
 import WidgetKit
 
 struct TrackActivityView: View {
@@ -11,7 +11,7 @@ struct TrackActivityView: View {
     @State private var selectedActivityType: ActivityType?
     @State private var notes: String = ""
     @State private var quantity: String = ""
-    @State private var customDateTime: Date = Date()
+    @State private var customDateTime: Date = .init()
     @State private var useCustomTime: Bool = false
     @State private var includeLocation: Bool = false
     @StateObject private var locationManager = LocationManager()
@@ -79,9 +79,11 @@ struct TrackActivityView: View {
     private var activityTypeSection: some View {
         Section(NSLocalizedString("Activity Type", comment: "Activity type section title")) {
             if sortedActivityTypes.isEmpty {
-                Text(NSLocalizedString("No activity types available. Add activity types first.", 
-                                     comment: "No activity types message"))
-                    .foregroundColor(.secondary)
+                Text(NSLocalizedString(
+                    "No activity types available. Add activity types first.",
+                    comment: "No activity types message"
+                ))
+                .foregroundColor(.secondary)
             } else {
                 ForEach(sortedActivityTypes) { activityType in
                     Button(action: {
@@ -114,15 +116,20 @@ struct TrackActivityView: View {
     
     private var detailsSection: some View {
         Section(NSLocalizedString("Details", comment: "Details section title")) {
-            TextField(NSLocalizedString("Notes (optional)", comment: "Notes field placeholder"), 
-                     text: $notes, axis: .vertical)
-                .lineLimit(3...6)
+            TextField(
+                NSLocalizedString("Notes (optional)", comment: "Notes field placeholder"),
+                text: $notes,
+                axis: .vertical
+            )
+            .lineLimit(3 ... 6)
             
             if selectedActivityType?.hasQuantity == true {
                 HStack {
-                    TextField(NSLocalizedString("Quantity", comment: "Quantity field placeholder"), 
-                             text: $quantity)
-                        .keyboardType(.decimalPad)
+                    TextField(
+                        NSLocalizedString("Quantity", comment: "Quantity field placeholder"),
+                        text: $quantity
+                    )
+                    .keyboardType(.decimalPad)
                     
                     if let unit = selectedActivityType?.quantityUnit {
                         Text(unit)
@@ -138,9 +145,11 @@ struct TrackActivityView: View {
             Toggle(NSLocalizedString("Custom time", comment: "Custom time toggle"), isOn: $useCustomTime)
             
             if useCustomTime {
-                DatePicker(NSLocalizedString("When", comment: "Date picker label"), 
-                          selection: $customDateTime, 
-                          displayedComponents: [.date, .hourAndMinute])
+                DatePicker(
+                    NSLocalizedString("When", comment: "Date picker label"),
+                    selection: $customDateTime,
+                    displayedComponents: [.date, .hourAndMinute]
+                )
             }
         }
     }
@@ -191,7 +200,7 @@ struct TrackActivityView: View {
 
         // Parse quantity if provided
         var quantityValue: Double? = nil
-        if activityType.hasQuantity && !quantity.isEmpty {
+        if activityType.hasQuantity, !quantity.isEmpty {
             if let parsedQuantity = Double(quantity), parsedQuantity >= 0 {
                 quantityValue = parsedQuantity
             }

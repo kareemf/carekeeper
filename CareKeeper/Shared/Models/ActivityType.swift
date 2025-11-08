@@ -13,7 +13,7 @@ final class ActivityType {
     var dateCreated: Date = Date()
 
     // Cache metadata (for Pure CloudKit migration)
-    var lastSyncedAt: Date?      // Last time this record was synced from CloudKit
+    var lastSyncedAt: Date? // Last time this record was synced from CloudKit
     var cloudKitRecordID: String? // CloudKit record ID for tracking
 
     // Relationships
@@ -46,9 +46,10 @@ final class ActivityType {
 }
 
 // MARK: - Computed Properties
+
 extension ActivityType {
     var displayIcon: String {
-        if let icon = icon, !icon.isEmpty {
+        if let icon, !icon.isEmpty {
             return icon
         }
         return "" // Empty string instead of showing "circle" SF Symbol name
@@ -64,6 +65,7 @@ extension ActivityType {
 }
 
 // MARK: - CloudKit Configuration
+
 extension ActivityType {
     static func configureCloudKitSchema() {
         // All fields use CloudKit's infrastructure-level encryption.
@@ -72,13 +74,14 @@ extension ActivityType {
 }
 
 // MARK: - Property Update Helpers
+
 private protocol PropertyUpdatable: AnyObject {
     associatedtype ModelType = Self
-    static func makeUpdater<T>(_ keyPath: ReferenceWritableKeyPath<Self, T>) -> (Self, Self) -> Void
+    static func makeUpdater(_ keyPath: ReferenceWritableKeyPath<Self, some Any>) -> (Self, Self) -> Void
 }
 
 private extension PropertyUpdatable {
-    static func makeUpdater<T>(_ keyPath: ReferenceWritableKeyPath<Self, T>) -> (Self, Self) -> Void {
+    static func makeUpdater(_ keyPath: ReferenceWritableKeyPath<Self, some Any>) -> (Self, Self) -> Void {
         { dest, src in
             dest[keyPath: keyPath] = src[keyPath: keyPath]
         }
@@ -95,7 +98,7 @@ extension ActivityType: PropertyUpdatable {
         makeUpdater(\.quantityUnit),
         makeUpdater(\.hasLocation),
         makeUpdater(\.listOrder),
-        makeUpdater(\.dateCreated)
+        makeUpdater(\.dateCreated),
     ]
 
     func applyScalarUpdates(from other: ActivityType) {

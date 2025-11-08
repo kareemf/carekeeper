@@ -1,6 +1,6 @@
-import SwiftUI
-import SwiftData
 import Combine
+import SwiftData
+import SwiftUI
 
 struct ActivityListView: View {
     @Environment(\.modelContext) private var modelContext
@@ -32,24 +32,24 @@ struct ActivityListView: View {
 
     // Helper publishers to observe cache changes
     private var myCareesPublisher: AnyPublisher<[Caree], Never> {
-        if let cacheService = cacheService {
-            return cacheService.$myCarees.eraseToAnyPublisher()
+        if let cacheService {
+            cacheService.$myCarees.eraseToAnyPublisher()
         } else {
-            return Just([]).eraseToAnyPublisher()
+            Just([]).eraseToAnyPublisher()
         }
     }
 
     private var sharedCareesPublisher: AnyPublisher<[Caree], Never> {
-        if let cacheService = cacheService {
-            return cacheService.$sharedCarees.eraseToAnyPublisher()
+        if let cacheService {
+            cacheService.$sharedCarees.eraseToAnyPublisher()
         } else {
-            return Just([]).eraseToAnyPublisher()
+            Just([]).eraseToAnyPublisher()
         }
     }
 
     var body: some View {
         Group {
-            if let caree = caree {
+            if let caree {
                 List {
                     if filteredActivities(for: caree).isEmpty {
                         emptyStateView
@@ -75,8 +75,10 @@ struct ActivityListView: View {
                             Button {
                                 selectedActivityType = nil
                             } label: {
-                                Label(NSLocalizedString("All Types", comment: "All activity types filter"),
-                                      systemImage: selectedActivityType == nil ? "checkmark" : "")
+                                Label(
+                                    NSLocalizedString("All Types", comment: "All activity types filter"),
+                                    systemImage: selectedActivityType == nil ? "checkmark" : ""
+                                )
                             }
 
                             Divider()
@@ -95,8 +97,10 @@ struct ActivityListView: View {
                                 }
                             }
                         } label: {
-                            Label(NSLocalizedString("Filter", comment: "Filter button"),
-                                  systemImage: "line.3.horizontal.decrease.circle")
+                            Label(
+                                NSLocalizedString("Filter", comment: "Filter button"),
+                                systemImage: "line.3.horizontal.decrease.circle"
+                            )
                         }
                     }
                 }
@@ -115,7 +119,7 @@ struct ActivityListView: View {
             titleVisibility: .visible
         ) {
             Button(NSLocalizedString("Delete", comment: "Delete button"), role: .destructive) {
-                if let offsets = activityToDelete, let caree = caree {
+                if let offsets = activityToDelete, let caree {
                     deleteActivities(at: offsets, from: caree)
                 }
             }
@@ -128,7 +132,7 @@ struct ActivityListView: View {
         .task {
             await refreshData()
         }
-        .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { _ in
+        .onReceive(cloudKitService.$cacheService.compactMap(\.self)) { _ in
             Task {
                 await refreshData()
             }
@@ -156,8 +160,8 @@ struct ActivityListView: View {
                 .foregroundColor(.secondary)
 
             Text(selectedActivityType == nil
-                 ? NSLocalizedString("No activities yet", comment: "Empty activities message")
-                 : NSLocalizedString("No activities for this type", comment: "Empty filtered activities message"))
+                ? NSLocalizedString("No activities yet", comment: "Empty activities message")
+                : NSLocalizedString("No activities for this type", comment: "Empty filtered activities message"))
                 .font(.headline)
                 .foregroundColor(.secondary)
 
@@ -176,7 +180,7 @@ struct ActivityListView: View {
 
     @MainActor
     private func updateActivities() {
-        guard let cacheService = cacheService else {
+        guard let cacheService else {
             caree = nil
             activities = []
             return
@@ -188,7 +192,7 @@ struct ActivityListView: View {
         // Update caree and activities state
         caree = foundCaree
 
-        if let foundCaree = foundCaree {
+        if let foundCaree {
             // Extract and sort activities
             activities = (foundCaree.activities ?? []).sorted { $0.dateTime > $1.dateTime }
         } else {
@@ -228,12 +232,12 @@ struct ActivityListView: View {
 
     @Sendable
     private func refreshData() async {
-        if let cacheService = cacheService {
+        if let cacheService {
             try? await cacheService.refreshCache()
         }
 
         let needsSharedFetch = await MainActor.run { () -> Bool in
-            guard let cacheService = cacheService else { return true }
+            guard let cacheService else { return true }
             guard let targetCaree = cacheService.getCachedCaree(id: careeID) else { return true }
             return targetCaree.isShared
         }

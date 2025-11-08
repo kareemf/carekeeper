@@ -14,6 +14,7 @@ enum AppLogger {
 }
 
 // MARK: - Console.app Filtering Guide
+
 /*
  To view logs in Console.app:
 

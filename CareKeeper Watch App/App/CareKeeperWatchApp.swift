@@ -5,7 +5,6 @@ import SwiftUI
 /// All data comes from WatchDataProvider using selective CloudKit queries
 @main
 struct CareKeeperWatchApp: App {
-
     // Initialize diagnostics
     private let metricsManager = MetricsManager.shared
     private let fileLogger = FileLogger.shared

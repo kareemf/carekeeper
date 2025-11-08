@@ -1,0 +1,10 @@
+--swiftversion 6.0
+--indent 4
+--linebreaks lf
+--maxwidth 130
+--stripunusedargs closure-only
+--trimwhitespace nonblank-lines
+--wraparguments before-first
+--wrapcollections before-first
+--disable blankLinesAtEndOfScope,redundantSelf
+--exclude build,DerivedData,"CareKeeper/Preview Content","CareKeeper Watch App/Preview Content","CareKeeper Widget/Preview Content","CareKeeper Watch App/Complications/Preview"

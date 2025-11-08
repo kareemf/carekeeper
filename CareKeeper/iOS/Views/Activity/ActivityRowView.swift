@@ -38,10 +38,12 @@ struct ActivityRowView: View {
                     }
                     
                     if activity.hasLocation {
-                        Label(NSLocalizedString("Location", comment: "Location label"), 
-                              systemImage: "location.fill")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        Label(
+                            NSLocalizedString("Location", comment: "Location label"),
+                            systemImage: "location.fill"
+                        )
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                     }
                 }
             }

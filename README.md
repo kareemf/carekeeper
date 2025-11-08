@@ -7,7 +7,7 @@ A simple yet flexible collaborative activity tracking app for caregivers on iOS 
 - **Fast Activity Tracking**: Quick data entry inspired by Apple Workouts app design
 - **Collaborative Care**: Share carees and activities with other caregivers via CloudKit
 - **Flexible Taxonomy**: User-defined activity types with customizable attributes
-- **Cross-Platform**: Native iOS and watchOS apps with shared data
+- **Cross-Device**: Native iOS and watchOS apps with shared data
 - **Offline Support**: Works offline with automatic sync when connected
 - **Privacy-First**: End-to-end encryption for sensitive data
 
@@ -27,34 +27,35 @@ git clone https://github.com/kareemf/carekeeper.git
 cd carekeeper
 ```
 
-### 2. Install XcodeGen (Optional but Recommended)
+### 2. Install Required Tooling
 
-This project uses XcodeGen to manage the Xcode project file, making it easier to handle merge conflicts and project configuration.
+This project relies on a few CLI tools for consistent builds and linting:
 
 ```bash
-brew install xcodegen
+brew install git-secrets xcodegen swiftformat swiftlint
 ```
 
-After making changes to `project.yml`, regenerate the Xcode project:
+- **git-secrets** prevents accidental commits of credentials/keys.
+- **xcodegen** regenerates the Xcode project from `project.yml`.
+- **swiftformat** (lint mode) enforces formatting; run `swiftformat .` to auto-fix.
+- **swiftlint** enforces Swift style rules.
+
+After updating `project.yml`, regenerate the project with:
 
 ```bash
 xcodegen generate
 ```
 
-> **Note**: If you don't use XcodeGen, you can still use the pre-generated `.xcodeproj` file directly.
+> **Note**: If you don't use XcodeGen, you can still use the pre-generated `.xcodeproj` file directly, but any project file changes should be made through `project.yml`.
 
 ### 3. Configure Git Hooks
 
 This project includes Git hooks that run checks before every commit:
 
-1. `git-secrets` — prevents accidental commits of credentials/keys.
-2. `xcodegen` — regenerates the Xcode project to keep it aligned with `project.yml`.
-
-Install the dependencies:
-
-```bash
-brew install git-secrets xcodegen
-```
+1. `swiftformat` — auto-formats tracked files, re-stages the changes, then verifies formatting via lint mode.
+2. `swiftlint --strict` — enforces Swift style rules.
+3. `git-secrets` — prevents accidental commits of credentials/keys.
+4. `xcodegen` — regenerates the Xcode project to keep it aligned with `project.yml`.
 
 Then point Git at the repo-local hooks directory:
 
@@ -62,7 +63,7 @@ Then point Git at the repo-local hooks directory:
 git config core.hooksPath .githooks
 ```
 
-The pre-commit hook will fail (with actionable messaging) if `git-secrets` or `xcodegen` is missing, or if the secrets scan/xcodegen run surfaces issues. Re-run your commit after addressing the feedback.
+The pre-commit hook will fail (with actionable messaging) if any tool is missing or surfaces issues. Fix them (e.g., run `swiftformat .`, resolve lint warnings, rerun XcodeGen) and reattempt the commit. Formatting fixes performed by the hook are automatically staged, so you can simply re-run your commit afterward.
 
 ### 4. Create `Config.plist`
 
@@ -388,6 +389,6 @@ Use the screenshot capture helper to add images to documentation:
 
 ## Support
 
-- 📧 [Create an issue](https://github.com/your-username/carekeeper/issues) for bug reports
-- 💡 [Start a discussion](https://github.com/your-username/carekeeper/discussions) for feature requests
-- 📖 [Check the wiki](https://github.com/your-username/carekeeper/wiki) for detailed documentation
+- 📧 [Create an issue](https://github.com/kareemf/carekeeper/issues) for bug reports
+- 💡 [Start a discussion](https://github.com/kareemf/carekeeper/discussions) for feature requests
+- 📖 [Check the wiki](https://github.com/kareemf/carekeeper/wiki) for detailed documentation

@@ -25,7 +25,7 @@ struct ActivityTypeEditView: View {
         self.caree = caree
         self.activityType = activityType
 
-        if let activityType = activityType {
+        if let activityType {
             _name = State(initialValue: activityType.name)
             _icon = State(initialValue: activityType.icon ?? "")
             _hasQuantity = State(initialValue: activityType.hasQuantity)
@@ -50,17 +50,19 @@ struct ActivityTypeEditView: View {
                     Toggle(NSLocalizedString("Has quantity", comment: "Has quantity toggle"), isOn: $hasQuantity)
                     
                     if hasQuantity {
-                        TextField(NSLocalizedString("Unit (e.g., oz, minutes)", comment: "Quantity unit field"), 
-                                text: $quantityUnit)
-                            .textInputAutocapitalization(.never)
+                        TextField(
+                            NSLocalizedString("Unit (e.g., oz, minutes)", comment: "Quantity unit field"),
+                            text: $quantityUnit
+                        )
+                        .textInputAutocapitalization(.never)
                     }
                     
                     Toggle(NSLocalizedString("Track location", comment: "Track location toggle"), isOn: $hasLocation)
                 }
             }
-            .navigationTitle(isEditing ? 
-                           NSLocalizedString("Edit Activity Type", comment: "Edit activity type title") :
-                           NSLocalizedString("Add Activity Type", comment: "Add activity type title"))
+            .navigationTitle(isEditing ?
+                NSLocalizedString("Edit Activity Type", comment: "Edit activity type title") :
+                NSLocalizedString("Add Activity Type", comment: "Add activity type title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

@@ -1,9 +1,8 @@
-import XCTest
 @testable import CareKeeperV2
+import XCTest
 
 @MainActor
 final class WatchDataProviderTests: XCTestCase {
-
     func testLoadActivityTypesRefreshesAfterInitialFetch() async {
         let caree = CareeSnapshot(
             id: UUID(),
@@ -20,7 +19,7 @@ final class WatchDataProviderTests: XCTestCase {
                 name: "Meals",
                 icon: "🍽",
                 careeID: caree.id
-            )
+            ),
         ]
 
         let provider = WatchDataProvider(
@@ -66,7 +65,7 @@ final class WatchDataProviderTests: XCTestCase {
                 activityTypeID: activityTypeID,
                 careeID: caree.id,
                 syncState: .synced
-            )
+            ),
         ]
 
         let provider = WatchDataProvider(
@@ -112,7 +111,11 @@ final class MockSelectiveCloudKitService: SelectiveCloudKitService {
         return activityTypesByCaree[careeID] ?? []
     }
 
-    override func fetchRecentActivities(for careeID: UUID, isShared: Bool, hoursBack: TimeInterval) async throws -> [ActivitySnapshot] {
+    override func fetchRecentActivities(
+        for careeID: UUID,
+        isShared: Bool,
+        hoursBack: TimeInterval
+    ) async throws -> [ActivitySnapshot] {
         recentActivityFetchCount[careeID, default: 0] += 1
         return recentActivitiesByCaree[careeID] ?? []
     }
