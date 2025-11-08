@@ -1,4 +1,4 @@
-@testable import CareKeeperV2
+@testable import CareKeeper
 import CoreLocation
 import SwiftData
 import XCTest
