@@ -40,6 +40,7 @@ targets:
         TARGETED_DEVICE_FAMILY: "1,2"
         SUPPORTS_MACCATALYST: NO
         IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+        SWIFT_MODULE_NAME: CareKeeper
     info:
       path: CareKeeper/Info.plist
       properties:

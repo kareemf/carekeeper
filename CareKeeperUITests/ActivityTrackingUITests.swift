@@ -215,9 +215,9 @@ final class ActivityTrackingUITests: XCTestCase {
             XCTAssertTrue(app.navigationBars["Activities"].waitForExistence(timeout: 2))
 
             // Find and delete an activity
-            let cells = app.cells
-            if !cells.isEmpty {
-                let firstCell = cells.element(boundBy: 0)
+            let cellCount = app.cells.count
+            if cellCount > 0 {
+                let firstCell = app.cells.element(boundBy: 0)
                 firstCell.swipeLeft()
 
                 app.buttons["Delete"].tap()
@@ -247,11 +247,9 @@ final class ActivityTrackingUITests: XCTestCase {
             XCTAssertTrue(app.navigationBars["Activities"].waitForExistence(timeout: 2))
 
             // Find and attempt to delete
-            let cells = app.cells
-            if !cells.isEmpty {
-                let cellCount = cells.count
-
-                let firstCell = cells.element(boundBy: 0)
+            let cellCount = app.cells.count
+            if cellCount > 0 {
+                let firstCell = app.cells.element(boundBy: 0)
                 firstCell.swipeLeft()
 
                 app.buttons["Delete"].tap()

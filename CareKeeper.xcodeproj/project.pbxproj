@@ -1127,6 +1127,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
+				SWIFT_MODULE_NAME = CareKeeper;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1254,6 +1255,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
+				SWIFT_MODULE_NAME = CareKeeper;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
