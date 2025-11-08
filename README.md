@@ -172,6 +172,19 @@ xcrun simctl install booted \
 xcrun simctl launch booted com.kareemf.CareKeeper
 ```
 
+## Continuous Integration
+
+Every push and pull request triggers `.github/workflows/ci.yml`, which runs:
+
+1. `swiftformat --lint .`
+2. `swiftlint --strict`
+3. `git secrets --scan`
+4. `gitleaks detect --no-banner --redact`
+5. `trufflehog filesystem --no-update --fail --only-verified --directory .`
+6. `xcodebuild -scheme CareKeeper -project CareKeeper.xcodeproj -destination 'platform=iOS Simulator,name=iPhone 16 Pro' clean build test`
+
+You can mirror the pipeline locally by running the commands above (after installing the required tooling).
+
 #### Build from Xcode
 
 1. Open `CareKeeper.xcodeproj` in Xcode

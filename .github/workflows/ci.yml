@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  build-test:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tooling
+        run: |
+          brew update
+          brew install swiftformat swiftlint git-secrets gitleaks trufflehog xcodegen >/dev/null
+
+      - name: SwiftFormat Lint
+        run: swiftformat --lint .
+
+      - name: SwiftLint
+        run: swiftlint --strict
+
+      - name: git-secrets scan
+        run: git secrets --scan
+
+      - name: gitleaks scan
+        run: gitleaks detect --no-banner --redact
+
+      - name: trufflehog scan
+        run: trufflehog filesystem --no-update --fail --only-verified --json --directory .
+
+      - name: Xcode build & tests
+        run: |
+          xcodebuild -scheme CareKeeper \
+            -project CareKeeper.xcodeproj \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
+            clean build test

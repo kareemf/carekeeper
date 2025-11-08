@@ -37,7 +37,8 @@
 
 ## 8. Testing & Build Instructions
 - Verify `xcodebuild` commands succeed from a clean clone; script them (and simulator install steps) in README.
-- ✅ SwiftFormat + SwiftLint configs added, pre-commit hook + README updated. Next: add GitHub Actions CI that runs unit tests, `swiftlint`, `swiftformat --lint`, and the secret scanners (`git-secrets`, `gitleaks`, `trufflehog`).
+- ✅ SwiftFormat + SwiftLint configs added, pre-commit hook + README updated.
+- ✅ GitHub Actions workflow (`.github/workflows/ci.yml`) now runs `swiftformat --lint`, `swiftlint --strict`, `git secrets --scan`, `gitleaks detect`, `trufflehog filesystem`, and `xcodebuild clean build test` on every push/PR.
 
 ## 9. Community & Governance
 - Add CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, and PR/issue templates; include instructions to run hooks (`git config core.hooksPath .githooks`).
@@ -52,6 +53,10 @@
 - Including personal `.xcuserstate`/DerivedData/log files or screenshots with real people.
 - Forgetting to scrub any future secrets after history rewrite.
 
+## 11. Visual Assets & Screenshots
+- Documented the simulator capture workflow in `technical/screenshot-workflow.md` (boot commands, status bar overrides, `simctl io screenshot`, watch capture tips).
+- TODO: Capture the final set of iOS + watch screenshots/GIFs once demo data/story copy is locked and add them to README/docs.
+
 ## Portfolio Polish
 - Highlight the selective CloudKit + watch caching approach, log streaming/diagnostics, and ADR-driven architecture decisions.
 - Include short demo video/GIFs if possible to showcase UX.
@@ -60,8 +65,7 @@
 ---
 
 ### Outstanding Inputs / Clarifications
-- ✅ History rewrite approval received; initial scrub completed. Need to re-clone + verify before force-push.
+- ✅ History rewrite approval received; initial scrub completed.
 - ✅ License: MIT.
-- ✅ Screenshots: I’ll capture via simulators if feasible; otherwise you’ll take over (TBD once tooling is ready).
-- ✅ CI scope: run unit tests plus git-secrets/gitleaks/trufflehog in GitHub Actions. No linter today; if one is added it must run in pre-commit + README.
-- Remaining: confirm whether you want me to proceed with simulator screenshot capture now or leave it pending; also confirm timing for force-pushing the rewritten history after validation.
+- ✅ CI scope implemented via GitHub Actions workflow.
+- Screenshots: confirm when to capture the final assets (per `technical/screenshot-workflow.md`) or whether to leave placeholders for now.
