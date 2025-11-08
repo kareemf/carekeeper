@@ -11,7 +11,7 @@ struct ActivityTypeIconView: View {
             Image(systemName: icon.isEmpty ? "circle" : icon)
         } else if icon.isEmpty {
             // Empty - show placeholder
-            Image(systemName: "circle")
+            Image(systemName: "circle.fill")
         } else {
             // Emoji or text
             Text(icon)

@@ -160,7 +160,8 @@ struct ActivityListView: View {
                let activityType = activityTypes.first(where: { $0.id == filterID }) {
                 // Filtering by specific type
                 HStack(spacing: 4) {
-                    Text(activityType.icon)
+                    ActivityTypeIconView(icon: activityType.icon)
+                        .font(.body)
                     Text(activityType.name)
                         .font(.caption)
                 }
