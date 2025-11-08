@@ -14,7 +14,7 @@ A simple yet flexible collaborative activity tracking app for caregivers on iOS 
 ## Requirements
 
 - iOS 18.0+ / watchOS 10.0+
-- Xcode 15.0+
+- Xcode 16.0+
 - Swift 5.9+
 - CloudKit enabled Apple ID for sync and sharing
 
