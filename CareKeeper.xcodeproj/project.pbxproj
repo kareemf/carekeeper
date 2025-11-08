@@ -111,6 +111,7 @@
 		EB47C2583085AD3ED81BF0A8 /* Snapshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7775B2FAAD7AFC371698ED /* Snapshots.swift */; };
 		ECCBC9D36E555258A2184798 /* Snapshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7775B2FAAD7AFC371698ED /* Snapshots.swift */; };
 		EE6535793DDAD7198B687A05 /* CloudKitDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864595D44F7F815E63F99B04 /* CloudKitDataService.swift */; };
+		EFB2EABE9D61C45711F04047 /* WatchDataProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC4150639AD6E23B5DF5856 /* WatchDataProviderTests.swift */; };
 		F14BBD8E304D7694ACC00468 /* LocalCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 453B098EAF3B2DCBDF614CAE /* LocalCacheService.swift */; };
 		F308997BB6F53ACB26559A33 /* CareeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602A75653E2F86CB58273405 /* CareeTests.swift */; };
 		F7AE656E20B0B482DBC20E41 /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2606EF2CF9DC30ED71920DFB /* CloudKitSyncService.swift */; };
@@ -261,6 +262,7 @@
 		F7FC66039C53C043A170CDEB /* ActivityTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeTests.swift; sourceTree = "<group>"; };
 		FD4EE14A1A83C8E2F7FC6687 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		FF35B00333E669D852B2B9BF /* CareKeeper Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CareKeeper Watch App.entitlements"; sourceTree = "<group>"; };
+		FFC4150639AD6E23B5DF5856 /* WatchDataProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchDataProviderTests.swift; sourceTree = "<group>"; };
 		FFF8AB3750E092280F6B93E1 /* CareKeeperWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperWatchApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -298,6 +300,7 @@
 				F7FC66039C53C043A170CDEB /* ActivityTypeTests.swift */,
 				602A75653E2F86CB58273405 /* CareeTests.swift */,
 				054BD6209D8813C92EC12F97 /* SnapshotCodableTests.swift */,
+				FFC4150639AD6E23B5DF5856 /* WatchDataProviderTests.swift */,
 			);
 			path = CareKeeperTests;
 			sourceTree = "<group>";
@@ -863,6 +866,7 @@
 				F308997BB6F53ACB26559A33 /* CareeTests.swift in Sources */,
 				E5A238654E741E8FFFA199EB /* SnapshotCodableTests.swift in Sources */,
 				ECCBC9D36E555258A2184798 /* Snapshots.swift in Sources */,
+				EFB2EABE9D61C45711F04047 /* WatchDataProviderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -33,26 +33,33 @@ class WatchDataProvider: ObservableObject {
 
     // MARK: - Private Properties
 
-    private let selectiveService = SelectiveCloudKitService()
+    private let selectiveService: SelectiveCloudKitService
     private let cacheService: WatchCacheService
     private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data")
     private let signposter = OSSignposter(logger: Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data-signpost"))
     private let careeRefreshThrottleInterval: TimeInterval = 60
+    private let perCareeRefreshThrottleInterval: TimeInterval
 
     // Task management for cancellation
     private var loadCareesTask: Task<Void, Never>?
     private var loadActivityTypesTask: Task<Void, Never>?
     private var loadActivitiesTask: Task<Void, Never>?
 
-    private var refreshedActivityTypesCareeIDs: Set<UUID> = []
-    private var refreshedRecentActivitiesCareeIDs: Set<UUID> = []
     private var lastCareesRefreshDate: Date?
+    private var lastActivityTypesRefreshDates: [UUID: Date] = [:]
+    private var lastRecentActivitiesRefreshDates: [UUID: Date] = [:]
 
     // MARK: - Init
 
-    init(cacheService: WatchCacheService? = nil) {
+    init(
+        cacheService: WatchCacheService? = nil,
+        selectiveService: SelectiveCloudKitService? = nil,
+        perCareeRefreshThrottleInterval: TimeInterval = 30
+    ) {
         let resolvedCache = cacheService ?? WatchCacheService()
         self.cacheService = resolvedCache
+        self.selectiveService = selectiveService ?? SelectiveCloudKitService()
+        self.perCareeRefreshThrottleInterval = perCareeRefreshThrottleInterval
 
         guard resolvedCache.isAppGroupAvailable else {
             logger.warning("⚠️ Watch cache disabled: app group container unavailable.")
@@ -185,8 +192,10 @@ class WatchDataProvider: ObservableObject {
             }
         }
 
-        if refreshedActivityTypesCareeIDs.contains(careeID) && !force {
-            logger.info("⏭️ Skipping activity type refresh for caree \(careeID) - already refreshed")
+        if !force,
+           let lastRefresh = lastActivityTypesRefreshDates[careeID],
+           Date().timeIntervalSince(lastRefresh) < perCareeRefreshThrottleInterval {
+            logger.info("⏭️ Throttling activity type refresh for caree \(careeID) - refreshed recently")
             return
         }
 
@@ -226,8 +235,8 @@ class WatchDataProvider: ObservableObject {
                 } else {
                     logger.warning("⚠️ Skipping activity type cache save for \(careeID): app group unavailable.")
                 }
-                refreshedActivityTypesCareeIDs.insert(careeID)
                 logger.info("✅ Loaded \(types.count) activity types")
+                lastActivityTypesRefreshDates[careeID] = Date()
 
             } catch {
                 logger.error("❌ Failed to load activity types: \(error.localizedDescription)")
@@ -255,8 +264,10 @@ class WatchDataProvider: ObservableObject {
             }
         }
 
-        if refreshedRecentActivitiesCareeIDs.contains(careeID) && !force {
-            logger.info("⏭️ Skipping recent activities refresh for caree \(careeID) - already refreshed")
+        if !force,
+           let lastRefresh = lastRecentActivitiesRefreshDates[careeID],
+           Date().timeIntervalSince(lastRefresh) < perCareeRefreshThrottleInterval {
+            logger.info("⏭️ Throttling recent activities refresh for caree \(careeID) - refreshed recently")
             return
         }
 
@@ -310,8 +321,8 @@ class WatchDataProvider: ObservableObject {
                 } else {
                     logger.warning("⚠️ Skipping recent activity cache save for \(careeID): app group unavailable.")
                 }
-                refreshedRecentActivitiesCareeIDs.insert(careeID)
                 logger.info("✅ Loaded \(activities.count) activities (+ \(self.pendingActivities.count) pending)")
+                lastRecentActivitiesRefreshDates[careeID] = Date()
                 MemoryMonitor.logMemoryUsage(context: "After loadRecentActivities")
 
             } catch is CancellationError {
@@ -610,8 +621,8 @@ class WatchDataProvider: ObservableObject {
         let activitiesBeforeCount = recentActivitiesByCaree.count
         recentActivitiesByCaree = recentActivitiesByCaree.filter { keysToKeep.contains($0.key) }
 
-        refreshedActivityTypesCareeIDs.subtract(removedActivityTypeIDs)
-        refreshedRecentActivitiesCareeIDs.subtract(removedRecentActivityIDs)
+        lastActivityTypesRefreshDates = lastActivityTypesRefreshDates.filter { keysToKeep.contains($0.key) }
+        lastRecentActivitiesRefreshDates = lastRecentActivitiesRefreshDates.filter { keysToKeep.contains($0.key) }
         refreshingActivityTypeCareeIDs.subtract(removedActivityTypeIDs)
         refreshingRecentActivityCareeIDs.subtract(removedRecentActivityIDs)
 
@@ -629,8 +640,8 @@ class WatchDataProvider: ObservableObject {
 
         activityTypesByCaree.removeAll()
         recentActivitiesByCaree.removeAll()
-        refreshedActivityTypesCareeIDs.removeAll()
-        refreshedRecentActivitiesCareeIDs.removeAll()
+        lastActivityTypesRefreshDates.removeAll()
+        lastRecentActivitiesRefreshDates.removeAll()
         refreshingActivityTypeCareeIDs.removeAll()
         refreshingRecentActivityCareeIDs.removeAll()
 

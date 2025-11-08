@@ -235,6 +235,28 @@ struct ActivityTypeSnapshot: Identifiable, Hashable, Codable, Sendable {
         self.dateCreated = activityType.dateCreated
     }
 
+    init(
+        id: UUID = UUID(),
+        name: String,
+        icon: String = "circle.fill",
+        hasQuantity: Bool = false,
+        quantityUnit: String? = nil,
+        hasLocation: Bool = false,
+        listOrder: Int = 0,
+        careeID: UUID,
+        dateCreated: Date = Date()
+    ) {
+        self.id = id
+        self.name = name
+        self.icon = icon
+        self.hasQuantity = hasQuantity
+        self.quantityUnit = quantityUnit
+        self.hasLocation = hasLocation
+        self.listOrder = listOrder
+        self.careeID = careeID
+        self.dateCreated = dateCreated
+    }
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
