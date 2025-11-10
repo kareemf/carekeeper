@@ -2,6 +2,23 @@ import CloudKit
 import Foundation
 import os.log
 
+@MainActor
+protocol SelectiveCloudKitServiceProtocol: AnyObject {
+    func fetchAllCarees(includeImages: Bool) async throws -> [CareeSnapshot]
+    func fetchCareeImage(for careeID: UUID, zoneName: String, zoneOwnerName: String?, isShared: Bool) async throws -> Data?
+    func fetchActivityTypes(for careeID: UUID, isShared: Bool) async throws -> [ActivityTypeSnapshot]
+    func fetchRecentActivities(
+        for careeID: UUID,
+        activityTypeID: UUID?,
+        isShared: Bool,
+        hoursBack: TimeInterval?
+    ) async throws -> [ActivitySnapshot]
+    func fetchActivityTypeCount(for careeID: UUID, isShared: Bool) async throws -> Int
+    func createActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws -> ActivitySnapshot
+    func updateActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws -> ActivitySnapshot
+    func deleteActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws
+}
+
 /// Watch-optimized CloudKit queries with aggressive filtering
 /// Key optimizations:
 /// - Time-based filters (last 24h for activities)
@@ -9,7 +26,7 @@ import os.log
 /// - On-demand loading (activity types loaded per caree, not upfront)
 /// - Lightweight count queries (avoids loading full objects)
 @MainActor
-class SelectiveCloudKitService {
+class SelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
     // MARK: - Configuration
 
     /// Only load activities from last 24 hours (configurable)

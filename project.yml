@@ -40,11 +40,13 @@ targets:
         TARGETED_DEVICE_FAMILY: "1,2"
         SUPPORTS_MACCATALYST: NO
         IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+        DEFINES_MODULE: YES
+        PRODUCT_MODULE_NAME: CareKeeper
     prebuildScripts:
       - name: Ensure Config.plist
-        script: "${PROJECT_DIR}/scripts/ensure-config.sh"
-        shell: /bin/bash
-        SWIFT_MODULE_NAME: CareKeeper
+        script: "\"${PROJECT_DIR}/scripts/ensure-config.sh\""
+        shell: /bin/sh
+        basedOnDependencyAnalysis: false
     info:
       path: CareKeeper/Info.plist
       properties:
@@ -161,6 +163,11 @@ targets:
         com.apple.developer.ubiquity-kvstore-identifier: "$(TeamIdentifierPrefix)$(CFBundleIdentifier)"
         com.apple.security.application-groups:
           - group.com.kareemf.CareKeeper
+    prebuildScripts:
+      - name: Ensure Config.plist
+        script: "\"${PROJECT_DIR}/scripts/ensure-config.sh\""
+        shell: /bin/sh
+        basedOnDependencyAnalysis: false
 
   CareKeeperTests:
     type: bundle.unit-test
@@ -169,7 +176,7 @@ targets:
       - path: CareKeeperTests
       - path: CareKeeper/Shared/Models
       - path: CareKeeper/Shared/Services
-      - path: CareKeeper/watchOS/Services/SelectiveCloudKitService.swift
+      - path: CareKeeper/watchOS
     dependencies:
       - target: CareKeeper iOS
     settings:

@@ -66,6 +66,7 @@
 		73EF8777FD02248038A72C2B /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF4BD38CBFBB8FF9F46CE8A /* ErrorAlert.swift */; };
 		751E2ACE37527AC8019AD2AB /* CloudKitSharedRecordsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850E95460BA25DE867600209 /* CloudKitSharedRecordsService.swift */; };
 		79D2D91E0AA09CE1B70489DB /* FileLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF53BD91CA672373C73D285 /* FileLogger.swift */; };
+		7A2BB82649AD27703CFCE99C /* WatchDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BCEBD704F9701E5F4440BD /* WatchDataProvider.swift */; };
 		805AB8CA18C75280907BB24A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FD4EE14A1A83C8E2F7FC6687 /* Preview Assets.xcassets */; };
 		839BEE640180927EB5A09DB5 /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE83AC3D303F7059ACDDCAFD /* PreviewData.swift */; };
 		84312518F10A027C20E493AF /* UserNotificationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B286401A6A22BB4AED15B7 /* UserNotificationPreferences.swift */; };
@@ -75,6 +76,7 @@
 		8B08616C6353BB2C80AF784C /* ShareAcceptanceNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55F08D9E981ECDC8A5194BE4 /* ShareAcceptanceNotifier.swift */; };
 		8B99E46297CE77B9634F7E7F /* FileLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF53BD91CA672373C73D285 /* FileLogger.swift */; };
 		930B14ABC3D4F90FFED9BF7A /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF4BD38CBFBB8FF9F46CE8A /* ErrorAlert.swift */; };
+		95165D5FC6F608B99D0F1EA0 /* WatchCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF447B47F331C1AC5E93FB9 /* WatchCacheService.swift */; };
 		954AF1830552A69BBBBF3E75 /* ActivityTypeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194DC4FBABE800B5E10FB6CB /* ActivityTypeRowView.swift */; };
 		9577A1CBFF2D0CA7A596DF2E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E16FBE8C16D3C0D2B5A0DD7F /* Assets.xcassets */; };
 		95B655A1C3DE6BFF2CD061EE /* CareKeeper Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D33886BD3B065B6BF5ECD6AA /* CareKeeper Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -694,6 +696,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BBC90296502FD4A99E93605C /* Build configuration list for PBXNativeTarget "CareKeeper Watch App" */;
 			buildPhases = (
+				D20A698B25FA3DDC808802E8 /* Ensure Config.plist */,
 				E9894483CC5FAB5AB02545EF /* Sources */,
 				7F4B0BC84CAAA87119CA1D84 /* Resources */,
 				F70ECED9495E7C49DF3BFBAC /* Embed Foundation Extensions */,
@@ -792,6 +795,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		2CE631DD921BE1DE514449D7 /* Ensure Config.plist */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -805,8 +809,27 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/bash;
-			shellScript = "${PROJECT_DIR}/scripts/ensure-config.sh";
+			shellPath = /bin/sh;
+			shellScript = "\"${PROJECT_DIR}/scripts/ensure-config.sh\"";
+		};
+		D20A698B25FA3DDC808802E8 /* Ensure Config.plist */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Ensure Config.plist";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PROJECT_DIR}/scripts/ensure-config.sh\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -924,6 +947,8 @@
 				ECCBC9D36E555258A2184798 /* Snapshots.swift in Sources */,
 				6E0AED0B5150423162D02208 /* UserNotificationPreferences.swift in Sources */,
 				C1B2970CB7C292950F65F3B7 /* UserNotificationService.swift in Sources */,
+				95165D5FC6F608B99D0F1EA0 /* WatchCacheService.swift in Sources */,
+				7A2BB82649AD27703CFCE99C /* WatchDataProvider.swift in Sources */,
 				EFB2EABE9D61C45711F04047 /* WatchDataProviderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1164,6 +1189,7 @@
 				CODE_SIGN_ENTITLEMENTS = CareKeeper/CareKeeper.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1177,6 +1203,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
+				PRODUCT_MODULE_NAME = CareKeeper;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
@@ -1291,6 +1318,7 @@
 				CODE_SIGN_ENTITLEMENTS = CareKeeper/CareKeeper.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"CareKeeper/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1304,6 +1332,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
+				PRODUCT_MODULE_NAME = CareKeeper;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;

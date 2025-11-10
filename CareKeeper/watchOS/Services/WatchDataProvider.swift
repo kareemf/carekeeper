@@ -32,7 +32,7 @@ class WatchDataProvider: ObservableObject {
 
     // MARK: - Private Properties
 
-    private let selectiveService: SelectiveCloudKitService
+    private let selectiveService: SelectiveCloudKitServiceProtocol
     private let cacheService: WatchCacheService
     private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data")
     private let signposter = OSSignposter(logger: Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data-signpost"))
@@ -52,7 +52,7 @@ class WatchDataProvider: ObservableObject {
 
     init(
         cacheService: WatchCacheService? = nil,
-        selectiveService: SelectiveCloudKitService? = nil,
+        selectiveService: SelectiveCloudKitServiceProtocol? = nil,
         perCareeRefreshThrottleInterval: TimeInterval = 30
     ) {
         let resolvedCache = cacheService ?? WatchCacheService()
@@ -306,6 +306,7 @@ class WatchDataProvider: ObservableObject {
                 let activities = try await Task.detached(priority: .utility) { [selectiveService] () -> [ActivitySnapshot] in
                     try await selectiveService.fetchRecentActivities(
                         for: careeID,
+                        activityTypeID: nil,
                         isShared: caree.isShared,
                         hoursBack: hoursBack
                     )

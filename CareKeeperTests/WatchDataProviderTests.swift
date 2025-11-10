@@ -100,23 +100,45 @@ final class WatchDataProviderTests: XCTestCase {
 
 // MARK: - Test Doubles
 
-final class MockSelectiveCloudKitService: SelectiveCloudKitService {
+@MainActor
+final class MockSelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
     var activityTypesByCaree: [UUID: [ActivityTypeSnapshot]] = [:]
     var recentActivitiesByCaree: [UUID: [ActivitySnapshot]] = [:]
     var activityTypeFetchCount: [UUID: Int] = [:]
     var recentActivityFetchCount: [UUID: Int] = [:]
 
-    override func fetchActivityTypes(for careeID: UUID, isShared: Bool) async throws -> [ActivityTypeSnapshot] {
+    func fetchAllCarees(includeImages: Bool) async throws -> [CareeSnapshot] { [] }
+
+    func fetchCareeImage(for careeID: UUID, zoneName: String, zoneOwnerName: String?, isShared: Bool) async throws -> Data? {
+        nil
+    }
+
+    func fetchActivityTypes(for careeID: UUID, isShared: Bool) async throws -> [ActivityTypeSnapshot] {
         activityTypeFetchCount[careeID, default: 0] += 1
         return activityTypesByCaree[careeID] ?? []
     }
 
-    override func fetchRecentActivities(
+    func fetchRecentActivities(
         for careeID: UUID,
+        activityTypeID: UUID? = nil,
         isShared: Bool,
-        hoursBack: TimeInterval
+        hoursBack: TimeInterval? = nil
     ) async throws -> [ActivitySnapshot] {
         recentActivityFetchCount[careeID, default: 0] += 1
         return recentActivitiesByCaree[careeID] ?? []
     }
+
+    func fetchActivityTypeCount(for careeID: UUID, isShared: Bool) async throws -> Int {
+        activityTypesByCaree[careeID]?.count ?? 0
+    }
+
+    func createActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws -> ActivitySnapshot {
+        activity
+    }
+
+    func updateActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws -> ActivitySnapshot {
+        activity
+    }
+
+    func deleteActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws {}
 }
