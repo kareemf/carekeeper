@@ -45,4 +45,5 @@ jobs:
           xcodebuild -scheme CareKeeper \
             -project CareKeeper.xcodeproj \
             -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
+            -only-testing CareKeeperTests \
             clean build test

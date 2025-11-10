@@ -164,6 +164,8 @@ targets:
     sources:
       - path: CareKeeperTests
       - path: CareKeeper/Shared/Models
+      - path: CareKeeper/Shared/Services
+      - path: CareKeeper/watchOS/Services/SelectiveCloudKitService.swift
     dependencies:
       - target: CareKeeper iOS
     settings:

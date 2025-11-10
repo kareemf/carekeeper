@@ -59,6 +59,7 @@
 		68661CE3F9D2B4561C65D01B /* SharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8437D59195E6520DF4FF83E4 /* SharingView.swift */; };
 		6A1BA576792FDB0F054B6C75 /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = B513542CE8B64599249C0038 /* ShakeEffect.swift */; };
 		6D507F95604F1B868D63114E /* CloudKitNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC90A00357B4C68FB47705C /* CloudKitNotificationService.swift */; };
+		6E0AED0B5150423162D02208 /* UserNotificationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B286401A6A22BB4AED15B7 /* UserNotificationPreferences.swift */; };
 		6F95815EDCF4B9D698826816 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9848D72C9BBFC2CAB5E6D661 /* AppLogger.swift */; };
 		7079125602410C9A9A13E439 /* FileLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF53BD91CA672373C73D285 /* FileLogger.swift */; };
 		70BDB6AFB29853B326E1743C /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4015C2BC2F6B99E499249 /* CloudKitConfig.swift */; };
@@ -68,9 +69,11 @@
 		805AB8CA18C75280907BB24A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FD4EE14A1A83C8E2F7FC6687 /* Preview Assets.xcassets */; };
 		839BEE640180927EB5A09DB5 /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE83AC3D303F7059ACDDCAFD /* PreviewData.swift */; };
 		84312518F10A027C20E493AF /* UserNotificationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B286401A6A22BB4AED15B7 /* UserNotificationPreferences.swift */; };
+		84E215D1A0DC5DD53730658F /* CloudKitRetryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785FA28D76B619F588FF3D80 /* CloudKitRetryService.swift */; };
 		88AADE3324C37848C70CE9CB /* ActivityTypeEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD10B7C61EADF4F0A5A9985 /* ActivityTypeEditView.swift */; };
 		8A3FF19EB2F916DA89E201FA /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 47A269A73093A163B18A4DD6 /* Config.plist */; };
 		8B08616C6353BB2C80AF784C /* ShareAcceptanceNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55F08D9E981ECDC8A5194BE4 /* ShareAcceptanceNotifier.swift */; };
+		8B99E46297CE77B9634F7E7F /* FileLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF53BD91CA672373C73D285 /* FileLogger.swift */; };
 		930B14ABC3D4F90FFED9BF7A /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF4BD38CBFBB8FF9F46CE8A /* ErrorAlert.swift */; };
 		954AF1830552A69BBBBF3E75 /* ActivityTypeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194DC4FBABE800B5E10FB6CB /* ActivityTypeRowView.swift */; };
 		9577A1CBFF2D0CA7A596DF2E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E16FBE8C16D3C0D2B5A0DD7F /* Assets.xcassets */; };
@@ -81,25 +84,32 @@
 		A1074D868C422C77494D523B /* ActivityListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D3B0237A1629CAD6628A7E /* ActivityListView.swift */; };
 		A38ECFFC148412ACD350F86B /* CloudKitRecordConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BC7DE2D93431F84A97EC1F8 /* CloudKitRecordConverter.swift */; };
 		A58BFCB99F970A51DD79561D /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA88B88D62AF42A8D039CEF /* Activity.swift */; };
+		A6125B4652A81ED6CDD21B83 /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4015C2BC2F6B99E499249 /* CloudKitConfig.swift */; };
 		A71150726AA40C05A80312C3 /* CareeListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110225D18E7ECADB0C65749C /* CareeListRowView.swift */; };
 		A73D21E0043A5AE81096215E /* WatchDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BCEBD704F9701E5F4440BD /* WatchDataProvider.swift */; };
 		A7E024A5B00557BC8A73D316 /* CareKeeperWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF8AB3750E092280F6B93E1 /* CareKeeperWatchApp.swift */; };
 		AF665F36FF101BE3FB4C58C2 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA88B88D62AF42A8D039CEF /* Activity.swift */; };
+		B0DE11638602B0D68F47A647 /* MemoryMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0CB17473EB4DF0846409CC /* MemoryMonitor.swift */; };
 		B15ADBDF1A6B9648ADC050A5 /* UserNotificationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B286401A6A22BB4AED15B7 /* UserNotificationPreferences.swift */; };
 		B1666EB3F661492D8DD89D67 /* Config.default.plist in Resources */ = {isa = PBXBuildFile; fileRef = B6182A16262A89EDA6C4D5BB /* Config.default.plist */; };
 		B5006A5BB5364BB6C913F338 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE48EB682E50DF9AB2518345 /* LocationManager.swift */; };
 		B8A32EC2156D4341717BC8C1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D301F33E67563B268F54354F /* AppDelegate.swift */; };
+		B9E106E7E36D7D962BF95EEA /* SelectiveCloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B72D787FBD712217235C66AD /* SelectiveCloudKitService.swift */; };
 		BB58354CD68A976EC43C11CC /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA88B88D62AF42A8D039CEF /* Activity.swift */; };
 		BC087EC89957428C624AEDD1 /* UserNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C541FA572C54096F3E1A6 /* UserNotificationService.swift */; };
 		BDA3DF780CBF40157D0D811F /* Config.default.plist in Resources */ = {isa = PBXBuildFile; fileRef = B6182A16262A89EDA6C4D5BB /* Config.default.plist */; };
+		BEFD99EB7C2AAF4B3A7C2256 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3C92BA7C6FAC2EA172D01D /* AppError.swift */; };
 		BFD29868C4BDA100D939500F /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74AAF2CA7657295C86F2D04 /* ActivityType.swift */; };
+		C1B2970CB7C292950F65F3B7 /* UserNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C541FA572C54096F3E1A6 /* UserNotificationService.swift */; };
 		C4DFEE735BA7A25655DDA5B5 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64492941EF7F5D103F0861FA /* Caree.swift */; };
+		C917129AB8710E71DF07F01E /* MetricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A931C81A5ED3A43CBAECAC /* MetricsManager.swift */; };
 		C9C32C228668877A98E7F501 /* CareeImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909E249A28330C66DACA9391 /* CareeImportService.swift */; };
 		C9E1E362699ACB7AB49C65D8 /* CareeExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7D36821368CA28F045AC5E /* CareeExportService.swift */; };
 		D1D6E164F1F662FBFC78FE84 /* CloudKitSyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68AF7DA3BF1B49A663BF7F2 /* CloudKitSyncStatusView.swift */; };
 		D3DB6ABF7170CD31365E7C0C /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64492941EF7F5D103F0861FA /* Caree.swift */; };
 		D4F2FBCD7E59BC73FE23278F /* MemoryMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0CB17473EB4DF0846409CC /* MemoryMonitor.swift */; };
 		D656CA0625CB0C0AE8CCE52A /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE83AC3D303F7059ACDDCAFD /* PreviewData.swift */; };
+		D86A279265360BB283D27941 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9848D72C9BBFC2CAB5E6D661 /* AppLogger.swift */; };
 		DB0F8FC74122811B12CFCCFB /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBFD8ECE39C3D7E485F22C08 /* PreviewContainer.swift */; };
 		DBDD85CBA40365FD7B1059C7 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3C92BA7C6FAC2EA172D01D /* AppError.swift */; };
 		DC502F030D1E2CD431DD10CA /* ImportProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39B9C9FF21B8739B2795815D /* ImportProgressView.swift */; };
@@ -109,6 +119,7 @@
 		E133DFD237FAC2AB60072D84 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F4AFF9F279FD468529AC8C /* CareeListView.swift */; };
 		E26F6FE04FF10F8095FC1B69 /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 47A269A73093A163B18A4DD6 /* Config.plist */; };
 		E5A238654E741E8FFFA199EB /* SnapshotCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054BD6209D8813C92EC12F97 /* SnapshotCodableTests.swift */; };
+		E6EDA6DEEF494275463B0C56 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE48EB682E50DF9AB2518345 /* LocationManager.swift */; };
 		E7247A81A38C2D8E04F3F233 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3C92BA7C6FAC2EA172D01D /* AppError.swift */; };
 		E9FF674C7F63F8593717F45D /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBFD8ECE39C3D7E485F22C08 /* PreviewContainer.swift */; };
 		EA293094D4ABC52691EAE9FA /* ActivityTypeIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED05DD2188ACDFC8B05CE91 /* ActivityTypeIconView.swift */; };
@@ -876,10 +887,21 @@
 				406E8C951037236B6E9AE368 /* ActivityTests.swift in Sources */,
 				30EDBCDDE1471F92D6A2F9CA /* ActivityType.swift in Sources */,
 				5F70ED238471FE040C9B3326 /* ActivityTypeTests.swift in Sources */,
+				BEFD99EB7C2AAF4B3A7C2256 /* AppError.swift in Sources */,
+				D86A279265360BB283D27941 /* AppLogger.swift in Sources */,
 				3AEE7A85BBCB19513CFD61CB /* Caree.swift in Sources */,
 				F308997BB6F53ACB26559A33 /* CareeTests.swift in Sources */,
+				A6125B4652A81ED6CDD21B83 /* CloudKitConfig.swift in Sources */,
+				84E215D1A0DC5DD53730658F /* CloudKitRetryService.swift in Sources */,
+				8B99E46297CE77B9634F7E7F /* FileLogger.swift in Sources */,
+				E6EDA6DEEF494275463B0C56 /* LocationManager.swift in Sources */,
+				B0DE11638602B0D68F47A647 /* MemoryMonitor.swift in Sources */,
+				C917129AB8710E71DF07F01E /* MetricsManager.swift in Sources */,
+				B9E106E7E36D7D962BF95EEA /* SelectiveCloudKitService.swift in Sources */,
 				E5A238654E741E8FFFA199EB /* SnapshotCodableTests.swift in Sources */,
 				ECCBC9D36E555258A2184798 /* Snapshots.swift in Sources */,
+				6E0AED0B5150423162D02208 /* UserNotificationPreferences.swift in Sources */,
+				C1B2970CB7C292950F65F3B7 /* UserNotificationService.swift in Sources */,
 				EFB2EABE9D61C45711F04047 /* WatchDataProviderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
