@@ -2,10 +2,18 @@
 set -euo pipefail
 
 CONFIG_PATH="CareKeeper/Shared/Config.plist"
+FORCE_REGEN=${FORCE_CONFIG_REGEN:-0}
+IS_CI=${CI:-}
 
-if [[ -f "$CONFIG_PATH" ]]; then
+# On developer machines keep any manually managed file, but in CI (or when forced)
+# regenerate so we always embed the latest env-provided values.
+if [[ -f "$CONFIG_PATH" && -z "$IS_CI" && "$FORCE_REGEN" != "1" ]]; then
   echo "Config.plist already exists; skipping generation."
   exit 0
+fi
+
+if [[ -f "$CONFIG_PATH" ]]; then
+  echo "Overwriting existing Config.plist (CI or FORCE_CONFIG_REGEN=1)."
 fi
 
 : "${CLOUDKIT_CONTAINER_ID?Environment variable CLOUDKIT_CONTAINER_ID is required}"

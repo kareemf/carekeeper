@@ -639,7 +639,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 25B5ECE3C04A3496249CEF52 /* Build configuration list for PBXNativeTarget "CareKeeper iOS" */;
 			buildPhases = (
-				2CE631DD921BE1DE514449D7 /* Ensure Config.plist */,
 				8B0C51C0B9B73D363E32B729 /* Sources */,
 				AE830C89523195A05968E3CF /* Resources */,
 				F627708F8CB4C169D1B1A37F /* Frameworks */,
@@ -793,25 +792,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2CE631DD921BE1DE514449D7 /* Ensure Config.plist */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Ensure Config.plist";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PROJECT_DIR}/scripts/ensure-config.sh\"";
-		};
 		D20A698B25FA3DDC808802E8 /* Ensure Config.plist */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -826,6 +806,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"${PROJECT_DIR}/CareKeeper/Shared/Config.plist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

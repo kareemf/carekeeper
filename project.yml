@@ -42,11 +42,6 @@ targets:
         IPHONEOS_DEPLOYMENT_TARGET: "18.0"
         DEFINES_MODULE: YES
         PRODUCT_MODULE_NAME: CareKeeper
-    prebuildScripts:
-      - name: Ensure Config.plist
-        script: "\"${PROJECT_DIR}/scripts/ensure-config.sh\""
-        shell: /bin/sh
-        basedOnDependencyAnalysis: false
     info:
       path: CareKeeper/Info.plist
       properties:
@@ -168,6 +163,8 @@ targets:
         script: "\"${PROJECT_DIR}/scripts/ensure-config.sh\""
         shell: /bin/sh
         basedOnDependencyAnalysis: false
+        outputFiles:
+          - "${PROJECT_DIR}/CareKeeper/Shared/Config.plist"
 
   CareKeeperTests:
     type: bundle.unit-test
