@@ -38,7 +38,7 @@
 ## 8. Testing & Build Instructions
 - Verify `xcodebuild` commands succeed from a clean clone; script them (and simulator install steps) in README.
 - ✅ SwiftFormat + SwiftLint configs added, pre-commit hook + README updated.
-- ✅ GitHub Actions workflow (`.github/workflows/ci.yml`) now runs `swiftformat --lint`, `swiftlint --strict`, `git secrets --scan`, `gitleaks detect`, `trufflehog filesystem`, and `xcodebuild clean build test` on every push/PR.
+- ✅ GitHub Actions workflow (`.github/workflows/ci.yml`) now runs `swiftformat --lint`, `swiftlint --strict`, `git secrets --scan`, `gitleaks detect`, `trufflehog filesystem`, and `xcodebuild clean build test` on every push/PR, and it generates `Config.plist` from env vars via `scripts/ensure-config.sh`.
 
 ## 9. Community & Governance
 - Add CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, and PR/issue templates; include instructions to run hooks (`git config core.hooksPath .githooks`).

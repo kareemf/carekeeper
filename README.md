@@ -67,19 +67,28 @@ The pre-commit hook will fail (with actionable messaging) if any tool is missing
 
 ### 4. Create `Config.plist`
 
-Runtime CloudKit/App Group identifiers now live in `CareKeeper/Shared/Config.plist`. A default template ships in the repo; copy and customize it before building:
+Runtime CloudKit/App Group identifiers now live in `CareKeeper/Shared/Config.plist`. A template ships in the repo; copy and customize it before building:
 
 ```bash
 cp CareKeeper/Shared/Config.default.plist CareKeeper/Shared/Config.plist
 ```
 
-Edit the new file and set:
+or generate it from environment variables:
 
-- `CLOUDKIT_CONTAINER_ID` – your CloudKit container (e.g., `iCloud.com.example.CareKeeper`)
-- `APP_GROUP_IDENTIFIER` – your shared app group for iOS/watchOS
-- `ZONE_NAME` – optional custom zone name (defaults to `com.example.carekeeper.zone`)
+```bash
+CLOUDKIT_CONTAINER_ID="iCloud.com.example.CareKeeper" \
+APP_GROUP_IDENTIFIER="group.com.example.CareKeeper" \
+ZONE_NAME="com.example.carekeeper.zone" \
+./scripts/ensure-config.sh
+```
 
-`Config.plist` is git-ignored so you can keep local values without affecting the repo.
+`Config.plist` is git-ignored so you can safely store the real values locally. The keys are:
+
+- `CLOUDKIT_CONTAINER_ID` – CloudKit container (e.g., `iCloud.com.kareemf.CareKeeper2`)
+- `APP_GROUP_IDENTIFIER` – shared app group for iOS/watchOS
+- `ZONE_NAME` – custom zone name (defaults to `com.example.carekeeper.zone` if omitted)
+
+**Xcode Cloud / other CI:** add the command above as a pre-build script and expose the three environment variables in your CI configuration. The provided GitHub Actions workflow already does this.
 
 ### 5. Open in Xcode
 

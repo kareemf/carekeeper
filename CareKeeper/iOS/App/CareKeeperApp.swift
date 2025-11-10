@@ -14,9 +14,14 @@ struct CareKeeperApp: App {
     @StateObject private var cloudKitService = CloudKitDataService()
     @StateObject private var notificationService = CloudKitNotificationService()
     @State private var cacheService: LocalCacheService?
+    @State private var startupError: Error?
 
     // Initialize diagnostics
     private let metricsManager = MetricsManager.shared
+
+    init() {
+        _startupError = State(initialValue: CloudKitConfig.configurationError)
+    }
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -211,6 +216,7 @@ struct CareKeeperApp: App {
                 } message: {
                     Text(shareNotifier.alertMessage)
                 }
+                .errorAlert($startupError)
         }
         // Keep the app’s main environment bound to the CloudKit-synced container
         .modelContainer(sharedModelContainer)

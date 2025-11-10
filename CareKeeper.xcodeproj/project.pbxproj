@@ -69,6 +69,7 @@
 		839BEE640180927EB5A09DB5 /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE83AC3D303F7059ACDDCAFD /* PreviewData.swift */; };
 		84312518F10A027C20E493AF /* UserNotificationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B286401A6A22BB4AED15B7 /* UserNotificationPreferences.swift */; };
 		88AADE3324C37848C70CE9CB /* ActivityTypeEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD10B7C61EADF4F0A5A9985 /* ActivityTypeEditView.swift */; };
+		8A3FF19EB2F916DA89E201FA /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 47A269A73093A163B18A4DD6 /* Config.plist */; };
 		8B08616C6353BB2C80AF784C /* ShareAcceptanceNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55F08D9E981ECDC8A5194BE4 /* ShareAcceptanceNotifier.swift */; };
 		930B14ABC3D4F90FFED9BF7A /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF4BD38CBFBB8FF9F46CE8A /* ErrorAlert.swift */; };
 		954AF1830552A69BBBBF3E75 /* ActivityTypeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194DC4FBABE800B5E10FB6CB /* ActivityTypeRowView.swift */; };
@@ -106,6 +107,7 @@
 		DD767D182D049F0F3637E62B /* ActivityTypeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96A6784B396063FE17BEC14 /* ActivityTypeUITests.swift */; };
 		DE4108F4D16876C2387A2541 /* TrackActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB799BD4D39BD6CEAB99CBC /* TrackActivityView.swift */; };
 		E133DFD237FAC2AB60072D84 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F4AFF9F279FD468529AC8C /* CareeListView.swift */; };
+		E26F6FE04FF10F8095FC1B69 /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 47A269A73093A163B18A4DD6 /* Config.plist */; };
 		E5A238654E741E8FFFA199EB /* SnapshotCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054BD6209D8813C92EC12F97 /* SnapshotCodableTests.swift */; };
 		E9FF674C7F63F8593717F45D /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBFD8ECE39C3D7E485F22C08 /* PreviewContainer.swift */; };
 		EA293094D4ABC52691EAE9FA /* ActivityTypeIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED05DD2188ACDFC8B05CE91 /* ActivityTypeIconView.swift */; };
@@ -197,6 +199,7 @@
 		39B9C9FF21B8739B2795815D /* ImportProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportProgressView.swift; sourceTree = "<group>"; };
 		3D048976DFEF3092C2BD1B19 /* SyncStatusIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusIndicator.swift; sourceTree = "<group>"; };
 		453B098EAF3B2DCBDF614CAE /* LocalCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalCacheService.swift; sourceTree = "<group>"; };
+		47A269A73093A163B18A4DD6 /* Config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Config.plist; sourceTree = "<group>"; };
 		532BD9A9DD1376130D5EECB7 /* XCUIElementExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCUIElementExtensions.swift; sourceTree = "<group>"; };
 		5370AF5DE7F498E397A75893 /* CloudKitSyncMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncMonitor.swift; sourceTree = "<group>"; };
 		55F08D9E981ECDC8A5194BE4 /* ShareAcceptanceNotifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareAcceptanceNotifier.swift; sourceTree = "<group>"; };
@@ -489,6 +492,7 @@
 			isa = PBXGroup;
 			children = (
 				B6182A16262A89EDA6C4D5BB /* Config.default.plist */,
+				47A269A73093A163B18A4DD6 /* Config.plist */,
 				2162820E6C0E8811DBA1F646 /* Components */,
 				7EF1F959229D3A62306DB03A /* Models */,
 				5A025A5D7A487212583DA815 /* Services */,
@@ -755,6 +759,7 @@
 			files = (
 				2AE6F0B5667E58000BF31695 /* Assets.xcassets in Resources */,
 				BDA3DF780CBF40157D0D811F /* Config.default.plist in Resources */,
+				8A3FF19EB2F916DA89E201FA /* Config.plist in Resources */,
 				805AB8CA18C75280907BB24A /* Preview Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -765,6 +770,7 @@
 			files = (
 				9577A1CBFF2D0CA7A596DF2E /* Assets.xcassets in Resources */,
 				B1666EB3F661492D8DD89D67 /* Config.default.plist in Resources */,
+				E26F6FE04FF10F8095FC1B69 /* Config.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -8,6 +8,7 @@ enum AppError: LocalizedError {
     case locationPermissionDenied
     case locationUnavailable
     case invalidInput(String)
+    case missingConfiguration(String)
 
     var errorDescription: String? {
         switch self {
@@ -28,6 +29,8 @@ enum AppError: LocalizedError {
         case .locationUnavailable:
             NSLocalizedString("Unable to determine location. Please try again.", comment: "Location unavailable error")
         case let .invalidInput(message):
+            message
+        case let .missingConfiguration(message):
             message
         }
     }
@@ -50,6 +53,11 @@ enum AppError: LocalizedError {
             )
         case .invalidInput:
             nil
+        case .missingConfiguration:
+            NSLocalizedString(
+                "Set CLOUDKIT_CONTAINER_ID, APP_GROUP_IDENTIFIER, and ZONE_NAME (via Config.plist or environment) then relaunch.",
+                comment: "Missing configuration recovery"
+            )
         }
     }
 }
