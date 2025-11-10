@@ -30,7 +30,8 @@ enum CloudKitConfig {
         let userConfig = loadPlist(named: "Config") ?? [:]
         let defaultConfig = loadPlist(named: "Config.default") ?? [:]
 
-        func value(for key: String, env envKey: String) -> String? {
+        func value(for key: String) -> String? {
+            let envKey = key.uppercased()
             if let raw = environment[envKey]?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty {
                 return raw
             }
@@ -44,28 +45,20 @@ enum CloudKitConfig {
         }
 
         var missing: [String] = []
-        let zone = value(for: "ZONE_NAME", env: "ZONE_NAME") ?? placeholders.zone
+        let zone = value(for: "ZONE_NAME") ?? placeholders.zone
         if zone == placeholders.zone { missing.append("ZONE_NAME") }
 
-        let container = value(for: "CLOUDKIT_CONTAINER_ID", env: "CLOUDKIT_CONTAINER_ID") ?? placeholders.container
+        let container = value(for: "CLOUDKIT_CONTAINER_ID") ?? placeholders.container
         if container == placeholders.container { missing.append("CLOUDKIT_CONTAINER_ID") }
 
-        let appGroup = value(for: "APP_GROUP_IDENTIFIER", env: "APP_GROUP_IDENTIFIER") ?? placeholders.appGroup
+        let appGroup = value(for: "APP_GROUP_IDENTIFIER") ?? placeholders.appGroup
         if appGroup == placeholders.appGroup { missing.append("APP_GROUP_IDENTIFIER") }
 
-        let isCI = environment["CI"] == "true"
-        let shouldSurfaceError: Bool
-        #if DEBUG
-            shouldSurfaceError = isCI
-        #else
-            shouldSurfaceError = true
-        #endif
-        let error: AppError? = shouldSurfaceError && !missing.isEmpty
-            ?
-            .missingConfiguration(
+        let error: AppError? = missing.isEmpty
+            ? nil
+            : .missingConfiguration(
                 "Missing configuration for: \(missing.joined(separator: ", ")). Provide values via Config.plist or environment variables."
             )
-            : nil
 
         return Values(
             zoneName: zone,
