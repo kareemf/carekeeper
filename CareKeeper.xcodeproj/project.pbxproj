@@ -637,6 +637,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 25B5ECE3C04A3496249CEF52 /* Build configuration list for PBXNativeTarget "CareKeeper iOS" */;
 			buildPhases = (
+				2CE631DD921BE1DE514449D7 /* Ensure Config.plist */,
 				8B0C51C0B9B73D363E32B729 /* Sources */,
 				AE830C89523195A05968E3CF /* Resources */,
 				F627708F8CB4C169D1B1A37F /* Frameworks */,
@@ -787,6 +788,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2CE631DD921BE1DE514449D7 /* Ensure Config.plist */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Ensure Config.plist";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "${PROJECT_DIR}/scripts/ensure-config.sh";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		7C3512C28D98F0B8691F49C4 /* Sources */ = {
@@ -1157,7 +1179,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
-				SWIFT_MODULE_NAME = CareKeeper;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1285,7 +1306,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
-				SWIFT_MODULE_NAME = CareKeeper;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

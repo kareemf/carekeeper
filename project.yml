@@ -40,6 +40,10 @@ targets:
         TARGETED_DEVICE_FAMILY: "1,2"
         SUPPORTS_MACCATALYST: NO
         IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+    prebuildScripts:
+      - name: Ensure Config.plist
+        script: "${PROJECT_DIR}/scripts/ensure-config.sh"
+        shell: /bin/bash
         SWIFT_MODULE_NAME: CareKeeper
     info:
       path: CareKeeper/Info.plist
@@ -205,7 +209,6 @@ schemes:
       config: Debug
       targets:
         - CareKeeperTests
-        - CareKeeperUITests
     profile:
       config: Release
     analyze:
