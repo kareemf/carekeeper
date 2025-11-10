@@ -87,6 +87,7 @@ targets:
         excludes:
           - "**/*.md"
       - path: CareKeeper/Shared/Services/CloudKitConfig.swift
+      - path: CareKeeper/Shared/Services/AppError.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeper.watchkitapp.widget

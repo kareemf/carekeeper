@@ -109,6 +109,7 @@
 		E133DFD237FAC2AB60072D84 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F4AFF9F279FD468529AC8C /* CareeListView.swift */; };
 		E26F6FE04FF10F8095FC1B69 /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 47A269A73093A163B18A4DD6 /* Config.plist */; };
 		E5A238654E741E8FFFA199EB /* SnapshotCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054BD6209D8813C92EC12F97 /* SnapshotCodableTests.swift */; };
+		E7247A81A38C2D8E04F3F233 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3C92BA7C6FAC2EA172D01D /* AppError.swift */; };
 		E9FF674C7F63F8593717F45D /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBFD8ECE39C3D7E485F22C08 /* PreviewContainer.swift */; };
 		EA293094D4ABC52691EAE9FA /* ActivityTypeIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED05DD2188ACDFC8B05CE91 /* ActivityTypeIconView.swift */; };
 		EAF7DBB5B30AB1C88A5AD9A7 /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD1EFD76B0B5CDD774547C41 /* ActivityDetailView.swift */; };
@@ -858,6 +859,7 @@
 			files = (
 				AF665F36FF101BE3FB4C58C2 /* Activity.swift in Sources */,
 				54F55ABD141F4A6D4A7678E3 /* ActivityType.swift in Sources */,
+				E7247A81A38C2D8E04F3F233 /* AppError.swift in Sources */,
 				628D3C39DBA7D8652A8285D5 /* CareKeeperWidget.swift in Sources */,
 				07E476CC1FB5FA111AF2DA60 /* CareKeeperWidgetBundle.swift in Sources */,
 				C4DFEE735BA7A25655DDA5B5 /* Caree.swift in Sources */,
