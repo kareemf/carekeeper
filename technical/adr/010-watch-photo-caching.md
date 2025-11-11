@@ -24,8 +24,7 @@ So we can aggressively cache photos to reduce watch bandwidth and CPU consumptio
    - When users trigger the refresh button or pull-to-refresh, perform a full fetch that includes the photo field so updates from other devices propagate immediately.
    - After each forced refresh, update the cached image (including change token metadata so we can detect future differences if needed).
 3. **UX messaging**
-   - iOS `CareeEditView`: whenever the user picks a new photo, display: “Watch app users: perform a manual refresh to load the new image.”
-   - Documentation: add an `!!! note` to the watch user guide and FAQ describing the aggressive caching strategy and the refresh workaround.
+   - Communicate the caching strategy in release notes/docs, but avoid persistent in-app warnings that require manual refresh steps once the new streaming/downsample flow lands.
 4. **Downsampling**
    - Downscale the caree photo during upload on iOS so future fetches (including the watch cache) receive a smaller asset. Existing photos remain untouched; new uploads automatically use the smaller representation.
 
@@ -35,7 +34,7 @@ So we can aggressively cache photos to reduce watch bandwidth and CPU consumptio
 
 ## Testing
 - Edit a caree photo on iOS, verify:
-  - Watch still shows cached image until manual refresh.
+- Watch should update via the cache/streaming pipeline without requiring a manual refresh; QA should confirm a fresh fetch brings in the new image automatically.
   - After tapping the refresh button, the new photo appears.
   - Documentation and banner text guide the user appropriately.
 - Validate cold launch behavior: first visit to a caree with no cached photo downloads it once, subsequent visits reuse cache.

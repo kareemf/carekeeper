@@ -340,11 +340,6 @@ Without iCloud, CareKeeper cannot function.
 
 24 hours covers recent activities while keeping the watch app fast and reliable. View full history on iPhone if you need more history.
 
-### Why didn't my caree photo update on the watch?
-
-**Aggressive caching.** To keep bandwidth and battery usage low, watchOS caches caree photos and only re-downloads them on demand. After you change a caree’s image on iPhone, tap the refresh button (or pull to refresh) in the watch caree list to fetch the new picture.
-
----
 
 ### Why can't I create carees on the watch?
 
