@@ -52,12 +52,20 @@ struct CareKeeperApp: App {
                 AppLogger.app.info("   App Group: \(CloudKitConfig.appGroupID)")
 
                 // Configure for both local (iOS↔️watchOS) and cloud (iCloud) sync
-                let modelConfiguration = ModelConfiguration(
-                    schema: schema,
-                    isStoredInMemoryOnly: false,
-                    groupContainer: .identifier(CloudKitConfig.appGroupID),
-                    cloudKitDatabase: .private(CloudKitConfig.containerID)
-                )
+                let modelConfiguration = if let groupContainer = Self.resolvedGroupContainer() {
+                    ModelConfiguration(
+                        schema: schema,
+                        isStoredInMemoryOnly: false,
+                        groupContainer: groupContainer,
+                        cloudKitDatabase: .private(CloudKitConfig.containerID)
+                    )
+                } else {
+                    ModelConfiguration(
+                        schema: schema,
+                        isStoredInMemoryOnly: false,
+                        cloudKitDatabase: .private(CloudKitConfig.containerID)
+                    )
+                }
 
                 let container = try ModelContainer(
                     for: schema,
@@ -142,12 +150,18 @@ struct CareKeeperApp: App {
 
         do {
             // Persisted on disk so cache survives relaunch; no cloudKitDatabase means local-only.
-            let config = ModelConfiguration(
-                schema: schema,
-                isStoredInMemoryOnly: false,
-                groupContainer: .identifier(CloudKitConfig.appGroupID)
-                // Intentionally omit cloudKitDatabase to keep this store local-only.
-            )
+            let config = if let groupContainer = Self.resolvedGroupContainer() {
+                ModelConfiguration(
+                    schema: schema,
+                    isStoredInMemoryOnly: false,
+                    groupContainer: groupContainer
+                )
+            } else {
+                ModelConfiguration(
+                    schema: schema,
+                    isStoredInMemoryOnly: false
+                )
+            }
             let container = try ModelContainer(
                 for: schema,
                 configurations: [config]
@@ -162,6 +176,30 @@ struct CareKeeperApp: App {
             fatalError("Cannot create cache ModelContainer: \(error)")
         }
     }()
+
+    private static func resolvedGroupContainer() -> ModelConfiguration.GroupContainer? {
+        // GitHub Actions builds run unsigned (“Sign to Run Locally”), so the app
+        // lacks the shared App Group entitlement and the container lookup fails.
+        // Xcode Cloud (and local signed installs) do have the entitlement, so the
+        // same lookup succeeds. Detect the missing container and fall back to a
+        // sandbox-only store so CI tests don’t crash before they even start.
+        let appGroupID = CloudKitConfig.appGroupID
+        if let url = FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: appGroupID)
+        {
+            AppLogger.app.debug("✅ App group container reachable at \(url.path)")
+            return .identifier(appGroupID)
+        } else {
+            let isCI = ProcessInfo.processInfo.environment["CI"] != nil
+            let context = isCI ? "CI environment" : "runtime"
+            AppLogger
+                .app
+                .warning(
+                    "⚠️ App group \(appGroupID) unavailable in \(context); falling back to local sandbox storage."
+                )
+            return nil
+        }
+    }
 
     var body: some Scene {
         WindowGroup {
