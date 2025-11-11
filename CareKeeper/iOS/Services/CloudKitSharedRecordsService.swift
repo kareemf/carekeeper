@@ -204,28 +204,29 @@ class CloudKitSharedRecordsService: ObservableObject {
                 // Carees
                 do {
                     let careeQuery = CKQuery(recordType: "CD_Caree", predicate: NSPredicate(value: true))
-                    let (matchResults, _) = try await sharedDatabase.records(matching: careeQuery, inZoneWith: zone.zoneID)
-                    for (_, result) in matchResults {
-                        switch result {
-                        case let .success(record):
-                            allCareeRecords.append(record)
-                            logger.info("  ✅ Found caree: \(record["CD_name"] as? String ?? "unknown")")
-                            if let shareReference = record.share {
-                                do {
-                                    let shareRecord = try await sharedDatabase.record(for: shareReference.recordID)
-                                    if let share = shareRecord as? CKShare,
-                                       let cdId = record["CD_id"] as? String,
-                                       let uuid = UUID(uuidString: cdId)
-                                    {
-                                        shares[uuid] = share
-                                        logger.info("    📎 Fetched share for caree: \(uuid)")
-                                    }
-                                } catch {
-                                    logger.warning("    ⚠️ Failed to fetch share: \(error.localizedDescription)")
+                    let careeRecords = try await fetchAllSharedRecords(
+                        query: careeQuery,
+                        database: sharedDatabase,
+                        zoneID: zone.zoneID,
+                        recordType: "shared caree"
+                    )
+
+                    for record in careeRecords {
+                        allCareeRecords.append(record)
+                        logger.info("  ✅ Found caree: \(record["CD_name"] as? String ?? "unknown")")
+                        if let shareReference = record.share {
+                            do {
+                                let shareRecord = try await sharedDatabase.record(for: shareReference.recordID)
+                                if let share = shareRecord as? CKShare,
+                                   let cdId = record["CD_id"] as? String,
+                                   let uuid = UUID(uuidString: cdId)
+                                {
+                                    shares[uuid] = share
+                                    logger.info("    📎 Fetched share for caree: \(uuid)")
                                 }
+                            } catch {
+                                logger.warning("    ⚠️ Failed to fetch share: \(error.localizedDescription)")
                             }
-                        case let .failure(error):
-                            logger.warning("  ⚠️ Failed to fetch caree record: \(error.localizedDescription)")
                         }
                     }
                 } catch {
@@ -235,15 +236,15 @@ class CloudKitSharedRecordsService: ObservableObject {
                 // ActivityTypes
                 do {
                     let activityTypeQuery = CKQuery(recordType: "CD_ActivityType", predicate: NSPredicate(value: true))
-                    let (matchResults, _) = try await sharedDatabase.records(matching: activityTypeQuery, inZoneWith: zone.zoneID)
-                    for (_, result) in matchResults {
-                        switch result {
-                        case let .success(record):
-                            allActivityTypeRecords.append(record)
-                            logger.info("  ✅ Found activity type: \(record["CD_name"] as? String ?? "unknown")")
-                        case let .failure(error):
-                            logger.warning("  ⚠️ Failed to fetch activity type record: \(error.localizedDescription)")
-                        }
+                    let activityTypeRecords = try await fetchAllSharedRecords(
+                        query: activityTypeQuery,
+                        database: sharedDatabase,
+                        zoneID: zone.zoneID,
+                        recordType: "shared activity type"
+                    )
+                    for record in activityTypeRecords {
+                        allActivityTypeRecords.append(record)
+                        logger.info("  ✅ Found activity type: \(record["CD_name"] as? String ?? "unknown")")
                     }
                 } catch {
                     logger
@@ -255,15 +256,15 @@ class CloudKitSharedRecordsService: ObservableObject {
                 // Activities
                 do {
                     let activityQuery = CKQuery(recordType: "CD_Activity", predicate: NSPredicate(value: true))
-                    let (matchResults, _) = try await sharedDatabase.records(matching: activityQuery, inZoneWith: zone.zoneID)
-                    for (_, result) in matchResults {
-                        switch result {
-                        case let .success(record):
-                            allActivityRecords.append(record)
-                            logger.info("  ✅ Found activity at: \(record["CD_dateTime"] as? Date ?? Date())")
-                        case let .failure(error):
-                            logger.warning("  ⚠️ Failed to fetch activity record: \(error.localizedDescription)")
-                        }
+                    let activityRecords = try await fetchAllSharedRecords(
+                        query: activityQuery,
+                        database: sharedDatabase,
+                        zoneID: zone.zoneID,
+                        recordType: "shared activity"
+                    )
+                    for record in activityRecords {
+                        allActivityRecords.append(record)
+                        logger.info("  ✅ Found activity at: \(record["CD_dateTime"] as? Date ?? Date())")
                     }
                 } catch {
                     logger
@@ -506,5 +507,56 @@ class CloudKitSharedRecordsService: ObservableObject {
         clone.lastSyncedAt = caree.lastSyncedAt
         clone.cloudKitRecordID = caree.cloudKitRecordID
         return clone
+    }
+
+    private func fetchAllSharedRecords(
+        query: CKQuery,
+        database: CKDatabase,
+        zoneID: CKRecordZone.ID,
+        recordType: String,
+        desiredKeys: [String]? = nil,
+        resultsLimit: Int = CKQueryOperation.maximumResults
+    ) async throws -> [CKRecord] {
+        var records: [CKRecord] = []
+        var cursor: CKQueryOperation.Cursor?
+        var batchIndex = 0
+
+        repeat {
+            let matchResults: [(CKRecord.ID, Result<CKRecord, Error>)]
+            let nextCursor: CKQueryOperation.Cursor?
+
+            if let cursor {
+                (matchResults, nextCursor) = try await database.records(
+                    continuingMatchFrom: cursor,
+                    desiredKeys: desiredKeys,
+                    resultsLimit: resultsLimit
+                )
+            } else {
+                (matchResults, nextCursor) = try await database.records(
+                    matching: query,
+                    inZoneWith: zoneID,
+                    desiredKeys: desiredKeys,
+                    resultsLimit: resultsLimit
+                )
+            }
+
+            for (_, result) in matchResults {
+                switch result {
+                case let .success(record):
+                    records.append(record)
+                case let .failure(error):
+                    logger.warning("  ⚠️ Failed \(recordType) record fetch: \(error.localizedDescription)")
+                }
+            }
+
+            batchIndex += 1
+            cursor = nextCursor
+        } while cursor != nil
+
+        logger
+            .info(
+                "  📥 Fetched \(records.count) \(recordType) records in zone \(zoneID.zoneName) (\(batchIndex) batch\(batchIndex == 1 ? "" : "es"))"
+            )
+        return records
     }
 }
