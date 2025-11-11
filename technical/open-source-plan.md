@@ -1,5 +1,14 @@
 # Open-Sourcing Plan (Updated)
 
+_Last refreshed: 2025-11-11_
+
+## Status Snapshot
+- ✅ CI/CD (GitHub Actions + Xcode Cloud) now green with `scripts/ensure-config.sh` generating `Config.plist`.
+- ✅ Contribution collateral (CONTRIBUTING, Code of Conduct, Security policy, issue/PR templates) drafted and moved to the `contribution-guides` branch for review before landing on `main`.
+- ⏳ Screenshots/demo assets still outstanding; capture workflow documented but final images/videos not yet produced.
+- ⏳ History re-clone + full secret scan still pending before any public tag/release.
+- ⏳ Public “v1.0.0-oss” release checklist (tagging, announcement, issue triage) still to be completed after docs/assets settle.
+
 ## 1. Scope & Goals
 - Publish the full CareKeeper codebase (iOS + watch targets, shared services, docs) while keeping only non-sensitive build metadata (e.g., team ID, bundle IDs) so contributors can compile existing targets.
 - Present the project as a portfolio-quality showcase that highlights the watch caching strategy, selective CloudKit queries, and diagnostics/logging work.
@@ -16,12 +25,13 @@
 
 ## 3. History Hygiene
 - ✅ Ran `git filter-repo --invert-paths --path .claude/settings.local.json` (2025-??-??) to scrub the Claude settings file from history. Remote `origin` was re-added afterward.
-- Next: re-clone into a temp directory, re-run the secret scanners, and then force-push (`git push --force-with-lease --all` + `git push --force --tags`) once validated. Communicate the rewrite to any collaborators.
+- ⏳ Next: re-clone into a temp directory, re-run the secret scanners on history, and then force-push (`git push --force-with-lease --all` + `git push --force --tags`) once validated. Communicate the rewrite to any collaborators.
 
 ## 4. Configuration Strategy
-- Keep non-sensitive build metadata (team ID, bundle IDs) in repo so existing targets build out of the box.
-- Add `.xcconfig` templates for CloudKit container ID, App Group ID, and any other environment-specific values; ship them with placeholder/sample values plus instructions on how to create personal containers.
-- Document in README that CloudKit/App Group IDs must be replaced locally; do not publish production IDs even if the template contains sample strings.
+- ✅ Keep non-sensitive build metadata (team ID, bundle IDs) in repo so existing targets build out of the box.
+- ✅ Provide `CareKeeper/Shared/Config.default.plist` plus `scripts/ensure-config.sh` to materialize `Config.plist` from env vars (CI already wired).
+- 💤 Optional: add `.xcconfig` templates for additional per-environment values if new secrets ever emerge (none outstanding today).
+- ✅ README now calls out the need to replace CloudKit/App Group IDs locally and documents the generation script.
 
 - Confirm icon/font/licensed assets are cleared (only built-in icon used today).
 - Adopt the MIT License (per latest guidance) and add LICENSE, headers/NOTICE where required.
@@ -41,8 +51,8 @@
 - ✅ GitHub Actions workflow (`.github/workflows/ci.yml`) now runs `swiftformat --lint`, `swiftlint --strict`, `git secrets --scan`, `gitleaks detect`, `trufflehog filesystem`, and `xcodebuild clean build test` on every push/PR, and it generates `Config.plist` from env vars via `scripts/ensure-config.sh`.
 
 ## 9. Community & Governance
-- Add CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, and PR/issue templates; include instructions to run hooks (`git config core.hooksPath .githooks`).
-- Tag a few "good first issue" tasks after launch to show community readiness.
+- ✅ Drafted CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, and PR/issue templates (present on `contribution-guides` branch awaiting review). Includes instructions to run hooks (`git config core.hooksPath .githooks`).
+- 💤 Optional: tag “good first issue” tickets if we ever expect outside contributors. Currently deprioritized because the repo is still largely a solo effort.
 
 - Final secret scan across history (git-secrets, gitleaks, trufflehog) on a clean re-clone.
 - Tag release (e.g., `v1.0.0-oss`) with notes about requirements (Apple Dev account, personal CloudKit container).
@@ -54,8 +64,8 @@
 - Forgetting to scrub any future secrets after history rewrite.
 
 ## 11. Visual Assets & Screenshots
-- Documented the simulator capture workflow in `technical/screenshot-workflow.md` (boot commands, status bar overrides, `simctl io screenshot`, watch capture tips).
-- TODO: Capture the final set of iOS + watch screenshots/GIFs once demo data/story copy is locked and add them to README/docs.
+- ✅ Documented the simulator capture workflow in `technical/screenshot-workflow.md` (boot commands, status bar overrides, `simctl io screenshot`, watch capture tips).
+- ⏳ Capture the final set of iOS + watch screenshots/GIFs once demo data/story copy is locked and add them to README/docs. Also consider a short demo video for the README landing section.
 
 ## Portfolio Polish
 - Highlight the selective CloudKit + watch caching approach, log streaming/diagnostics, and ADR-driven architecture decisions.
@@ -68,4 +78,5 @@
 - ✅ History rewrite approval received; initial scrub completed.
 - ✅ License: MIT.
 - ✅ CI scope implemented via GitHub Actions workflow.
-- Screenshots: confirm when to capture the final assets (per `technical/screenshot-workflow.md`) or whether to leave placeholders for now.
+- ⏳ Screenshots/GIF capture timeline—confirm when to capture the final assets (per `technical/screenshot-workflow.md`) or whether to leave placeholders for now.
+- ⏳ Release/announcement plan once contributions + screenshots merge back to `main`.

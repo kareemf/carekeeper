@@ -412,5 +412,3 @@ Use the screenshot capture helper to add images to documentation:
 ## Support
 
 - 📧 [Create an issue](https://github.com/kareemf/carekeeper/issues) for bug reports
-- 💡 [Start a discussion](https://github.com/kareemf/carekeeper/discussions) for feature requests
-- 📖 [Check the wiki](https://github.com/kareemf/carekeeper/wiki) for detailed documentation
