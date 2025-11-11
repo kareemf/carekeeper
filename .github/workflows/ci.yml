@@ -9,6 +9,7 @@ on:
 jobs:
   build-test:
     runs-on: macos-15
+    environment: CI
     env:
       CLOUDKIT_CONTAINER_ID: ${{ secrets.CLOUDKIT_CONTAINER_ID }}
       APP_GROUP_IDENTIFIER: ${{ secrets.APP_GROUP_IDENTIFIER }}
