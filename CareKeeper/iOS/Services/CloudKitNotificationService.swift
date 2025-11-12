@@ -18,7 +18,7 @@ class CloudKitNotificationService: ObservableObject {
     private func setupCloudKitSubscriptions() async {
         await setupSharedDatabaseSubscription()
         await setupPrivateDatabaseSubscription()
-        await setupActivityNotificationSubscription()
+        await setupActivityQuerySubscriptions()
     }
     
     /// Subscribe to changes in the shared database (when shares are accepted)
@@ -76,16 +76,52 @@ class CloudKitNotificationService: ObservableObject {
         }
     }
 
-    /// Subscribe to new Activity records for user-facing notifications
-    /// Note: Query subscriptions are not allowed in shared database, so we rely on
-    /// the shared database subscription to catch all changes, then filter activities
-    /// in the notification handler (CloudKitSharedRecordsService)
-    private func setupActivityNotificationSubscription() async {
-        // NOTE: We don't create a separate activity subscription because:
-        // 1. Query subscriptions are not allowed in shared database
-        // 2. Database subscriptions catch all record types anyway
-        // 3. We filter for CD_Activity records in the notification handler
+    /// Subscribe specifically to CD_Activity creations so we can surface user-facing notifications.
+    /// Uses query subscriptions on private DB (owners) and shared DB (participants) when supported.
+    private func setupActivityQuerySubscriptions() async {
+        await setupActivitySubscription(
+            scope: .private,
+            subscriptionID: "private-activity-created",
+            database: container.privateCloudDatabase
+        )
+        await setupActivitySubscription(
+            scope: .shared,
+            subscriptionID: "shared-activity-created",
+            database: container.sharedCloudDatabase
+        )
+    }
 
-        logger.info("ℹ️  Activity notifications are handled via shared database subscription")
+    private func setupActivitySubscription(
+        scope: CKDatabase.Scope,
+        subscriptionID: String,
+        database: CKDatabase
+    ) async {
+        do {
+            let existing = try await database.allSubscriptions()
+            if existing.contains(where: { $0.subscriptionID == subscriptionID }) {
+                logger.info("✅ Activity subscription (\(subscriptionID)) already exists for \(scope.rawValue)")
+                return
+            }
+
+            let predicate = NSPredicate(value: true)
+            let subscription = CKQuerySubscription(
+                recordType: "CD_Activity",
+                predicate: predicate,
+                subscriptionID: subscriptionID,
+                options: .firesOnRecordCreation
+            )
+            let notificationInfo = CKSubscription.NotificationInfo()
+            notificationInfo.shouldSendContentAvailable = true
+            notificationInfo.shouldBadge = false
+            subscription.notificationInfo = notificationInfo
+
+            let saved = try await database.save(subscription)
+            logger.info("✅ Created activity subscription (\(saved.subscriptionID)) for \(scope.rawValue) database")
+        } catch let error as CKError where error.code == .permissionFailure && scope == .shared {
+            // Shared DB may reject query subscriptions on older OS versions. Log and proceed.
+            logger.warning("⚠️ Shared activity subscription not supported on this OS: \(error.localizedDescription)")
+        } catch {
+            logger.error("❌ Failed setting up activity subscription (\(subscriptionID)): \(error.localizedDescription)")
+        }
     }
 }

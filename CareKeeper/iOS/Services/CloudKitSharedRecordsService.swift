@@ -102,10 +102,25 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
 
         do {
-            let sharedDatabase = container.sharedCloudDatabase
-            let record = try await sharedDatabase.record(for: recordID)
+            let database: CKDatabase
+            switch queryNotification.databaseScope {
+            case .shared:
+                database = container.sharedCloudDatabase
+            case .private:
+                database = container.privateCloudDatabase
+            default:
+                logger
+                    .warning(
+                        "⚠️ Unsupported database scope for activity notification: \(queryNotification.databaseScope.rawValue)"
+                    )
+                return
+            }
 
-            let creatorID = record["CD_creatorUserRecordID"] as? String
+            let record = try await database.record(for: recordID)
+
+            let creatorIDField = record["CD_creatorUserRecordID"] as? String
+            let creatorRecordID = record.creatorUserRecordID?.recordName
+            let creatorID = creatorIDField ?? creatorRecordID
             let currentUserID = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
             if creatorID == currentUserID { return }
 
@@ -128,12 +143,12 @@ class CloudKitSharedRecordsService: ObservableObject {
             let prefs = UserNotificationPreferences.shared
             guard prefs.isEnabled(for: careeID) else { return }
 
-            let careeRecord = try await sharedDatabase.record(for: careeReference.recordID)
+            let careeRecord = try await database.record(for: careeReference.recordID)
             let careeName = careeRecord["CD_name"] as? String ?? "Unknown"
 
             var activityTypeName = "Activity"
             if let activityTypeRef = record["CD_activityType"] as? CKRecord.Reference {
-                if let activityTypeRecord = try? await sharedDatabase.record(for: activityTypeRef.recordID) {
+                if let activityTypeRecord = try? await database.record(for: activityTypeRef.recordID) {
                     activityTypeName = activityTypeRecord["CD_name"] as? String ?? "Activity"
                 }
             }
