@@ -13,9 +13,6 @@ struct CareeDetailView: View {
     @EnvironmentObject private var dataProvider: WatchDataProvider
     @State private var loadTask: Task<Void, Never>?
 
-    @StateObject private var notificationPrefs = UserNotificationPreferences.shared
-    @StateObject private var notificationService = UserNotificationService.shared
-
     private var activityTypes: [ActivityTypeSnapshot] {
         dataProvider.activityTypesByCaree[careeSnapshot.id] ?? []
     }
@@ -47,17 +44,10 @@ struct CareeDetailView: View {
         }
         .navigationTitle(careeSnapshot.name)
         .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
+            ToolbarItem(placement: .topBarTrailing) {
                 if dataProvider.isRefreshingCarees || (isRefreshingActivityTypes && !isLoadingActivityTypes) {
                     ProgressView()
                         .scaleEffect(0.6)
-                }
-
-                Button {
-                    toggleNotifications()
-                } label: {
-                    Image(systemName: notificationPrefs.isEnabled(for: careeSnapshot.id) ? "bell.fill" : "bell.slash")
-                        .foregroundColor(notificationPrefs.isEnabled(for: careeSnapshot.id) ? .blue : .gray)
                 }
             }
         }
@@ -159,28 +149,6 @@ struct CareeDetailView: View {
         .padding(.horizontal, 12)
     }
 
-    // MARK: - Actions
-
-    private func toggleNotifications() {
-        Task {
-            // Check current authorization status
-            await notificationService.checkAuthorizationStatus()
-
-            if notificationService.authorizationStatus == .notDetermined {
-                // Request permission if not yet determined
-                let granted = await notificationService.requestPermission()
-                if granted {
-                    // Enable notifications for this caree
-                    notificationPrefs.setEnabled(true, for: careeSnapshot.id)
-                }
-            } else if notificationService.authorizationStatus == .authorized {
-                // Toggle the preference
-                notificationPrefs.toggle(for: careeSnapshot.id)
-            }
-            // Note: watchOS doesn't have Settings deep linking like iOS,
-            // so we silently fail if permission is denied
-        }
-    }
 }
 
 #Preview {
