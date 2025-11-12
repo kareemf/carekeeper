@@ -93,7 +93,7 @@ if [ -n "$WATCH_DEVICE" ]; then
 fi
 echo ""
 
-# Build iOS app
+# Build iOS app (also builds widget extension)
 echo "🔨 Building iOS app..."
 xcodebuild -project CareKeeper.xcodeproj \
   -scheme CareKeeper \
@@ -117,10 +117,6 @@ if [ -n "$WATCH_DEVICE" ]; then
 fi
 
 # Install iOS app
-echo "📲 Installing iOS app..."
-xcrun simctl install "$IOS_DEVICE" \
-  ~/Library/Developer/Xcode/DerivedData/CareKeeper-*/Build/Products/Debug-iphonesimulator/CareKeeper\ iOS.app
-
 # Install watchOS app (if watch simulator is booted)
 if [ -n "$WATCH_DEVICE" ]; then
     echo "📲 Installing watchOS app..."
@@ -146,3 +142,22 @@ echo ""
 echo "✅ Apps launched successfully!"
 echo ""
 echo "💡 Tip: Run './scripts/sync-ios-to-watch-sim.sh' to sync data from iOS to watchOS"
+# Install widget extension (iOS)
+LATEST_DERIVED=$(ls -dt ~/Library/Developer/Xcode/DerivedData/CareKeeper-* 2>/dev/null | head -1)
+IOS_APP_PATH="$LATEST_DERIVED/Build/Products/Debug-iphonesimulator/CareKeeper iOS.app"
+WIDGET_PATH="$LATEST_DERIVED/Build/Products/Debug-iphonesimulator/CareKeeper iOS Widget.appex"
+
+echo "📲 Installing iOS app..."
+if [ -d "$IOS_APP_PATH" ]; then
+  xcrun simctl install "$IOS_DEVICE" "$IOS_APP_PATH"
+else
+  echo "❌ iOS app bundle not found at $IOS_APP_PATH"
+  exit 1
+fi
+
+if [ -d "$WIDGET_PATH" ]; then
+  echo "📲 Installing iOS widget..."
+  xcrun simctl install "$IOS_DEVICE" "$WIDGET_PATH"
+else
+  echo "⚠️ Widget build output not found; skipping widget install."
+fi

@@ -24,6 +24,8 @@ targets:
       - path: CareKeeper/Assets.xcassets
     dependencies:
       - target: CareKeeper Watch App
+      - target: CareKeeper iOS Widget
+        embed: true
       - framework: WebKit.framework
         embed: false
     settings:
@@ -98,6 +100,37 @@ targets:
         SWIFT_VERSION: "5.0"
         TARGETED_DEVICE_FAMILY: "4"
         WATCHOS_DEPLOYMENT_TARGET: "10.0"
+        SKIP_INSTALL: YES
+    entitlements:
+      path: "CareKeeper Widget/CareKeeper Widget.entitlements"
+      properties:
+        com.apple.security.application-groups:
+          - group.com.kareemf.CareKeeper
+        com.apple.developer.icloud-container-identifiers:
+          - iCloud.com.kareemf.CareKeeper2
+
+  CareKeeper iOS Widget:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: CareKeeper Widget
+        excludes:
+          - "**/*.md"
+      - path: CareKeeper/Shared/Models
+        excludes:
+          - "**/*.md"
+      - path: CareKeeper/Shared/Services/CloudKitConfig.swift
+      - path: CareKeeper/Shared/Services/AppError.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kareemf.CareKeeper.widget
+        INFOPLIST_FILE: CareKeeper-Widget-Info.plist
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: "CareKeeper Widget/CareKeeper Widget.entitlements"
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
         SKIP_INSTALL: YES
     entitlements:
       path: "CareKeeper Widget/CareKeeper Widget.entitlements"

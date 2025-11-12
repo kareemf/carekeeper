@@ -9,7 +9,10 @@
 /* Begin PBXBuildFile section */
 		07E476CC1FB5FA111AF2DA60 /* CareKeeperWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F6079C2D611AE02903EA9 /* CareKeeperWidgetBundle.swift */; };
 		08B8FF3C5031A3F49BE3DFAC /* CloudKitRetryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785FA28D76B619F588FF3D80 /* CloudKitRetryService.swift */; };
+		093D4C626797B5318B2CC8F4 /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4015C2BC2F6B99E499249 /* CloudKitConfig.swift */; };
+		09D4CE34A53AABF790AD56EA /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3C92BA7C6FAC2EA172D01D /* AppError.swift */; };
 		0C83CF568B6644CF371FE573 /* CloudKitSyncMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5370AF5DE7F498E397A75893 /* CloudKitSyncMonitor.swift */; };
+		10AF144FF8DD99A406C57E72 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA88B88D62AF42A8D039CEF /* Activity.swift */; };
 		10F399117B45CC73C0B44831 /* CareKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21723E30B697002E61F47A31 /* CareKeeperApp.swift */; };
 		1358B9D3286B3C8C31AF2D1A /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA88B88D62AF42A8D039CEF /* Activity.swift */; };
 		160B2638A4473314114B5C65 /* UserNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C541FA572C54096F3E1A6 /* UserNotificationService.swift */; };
@@ -26,6 +29,7 @@
 		2BF1D1726E96E5DEB843604A /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A15DD7991742E0B0DA3CCA2 /* WebKit.framework */; };
 		2C10919F9EC1E6254D54F93B /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74AAF2CA7657295C86F2D04 /* ActivityType.swift */; };
 		30EDBCDDE1471F92D6A2F9CA /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74AAF2CA7657295C86F2D04 /* ActivityType.swift */; };
+		33622250E055DB47A03D4F28 /* CareKeeper iOS Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BCF7E6083724B5F36702BEB6 /* CareKeeper iOS Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		35B16E1ADD16E26AC3CE8E4C /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9848D72C9BBFC2CAB5E6D661 /* AppLogger.swift */; };
 		35E82BCD255A36176DE06FEC /* MetricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A931C81A5ED3A43CBAECAC /* MetricsManager.swift */; };
 		389311D1F0430C2B8EFB0ECB /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97C3E57DFB34FB3E1A7DDCFA /* CareeListView.swift */; };
@@ -58,6 +62,7 @@
 		668CC28D100250AACEF4E2B6 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64492941EF7F5D103F0861FA /* Caree.swift */; };
 		68661CE3F9D2B4561C65D01B /* SharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8437D59195E6520DF4FF83E4 /* SharingView.swift */; };
 		6A1BA576792FDB0F054B6C75 /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = B513542CE8B64599249C0038 /* ShakeEffect.swift */; };
+		6CF820CD6C6387394D6A792A /* CareKeeperWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFF0F7407FAB7635569FDB8F /* CareKeeperWidget.swift */; };
 		6D507F95604F1B868D63114E /* CloudKitNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC90A00357B4C68FB47705C /* CloudKitNotificationService.swift */; };
 		6E0AED0B5150423162D02208 /* UserNotificationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B286401A6A22BB4AED15B7 /* UserNotificationPreferences.swift */; };
 		6F95815EDCF4B9D698826816 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9848D72C9BBFC2CAB5E6D661 /* AppLogger.swift */; };
@@ -82,6 +87,7 @@
 		95B655A1C3DE6BFF2CD061EE /* CareKeeper Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D33886BD3B065B6BF5ECD6AA /* CareKeeper Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9901C31F745FA77024E99DFD /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D16A365A7CB69E3FF4A955A /* CareeDetailView.swift */; };
 		998E938714C00E832D15909C /* CloudKitSharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 896A15EFFAAFEF3EC31F83BA /* CloudKitSharingService.swift */; };
+		9D2AEA9F3A49C6CAFEDC1AB6 /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74AAF2CA7657295C86F2D04 /* ActivityType.swift */; };
 		A075FF98205DF5BB853754BC /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3C92BA7C6FAC2EA172D01D /* AppError.swift */; };
 		A1074D868C422C77494D523B /* ActivityListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D3B0237A1629CAD6628A7E /* ActivityListView.swift */; };
 		A38ECFFC148412ACD350F86B /* CloudKitRecordConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BC7DE2D93431F84A97EC1F8 /* CloudKitRecordConverter.swift */; };
@@ -107,6 +113,7 @@
 		C917129AB8710E71DF07F01E /* MetricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A931C81A5ED3A43CBAECAC /* MetricsManager.swift */; };
 		C9C32C228668877A98E7F501 /* CareeImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909E249A28330C66DACA9391 /* CareeImportService.swift */; };
 		C9E1E362699ACB7AB49C65D8 /* CareeExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7D36821368CA28F045AC5E /* CareeExportService.swift */; };
+		CA4AA98B2955FFABE11480C4 /* CareKeeperWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F6079C2D611AE02903EA9 /* CareKeeperWidgetBundle.swift */; };
 		D1D6E164F1F662FBFC78FE84 /* CloudKitSyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68AF7DA3BF1B49A663BF7F2 /* CloudKitSyncStatusView.swift */; };
 		D3DB6ABF7170CD31365E7C0C /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64492941EF7F5D103F0861FA /* Caree.swift */; };
 		D4F2FBCD7E59BC73FE23278F /* MemoryMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0CB17473EB4DF0846409CC /* MemoryMonitor.swift */; };
@@ -119,6 +126,7 @@
 		DD767D182D049F0F3637E62B /* ActivityTypeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96A6784B396063FE17BEC14 /* ActivityTypeUITests.swift */; };
 		DE4108F4D16876C2387A2541 /* TrackActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB799BD4D39BD6CEAB99CBC /* TrackActivityView.swift */; };
 		E133DFD237FAC2AB60072D84 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F4AFF9F279FD468529AC8C /* CareeListView.swift */; };
+		E2049D6CD591770B8FE336D8 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64492941EF7F5D103F0861FA /* Caree.swift */; };
 		E26F6FE04FF10F8095FC1B69 /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 47A269A73093A163B18A4DD6 /* Config.plist */; };
 		E5A238654E741E8FFFA199EB /* SnapshotCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054BD6209D8813C92EC12F97 /* SnapshotCodableTests.swift */; };
 		E6EDA6DEEF494275463B0C56 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE48EB682E50DF9AB2518345 /* LocationManager.swift */; };
@@ -135,6 +143,7 @@
 		F7AE656E20B0B482DBC20E41 /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2606EF2CF9DC30ED71920DFB /* CloudKitSyncService.swift */; };
 		FB7D487A9C010985940C6607 /* WatchCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF447B47F331C1AC5E93FB9 /* WatchCacheService.swift */; };
 		FC9F2E98797052CCFF8C372C /* CloudKitParentReferenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7756395CF2C63DC54F3BDEC2 /* CloudKitParentReferenceService.swift */; };
+		FFFDDD04EDFB5DB16FA47723 /* Snapshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7775B2FAAD7AFC371698ED /* Snapshots.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -159,6 +168,13 @@
 			remoteGlobalIDString = D33AEF414D4813AD6FD4E498;
 			remoteInfo = "CareKeeper Watch App";
 		};
+		71F9BDDA8BB84D59BE04CCF6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D73F9B8A4F010D7EC1AB2F1E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F01D4BB85D597E15409B6C69;
+			remoteInfo = "CareKeeper iOS Widget";
+		};
 		DB5EB161880CFB84F5A8E076 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D73F9B8A4F010D7EC1AB2F1E /* Project object */;
@@ -178,6 +194,17 @@
 				1ACD811C263D77D505DDC1D9 /* CareKeeper Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F54E06FC2A4A420656BC0B3 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				33622250E055DB47A03D4F28 /* CareKeeper iOS Widget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F70ECED9495E7C49DF3BFBAC /* Embed Foundation Extensions */ = {
@@ -259,6 +286,7 @@
 		B8F4AFF9F279FD468529AC8C /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
 		B9427CFA7993E809BA9C6AD5 /* ActivityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTests.swift; sourceTree = "<group>"; };
 		BCA3FD650EAAFE8CD1629C8D /* CareKeeper iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "CareKeeper iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BCF7E6083724B5F36702BEB6 /* CareKeeper iOS Widget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = "CareKeeper iOS Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE48EB682E50DF9AB2518345 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		C24B649353E3AEDC5F4C93D5 /* ShareParticipantsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareParticipantsView.swift; sourceTree = "<group>"; };
 		C7623E17E0308BEEAD85973D /* CloudKitSharedDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSharedDataService.swift; sourceTree = "<group>"; };
@@ -378,6 +406,7 @@
 		4F693B2665B385AFBE2F92C7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				BCF7E6083724B5F36702BEB6 /* CareKeeper iOS Widget.appex */,
 				BCA3FD650EAAFE8CD1629C8D /* CareKeeper iOS.app */,
 				68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */,
 				D33886BD3B065B6BF5ECD6AA /* CareKeeper Widget.appex */,
@@ -642,12 +671,14 @@
 				8B0C51C0B9B73D363E32B729 /* Sources */,
 				AE830C89523195A05968E3CF /* Resources */,
 				F627708F8CB4C169D1B1A37F /* Frameworks */,
+				9F54E06FC2A4A420656BC0B3 /* Embed Foundation Extensions */,
 				9B1C309C0CDB21D49399FD23 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				36DA12DBE2513B36C7EE43F8 /* PBXTargetDependency */,
+				0C062CBE0C10F40C439D66D1 /* PBXTargetDependency */,
 			);
 			name = "CareKeeper iOS";
 			packageProductDependencies = (
@@ -712,6 +743,23 @@
 			productReference = 68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
+		F01D4BB85D597E15409B6C69 /* CareKeeper iOS Widget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E7B005E01A6B97FBDD578F89 /* Build configuration list for PBXNativeTarget "CareKeeper iOS Widget" */;
+			buildPhases = (
+				4F735A02BB2AA7B3139578B0 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CareKeeper iOS Widget";
+			packageProductDependencies = (
+			);
+			productName = "CareKeeper iOS Widget";
+			productReference = BCF7E6083724B5F36702BEB6 /* CareKeeper iOS Widget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -742,6 +790,10 @@
 						DevelopmentTeam = 8C7EB23ZZP;
 						ProvisioningStyle = Automatic;
 					};
+					F01D4BB85D597E15409B6C69 = {
+						DevelopmentTeam = 8C7EB23ZZP;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 2BDA0F23576EC8A7540D098B /* Build configuration list for PBXProject "CareKeeper" */;
@@ -761,6 +813,7 @@
 				D33AEF414D4813AD6FD4E498 /* CareKeeper Watch App */,
 				B7D95FF7DEF6E95C2851C31F /* CareKeeper Widget */,
 				2EF062019E59968F3B129711 /* CareKeeper iOS */,
+				F01D4BB85D597E15409B6C69 /* CareKeeper iOS Widget */,
 				00FFD98344F57489DEF0C740 /* CareKeeperTests */,
 				3C404C4EC684A32FA1110025 /* CareKeeperUITests */,
 			);
@@ -815,6 +868,21 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		4F735A02BB2AA7B3139578B0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10AF144FF8DD99A406C57E72 /* Activity.swift in Sources */,
+				9D2AEA9F3A49C6CAFEDC1AB6 /* ActivityType.swift in Sources */,
+				09D4CE34A53AABF790AD56EA /* AppError.swift in Sources */,
+				6CF820CD6C6387394D6A792A /* CareKeeperWidget.swift in Sources */,
+				CA4AA98B2955FFABE11480C4 /* CareKeeperWidgetBundle.swift in Sources */,
+				E2049D6CD591770B8FE336D8 /* Caree.swift in Sources */,
+				093D4C626797B5318B2CC8F4 /* CloudKitConfig.swift in Sources */,
+				FFFDDD04EDFB5DB16FA47723 /* Snapshots.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7C3512C28D98F0B8691F49C4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -975,6 +1043,11 @@
 			isa = PBXTargetDependency;
 			target = 2EF062019E59968F3B129711 /* CareKeeper iOS */;
 			targetProxy = 4326D37DB3ED6C244B6F7B9F /* PBXContainerItemProxy */;
+		};
+		0C062CBE0C10F40C439D66D1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F01D4BB85D597E15409B6C69 /* CareKeeper iOS Widget */;
+			targetProxy = 71F9BDDA8BB84D59BE04CCF6 /* PBXContainerItemProxy */;
 		};
 		10D4B85854059D80E6F6DF02 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1162,6 +1235,26 @@
 			};
 			name = Release;
 		};
+		95979185FAE96538E4790D9A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "CareKeeper Widget/CareKeeper Widget.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "CareKeeper-Widget-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.widget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		9607D1F1394150ACB9D90583 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1291,6 +1384,26 @@
 			};
 			name = Debug;
 		};
+		C3C152F9C1295624E2BF7B4C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "CareKeeper Widget/CareKeeper Widget.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "CareKeeper-Widget-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kareemf.CareKeeper.widget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 		C7EF1FC688B2850B97447C09 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1387,6 +1500,15 @@
 			buildConfigurations = (
 				70585D3C1F7B71E83D62AE29 /* Debug */,
 				D41CB91D679AC1BBC377141E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E7B005E01A6B97FBDD578F89 /* Build configuration list for PBXNativeTarget "CareKeeper iOS Widget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C3C152F9C1295624E2BF7B4C /* Debug */,
+				95979185FAE96538E4790D9A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

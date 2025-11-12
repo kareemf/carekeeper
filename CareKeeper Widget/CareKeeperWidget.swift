@@ -21,6 +21,7 @@ struct CareKeeperWidget: Widget {
             ])
         #else
                 .supportedFamilies([
+                    .systemSmall,
                     .accessoryCircular,
                     .accessoryRectangular,
                     .accessoryInline,
@@ -65,6 +66,8 @@ struct CareKeeperWidgetView: View {
 
     var body: some View {
         switch family {
+        case .systemSmall:
+            SystemSmallView(entry: entry)
         case .accessoryCircular:
             CircularView(entry: entry)
         case .accessoryRectangular:
@@ -127,6 +130,29 @@ struct CornerView: View {
             AccessoryWidgetBackground()
             Image(systemName: "heart.fill")
                 .font(.caption)
+        }
+    }
+}
+
+struct SystemSmallView: View {
+    let entry: SimpleEntry
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.red.opacity(0.85))
+
+            VStack(spacing: 8) {
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 36, weight: .bold))
+                    .foregroundColor(.white)
+
+                Text("CareKeeper")
+                    .font(.headline)
+                    .foregroundColor(.white)
+            }
+            .multilineTextAlignment(.center)
+            .padding()
         }
     }
 }
