@@ -524,6 +524,7 @@ No firm timeline yet.
 - ✅ True collaboration (not just "share reports")
 - ✅ Privacy-focused (no ads, no account)
 - ✅ Cross-category (baby + pet in one app)
+- ✅ Personal reminders per device (phone/watch)
 
 **Specialized trackers:**
 - Pre-configured for specific scenarios

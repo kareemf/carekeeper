@@ -7,7 +7,7 @@ A simple yet flexible collaborative activity tracking app for caregivers on iOS 
 - **Fast Activity Tracking**: Quick data entry inspired by Apple Workouts app design
 - **Collaborative Care**: Share carees and activities with other caregivers via CloudKit
 - **Flexible Taxonomy**: User-defined activity types with customizable attributes
-- **Cross-Device**: Native iOS and watchOS apps with shared data
+- **Cross-Device**: Native iOS and watchOS apps with shared data and per-device reminders
 - **Offline Support**: Works offline with automatic sync when connected
 - **Privacy-First**: End-to-end encryption for sensitive data
 

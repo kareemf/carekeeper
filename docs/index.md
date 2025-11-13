@@ -12,7 +12,7 @@ CareKeeper helps caregivers track care activities for children, pets, or anyone 
 Prioritizes speed of data entry. Quick tracking inspired by Apple Workouts. Track an activity in seconds with customizable types, quantities, locations, and notes.
 
 #### watchOS Companion
-Track activities from your wrist. No need to pull out your phone.
+Track activities from your wrist and schedule quick reminders with the Digital Crown.
 
 ### Flexible
 Define your own taxonomy. Create custom activity types with icons, quantity units, and location tracking to match your care needs.
@@ -29,6 +29,9 @@ Works offline with automatic sync when connected. Track activities anywhere, any
 
 ### Data Portability
 Export your data to or import it from JSON at any time.
+
+### Personal Reminders
+Set on-device reminders (separate per iPhone and Apple Watch) for activities that need a follow-up nudge.
 
 ## Getting Started
 
