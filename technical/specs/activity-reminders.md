@@ -1,4 +1,4 @@
-# Activity Reminders – Phase 1/2
+# Activity Reminders – Phase 1/3
 
 ## Context & Goals
 CareKeeper currently records historical data. We want to prototype personal, on-device reminders tied to specific carees/activities, then optionally gate the UX per ActivityType.
@@ -101,15 +101,15 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
    - When saving/deleting activities (both platforms), call scheduler to create/update/remove reminders.
    - When viewing activities, cleanup reminders whose due date already passed? (Optional future enhancement.)
 
-### Phase 2 – ActivityType flag
-1. Add `hasReminders` field to `ActivityType` (CloudKit + local cache).
-2. Update ActivityType create/edit screens to surface the flag.
-3. Update iOS/watch activity forms to hide reminder toggle when the type disables it.
-4. Optional: add small badge on ActivityType list indicating reminder capability.
+### Phase 2 – Deferred (future) ActivityType flag
+- Currently tracked as a follow-up, not in active scope. Captured in Potential Improvements below.
 
 ### Phase 3 – Documentation & Marketing
 1. Update README “Features” section and docs/index.md to list reminders.
 2. Update docs/reference/faq.md and relevant how-to guides with reminder setup steps, permissions, and platform behavior.
+3. Screenshots to capture:
+   - `[SCREENSHOT: iOS Activity detail view showing reminder toggle and date picker]`
+   - `[SCREENSHOT: watchOS Track Activity view showing reminder toggle with minutes-from-now crown control]`
 
 ---
 
@@ -123,3 +123,7 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
   - Manual tests on device + watch simulator for scheduling, editing, deleting.
 
 Once we iterate on this spec and lock the remaining details, we can start Phase 1 implementation. Let me know if anything needs refinement or if there are additional UX considerations (e.g., deep linking from notifications to specific caree/activity). 
+
+## Potential Improvements (Future Work)
+1. **ActivityType `hasReminders` flag** – gate the reminder UI by activity type to reduce watch UI clutter. Requires CloudKit schema update + snapshot/service changes.
+2. **Cross-device auto scheduling** – when iOS receives a watch-originated reminder metadata update (or vice versa), consider auto-creating/canceling the local reminder so actions propagate between devices.
