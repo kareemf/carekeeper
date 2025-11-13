@@ -16,6 +16,7 @@
 		10F399117B45CC73C0B44831 /* CareKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21723E30B697002E61F47A31 /* CareKeeperApp.swift */; };
 		1358B9D3286B3C8C31AF2D1A /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA88B88D62AF42A8D039CEF /* Activity.swift */; };
 		160B2638A4473314114B5C65 /* UserNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C541FA572C54096F3E1A6 /* UserNotificationService.swift */; };
+		17EE37032024753779440F19 /* ReminderPermissionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26DB80B4F46A04B3C923063E /* ReminderPermissionError.swift */; };
 		1ACD811C263D77D505DDC1D9 /* CareKeeper Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 68B7201C1844B1CB5EC45EC4 /* CareKeeper Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1C0E457B40BBC2B9005D2F3E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96578314089DB5262D6BF105 /* SceneDelegate.swift */; };
 		1E432DEBA851536DF04C61DC /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20DD095EA2B1632E9081E95 /* HelpView.swift */; };
@@ -57,6 +58,7 @@
 		54F55ABD141F4A6D4A7678E3 /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74AAF2CA7657295C86F2D04 /* ActivityType.swift */; };
 		55BFB4F90A35463A9C34B7A2 /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 006FB7D6F3CF5C1F82A959E6 /* ActivityDetailView.swift */; };
 		57849405473B53085A036999 /* SyncStatusIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D048976DFEF3092C2BD1B19 /* SyncStatusIndicator.swift */; };
+		57E864317447980A13525B8E /* ReminderPermissionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26DB80B4F46A04B3C923063E /* ReminderPermissionError.swift */; };
 		5CDF7913C58C1F8D57700B4D /* MemoryMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0CB17473EB4DF0846409CC /* MemoryMonitor.swift */; };
 		5E7D0910C4FC03C5B1FE2FDD /* ActivityListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72FD9C36B64CB5EE67557C8E /* ActivityListView.swift */; };
 		5F70ED238471FE040C9B3326 /* ActivityTypeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7FC66039C53C043A170CDEB /* ActivityTypeTests.swift */; };
@@ -117,6 +119,7 @@
 		BFD29868C4BDA100D939500F /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74AAF2CA7657295C86F2D04 /* ActivityType.swift */; };
 		C1B2970CB7C292950F65F3B7 /* UserNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C541FA572C54096F3E1A6 /* UserNotificationService.swift */; };
 		C4DFEE735BA7A25655DDA5B5 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64492941EF7F5D103F0861FA /* Caree.swift */; };
+		C67CC743989A140D909D8422 /* ReminderPermissionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26DB80B4F46A04B3C923063E /* ReminderPermissionError.swift */; };
 		C917129AB8710E71DF07F01E /* MetricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A931C81A5ED3A43CBAECAC /* MetricsManager.swift */; };
 		C9C32C228668877A98E7F501 /* CareeImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909E249A28330C66DACA9391 /* CareeImportService.swift */; };
 		C9E1E362699ACB7AB49C65D8 /* CareeExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7D36821368CA28F045AC5E /* CareeExportService.swift */; };
@@ -245,6 +248,7 @@
 		21723E30B697002E61F47A31 /* CareKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareKeeperApp.swift; sourceTree = "<group>"; };
 		259C7037CC970D88FF512FA5 /* CareeShareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeShareButton.swift; sourceTree = "<group>"; };
 		2606EF2CF9DC30ED71920DFB /* CloudKitSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncService.swift; sourceTree = "<group>"; };
+		26DB80B4F46A04B3C923063E /* ReminderPermissionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderPermissionError.swift; sourceTree = "<group>"; };
 		30F4015C2BC2F6B99E499249 /* CloudKitConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitConfig.swift; sourceTree = "<group>"; };
 		39B9C9FF21B8739B2795815D /* ImportProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportProgressView.swift; sourceTree = "<group>"; };
 		3D048976DFEF3092C2BD1B19 /* SyncStatusIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusIndicator.swift; sourceTree = "<group>"; };
@@ -445,6 +449,7 @@
 				BE48EB682E50DF9AB2518345 /* LocationManager.swift */,
 				DC0CB17473EB4DF0846409CC /* MemoryMonitor.swift */,
 				12A931C81A5ED3A43CBAECAC /* MetricsManager.swift */,
+				26DB80B4F46A04B3C923063E /* ReminderPermissionError.swift */,
 				1510F991F0E3BF573541CB5E /* ReminderScheduler.swift */,
 				D4B286401A6A22BB4AED15B7 /* UserNotificationPreferences.swift */,
 				831C541FA572C54096F3E1A6 /* UserNotificationService.swift */,
@@ -956,6 +961,7 @@
 				35E82BCD255A36176DE06FEC /* MetricsManager.swift in Sources */,
 				E9FF674C7F63F8593717F45D /* PreviewContainer.swift in Sources */,
 				839BEE640180927EB5A09DB5 /* PreviewData.swift in Sources */,
+				C67CC743989A140D909D8422 /* ReminderPermissionError.swift in Sources */,
 				7D0CA705DD647B43B1D82943 /* ReminderScheduler.swift in Sources */,
 				3D2F8E7C4934A9DA6EDB941E /* ReminderSource.swift in Sources */,
 				1C0E457B40BBC2B9005D2F3E /* SceneDelegate.swift in Sources */,
@@ -1007,6 +1013,7 @@
 				E6EDA6DEEF494275463B0C56 /* LocationManager.swift in Sources */,
 				B0DE11638602B0D68F47A647 /* MemoryMonitor.swift in Sources */,
 				C917129AB8710E71DF07F01E /* MetricsManager.swift in Sources */,
+				57E864317447980A13525B8E /* ReminderPermissionError.swift in Sources */,
 				D56164752973C66601D4F133 /* ReminderScheduler.swift in Sources */,
 				3BD4804FB425A942DDA45849 /* ReminderSource.swift in Sources */,
 				B9E106E7E36D7D962BF95EEA /* SelectiveCloudKitService.swift in Sources */,
@@ -1044,6 +1051,7 @@
 				27517BDA8152C117A8611D20 /* MetricsManager.swift in Sources */,
 				DB0F8FC74122811B12CFCCFB /* PreviewContainer.swift in Sources */,
 				D656CA0625CB0C0AE8CCE52A /* PreviewData.swift in Sources */,
+				17EE37032024753779440F19 /* ReminderPermissionError.swift in Sources */,
 				AFD1B10104173CF004D493EC /* ReminderScheduler.swift in Sources */,
 				3E2F969C9EB86B369CAE8436 /* ReminderSource.swift in Sources */,
 				38A437557F886D7546B39ED8 /* SelectiveCloudKitService.swift in Sources */,

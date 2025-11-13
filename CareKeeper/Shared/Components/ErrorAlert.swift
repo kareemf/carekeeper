@@ -10,9 +10,14 @@ struct ErrorAlertModifier: ViewModifier {
                 NSLocalizedString("Error", comment: "Error alert title"),
                 isPresented: .constant(error != nil),
                 presenting: error
-            ) { _ in
+            ) { error in
+                if let settingsError = error as? SettingsRedirectableError, settingsError.canOpenSettings {
+                    Button(settingsError.settingsButtonTitle) {
+                        settingsError.openSettings()
+                    }
+                }
                 Button(NSLocalizedString("OK", comment: "Error alert dismiss")) {
-                    error = nil
+                    self.error = nil
                 }
             } message: { error in
                 VStack(alignment: .leading, spacing: 8) {

@@ -336,9 +336,7 @@ struct TrackActivityView: View {
         let scheduler = ReminderScheduler.shared
         let authorized = await scheduler.ensureAuthorization()
         guard authorized else {
-            throw AppError.invalidInput(
-                "Reminders permission not granted on this watch. Open the Reminders app to grant access."
-            )
+            throw ReminderPermissionError(platform: .watch)
         }
 
         let dueDate = clampedReminderDueDate()
@@ -381,6 +379,12 @@ struct TrackActivityView: View {
             if reminderEnabled {
                 do {
                     try await attachReminderMetadata(to: &activity)
+                } catch let permissionError as ReminderPermissionError {
+                    await MainActor.run {
+                        isSaving = false
+                        self.error = permissionError
+                    }
+                    return
                 } catch let appError as AppError {
                     await MainActor.run {
                         isSaving = false

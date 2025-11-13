@@ -281,12 +281,7 @@ struct TrackActivityView: View {
         let authorized = await scheduler.ensureAuthorization()
         guard authorized else {
             await MainActor.run {
-                self.error = AppError.invalidInput(
-                    NSLocalizedString(
-                        "Reminders permission not granted. Enable Reminders access in Settings.",
-                        comment: "Reminders permission error"
-                    )
-                )
+                self.error = ReminderPermissionError(platform: .iOS)
                 self.reminderEnabled = false
             }
             return

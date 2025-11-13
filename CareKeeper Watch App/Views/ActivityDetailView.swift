@@ -373,6 +373,12 @@ struct ActivityDetailView: View {
                     updatedActivity: &updatedActivity,
                     originalActivity: baseActivity
                 )
+            } catch let permissionError as ReminderPermissionError {
+                await MainActor.run {
+                    isSaving = false
+                    self.error = permissionError
+                }
+                return
             } catch let appError as AppError {
                 await MainActor.run {
                     isSaving = false
@@ -676,9 +682,7 @@ struct ActivityDetailView: View {
         if reminderEnabled {
             let authorized = await scheduler.ensureAuthorization()
             guard authorized else {
-                throw AppError.invalidInput(
-                    "Reminders permission not granted on this device. Open the Reminders app to grant access."
-                )
+                throw ReminderPermissionError(platform: .watch)
             }
 
             let dueDate = clampedReminderDueDate()
