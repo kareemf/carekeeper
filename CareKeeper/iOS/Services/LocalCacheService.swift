@@ -327,7 +327,10 @@ class LocalCacheService: ObservableObject {
                 notes: activity.notes,
                 quantity: activity.quantity,
                 latitude: activity.latitude,
-                longitude: activity.longitude
+                longitude: activity.longitude,
+                reminderIdentifier: activity.reminderIdentifier,
+                reminderDueDate: activity.reminderDueDate,
+                reminderSource: activity.reminderSource
             )
             newActivity.id = activity.id
             newActivity.dateCreated = activity.dateCreated
@@ -343,6 +346,28 @@ class LocalCacheService: ObservableObject {
 
         try modelContext.save()
         scheduleRefresh(reason: "cacheActivity")
+    }
+
+    func updateReminderMetadata(
+        activityID: UUID,
+        identifier: String?,
+        dueDate: Date?,
+        source: ReminderSource?
+    ) async throws {
+        let fetchDescriptor = FetchDescriptor<Activity>(
+            predicate: #Predicate { $0.id == activityID }
+        )
+        guard let activity = try modelContext.fetch(fetchDescriptor).first else {
+            logger.warning("Attempted to update reminder metadata for missing activity \(activityID)")
+            return
+        }
+
+        activity.reminderIdentifier = identifier
+        activity.reminderDueDate = dueDate
+        activity.reminderSource = source
+
+        try modelContext.save()
+        scheduleRefresh(reason: "updateReminderMetadata")
     }
 
     // MARK: - Cache Read Operations

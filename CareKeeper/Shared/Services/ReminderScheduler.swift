@@ -16,9 +16,9 @@ enum ReminderSource: String, Codable, Sendable {
     var glyph: String {
         switch self {
         case .phone:
-            return "📱"
+            "📱"
         case .watch:
-            return "⌚️"
+            "⌚️"
         }
     }
 }

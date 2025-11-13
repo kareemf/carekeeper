@@ -446,7 +446,7 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
             lhs.activityTypeID == rhs.activityTypeID &&
             lhs.careeID == rhs.careeID &&
             lhs.dateCreated == rhs.dateCreated &&
-        lhs.syncState == rhs.syncState
+            lhs.syncState == rhs.syncState
     }
 
     var reminderSource: ReminderSource? {

@@ -17,6 +17,8 @@ struct TrackActivityView: View {
     @StateObject private var locationManager = LocationManager()
     @State private var error: Error?
     @State private var isSaving: Bool = false
+    @State private var reminderEnabled: Bool = false
+    @State private var reminderDate: Date = .init().addingTimeInterval(300)
 
     // Use unified API from CloudKitDataService
     @EnvironmentObject private var cloudKitService: CloudKitDataService
@@ -24,6 +26,8 @@ struct TrackActivityView: View {
     private var sortedActivityTypes: [ActivityType] {
         caree.sortedActivityTypes
     }
+
+    private let reminderWindow: TimeInterval = 7 * 24 * 60 * 60
     
     var body: some View {
         NavigationView {
@@ -34,6 +38,8 @@ struct TrackActivityView: View {
                     detailsSection
                         .transition(.move(edge: .leading).combined(with: .opacity))
                     timingSection
+                        .transition(.move(edge: .leading).combined(with: .opacity))
+                    reminderSection
                         .transition(.move(edge: .leading).combined(with: .opacity))
                     locationSection
                         .transition(.move(edge: .leading).combined(with: .opacity))
@@ -153,6 +159,26 @@ struct TrackActivityView: View {
             }
         }
     }
+
+    private var reminderSection: some View {
+        Section(NSLocalizedString("Reminder", comment: "Reminder section title")) {
+            Toggle(NSLocalizedString("Set Reminder", comment: "Reminder toggle label"), isOn: $reminderEnabled.animation())
+                .onChange(of: reminderEnabled) { _, isOn in
+                    if isOn {
+                        reminderDate = defaultReminderDate()
+                    }
+                }
+
+            if reminderEnabled {
+                DatePicker(
+                    NSLocalizedString("Remind me on", comment: "Reminder date picker label"),
+                    selection: $reminderDate,
+                    in: reminderPickerRange,
+                    displayedComponents: [.date, .hourAndMinute]
+                )
+            }
+        }
+    }
     
     @ViewBuilder
     private var locationSection: some View {
@@ -216,7 +242,7 @@ struct TrackActivityView: View {
         Task {
             do {
                 // Create activity (unified API routes internally)
-                _ = try await cloudKitService.createActivity(
+                let newActivity = try await cloudKitService.createActivity(
                     caree: caree,
                     activityType: activityType,
                     dateTime: activityDateTime,
@@ -225,6 +251,14 @@ struct TrackActivityView: View {
                     latitude: latitude,
                     longitude: longitude
                 )
+
+                if reminderEnabled {
+                    await scheduleReminderIfNeeded(
+                        for: newActivity,
+                        caree: caree,
+                        activityType: activityType
+                    )
+                }
 
                 await MainActor.run {
                     locationManager.stopUpdating()
@@ -240,6 +274,64 @@ struct TrackActivityView: View {
                 }
             }
         }
+    }
+
+    private func scheduleReminderIfNeeded(for activity: Activity, caree: Caree, activityType: ActivityType) async {
+        let scheduler = ReminderScheduler.shared
+        let authorized = await scheduler.ensureAuthorization()
+        guard authorized else {
+            await MainActor.run {
+                self.error = AppError.invalidInput(
+                    NSLocalizedString(
+                        "Reminders permission not granted. Enable Reminders access in Settings.",
+                        comment: "Reminders permission error"
+                    )
+                )
+                self.reminderEnabled = false
+            }
+            return
+        }
+
+        let dueDate = clampedReminderDate()
+        do {
+            let result = try await scheduler.scheduleReminder(
+                careeName: caree.name,
+                activityTypeName: activityType.name,
+                dueDate: dueDate
+            )
+
+            if let cacheService = cloudKitService.cacheService {
+                try await cacheService.updateReminderMetadata(
+                    activityID: activity.id,
+                    identifier: result.identifier,
+                    dueDate: result.dueDate,
+                    source: ReminderSource.current
+                )
+            }
+        } catch {
+            await MainActor.run {
+                self.error = AppError.saveFailed(error.localizedDescription)
+            }
+        }
+    }
+
+    private var reminderPickerRange: ClosedRange<Date> {
+        let now = Date()
+        let minDate = now.addingTimeInterval(60)
+        let maxDate = now.addingTimeInterval(reminderWindow)
+        return minDate ... maxDate
+    }
+
+    private func clampedReminderDate() -> Date {
+        let range = reminderPickerRange
+        return min(max(reminderDate, range.lowerBound), range.upperBound)
+    }
+
+    private func defaultReminderDate() -> Date {
+        let now = Date()
+        let defaultDate = now.addingTimeInterval(300) // 5 minutes from now
+        let range = reminderPickerRange
+        return min(max(defaultDate, range.lowerBound), range.upperBound)
     }
 }
 
