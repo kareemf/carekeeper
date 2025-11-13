@@ -323,7 +323,7 @@ class WatchDataProvider: ObservableObject {
 
                 try Task.checkCancellation()
 
-                await applyRecentActivities(mergedActivities, to: careeID)
+                applyRecentActivities(mergedActivities, to: careeID)
                 signposter.emitEvent("loadRecent.apply", id: signpostID)
 
                 if cacheService.isAppGroupAvailable {

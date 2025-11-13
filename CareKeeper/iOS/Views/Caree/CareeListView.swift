@@ -373,7 +373,7 @@ struct CareeListView: View {
     }
 
     private func refreshAllCarees(initial: Bool = false) async {
-        guard let cacheService else { return }
+        guard cacheService != nil else { return }
 
         if initial {
             await MainActor.run { initialLoading = true }

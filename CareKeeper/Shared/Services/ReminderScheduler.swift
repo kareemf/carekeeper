@@ -44,11 +44,7 @@ final class ReminderScheduler {
             case .authorized:
                 return true
             case .notDetermined:
-                do {
-                    return try await store.requestAccess(to: .reminder)
-                } catch {
-                    return false
-                }
+                return await requestReminderAuthorization()
             default:
                 return false
             }
@@ -147,11 +143,35 @@ final class ReminderScheduler {
             return true
         }
         // Try reloading calendars; sometimes the default is nil until calendars() is called.
-        if let calendar = store.calendars(for: .reminder).first {
-            store.defaultCalendarForNewReminders()
-            return calendar != nil
+        if store.calendars(for: .reminder).first != nil {
+            _ = store.defaultCalendarForNewReminders()
+            return true
         }
         return false
+    }
+
+    private func requestReminderAuthorization() async -> Bool {
+        if #available(iOS 17.0, macOS 14.0, visionOS 1.0, *) {
+            do {
+                return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Bool, Error>) in
+                    store.requestFullAccessToReminders { granted, error in
+                        if let error {
+                            continuation.resume(throwing: error)
+                        } else {
+                            continuation.resume(returning: granted)
+                        }
+                    }
+                }
+            } catch {
+                return false
+            }
+        } else {
+            do {
+                return try await store.requestAccess(to: .reminder)
+            } catch {
+                return false
+            }
+        }
     }
     #endif
 
