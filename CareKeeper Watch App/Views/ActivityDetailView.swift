@@ -27,6 +27,7 @@ struct ActivityDetailView: View {
     @State private var showingSaveSuccess = false
     @State private var error: Error?
     @FocusState private var timeInputFocused: Bool
+    @FocusState private var reminderInputFocused: Bool
 
     @StateObject private var locationManager = LocationManager()
     private let reminderWindowMinutes: Double = Double(60 * 24 * 7)
@@ -575,6 +576,9 @@ struct ActivityDetailView: View {
                           currentActivity.reminderIdentifier == nil
                 {
                     reminderMinutesAhead = defaultReminderMinutesAhead()
+                    reminderInputFocused = true
+                } else {
+                    reminderInputFocused = false
                 }
             }
 
@@ -598,6 +602,7 @@ struct ActivityDetailView: View {
                 .background(Color.gray.opacity(0.3))
                 .cornerRadius(8)
                 .focusable(true)
+                .focused($reminderInputFocused)
                 .digitalCrownRotation(
                     $reminderMinutesAhead,
                     from: reminderMinutesRange.lowerBound,

@@ -25,6 +25,7 @@ struct TrackActivityView: View {
     @State private var showSuccessToast = false
     @State private var error: Error?
     @FocusState private var timeInputFocused: Bool
+    @FocusState private var reminderInputFocused: Bool
 
     @StateObject private var locationManager = LocationManager()
     private let reminderWindowMinutes: Double = Double(60 * 24 * 7)
@@ -280,6 +281,9 @@ struct TrackActivityView: View {
             .onChange(of: reminderEnabled) { _, newValue in
                 if newValue {
                     reminderMinutesAhead = defaultReminderMinutes()
+                    reminderInputFocused = true
+                } else {
+                    reminderInputFocused = false
                 }
             }
 
@@ -302,6 +306,8 @@ struct TrackActivityView: View {
                 .padding()
                 .background(Color.gray.opacity(0.3))
                 .cornerRadius(8)
+                .focusable(true)
+                .focused($reminderInputFocused)
                 .digitalCrownRotation(
                     $reminderMinutesAhead,
                     from: reminderMinutesRange.lowerBound,
