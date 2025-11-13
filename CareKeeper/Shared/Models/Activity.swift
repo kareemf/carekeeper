@@ -77,6 +77,13 @@ extension Activity {
         return "\(quantity) \(unit)".trimmingCharacters(in: .whitespaces)
     }
 
+    var reminderDueDateRelativeDescription: String? {
+        guard let reminderDueDate else { return nil }
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .short
+        return formatter.localizedString(for: reminderDueDate, relativeTo: Date())
+    }
+
     var reminderSource: ReminderSource? {
         get {
             reminderSourceRawValue.flatMap { ReminderSource(rawValue: $0) }

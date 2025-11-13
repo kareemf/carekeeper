@@ -37,6 +37,9 @@ struct ActivityDetailView: View {
     @State private var showingDeleteConfirmation = false
     @State private var error: Error?
     @State private var isSaving = false
+    @State private var reminderEnabled = false
+    @State private var reminderDate = Date().addingTimeInterval(300)
+    @State private var showReminderDisableConfirmation = false
 
     init(activityID: UUID) {
         self.activityID = activityID
@@ -50,6 +53,7 @@ struct ActivityDetailView: View {
                         VStack(alignment: .leading, spacing: 20) {
                             headerSection(for: activity)
                             detailsSection(for: activity)
+                            reminderSection(for: activity)
 
                             if activity.hasLocation {
                                 locationSection(for: activity)
@@ -231,6 +235,55 @@ struct ActivityDetailView: View {
             }
         }
     }
+
+    private func reminderSection(for activity: Activity) -> some View {
+        Section {
+            if isEditing {
+                Toggle(NSLocalizedString("Set Reminder", comment: "Reminder toggle"), isOn: $reminderEnabled.animation())
+                    .onChange(of: reminderEnabled) { _, newValue in
+                        if !newValue, activity.reminderIdentifier != nil {
+                            showReminderDisableConfirmation = true
+                        }
+                        if newValue, activity.reminderIdentifier == nil {
+                            reminderDate = defaultReminderDate()
+                        }
+                    }
+
+                if reminderEnabled {
+                    DatePicker(
+                        NSLocalizedString("Remind me on", comment: "Reminder date picker"),
+                        selection: $reminderDate,
+                        in: reminderPickerRange,
+                        displayedComponents: [.date, .hourAndMinute]
+                    )
+                }
+            } else if activity.reminderIdentifier != nil,
+                      let dueText = activity.reminderDueDateRelativeDescription
+            {
+                HStack(spacing: 8) {
+                    Text("🔔")
+                    Text("\(activity.reminderSource?.glyph ?? ReminderSource.phone.glyph) \(dueText)")
+                        .foregroundColor(.secondary)
+                }
+                .font(.subheadline)
+            }
+        }
+        .confirmationDialog(
+            NSLocalizedString("Remove reminder?", comment: "Reminder disable title"),
+            isPresented: $showReminderDisableConfirmation
+        ) {
+            Button(NSLocalizedString("Remove", comment: "Remove reminder"), role: .destructive) {
+                reminderEnabled = false
+                showReminderDisableConfirmation = false
+            }
+            Button(NSLocalizedString("Cancel", comment: "Cancel"), role: .cancel) {
+                reminderEnabled = true
+                showReminderDisableConfirmation = false
+            }
+        } message: {
+            Text(NSLocalizedString("This deletes the pending reminder on this device.", comment: "Reminder disable message"))
+        }
+    }
     
     @ViewBuilder
     private func locationSection(for activity: Activity) -> some View {
@@ -279,6 +332,12 @@ struct ActivityDetailView: View {
         editingNotes = activity.notes ?? ""
         editingQuantity = activity.quantity?.description ?? ""
         editingDateTime = activity.dateTime
+        reminderEnabled = activity.reminderIdentifier != nil
+        if let dueDate = activity.reminderDueDate {
+            reminderDate = dueDate
+        } else {
+            reminderDate = defaultReminderDate()
+        }
     }
 
     private func startEditing(for activity: Activity) {
@@ -297,6 +356,7 @@ struct ActivityDetailView: View {
             return
         }
 
+        let previousReminderIdentifier = activity.reminderIdentifier
         // Update local values
         activity.notes = editingNotes.isEmpty ? nil : editingNotes
         activity.quantity = Double(editingQuantity)
@@ -309,6 +369,13 @@ struct ActivityDetailView: View {
                 // Update activity (unified API routes internally)
                 try await cloudKitService.updateActivity(activity: activity, caree: caree, activityType: activityType)
 
+                try await handleReminderPersistence(
+                    activity: activity,
+                    caree: caree,
+                    activityType: activityType,
+                    previousIdentifier: previousReminderIdentifier
+                )
+
                 await MainActor.run {
                     isSaving = false
                     isEditing = false
@@ -320,6 +387,90 @@ struct ActivityDetailView: View {
                 }
             }
         }
+    }
+
+    private func handleReminderPersistence(
+        activity: Activity,
+        caree: Caree,
+        activityType: ActivityType,
+        previousIdentifier: String?
+    ) async throws {
+        let scheduler = ReminderScheduler.shared
+        let cacheService = cloudKitService.cacheService
+
+        if reminderEnabled {
+            let authorized = await scheduler.ensureAuthorization()
+            guard authorized else {
+                await MainActor.run {
+                    self.error = AppError.invalidInput(
+                        NSLocalizedString(
+                            "Reminders permission not granted. Enable access in Settings.",
+                            comment: "Reminders permission error"
+                        )
+                    )
+                    self.reminderEnabled = false
+                }
+                scheduler.deleteReminder(with: previousIdentifier)
+                try await cacheService?.updateReminderMetadata(
+                    activityID: activity.id,
+                    identifier: nil,
+                    dueDate: nil,
+                    source: nil
+                )
+                return
+            }
+
+            let dueDate = clampedReminderDate()
+            let result: (identifier: String, dueDate: Date) = if let previousIdentifier {
+                try await scheduler.updateReminder(
+                    identifier: previousIdentifier,
+                    careeName: caree.name,
+                    activityTypeName: activityType.name,
+                    dueDate: dueDate
+                )
+            } else {
+                try await scheduler.scheduleReminder(
+                    careeName: caree.name,
+                    activityTypeName: activityType.name,
+                    dueDate: dueDate
+                )
+            }
+
+            try await cacheService?.updateReminderMetadata(
+                activityID: activity.id,
+                identifier: result.identifier,
+                dueDate: result.dueDate,
+                source: ReminderSource.current
+            )
+        } else if let previousIdentifier {
+            scheduler.deleteReminder(with: previousIdentifier)
+            try await cacheService?.updateReminderMetadata(
+                activityID: activity.id,
+                identifier: nil,
+                dueDate: nil,
+                source: nil
+            )
+        }
+    }
+
+    private var reminderWindow: TimeInterval { 7 * 24 * 60 * 60 }
+
+    private var reminderPickerRange: ClosedRange<Date> {
+        let now = Date()
+        let minDate = now.addingTimeInterval(60)
+        let maxDate = now.addingTimeInterval(reminderWindow)
+        return minDate ... maxDate
+    }
+
+    private func clampedReminderDate() -> Date {
+        let range = reminderPickerRange
+        return min(max(reminderDate, range.lowerBound), range.upperBound)
+    }
+
+    private func defaultReminderDate() -> Date {
+        let defaultDate = Date().addingTimeInterval(300)
+        let range = reminderPickerRange
+        return min(max(defaultDate, range.lowerBound), range.upperBound)
     }
 
     private func openInMaps(for activity: Activity) {
@@ -337,10 +488,13 @@ struct ActivityDetailView: View {
             return
         }
 
+        let reminderID = activity.reminderIdentifier
+
         Task {
             do {
                 // Delete activity (unified API routes internally)
                 try await cloudKitService.deleteActivity(activity: activity, caree: caree)
+                ReminderScheduler.shared.deleteReminder(with: reminderID)
 
                 // Cache is automatically updated by service
                 await MainActor.run {

@@ -3,6 +3,8 @@ import SwiftUI
 struct ActivityRowView: View {
     let activity: Activity
     @State private var showingDetail = false
+
+    private let bellSymbol = "🔔"
     
     var body: some View {
         HStack {
@@ -45,6 +47,15 @@ struct ActivityRowView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     }
+
+                    if let reminderInfo = reminderStatus(for: activity) {
+                        HStack(spacing: 4) {
+                            Text(bellSymbol)
+                            Text("\(reminderInfo.deviceGlyph) \(reminderInfo.timeText)")
+                        }
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                    }
                 }
             }
         }
@@ -57,6 +68,18 @@ struct ActivityRowView: View {
         .sheet(isPresented: $showingDetail) {
             ActivityDetailView(activityID: activity.id)
         }
+    }
+}
+
+private extension ActivityRowView {
+    func reminderStatus(for activity: Activity) -> (deviceGlyph: String, timeText: String)? {
+        guard activity.reminderIdentifier != nil else { return nil }
+        let glyph = activity.reminderSource?.glyph ?? ReminderSource.phone.glyph
+        let timeText = activity.reminderDueDateRelativeDescription ?? NSLocalizedString(
+            "scheduled",
+            comment: "Reminder scheduled fallback"
+        )
+        return (glyph, timeText)
     }
 }
 
