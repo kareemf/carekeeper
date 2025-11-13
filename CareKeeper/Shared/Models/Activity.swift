@@ -11,6 +11,9 @@ final class Activity {
     var latitude: Double?
     var longitude: Double?
     var dateCreated: Date = Date()
+    var reminderIdentifier: String?
+    var reminderDueDate: Date?
+    var reminderSourceRawValue: String?
 
     // Cache metadata (for Pure CloudKit migration)
     var lastSyncedAt: Date? // Last time this record was synced from CloudKit
@@ -26,6 +29,9 @@ final class Activity {
         quantity: Double? = nil,
         latitude: Double? = nil,
         longitude: Double? = nil,
+        reminderIdentifier: String? = nil,
+        reminderDueDate: Date? = nil,
+        reminderSource: ReminderSource? = nil,
         activityType: ActivityType? = nil,
         caree: Caree? = nil
     ) {
@@ -36,6 +42,9 @@ final class Activity {
         self.latitude = latitude
         self.longitude = longitude
         self.dateCreated = Date()
+        self.reminderIdentifier = reminderIdentifier
+        self.reminderDueDate = reminderDueDate
+        self.reminderSourceRawValue = reminderSource?.rawValue
         self.activityType = activityType
         self.caree = caree
         self.lastSyncedAt = nil
@@ -66,6 +75,15 @@ extension Activity {
         guard let quantity else { return nil }
         let unit = activityType?.quantityUnit ?? ""
         return "\(quantity) \(unit)".trimmingCharacters(in: .whitespaces)
+    }
+
+    var reminderSource: ReminderSource? {
+        get {
+            reminderSourceRawValue.flatMap { ReminderSource(rawValue: $0) }
+        }
+        set {
+            reminderSourceRawValue = newValue?.rawValue
+        }
     }
 }
 
@@ -109,6 +127,9 @@ extension Activity: PropertyUpdatable {
         makeUpdater(\.latitude),
         makeUpdater(\.longitude),
         makeUpdater(\.dateCreated),
+        makeUpdater(\.reminderIdentifier),
+        makeUpdater(\.reminderDueDate),
+        makeUpdater(\.reminderSourceRawValue),
     ]
 
     func applyScalarUpdates(from other: Activity) {

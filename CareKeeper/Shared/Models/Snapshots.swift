@@ -281,6 +281,9 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
     let activityTypeID: UUID
     let careeID: UUID
     let dateCreated: Date
+    var reminderIdentifier: String?
+    var reminderDueDate: Date?
+    var reminderSourceRawValue: String?
 
     // For optimistic UI
     var syncState: SyncState = .synced
@@ -375,6 +378,9 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
         self.activityTypeID = typeID
         self.careeID = careeID
         self.dateCreated = (record["CD_dateCreated"] as? Date) ?? Date()
+        self.reminderIdentifier = nil
+        self.reminderDueDate = nil
+        self.reminderSourceRawValue = nil
         self.syncState = .synced
     }
 
@@ -389,6 +395,9 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
         self.activityTypeID = activityTypeID
         self.careeID = careeID
         self.dateCreated = activity.dateCreated
+        self.reminderIdentifier = activity.reminderIdentifier
+        self.reminderDueDate = activity.reminderDueDate
+        self.reminderSourceRawValue = activity.reminderSource?.rawValue
         self.syncState = .synced
     }
 
@@ -403,6 +412,9 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
         activityTypeID: UUID,
         careeID: UUID,
         dateCreated: Date = Date(),
+        reminderIdentifier: String? = nil,
+        reminderDueDate: Date? = nil,
+        reminderSource: ReminderSource? = nil,
         syncState: SyncState = .pending
     ) {
         self.id = id
@@ -414,6 +426,9 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
         self.activityTypeID = activityTypeID
         self.careeID = careeID
         self.dateCreated = dateCreated
+        self.reminderIdentifier = reminderIdentifier
+        self.reminderDueDate = reminderDueDate
+        self.reminderSourceRawValue = reminderSource?.rawValue
         self.syncState = syncState
     }
 
@@ -431,6 +446,10 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
             lhs.activityTypeID == rhs.activityTypeID &&
             lhs.careeID == rhs.careeID &&
             lhs.dateCreated == rhs.dateCreated &&
-            lhs.syncState == rhs.syncState
+        lhs.syncState == rhs.syncState
+    }
+
+    var reminderSource: ReminderSource? {
+        reminderSourceRawValue.flatMap { ReminderSource(rawValue: $0) }
     }
 }
