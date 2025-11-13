@@ -1,54 +1,58 @@
 import EventKit
 import Foundation
-
-enum ReminderSource: String, Codable, Sendable {
-    case phone
-    case watch
-
-    static var current: ReminderSource {
-        #if os(watchOS)
-            return .watch
-        #else
-            return .phone
-        #endif
-    }
-
-    var glyph: String {
-        switch self {
-        case .phone:
-            "📱"
-        case .watch:
-            "⌚️"
-        }
-    }
-}
+#if os(watchOS)
+    import UserNotifications
+#endif
 
 /// Thin wrapper around EKEventStore so both iOS and watchOS can create local reminders.
 @MainActor
 final class ReminderScheduler {
     static let shared = ReminderScheduler()
 
-    private let store = EKEventStore()
+    #if !os(watchOS)
+        private let store = EKEventStore()
+    #endif
 
     private init() {}
 
-    var authorizationStatus: EKAuthorizationStatus {
-        store.authorizationStatus(for: .reminder)
-    }
-
     func ensureAuthorization() async -> Bool {
-        switch authorizationStatus {
-        case .authorized:
-            return true
-        case .notDetermined:
-            do {
-                return try await store.requestAccess(to: .reminder)
-            } catch {
+        #if os(watchOS)
+            let center = UNUserNotificationCenter.current()
+            let settings = await notificationSettings()
+            switch settings.authorizationStatus {
+            case .authorized, .provisional, .ephemeral:
+                return true
+            case .notDetermined:
+                do {
+                    return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Bool, Error>) in
+                        center.requestAuthorization(options: [.alert, .sound]) { granted, error in
+                            if let error {
+                                continuation.resume(throwing: error)
+                            } else {
+                                continuation.resume(returning: granted)
+                            }
+                        }
+                    }
+                } catch {
+                    return false
+                }
+            default:
                 return false
             }
-        default:
-            return false
-        }
+        #else
+            switch EKEventStore.authorizationStatus(for: .reminder) {
+            case .authorized:
+                return true
+            case .notDetermined:
+                do {
+                    return try await store.requestAccess(to: .reminder)
+                } catch {
+                    return false
+                }
+            default:
+                return false
+            }
+        #endif
     }
 
     func scheduleReminder(
@@ -56,6 +60,14 @@ final class ReminderScheduler {
         activityTypeName: String,
         dueDate: Date
     ) async throws -> (identifier: String, dueDate: Date) {
+        #if os(watchOS)
+            return try await scheduleNotification(
+                identifier: nil,
+                careeName: careeName,
+                activityTypeName: activityTypeName,
+                dueDate: dueDate
+            )
+        #else
         guard try await ensureDefaultCalendarAvailable() else {
             throw NSError(domain: "ReminderScheduler", code: 1, userInfo: [
                 NSLocalizedDescriptionKey: "No reminders calendar available. Open the Reminders app once to create the default list.",
@@ -77,6 +89,7 @@ final class ReminderScheduler {
 
         try store.save(reminder, commit: true)
         return (reminder.calendarItemIdentifier, dueDate)
+        #endif
     }
 
     func updateReminder(
@@ -85,6 +98,14 @@ final class ReminderScheduler {
         activityTypeName: String,
         dueDate: Date
     ) async throws -> (identifier: String, dueDate: Date) {
+        #if os(watchOS)
+            return try await scheduleNotification(
+                identifier: identifier,
+                careeName: careeName,
+                activityTypeName: activityTypeName,
+                dueDate: dueDate
+            )
+        #else
         if let reminder = store.calendarItem(withIdentifier: identifier) as? EKReminder {
             reminder.dueDateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: dueDate)
             reminder.title = "\(careeName): \(activityTypeName)"
@@ -98,9 +119,15 @@ final class ReminderScheduler {
                 dueDate: dueDate
             )
         }
+        #endif
     }
 
     func deleteReminder(with identifier: String?) {
+        #if os(watchOS)
+            guard let identifier else { return }
+            let center = UNUserNotificationCenter.current()
+            center.removePendingNotificationRequests(withIdentifiers: [identifier])
+        #else
         guard let identifier,
               let reminder = store.calendarItem(withIdentifier: identifier) as? EKReminder
         else {
@@ -111,8 +138,10 @@ final class ReminderScheduler {
         } catch {
             // Swallow – failure to delete a reminder shouldn't block UI.
         }
+        #endif
     }
 
+    #if !os(watchOS)
     private func ensureDefaultCalendarAvailable() async throws -> Bool {
         if store.defaultCalendarForNewReminders() != nil {
             return true
@@ -124,10 +153,51 @@ final class ReminderScheduler {
         }
         return false
     }
+    #endif
 
     private func relativeDescription(for dueDate: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .short
         return formatter.localizedString(for: dueDate, relativeTo: Date())
     }
+
+    #if os(watchOS)
+        private func notificationSettings() async -> UNNotificationSettings {
+            await withCheckedContinuation { (continuation: CheckedContinuation<UNNotificationSettings, Never>) in
+                UNUserNotificationCenter.current().getNotificationSettings { settings in
+                    continuation.resume(returning: settings)
+                }
+            }
+        }
+
+        private func scheduleNotification(
+            identifier: String?,
+            careeName: String,
+            activityTypeName: String,
+            dueDate: Date
+        ) async throws -> (identifier: String, dueDate: Date) {
+            let content = UNMutableNotificationContent()
+            content.title = "\(careeName): \(activityTypeName)"
+            content.body = "\(activityTypeName) | \(relativeDescription(for: dueDate))"
+            content.sound = .default
+
+            let triggerDate = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: dueDate)
+            let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
+
+            let identifier = identifier ?? UUID().uuidString
+            let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                UNUserNotificationCenter.current().add(request) { error in
+                    if let error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        continuation.resume(returning: ())
+                    }
+                }
+            }
+
+            return (identifier, dueDate)
+        }
+    #endif
 }

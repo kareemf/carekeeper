@@ -378,9 +378,9 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
         self.activityTypeID = typeID
         self.careeID = careeID
         self.dateCreated = (record["CD_dateCreated"] as? Date) ?? Date()
-        self.reminderIdentifier = nil
-        self.reminderDueDate = nil
-        self.reminderSourceRawValue = nil
+        self.reminderIdentifier = record["CD_reminderIdentifier"] as? String
+        self.reminderDueDate = record["CD_reminderDueDate"] as? Date
+        self.reminderSourceRawValue = record["CD_reminderSourceRawValue"] as? String
         self.syncState = .synced
     }
 
@@ -446,10 +446,20 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
             lhs.activityTypeID == rhs.activityTypeID &&
             lhs.careeID == rhs.careeID &&
             lhs.dateCreated == rhs.dateCreated &&
+            lhs.reminderIdentifier == rhs.reminderIdentifier &&
+            lhs.reminderDueDate == rhs.reminderDueDate &&
+            lhs.reminderSourceRawValue == rhs.reminderSourceRawValue &&
             lhs.syncState == rhs.syncState
     }
 
     var reminderSource: ReminderSource? {
         reminderSourceRawValue.flatMap { ReminderSource(rawValue: $0) }
+    }
+
+    var reminderDueDateRelativeDescription: String? {
+        guard let reminderDueDate else { return nil }
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .short
+        return formatter.localizedString(for: reminderDueDate, relativeTo: Date())
     }
 }

@@ -17,14 +17,19 @@ struct ActivityDetailView: View {
     @State private var minutesAgo: Double = 0
     @State private var useCustomTime = false
     @State private var captureNewLocation: Bool = false
+    @State private var reminderEnabled: Bool = false
+    @State private var reminderMinutesAhead: Double = 5
+    @State private var showReminderDisableConfirmation = false
     @State private var isSaving = false
     @State private var showingDeleteConfirmation = false
     @State private var isDeleting = false
     @State private var showingDeleteSuccess = false
     @State private var showingSaveSuccess = false
+    @State private var error: Error?
     @FocusState private var timeInputFocused: Bool
 
     @StateObject private var locationManager = LocationManager()
+    private let reminderWindowMinutes: Double = Double(60 * 24 * 7)
 
     private var activityType: ActivityTypeSnapshot? {
         // Find activity type across all loaded carees
@@ -43,6 +48,10 @@ struct ActivityDetailView: View {
             return refreshed
         }
         return activitySnapshot
+    }
+
+    private var isReminderEditableOnThisDevice: Bool {
+        currentActivity.reminderSource == nil || currentActivity.reminderSource == .watch
     }
 
     private var editedDateTime: Date {
@@ -166,6 +175,21 @@ struct ActivityDetailView: View {
                 deleteActivity()
             }
         }
+        .confirmationDialog(
+            "Remove reminder?",
+            isPresented: $showReminderDisableConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Remove", role: .destructive) {
+                reminderEnabled = false
+                showReminderDisableConfirmation = false
+            }
+            Button("Cancel", role: .cancel) {
+                showReminderDisableConfirmation = false
+            }
+        } message: {
+            Text("This deletes the pending reminder on this device.")
+        }
         .overlay(alignment: .center) {
             if showingDeleteSuccess {
                 deleteSuccessToast
@@ -180,6 +204,7 @@ struct ActivityDetailView: View {
             guard !isEditing else { return }
             initializeEditingValues()
         }
+        .errorAlert($error)
     }
 
     // MARK: - Sections
@@ -294,6 +319,13 @@ struct ActivityDetailView: View {
         // Calculate minutes ago from current time
         let timeDiff = Date().timeIntervalSince(currentActivity.dateTime)
         minutesAgo = max(0, timeDiff / 60)
+
+        reminderEnabled = currentActivity.reminderIdentifier != nil
+        if let dueDate = currentActivity.reminderDueDate {
+            reminderMinutesAhead = clampReminderMinutes(minutesUntil(date: dueDate))
+        } else {
+            reminderMinutesAhead = defaultReminderMinutesAhead()
+        }
     }
 
     private func startEditing() {
@@ -323,7 +355,7 @@ struct ActivityDetailView: View {
             let longitude = captureNewLocation ? locationManager.location?.coordinate.longitude : baseActivity.longitude
 
             // Create new activity snapshot with updated values
-            let updatedActivity = ActivitySnapshot(
+            var updatedActivity = ActivitySnapshot(
                 id: baseActivity.id,
                 dateTime: shouldAdjustTime ? editedDateTime : baseActivity.dateTime,
                 notes: editedNotes.isEmpty ? nil : editedNotes,
@@ -335,6 +367,25 @@ struct ActivityDetailView: View {
                 dateCreated: baseActivity.dateCreated,
                 syncState: baseActivity.syncState
             )
+
+            do {
+                try await persistReminderChanges(
+                    updatedActivity: &updatedActivity,
+                    originalActivity: baseActivity
+                )
+            } catch let appError as AppError {
+                await MainActor.run {
+                    isSaving = false
+                    self.error = appError
+                }
+                return
+            } catch {
+                await MainActor.run {
+                    isSaving = false
+                    self.error = AppError.saveFailed(error.localizedDescription)
+                }
+                return
+            }
 
             // Update the activity (optimistic UI with background sync)
             await dataProvider.updateActivity(updatedActivity)
@@ -362,9 +413,18 @@ struct ActivityDetailView: View {
         guard !isDeleting else { return }
         isDeleting = true
 
+        let activity = currentActivity
         Task {
+            await MainActor.run {
+                if activity.reminderSource == .watch,
+                   let reminderID = activity.reminderIdentifier
+                {
+                    ReminderScheduler.shared.deleteReminder(with: reminderID)
+                }
+            }
+
             // Delete the activity using WatchDataProvider
-            await dataProvider.deleteActivity(currentActivity)
+            await dataProvider.deleteActivity(activity)
 
             // Show success toast briefly before dismissing
             await MainActor.run {
@@ -387,93 +447,285 @@ struct ActivityDetailView: View {
     private var detailsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             if isEditing {
-                // Editable time guarded by toggle to avoid accidental crown changes
-                VStack(alignment: .leading, spacing: 8) {
-                    Label("Time", systemImage: "clock")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-
-                    Toggle(isOn: $useCustomTime) {
-                        Text(useCustomTime ? "Custom" : "Recorded")
-                            .font(.body)
-                    }
-                    .onChange(of: useCustomTime) { _, newValue in
-                        timeInputFocused = newValue
-                    }
-
-                    if useCustomTime {
-                        VStack(spacing: 4) {
-                            HStack {
-                                Text(editedDateTime, style: .time)
-                                    .font(.title3)
-                                    .fontWeight(.semibold)
-                                Spacer()
-                            }
-
-                            HStack {
-                                Text("\(Int(minutesAgo)) min ago")
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                                Spacer()
-                            }
-                        }
-                        .padding()
-                        .background(Color.gray.opacity(0.3))
-                        .cornerRadius(8)
-                        .focusable(true)
-                        .focused($timeInputFocused)
-                        .digitalCrownRotation(
-                            $minutesAgo,
-                            from: 0,
-                            through: 1440,
-                            by: 1,
-                            sensitivity: .low,
-                            isContinuous: false,
-                            isHapticFeedbackEnabled: true
-                        )
-                    } else {
-                        VStack(spacing: 4) {
-                            HStack {
-                                Text(currentActivity.dateTime, style: .time)
-                                    .font(.title3)
-                                    .fontWeight(.semibold)
-                                Spacer()
-                            }
-
-                            HStack {
-                                Text(currentActivity.dateTime, style: .date)
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                                Spacer()
-                            }
-                        }
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(8)
-                    }
+                editingTimeView
+                if isReminderEditableOnThisDevice {
+                    reminderEditor
+                } else {
+                    reminderUnavailableNotice
                 }
             } else {
-                // Time
-                HStack {
-                    Label("Time", systemImage: "clock")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text(currentActivity.dateTime, style: .time)
-                        .font(.body)
-                }
-
-                // Date
-                HStack {
-                    Label("Date", systemImage: "calendar")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text(currentActivity.dateTime, style: .date)
-                        .font(.body)
-                }
+                readOnlyTimeView
+                reminderReadOnlyView
             }
         }
+    }
+
+    private var editingTimeView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Time", systemImage: "clock")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            Toggle(isOn: $useCustomTime) {
+                Text(useCustomTime ? "Custom" : "Recorded")
+                    .font(.body)
+            }
+            .onChange(of: useCustomTime) { _, newValue in
+                timeInputFocused = newValue
+            }
+
+            if useCustomTime {
+                VStack(spacing: 4) {
+                    HStack {
+                        Text(editedDateTime, style: .time)
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                        Spacer()
+                    }
+
+                    HStack {
+                        Text("\(Int(minutesAgo)) min ago")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
+                }
+                .padding()
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(8)
+                .focusable(true)
+                .focused($timeInputFocused)
+                .digitalCrownRotation(
+                    $minutesAgo,
+                    from: 0,
+                    through: 1440,
+                    by: 1,
+                    sensitivity: .low,
+                    isContinuous: false,
+                    isHapticFeedbackEnabled: true
+                )
+            } else {
+                VStack(spacing: 4) {
+                    HStack {
+                        Text(currentActivity.dateTime, style: .time)
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                        Spacer()
+                    }
+
+                    HStack {
+                        Text(currentActivity.dateTime, style: .date)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
+                }
+                .padding()
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(8)
+            }
+        }
+    }
+
+    private var readOnlyTimeView: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label("Time", systemImage: "clock")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(currentActivity.dateTime, style: .time)
+                    .font(.body)
+            }
+
+            HStack {
+                Label("Date", systemImage: "calendar")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(currentActivity.dateTime, style: .date)
+                    .font(.body)
+            }
+        }
+    }
+
+    private var reminderEditor: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Reminder", systemImage: "bell")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            Toggle(isOn: $reminderEnabled) {
+                Text("Set Reminder")
+                    .font(.body)
+            }
+            .onChange(of: reminderEnabled) { _, newValue in
+                if !newValue,
+                   currentActivity.reminderIdentifier != nil
+                {
+                    reminderEnabled = true
+                    showReminderDisableConfirmation = true
+                } else if newValue,
+                          currentActivity.reminderIdentifier == nil
+                {
+                    reminderMinutesAhead = defaultReminderMinutesAhead()
+                }
+            }
+
+            if reminderEnabled {
+                VStack(spacing: 4) {
+                    HStack {
+                        Text(clampedReminderDueDate(), style: .time)
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                        Spacer()
+                    }
+
+                    HStack {
+                        Text("in \(Int(reminderMinutesAhead)) min")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
+                }
+                .padding()
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(8)
+                .focusable(true)
+                .digitalCrownRotation(
+                    $reminderMinutesAhead,
+                    from: reminderMinutesRange.lowerBound,
+                    through: reminderMinutesRange.upperBound,
+                    by: 1,
+                    sensitivity: .low,
+                    isContinuous: false,
+                    isHapticFeedbackEnabled: true
+                )
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var reminderReadOnlyView: some View {
+        if let reminderText = reminderDisplayText {
+            HStack {
+                Label("Reminder", systemImage: "bell.fill")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(reminderText)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+
+    private var reminderUnavailableNotice: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Reminder", systemImage: "bell")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            Text("View-only. Edit this reminder on your iPhone.")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+        }
+    }
+
+    private var reminderDisplayText: String? {
+        guard currentActivity.reminderIdentifier != nil else { return nil }
+        let glyph = currentActivity.reminderSource?.glyph ?? "🔔"
+        let relative = currentActivity.reminderDueDateRelativeDescription ?? NSLocalizedString(
+            "Soon",
+            comment: "Reminder fallback text"
+        )
+        return "\(glyph) \(relative)"
+    }
+
+    private var reminderMinutesRange: ClosedRange<Double> {
+        1 ... reminderWindowMinutes
+    }
+
+    private func clampedReminderDueDate() -> Date {
+        let minutes = clampReminderMinutes(reminderMinutesAhead)
+        return Date().addingTimeInterval(minutes * 60)
+    }
+
+    private func clampReminderMinutes(_ value: Double) -> Double {
+        min(max(value, reminderMinutesRange.lowerBound), reminderMinutesRange.upperBound)
+    }
+
+    private func defaultReminderMinutesAhead() -> Double {
+        clampReminderMinutes(5)
+    }
+
+    private func minutesUntil(date: Date) -> Double {
+        max(1, date.timeIntervalSinceNow / 60)
+    }
+
+    @MainActor
+    private func persistReminderChanges(
+        updatedActivity: inout ActivitySnapshot,
+        originalActivity: ActivitySnapshot
+    ) async throws {
+        guard isReminderEditableOnThisDevice else { return }
+
+        let scheduler = ReminderScheduler.shared
+        let previousIdentifier = originalActivity.reminderIdentifier
+
+        if reminderEnabled {
+            let authorized = await scheduler.ensureAuthorization()
+            guard authorized else {
+                throw AppError.invalidInput(
+                    "Reminders permission not granted on this device. Open the Reminders app to grant access."
+                )
+            }
+
+            let dueDate = clampedReminderDueDate()
+            let result: (identifier: String, dueDate: Date)
+            if let previousIdentifier {
+                result = try await scheduler.updateReminder(
+                    identifier: previousIdentifier,
+                    careeName: careeName(for: originalActivity),
+                    activityTypeName: activityTypeName(for: originalActivity),
+                    dueDate: dueDate
+                )
+            } else {
+                result = try await scheduler.scheduleReminder(
+                    careeName: careeName(for: originalActivity),
+                    activityTypeName: activityTypeName(for: originalActivity),
+                    dueDate: dueDate
+                )
+            }
+
+            updatedActivity.reminderIdentifier = result.identifier
+            updatedActivity.reminderDueDate = result.dueDate
+            updatedActivity.reminderSourceRawValue = ReminderSource.current.rawValue
+        } else if let previousIdentifier {
+            scheduler.deleteReminder(with: previousIdentifier)
+            updatedActivity.reminderIdentifier = nil
+            updatedActivity.reminderDueDate = nil
+            updatedActivity.reminderSourceRawValue = nil
+        } else {
+            updatedActivity.reminderIdentifier = nil
+            updatedActivity.reminderDueDate = nil
+            updatedActivity.reminderSourceRawValue = nil
+        }
+    }
+
+    private func careeName(for activity: ActivitySnapshot) -> String {
+        careeNameLookup(activity.careeID)
+    }
+
+    private func activityTypeName(for activity: ActivitySnapshot) -> String {
+        activityType?.name ?? NSLocalizedString("Activity", comment: "Fallback activity name")
+    }
+
+    private func careeNameLookup(_ id: UUID) -> String {
+        if let caree = dataProvider.carees.first(where: { $0.id == id }) {
+            return caree.name
+        }
+        return NSLocalizedString("Caree", comment: "Fallback caree name")
     }
 
     private var additionalInfoSection: some View {

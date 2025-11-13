@@ -36,8 +36,11 @@
 		38A437557F886D7546B39ED8 /* SelectiveCloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B72D787FBD712217235C66AD /* SelectiveCloudKitService.swift */; };
 		38BE6F5D581B2A41213F12A9 /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4015C2BC2F6B99E499249 /* CloudKitConfig.swift */; };
 		3AEE7A85BBCB19513CFD61CB /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64492941EF7F5D103F0861FA /* Caree.swift */; };
+		3BD4804FB425A942DDA45849 /* ReminderSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFCCEC6CA0F87A004C26762 /* ReminderSource.swift */; };
 		3CC581D13CB1611883D3DE02 /* ActivityTypeIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED05DD2188ACDFC8B05CE91 /* ActivityTypeIconView.swift */; };
+		3D2F8E7C4934A9DA6EDB941E /* ReminderSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFCCEC6CA0F87A004C26762 /* ReminderSource.swift */; };
 		3D8E9B4266B8EC7C1DC7B25D /* CareeManagementUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C45AE24F86869D588B83293 /* CareeManagementUITests.swift */; };
+		3E2F969C9EB86B369CAE8436 /* ReminderSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFCCEC6CA0F87A004C26762 /* ReminderSource.swift */; };
 		40348EDB7BA96A56EB929C2B /* WatchDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01CB5FE7A37E541C9A6B921 /* WatchDiagnosticsView.swift */; };
 		406E8C951037236B6E9AE368 /* ActivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9427CFA7993E809BA9C6AD5 /* ActivityTests.swift */; };
 		40B93AE1CC8FDB6BF919A33F /* Snapshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7775B2FAAD7AFC371698ED /* Snapshots.swift */; };
@@ -72,6 +75,7 @@
 		751E2ACE37527AC8019AD2AB /* CloudKitSharedRecordsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850E95460BA25DE867600209 /* CloudKitSharedRecordsService.swift */; };
 		79D2D91E0AA09CE1B70489DB /* FileLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF53BD91CA672373C73D285 /* FileLogger.swift */; };
 		7A2BB82649AD27703CFCE99C /* WatchDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BCEBD704F9701E5F4440BD /* WatchDataProvider.swift */; };
+		7D0CA705DD647B43B1D82943 /* ReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1510F991F0E3BF573541CB5E /* ReminderScheduler.swift */; };
 		805AB8CA18C75280907BB24A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FD4EE14A1A83C8E2F7FC6687 /* Preview Assets.xcassets */; };
 		839BEE640180927EB5A09DB5 /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE83AC3D303F7059ACDDCAFD /* PreviewData.swift */; };
 		84312518F10A027C20E493AF /* UserNotificationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B286401A6A22BB4AED15B7 /* UserNotificationPreferences.swift */; };
@@ -86,6 +90,7 @@
 		9577A1CBFF2D0CA7A596DF2E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E16FBE8C16D3C0D2B5A0DD7F /* Assets.xcassets */; };
 		95B655A1C3DE6BFF2CD061EE /* CareKeeper Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D33886BD3B065B6BF5ECD6AA /* CareKeeper Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9901C31F745FA77024E99DFD /* CareeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D16A365A7CB69E3FF4A955A /* CareeDetailView.swift */; };
+		992AEC166CD75A752B3630D9 /* ReminderSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFCCEC6CA0F87A004C26762 /* ReminderSource.swift */; };
 		998E938714C00E832D15909C /* CloudKitSharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 896A15EFFAAFEF3EC31F83BA /* CloudKitSharingService.swift */; };
 		9D2AEA9F3A49C6CAFEDC1AB6 /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74AAF2CA7657295C86F2D04 /* ActivityType.swift */; };
 		A075FF98205DF5BB853754BC /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3C92BA7C6FAC2EA172D01D /* AppError.swift */; };
@@ -97,10 +102,12 @@
 		A73D21E0043A5AE81096215E /* WatchDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BCEBD704F9701E5F4440BD /* WatchDataProvider.swift */; };
 		A7E024A5B00557BC8A73D316 /* CareKeeperWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF8AB3750E092280F6B93E1 /* CareKeeperWatchApp.swift */; };
 		AF665F36FF101BE3FB4C58C2 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA88B88D62AF42A8D039CEF /* Activity.swift */; };
+		AFD1B10104173CF004D493EC /* ReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1510F991F0E3BF573541CB5E /* ReminderScheduler.swift */; };
 		B0DE11638602B0D68F47A647 /* MemoryMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0CB17473EB4DF0846409CC /* MemoryMonitor.swift */; };
 		B15ADBDF1A6B9648ADC050A5 /* UserNotificationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B286401A6A22BB4AED15B7 /* UserNotificationPreferences.swift */; };
 		B1666EB3F661492D8DD89D67 /* Config.default.plist in Resources */ = {isa = PBXBuildFile; fileRef = B6182A16262A89EDA6C4D5BB /* Config.default.plist */; };
 		B5006A5BB5364BB6C913F338 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE48EB682E50DF9AB2518345 /* LocationManager.swift */; };
+		B6059EA0110A8ED4F885AC6A /* ReminderSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFCCEC6CA0F87A004C26762 /* ReminderSource.swift */; };
 		B8A32EC2156D4341717BC8C1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D301F33E67563B268F54354F /* AppDelegate.swift */; };
 		B9E106E7E36D7D962BF95EEA /* SelectiveCloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B72D787FBD712217235C66AD /* SelectiveCloudKitService.swift */; };
 		BB58354CD68A976EC43C11CC /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA88B88D62AF42A8D039CEF /* Activity.swift */; };
@@ -117,6 +124,7 @@
 		D1D6E164F1F662FBFC78FE84 /* CloudKitSyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68AF7DA3BF1B49A663BF7F2 /* CloudKitSyncStatusView.swift */; };
 		D3DB6ABF7170CD31365E7C0C /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64492941EF7F5D103F0861FA /* Caree.swift */; };
 		D4F2FBCD7E59BC73FE23278F /* MemoryMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0CB17473EB4DF0846409CC /* MemoryMonitor.swift */; };
+		D56164752973C66601D4F133 /* ReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1510F991F0E3BF573541CB5E /* ReminderScheduler.swift */; };
 		D656CA0625CB0C0AE8CCE52A /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE83AC3D303F7059ACDDCAFD /* PreviewData.swift */; };
 		D86A279265360BB283D27941 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9848D72C9BBFC2CAB5E6D661 /* AppLogger.swift */; };
 		DB0F8FC74122811B12CFCCFB /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBFD8ECE39C3D7E485F22C08 /* PreviewContainer.swift */; };
@@ -230,6 +238,7 @@
 		0EC90A00357B4C68FB47705C /* CloudKitNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitNotificationService.swift; sourceTree = "<group>"; };
 		110225D18E7ECADB0C65749C /* CareeListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListRowView.swift; sourceTree = "<group>"; };
 		12A931C81A5ED3A43CBAECAC /* MetricsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsManager.swift; sourceTree = "<group>"; };
+		1510F991F0E3BF573541CB5E /* ReminderScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderScheduler.swift; sourceTree = "<group>"; };
 		194DC4FBABE800B5E10FB6CB /* ActivityTypeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeRowView.swift; sourceTree = "<group>"; };
 		1A59BA7B7B42B0EC50766C3B /* CareKeeperTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CareKeeperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C45AE24F86869D588B83293 /* CareeManagementUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeManagementUITests.swift; sourceTree = "<group>"; };
@@ -239,6 +248,7 @@
 		30F4015C2BC2F6B99E499249 /* CloudKitConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitConfig.swift; sourceTree = "<group>"; };
 		39B9C9FF21B8739B2795815D /* ImportProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportProgressView.swift; sourceTree = "<group>"; };
 		3D048976DFEF3092C2BD1B19 /* SyncStatusIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusIndicator.swift; sourceTree = "<group>"; };
+		3DFCCEC6CA0F87A004C26762 /* ReminderSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderSource.swift; sourceTree = "<group>"; };
 		453B098EAF3B2DCBDF614CAE /* LocalCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalCacheService.swift; sourceTree = "<group>"; };
 		47A269A73093A163B18A4DD6 /* Config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Config.plist; sourceTree = "<group>"; };
 		532BD9A9DD1376130D5EECB7 /* XCUIElementExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCUIElementExtensions.swift; sourceTree = "<group>"; };
@@ -435,6 +445,7 @@
 				BE48EB682E50DF9AB2518345 /* LocationManager.swift */,
 				DC0CB17473EB4DF0846409CC /* MemoryMonitor.swift */,
 				12A931C81A5ED3A43CBAECAC /* MetricsManager.swift */,
+				1510F991F0E3BF573541CB5E /* ReminderScheduler.swift */,
 				D4B286401A6A22BB4AED15B7 /* UserNotificationPreferences.swift */,
 				831C541FA572C54096F3E1A6 /* UserNotificationService.swift */,
 			);
@@ -514,6 +525,7 @@
 				ADA88B88D62AF42A8D039CEF /* Activity.swift */,
 				A74AAF2CA7657295C86F2D04 /* ActivityType.swift */,
 				64492941EF7F5D103F0861FA /* Caree.swift */,
+				3DFCCEC6CA0F87A004C26762 /* ReminderSource.swift */,
 				9B7775B2FAAD7AFC371698ED /* Snapshots.swift */,
 			);
 			path = Models;
@@ -879,6 +891,7 @@
 				CA4AA98B2955FFABE11480C4 /* CareKeeperWidgetBundle.swift in Sources */,
 				E2049D6CD591770B8FE336D8 /* Caree.swift in Sources */,
 				093D4C626797B5318B2CC8F4 /* CloudKitConfig.swift in Sources */,
+				992AEC166CD75A752B3630D9 /* ReminderSource.swift in Sources */,
 				FFFDDD04EDFB5DB16FA47723 /* Snapshots.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -943,6 +956,8 @@
 				35E82BCD255A36176DE06FEC /* MetricsManager.swift in Sources */,
 				E9FF674C7F63F8593717F45D /* PreviewContainer.swift in Sources */,
 				839BEE640180927EB5A09DB5 /* PreviewData.swift in Sources */,
+				7D0CA705DD647B43B1D82943 /* ReminderScheduler.swift in Sources */,
+				3D2F8E7C4934A9DA6EDB941E /* ReminderSource.swift in Sources */,
 				1C0E457B40BBC2B9005D2F3E /* SceneDelegate.swift in Sources */,
 				6A1BA576792FDB0F054B6C75 /* ShakeEffect.swift in Sources */,
 				8B08616C6353BB2C80AF784C /* ShareAcceptanceNotifier.swift in Sources */,
@@ -969,6 +984,7 @@
 				07E476CC1FB5FA111AF2DA60 /* CareKeeperWidgetBundle.swift in Sources */,
 				C4DFEE735BA7A25655DDA5B5 /* Caree.swift in Sources */,
 				2B35CC212777BDD33EC5F138 /* CloudKitConfig.swift in Sources */,
+				B6059EA0110A8ED4F885AC6A /* ReminderSource.swift in Sources */,
 				6061D8F17924BD2E2147CD4A /* Snapshots.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -991,6 +1007,8 @@
 				E6EDA6DEEF494275463B0C56 /* LocationManager.swift in Sources */,
 				B0DE11638602B0D68F47A647 /* MemoryMonitor.swift in Sources */,
 				C917129AB8710E71DF07F01E /* MetricsManager.swift in Sources */,
+				D56164752973C66601D4F133 /* ReminderScheduler.swift in Sources */,
+				3BD4804FB425A942DDA45849 /* ReminderSource.swift in Sources */,
 				B9E106E7E36D7D962BF95EEA /* SelectiveCloudKitService.swift in Sources */,
 				E5A238654E741E8FFFA199EB /* SnapshotCodableTests.swift in Sources */,
 				ECCBC9D36E555258A2184798 /* Snapshots.swift in Sources */,
@@ -1026,6 +1044,8 @@
 				27517BDA8152C117A8611D20 /* MetricsManager.swift in Sources */,
 				DB0F8FC74122811B12CFCCFB /* PreviewContainer.swift in Sources */,
 				D656CA0625CB0C0AE8CCE52A /* PreviewData.swift in Sources */,
+				AFD1B10104173CF004D493EC /* ReminderScheduler.swift in Sources */,
+				3E2F969C9EB86B369CAE8436 /* ReminderSource.swift in Sources */,
 				38A437557F886D7546B39ED8 /* SelectiveCloudKitService.swift in Sources */,
 				EB47C2583085AD3ED81BF0A8 /* Snapshots.swift in Sources */,
 				494D452F3F54A6F73CF9C255 /* TrackActivityView.swift in Sources */,

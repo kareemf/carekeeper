@@ -264,6 +264,18 @@ struct ActivityRowView: View {
                     .foregroundColor(.secondary)
                     .lineLimit(2)
             }
+
+            if let reminderText = reminderDisplayText {
+                HStack(spacing: 4) {
+                    Image(systemName: "bell.fill")
+                        .font(.caption2)
+                        .foregroundColor(.yellow)
+                    Text(reminderText)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
+            }
         }
         .padding(.vertical, 4)
     }
@@ -285,6 +297,13 @@ struct ActivityRowView: View {
         case .synced:
             EmptyView()
         }
+    }
+
+    private var reminderDisplayText: String? {
+        guard activity.reminderIdentifier != nil else { return nil }
+        let glyph = activity.reminderSource?.glyph ?? "🔔"
+        let relative = activity.reminderDueDateRelativeDescription ?? NSLocalizedString("Soon", comment: "Reminder fallback")
+        return "\(glyph) \(relative)"
     }
 }
 

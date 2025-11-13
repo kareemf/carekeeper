@@ -19,12 +19,15 @@ struct TrackActivityView: View {
     @State private var includeLocation: Bool = false
     @State private var useCustomTime: Bool = false
     @State private var minutesAgo: Double = 0
+    @State private var reminderEnabled: Bool = false
+    @State private var reminderMinutesAhead: Double = 5
     @State private var isSaving = false
     @State private var showSuccessToast = false
     @State private var error: Error?
     @FocusState private var timeInputFocused: Bool
 
     @StateObject private var locationManager = LocationManager()
+    private let reminderWindowMinutes: Double = Double(60 * 24 * 7)
 
     var body: some View {
         ScrollView {
@@ -58,6 +61,19 @@ struct TrackActivityView: View {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return formatter.string(from: targetTime)
+    }
+
+    private var reminderTimeText: String {
+        let dueDate = clampedReminderDueDate()
+        if Calendar.current.isDateInToday(dueDate) {
+            return dueDate.formatted(date: .omitted, time: .shortened)
+        } else {
+            return dueDate.formatted(date: .abbreviated, time: .shortened)
+        }
+    }
+
+    private var reminderMinutesRange: ClosedRange<Double> {
+        1 ... reminderWindowMinutes
     }
 
     // MARK: - View Components
@@ -234,6 +250,8 @@ struct TrackActivityView: View {
                 }
             }
 
+            reminderSection
+
             // Notes section
             VStack(alignment: .leading, spacing: 4) {
                 Text("Notes")
@@ -248,6 +266,91 @@ struct TrackActivityView: View {
             }
         }
         .padding(.horizontal)
+    }
+
+    private var reminderSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Reminder")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            Toggle(isOn: $reminderEnabled) {
+                Text("Set Reminder")
+            }
+            .onChange(of: reminderEnabled) { _, newValue in
+                if newValue {
+                    reminderMinutesAhead = defaultReminderMinutes()
+                }
+            }
+
+            if reminderEnabled {
+                VStack(spacing: 8) {
+                    HStack {
+                        Text(reminderTimeText)
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                        Spacer()
+                    }
+
+                    HStack {
+                        Text("in \(Int(reminderMinutesAhead)) min")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
+                }
+                .padding()
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(8)
+                .digitalCrownRotation(
+                    $reminderMinutesAhead,
+                    from: reminderMinutesRange.lowerBound,
+                    through: reminderMinutesRange.upperBound,
+                    by: 1,
+                    sensitivity: .low,
+                    isContinuous: false,
+                    isHapticFeedbackEnabled: true
+                )
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.2))
+        .cornerRadius(8)
+    }
+
+    private func clampedReminderDueDate() -> Date {
+        let minutes = clampReminderMinutes(reminderMinutesAhead)
+        return Date().addingTimeInterval(minutes * 60)
+    }
+
+    private func clampReminderMinutes(_ value: Double) -> Double {
+        min(max(value, reminderMinutesRange.lowerBound), reminderMinutesRange.upperBound)
+    }
+
+    private func defaultReminderMinutes() -> Double {
+        clampReminderMinutes(5)
+    }
+
+    @MainActor
+    private func attachReminderMetadata(to activity: inout ActivitySnapshot) async throws {
+        let scheduler = ReminderScheduler.shared
+        let authorized = await scheduler.ensureAuthorization()
+        guard authorized else {
+            throw AppError.invalidInput(
+                "Reminders permission not granted on this watch. Open the Reminders app to grant access."
+            )
+        }
+
+        let dueDate = clampedReminderDueDate()
+        let result = try await scheduler.scheduleReminder(
+            careeName: careeSnapshot.name,
+            activityTypeName: activityTypeSnapshot.name,
+            dueDate: dueDate
+        )
+
+        activity.reminderIdentifier = result.identifier
+        activity.reminderDueDate = result.dueDate
+        activity.reminderSourceRawValue = ReminderSource.current.rawValue
     }
 
     // MARK: - Actions
@@ -265,8 +368,7 @@ struct TrackActivityView: View {
             let longitude = (includeLocation && activityTypeSnapshot.hasLocation) ? locationManager.location?.coordinate
                 .longitude : nil
 
-            // Create activity snapshot
-            let activity = ActivitySnapshot(
+            var activity = ActivitySnapshot(
                 dateTime: dateTime,
                 notes: notes.isEmpty ? nil : notes,
                 quantity: activityQuantity,
@@ -275,6 +377,24 @@ struct TrackActivityView: View {
                 activityTypeID: activityTypeSnapshot.id,
                 careeID: careeSnapshot.id
             )
+
+            if reminderEnabled {
+                do {
+                    try await attachReminderMetadata(to: &activity)
+                } catch let appError as AppError {
+                    await MainActor.run {
+                        isSaving = false
+                        self.error = appError
+                    }
+                    return
+                } catch {
+                    await MainActor.run {
+                        isSaving = false
+                        self.error = AppError.saveFailed(error.localizedDescription)
+                    }
+                    return
+                }
+            }
 
             // Track with optimistic UI
             await dataProvider.trackActivity(activity)
