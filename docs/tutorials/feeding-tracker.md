@@ -31,7 +31,7 @@ This tutorial will focus on the bottle feeding setup.
 
 Create a single **"Bottle"** activity type with quantity enabled.
 
-[SCREENSHOT: Single "Bottle" activity type]
+![Single "Bottle" activity type](../screenshots/single-bottle-activity-type.PNG)
 
 ### Logging an Activity
 
@@ -136,7 +136,7 @@ To see all activities for a caree:
 2. Scroll to "Recent Activities"
 3. Tap **See All Activities** to view complete history
 
-[SCREENSHOT: Activity history list]
+![Activity history list](../screenshots/activity-history-list.PNG)
 
 ### Activity List Features
 

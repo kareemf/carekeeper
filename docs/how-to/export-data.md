@@ -38,7 +38,7 @@ Export your CareKeeper data to JSON format for backup, analysis, or migration to
 3. Scroll to the "Data Management" section
 4. Tap **Export Data**
 
-[SCREENSHOT: Settings screen with Export Data option]
+![Settings screen with Export Data option](../screenshots/settings-screen-with-export-data-option.png)
 
 ### Step 2: Choose What to Export
 
@@ -51,7 +51,7 @@ You have two options:
 - Largest file size
 - Most comprehensive backup
 
-[SCREENSHOT: Export all data option]
+![Export all data option](../screenshots/export-all-data-option.png)
 
 #### Export Single Caree
 - Select one caree from the list

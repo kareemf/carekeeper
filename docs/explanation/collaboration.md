@@ -15,6 +15,14 @@ CareKeeper's collaboration features enable multiple caregivers to coordinate car
 
 [SCREENSHOT: Collaboration flow diagram]
 
+```mermaid
+flowchart LR
+    owner([Owner creates caree]) --> share([Share caree link])
+    share --> accept([Participants accept invite])
+    accept --> track([Everyone tracks activities])
+    track --> sync([iCloud sync + notifications])
+```
+
 ### Real-Time Sync
 
 When someone tracks an activity:
@@ -101,7 +109,7 @@ If your device is offline:
 3. **Synced when online** - Automatic retry
 4. **Conflict resolution** - CloudKit handles concurrent edits
 
-[SCREENSHOT: Sync status indicator showing offline state]
+![Sync status indicator showing offline state](../screenshots/sync-status-indicator-showing-offline-state.png)
 
 !!! tip "Offline Confidence"
     Don't worry about losing data offline. Everything is saved locally and will sync when you're back online.
@@ -122,8 +130,22 @@ If two people edit the same activity simultaneously:
 
 [SCREENSHOT: Conflict resolution illustration]
 
+```mermaid
+sequenceDiagram
+    participant A as Caregiver A
+    participant Cloud as CloudKit
+    participant B as Caregiver B
+
+    A->>Cloud: Edit Activity (version n)
+    B->>Cloud: Edit Activity (version n)
+    Cloud-->>A: Accept last write
+    Cloud-->>B: Accept last write
+    Cloud->>A: Sync winner (version n+1)
+    Cloud->>B: Sync winner (version n+1)
+```
+
 !!! note "Rare Conflicts"
-    Conflicts are rare in practice because most activities are created (not edited) and edits happen on different activities.
+    Conflicts should be rare in practice because most activities are likely to be write-once (not edited) and edits happen on different activities.
 
 ## Notifications
 

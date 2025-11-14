@@ -19,14 +19,14 @@ In this tutorial, you'll learn how to create your first caree and understand how
 2. You'll see the main Carees tab
 3. If this is your first time, the list will be empty with a message like "No carees yet"
 
-[SCREENSHOT: Empty carees list with "Add your first caree" prompt]
+![Empty carees list with "Add your first caree" prompt](../screenshots/empty-carees-list-with-add-your-first-caree-prompt.png)
 
 ## Step 2: Create a New Caree
 
 1. Tap the **+** button in the top-right corner
 2. You'll see the "New Caree" form
 
-[SCREENSHOT: New caree form]
+![New caree form](../screenshots/new-caree-form.png)
 
 ## Step 3: Fill in Caree Details
 
@@ -109,7 +109,7 @@ If you have multiple carees, you can change their order:
 !!! tip "Pull-to-refresh lists"
     Most views in the app support pull-to-refresh to fetch latest data and refresh cache
 
-[SCREENSHOT: Reordering carees with drag handles]
+![Reordering carees with drag handles](../screenshots/reordering-carees-with-drag-handles.png)
 
 ## What's Next?
 

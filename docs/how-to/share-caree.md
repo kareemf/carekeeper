@@ -49,7 +49,7 @@ You can share via:
 2. Select a contact or enter a phone number
 3. Tap **Send**
 
-[SCREENSHOT: Share via Messages]
+![Share via Messages](../screenshots/share-via-messages.png)
 
 #### Copy Link
 1. Tap **Copy Link**
@@ -110,7 +110,7 @@ To see who has access to a caree:
 3. Scroll down to see "People" section
 4. All participants are listed with their names and icons
 
-[SCREENSHOT: Participant list]
+![Participant list](../screenshots/participant-list.png)
 
 ### Removing a Participant
 

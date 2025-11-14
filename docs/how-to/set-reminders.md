@@ -28,5 +28,5 @@ Watch reminders use the watch’s notification permissions. If they’re disable
 
 ## Screenshots
 
-- [SCREENSHOT: iOS Activity detail view showing reminder toggle and date picker]
-- [SCREENSHOT: watchOS Track Activity view showing reminder toggle with minutes-from-now crown control]
+- ![iOS Activity detail view showing reminder toggle and date picker](../screenshots/ios-activity-detail-view-showing-reminder-toggle-and-date-picker.PNG)
+- ![watchOS Track Activity view showing reminder toggle with minutes-from-now crown control](../screenshots/watchos-track-activity-view-showing-reminder-toggle-with-minutes-from-now-crown-control.PNG)

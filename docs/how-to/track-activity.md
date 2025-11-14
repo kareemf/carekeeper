@@ -222,7 +222,7 @@ Alternatively:
 3. Tap **Delete**
 4. Confirm deletion
 
-[SCREENSHOT: Swipe left to delete]
+![Swipe left to delete](../screenshots/swipe-left-to-delete.PNG)
 
 ### On Watch
 
@@ -231,7 +231,7 @@ Alternatively:
 3. Scroll down and tap **Delete Activity**
 4. Confirm deletion
 
-[SCREENSHOT: Watch delete confirmation]
+![Watch delete confirmation](../screenshots/watch-delete-confirmation.PNG)
 
 ### Location Not Capturing
 - Check that location permission is granted in Settings

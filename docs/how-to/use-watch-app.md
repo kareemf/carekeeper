@@ -19,7 +19,7 @@ CareKeeper installs automatically on your Apple Watch when you install it on you
 2. Scroll to find CareKeeper
 3. Tap **Install**
 
-[SCREENSHOT: Watch app showing CareKeeper in app list]
+![Watch app showing CareKeeper in app list](../screenshots/watch-app-showing-carekeeper-in-app-list.PNG)
 
 ### First Launch
 
@@ -43,7 +43,7 @@ When you open CareKeeper, you see your caree list:
 - Scroll with Digital Crown or swipe
 - Tap a caree to see activity types
 
-[SCREENSHOT: Watch caree list]
+![Watch caree list](../screenshots/watch-caree-list.PNG)
 
 ### Caree Detail: Activity Type Buttons
 
@@ -54,7 +54,7 @@ After tapping a caree:
 - Scroll to see more activity types
 - Tap to track
 
-[SCREENSHOT: Watch activity type buttons]
+![Watch activity type buttons](../screenshots/watch-activity-type-buttons.PNG)
 
 !!! tip "Button Order"
     Activity types appear in the same order as your iPhone. Put frequent ones at the top for quick access.
@@ -104,7 +104,7 @@ By default, activities are tracked at "Now". To change the time:
 3. Scroll or use Digital Crown to adjust time
 4. Tap **Save**
 
-[SCREENSHOT: Custom time toggle on watch]
+![Custom time toggle on watch](../screenshots/custom-time-toggle-on-watch.PNG)
 
 !!! note "Time Selection"
     Time is adjusted in 5-minute increments for easier scrolling.
@@ -169,7 +169,7 @@ To filter by activity type:
 4. Tap **Delete Activity**
 5. Confirm deletion
 
-[SCREENSHOT: Watch delete confirmation]
+![Watch delete confirmation](../screenshots/watch-delete-confirmation.PNG)
 
 ## Watch Complications
 
@@ -185,7 +185,7 @@ Add CareKeeper to your watch face for instant access:
 6. Tap it to add
 7. Press Digital Crown to save
 
-[SCREENSHOT: Watch face editing with CareKeeper complication]
+![Watch face editing with CareKeeper complication](../screenshots/watch-face-editing-with-carekeeper-complication.PNG)
 
 ### Carees Not Appearing
 **Solutions:**

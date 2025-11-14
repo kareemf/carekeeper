@@ -27,7 +27,7 @@ By the end of this tutorial, you'll know how to:
 5. Authenticate with your iCloud account
 6. Wait for the app to install
 
-[SCREENSHOT: App Store listing for CareKeeper]
+![App Store listing for CareKeeper](../screenshots/app-store-listing-for-carekeeper.png)
 
 ### On Apple Watch
 
