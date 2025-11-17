@@ -76,7 +76,7 @@ Just tap the appropriate activity type and enter quantity - no typing needed!
 ### Pros & Cons
 
 Pros:
-- **Perfect for Apple Watch** - no typing required
+- **Works well on Apple Watch** - no typing required
 - Easy to see breakdown (5 formula, 3 fresh, 2 frozen today)
 - Forces you to specify type (can't forget)
 - Can set different default quantities per type

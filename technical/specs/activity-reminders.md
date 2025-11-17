@@ -94,12 +94,16 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
    - ✅ Reminder metadata (`identifier`, `dueDate`, `source`) now lives in shared models (`Activity`, `ActivitySnapshot`), cache DB entities, and user-specific `CD_ActivityReminderMetadata` records via `ActivityReminderMetadataStore`.
    - ✅ Added a dependency-injection friendly initializer plus unit coverage for `ensureAuthorization` so permission branches are verified without launching UI alerts.
    - ✅ iOS reminders now attach explicit `EKAlarm` entries so Reminders.app delivers notifications (previously due dates existed without alarms, so no alert fired even though records appeared).
+   - ✅ Reminder payloads now append the activity’s note (if provided) so the user sees their context directly in the Reminders app / notification.
+   - ✅ Editing a reminder that has already been resolved/checked off now discards the completed EKReminder and schedules a fresh one so users can “restart” reminders without manual cleanup.
 2. **iOS UI**
    - ✅ Activity create/edit forms expose the reminder toggle + date picker; reminder indicators render in list/detail rows with bell + device glyph.
    - ✅ Editing flows now initialize the reminder picker with the existing due date (even if it’s already in the past) so users don’t see a random future timestamp when adjusting a previously scheduled reminder.
+   - ✅ Reminder badges in list/detail views now use SF Symbols (`bell.fill`, `iphone`, `applewatch`) with neutral colors instead of emojis/orange text for consistency with the rest of the UI.
 3. **watchOS UI**
    - ✅ Toggle + minutes-from-now picker UI in `TrackActivityView` with Digital Crown.
    - ✅ Reminder scheduling/canceling now flows through `ReminderScheduler` (UNUserNotificationCenter-based on watch), and `WatchDataProvider` syncs metadata to the shared store for the paired phone.
+   - ✅ Reminder chips in list/detail screens also use `bell.fill` + device SF Symbols with the same neutral styling as iOS.
 4. **Data plumbing**
    - ✅ `ActivityReminderMetadataStore` persists records in the private database + custom zone.
    - ✅ Owned + shared refresh flows now fetch reminder metadata before caching, the watch data provider overlays the same payload when syncing snapshots, the `CKFetchRecordsOperation` fetch awaits completion, and `LocalCacheService.replaceCaree` copies reminder fields when rebuilding the cache so list/detail views retain the bell state after pull-to-refresh.

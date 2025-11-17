@@ -98,7 +98,7 @@ Notes let you record additional details:
 
 ## Tracking on Apple Watch
 
-The watch app is optimized for speed—perfect for busy moments.
+The watch app is designed for quick tracking during busy moments.
 
 ### Opening the Watch App
 
@@ -118,9 +118,6 @@ For activities without quantity:
 4. Activity is tracked immediately!
 
 [SCREENSHOT: Watch showing activity confirmation]
-
-!!! success "2-Second Tracking"
-    Perfect for quick moments: diaper change while holding baby, quick nap tracking, etc.
 
 ### Tracking with Quantity (Digital Crown)
 

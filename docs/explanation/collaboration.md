@@ -178,9 +178,6 @@ Get notified when other participants track activities:
 
 [SCREENSHOT: Notification settings]
 
-!!! tip "Notification Fatigue"
-    If a caree is very active (frequent tracking), consider disabling notifications and checking manually instead.
-
 ### Notification Content
 
 Notifications show:
