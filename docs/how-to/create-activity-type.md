@@ -17,7 +17,7 @@ Activity types are the building blocks of tracking in CareKeeper. This guide cov
 2. In the "Activity Types" section, tap **+ Add Activity Type**
 3. You'll see the activity type form
 
-![New activity type form](../screenshots/new-activity-type-form.png)
+![New activity type form](../screenshots/new-activity-type-form.png){: .doc-screenshot }
 
 ### Choose a Name
 
@@ -83,7 +83,7 @@ Enable this to record where activities occurred:
 2. CareKeeper will request location permission if not granted
 3. When tracking, your current location is automatically captured
 
-![Location toggle and permission request](../screenshots/location-toggle-and-permission-request.jpg)
+![Location toggle and permission request](../screenshots/location-toggle-and-permission-request.jpg){: .doc-screenshot }
 
 !!! note "Single point locations"
    - Locations are stored as a single point rather than a route/trail
@@ -123,7 +123,7 @@ To modify an existing activity type:
 2. Tap **Delete**
 3. Confirm the deletion
 
-![Delete confirmation](../screenshots/delete-confirmation-at.png)
+![Delete confirmation](../screenshots/delete-confirmation-at.png){: .doc-screenshot }
 
 ### Reordering Activity Types
 
@@ -136,7 +136,7 @@ Set the order for easier access:
 !!! tip "Optimize for Watch"
     Put frequently-used types at the top. The watch app shows them in the same order.
 
-![Reordering with drag handles](../screenshots/reordering-with-drag-handles.png)
+![Reordering with drag handles](../screenshots/reordering-with-drag-handles.png){: .doc-screenshot }
 
 ## Examples
 

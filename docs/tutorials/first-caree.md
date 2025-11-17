@@ -19,14 +19,14 @@ In this tutorial, you'll learn how to create your first caree and understand how
 2. You'll see the main Carees tab
 3. If this is your first time, the list will be empty with a message like "No carees yet"
 
-![Empty carees list with "Add your first caree" prompt](../screenshots/empty-carees-list-with-add-your-first-caree-prompt.png)
+![Empty carees list with "Add your first caree" prompt](../screenshots/empty-carees-list-with-add-your-first-caree-prompt.png){: .doc-screenshot }
 
 ## Step 2: Create a New Caree
 
 1. Tap the **+** button in the top-right corner
 2. You'll see the "New Caree" form
 
-![New caree form](../screenshots/new-caree-form.png)
+![New caree form](../screenshots/new-caree-form.png){: .doc-screenshot }
 
 ## Step 3: Fill in Caree Details
 
@@ -70,7 +70,7 @@ In this tutorial, you'll learn how to create your first caree and understand how
    - Activity Types section (empty for now)
    - Recent Activities (empty for now)
 
-[SCREENSHOT: Caree detail view]
+![New caree detail view](../screenshots/new-caree-detail-view.png){: .doc-screenshot }
 
 ## Managing Carees
 
@@ -93,7 +93,7 @@ In this tutorial, you'll learn how to create your first caree and understand how
 3. Scroll down and tap **Delete Caree**
 4. Confirm the deletion
 
-[SCREENSHOT: Delete confirmation dialog]
+![Delete confirmation dialog - Caree](../screenshots/delete-confirmation-caree.png){: .doc-screenshot }
 
 ### Reorder Carees
 
@@ -109,7 +109,7 @@ If you have multiple carees, you can change their order:
 !!! tip "Pull-to-refresh lists"
     Most views in the app support pull-to-refresh to fetch latest data and refresh cache
 
-![Reordering carees with drag handles](../screenshots/reordering-carees-with-drag-handles.png)
+![Reordering carees with drag handles](../screenshots/reordering-carees-with-drag-handles.png){: .doc-screenshot }
 
 ## What's Next?
 

@@ -19,7 +19,7 @@ CareKeeper installs automatically on your Apple Watch when you install it on you
 2. Scroll to find CareKeeper
 3. Tap **Install**
 
-![Watch app showing CareKeeper in app list](../screenshots/watch-app-showing-carekeeper-in-app-list.PNG)
+![Watch app showing CareKeeper in app list](../screenshots/watch-app-showing-carekeeper-in-app-list.PNG){: .doc-screenshot }
 
 ### First Launch
 
@@ -43,7 +43,7 @@ When you open CareKeeper, you see your caree list:
 - Scroll with Digital Crown or swipe
 - Tap a caree to see activity types
 
-![Watch caree list](../screenshots/watch-caree-list.PNG)
+![Watch caree list](../screenshots/watch-caree-list.PNG){: .doc-screenshot }
 
 ### Caree Detail: Activity Type Buttons
 
@@ -54,7 +54,7 @@ After tapping a caree:
 - Scroll to see more activity types
 - Tap to track
 
-![Watch activity type buttons](../screenshots/watch-activity-type-buttons.PNG)
+![Watch activity type buttons](../screenshots/watch-activity-type-buttons.PNG){: .doc-screenshot }
 
 !!! tip "Button Order"
     Activity types appear in the same order as your iPhone. Put frequent ones at the top for quick access.
@@ -67,13 +67,11 @@ For activities without quantity (diaper changes, naps, etc.):
 
 1. Tap your caree
 2. Tap the activity type button
-3. ✓ Confirmation checkmark appears
-4. Done! Activity tracked.
+3. Tap **Save**
+4. ✓ Confirmation checkmark appears
+5. Done! Activity tracked.
 
-[SCREENSHOT: One-tap tracking with checkmark]
-
-!!! success "2 Seconds"
-    From raising your wrist to tracked activity: about 2 seconds. Perfect for busy hands.
+![Watch confirmation checkmark](../screenshots/watch-confirmation-checkmark.PNG)
 
 ### Tracking with Quantity
 
@@ -86,9 +84,9 @@ For activities with quantity (feeding, water, etc.):
    - Turn clockwise: increase
    - Turn counterclockwise: decrease
    - Spin faster for bigger jumps
-5. Tap **Save** or press the Digital Crown
+5. Tap **Save**
 
-[SCREENSHOT: Quantity adjustment with Digital Crown arrows]
+![Watch quantity adjustment with Digital Crown highlighted](../screenshots/watch-quantity-adjustment-with-digital-crown-highlighted.PNG)
 
 !!! tip "Digital Crown Mastery"
     - **Slow turn**: Adjust by 0.5 units (e.g., 3.0 → 3.5 → 4.0)
@@ -104,10 +102,7 @@ By default, activities are tracked at "Now". To change the time:
 3. Scroll or use Digital Crown to adjust time
 4. Tap **Save**
 
-![Custom time toggle on watch](../screenshots/custom-time-toggle-on-watch.PNG)
-
-!!! note "Time Selection"
-    Time is adjusted in 5-minute increments for easier scrolling.
+![Custom time toggle on watch](../screenshots/custom-time-toggle-on-watch.PNG){: .doc-screenshot }
 
 ## Viewing Activities
 
@@ -115,11 +110,11 @@ By default, activities are tracked at "Now". To change the time:
 
 From the caree detail screen:
 
-1. Scroll down past the "Track" type button
+1. Swipe left on the activity types list to see the Activities button
 2. Tap **Activities**
-3. Recent activities appear in reverse chronological order
+3.  Past 24 hours of activities appear in reverse chronological order
 
-[SCREENSHOT: Watch activity list]
+![Watch activity list](../screenshots/watch-activity-list.png)
 
 ### Activity Details
 
@@ -144,7 +139,10 @@ To filter by activity type:
    - Next activity type
    - Etc.
 
-[SCREENSHOT: Watch activity filter cycling]
+<div class="app-overview-grid">
+  <img src="/screenshots/watch-activity-filter-cycling.PNG" alt="Watch activity filter cycling - bottle" />
+  <img src="/screenshots/watch-activity-filter-cycling-2.PNG" alt="Watch activity filter cycling - diaper" />
+</div>
 
 !!! tip "Quick Filter"
     Each tap cycles to the next activity type. Much faster than a picker on the small watch screen.
@@ -159,7 +157,13 @@ To filter by activity type:
 4. Use Digital Crown to adjust quantity or time
 5. Tap **Save**
 
-[SCREENSHOT: Watch edit activity screen]
+<!-- ![Watch edit activity screen](../screenshots/watch-edit-activity-screen.PNG) -->
+
+<div class="app-overview-grid">
+  <img src="/screenshots/watch-edit-activity-screen.PNG" alt="Watch edit activity screen 1" />
+  <img src="/screenshots/watch-edit-activity-screen-2.PNG" alt="Watch edit activity screen 2" />
+  <img src="/screenshots/watch-edit-activity-screen-3.PNG" alt="Watch edit activity screen 3" />
+</div>
 
 ### Delete Activity
 
@@ -169,7 +173,7 @@ To filter by activity type:
 4. Tap **Delete Activity**
 5. Confirm deletion
 
-![Watch delete confirmation](../screenshots/watch-delete-confirmation.PNG)
+![Watch delete confirmation](../screenshots/watch-delete-confirmation.PNG){: .doc-screenshot }
 
 ## Watch Complications
 
@@ -185,7 +189,7 @@ Add CareKeeper to your watch face for instant access:
 6. Tap it to add
 7. Press Digital Crown to save
 
-![Watch face editing with CareKeeper complication](../screenshots/watch-face-editing-with-carekeeper-complication.PNG)
+![Watch face editing with CareKeeper complication](../screenshots/watch-face-editing-with-carekeeper-complication.PNG){: .doc-screenshot }
 
 ### Carees Not Appearing
 **Solutions:**

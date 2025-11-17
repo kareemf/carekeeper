@@ -6,15 +6,15 @@
 - Multi-device sync illustration (`multi-device-sync-illustration`)
 - Multiple carees with different participant lists (`multiple-carees-with-different-participant-lists`)
 <!-- - Sync status indicator showing offline state (`sync-status-indicator-showing-offline-state`) -->
-- Conflict resolution illustration (`conflict-resolution-illustration`)
+<!-- - Conflict resolution illustration (`conflict-resolution-illustration`) -->
 - Example activity notification (`example-activity-notification`)
 - Notification settings (`notification-settings`)
 - Notification with tap action (`notification-with-tap-action`)
 - Notes used for communication (`notes-used-for-communication`)
-- Shift-based tracking example (`shift-based-tracking-example`)
-- Roommate pet care example (`roommate-pet-care-example`)
-- Day care tracking example (`day-care-tracking-example`)
-- Pet care coordination example (`pet-care-coordination-example`)
+  - Shift-based tracking example (`shift-based-tracking-example`)
+  - Roommate pet care example (`roommate-pet-care-example`)
+  - Day care tracking example (`day-care-tracking-example`)
+  - Pet care coordination example (`pet-care-coordination-example`)
 - CloudKit database architecture (`cloudkit-database-architecture`)
 
 ## docs/explanation/security-privacy.md
@@ -30,7 +30,7 @@
 <!-- - Emoji picker (`emoji-picker`) -->
 - SF Symbol selection (`sf-symbol-selection`)
 - Quantity configuration (`quantity-configuration`)
-- Location toggle and permission request (`location-toggle-and-permission-request`)
+<!-- - Location toggle and permission request (`location-toggle-and-permission-request`) -->
 - Saved activity type in list (`saved-activity-type-in-list`)
 - Swipe to edit activity type (`swipe-to-edit-activity-type`)
 <!-- - Delete confirmation (`delete-confirmation`) -->
@@ -42,7 +42,7 @@
 ## docs/how-to/export-data.md
 
 <!-- - Settings screen with Export Data option (`settings-screen-with-export-data-option`) -->
-- Export all data option (`export-all-data-option`)
+<!-- - Export all data option (`export-all-data-option`) -->
 - Select caree to export (`select-caree-to-export`)
 - Export in progress indicator (`export-in-progress-indicator`)
 - Save to Files interface (`save-to-files-interface`)
@@ -81,17 +81,17 @@
 - Activity with location capture (`activity-with-location-capture`)
 - Date/Time picker (`date-time-picker`)
 - Notes field with keyboard (`notes-field-with-keyboard`)
-- Watch app caree list (`watch-app-caree-list`)
-- Watch showing activity confirmation (`watch-showing-activity-confirmation`)
-- Watch quantity adjustment with Digital Crown highlighted (`watch-quantity-adjustment-with-digital-crown-highlighted`)
+<!-- - Watch app caree list (`watch-app-caree-list`) -->
+<!-- - Watch showing activity confirmation (`watch-showing-activity-confirmation`) -->
+<!-- - Watch quantity adjustment with Digital Crown highlighted (`watch-quantity-adjustment-with-digital-crown-highlighted`) -->
 - Watch custom time selection (`watch-custom-time-selection`)
 - Recent activities list (`recent-activities-list`)
 - Full activity list with filter (`full-activity-list-with-filter`)
-- Watch activity list (`watch-activity-list`)
+<!-- - Watch activity list (`watch-activity-list`) -->
 - Swipe left to edit activity (`swipe-left-to-edit-activity`)
 - Activity detail view with edit button (`activity-detail-view-with-edit-button`)
 - Watch activity edit view (`watch-activity-edit-view`)
-- Swipe left to delete (`swipe-left-to-delete`)
+<!-- - Swipe left to delete (`swipe-left-to-delete`) -->
 - Watch delete confirmation (`watch-delete-confirmation`)
 
 ## docs/how-to/use-watch-app.md
@@ -100,43 +100,43 @@
 - First launch sync screen (`first-launch-sync-screen`)
 <!-- - Watch caree list (`watch-caree-list`) -->
 <!-- - Watch activity type buttons (`watch-activity-type-buttons`) -->
-- One-tap tracking with checkmark (`one-tap-tracking-with-checkmark`)
-- Quantity adjustment with Digital Crown arrows (`quantity-adjustment-with-digital-crown-arrows`)
+<!-- - One-tap tracking with checkmark (`one-tap-tracking-with-checkmark`) -->
+<!-- - Quantity adjustment with Digital Crown arrows (`quantity-adjustment-with-digital-crown-arrows`) -->
 <!-- - Custom time toggle on watch (`custom-time-toggle-on-watch`) -->
-- Watch activity list (`watch-activity-list`)
+<!-- - Watch activity list (`watch-activity-list`) -->
 - Watch activity detail view (`watch-activity-detail-view`)
-- Watch activity filter cycling (`watch-activity-filter-cycling`)
-- Watch edit activity screen (`watch-edit-activity-screen`)
+<!-- - Watch activity filter cycling (`watch-activity-filter-cycling`) -->
+<!-- - Watch edit activity screen (`watch-edit-activity-screen`) -->
 <!-- - Watch delete confirmation (`watch-delete-confirmation`) -->
 <!-- - Watch face editing with CareKeeper complication (`watch-face-editing-with-carekeeper-complication`) -->
 
 ## docs/index.md
 
-- App overview showing iOS app with caree list and activity tracking (`app-overview-showing-ios-app-with-caree-list-and-activity-tracking`)
+<!-- - App overview showing iOS app with caree list and activity tracking (`app-overview-showing-ios-app-with-caree-list-and-activity-tracking`) -->
 
 ## docs/tutorials/feeding-tracker.md
 
-- Single "Bottle" activity type (`single-bottle-activity-type`)
+<!-- - Single "Bottle" activity type (`single-bottle-activity-type`) -->
 - Track activity with notes field filled (`track-activity-with-notes-field-filled`)
-- Three activity types listed (`three-activity-types-listed`)
+<!-- - Three activity types listed (`three-activity-types-listed`) -->
 - watchoS showing three buttons, tap → enter quantity → done (`watchos-showing-three-buttons-tap-enter-quantity-done`)
-- Watch showing activity type buttons (`watch-showing-activity-type-buttons`)
-- Watch confirmation checkmark (`watch-confirmation-checkmark`)
+<!-- - Watch showing activity type buttons (`watch-showing-activity-type-buttons`) -->
+<!-- - Watch confirmation checkmark (`watch-confirmation-checkmark`) -->
 - Watch showing quantity adjustment with Digital Crown (`watch-showing-quantity-adjustment-with-digital-crown`)
 - Activity history list (`activity-history-list`)
 - Filtered activity list and swipe actions (`filtered-activity-list-and-swipe-actions`)
-- Reordering activity types (`reordering-activity-types`)
+<!-- - Reordering activity types (`reordering-activity-types`) -->
 
 ## docs/tutorials/first-caree.md
 
-- Empty carees list with "Add your first caree" prompt (`empty-carees-list-with-add-your-first-caree-prompt`)
-- New caree form (`new-caree-form`)
+<!-- - Empty carees list with "Add your first caree" prompt (`empty-carees-list-with-add-your-first-caree-prompt`) -->
+<!-- - New caree form (`new-caree-form`) -->
 - Name field being filled in (`name-field-being-filled-in`)
 - Photo picker showing options (`photo-picker-showing-options`)
 - Saved caree appearing in list (`saved-caree-appearing-in-list`)
-- Caree detail view (`caree-detail-view`)
+<!-- - Caree detail view (`new-caree-detail-view`) -->
 - Edit caree screen (`edit-caree-screen`)
-- Delete confirmation dialog (`delete-confirmation-dialog`)
+<!-- - Delete confirmation dialog (`delete-confirmation-dialog`) -->
 <!-- - Reordering carees with drag handles (`reordering-carees-with-drag-handles`) -->
 
 ## docs/tutorials/getting-started.md
@@ -144,5 +144,5 @@
 <!-- - App Store listing for CareKeeper (`app-store-listing-for-carekeeper`) -->
 - Watch app showing CareKeeper installation (`watch-app-showing-carekeeper-installation`)
 - CareKeeper welcome screen (`carekeeper-welcome-screen`)
-- Permission request screens (`permission-request-screens`)
+<!-- - Permission request screens (`permission-request-screens`) -->
 - Settings showing iCloud sync status (`settings-showing-icloud-sync-status`)

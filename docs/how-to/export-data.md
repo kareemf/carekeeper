@@ -38,7 +38,7 @@ Export your CareKeeper data to JSON format for backup, analysis, or migration to
 3. Scroll to the "Data Management" section
 4. Tap **Export Data**
 
-![Settings screen with Export Data option](../screenshots/settings-screen-with-export-data-option.png)
+![Settings screen with Export Data option](../screenshots/settings-screen-with-export-data-option.png){: .doc-screenshot }
 
 ### Step 2: Choose What to Export
 
@@ -51,7 +51,7 @@ You have two options:
 - Largest file size
 - Most comprehensive backup
 
-![Export all data option](../screenshots/export-all-data-option.png)
+![Export all data option](../screenshots/export-all-data-option.png){: .doc-screenshot }
 
 #### Export Single Caree
 - Select one caree from the list
@@ -101,34 +101,36 @@ CareKeeper exports data as JSON (JavaScript Object Notation)—a standard, human
 
 ```json
 {
-  "exportDate": "2024-10-27T12:00:00Z",
-  "version": "1.0",
   "carees": [
     {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "name": "Emma",
-      "dateCreated": "2024-01-15T08:00:00Z",
-      "activityTypes": [
-        {
-          "id": "660e8400-e29b-41d4-a716-446655440001",
-          "name": "Bottle",
-          "icon": "🍼",
-          "hasQuantity": true,
-          "quantityUnit": "oz",
-          "hasLocation": false
-        }
-      ],
       "activities": [
         {
-          "id": "770e8400-e29b-41d4-a716-446655440002",
-          "activityTypeId": "660e8400-e29b-41d4-a716-446655440001",
-          "dateTime": "2024-10-27T14:30:00Z",
-          "quantity": 3.5,
-          "notes": "Took bottle eagerly"
+          "activityTypeID": "2850FEE9-45CE-4E7C-9FF4-A12446EA7FCA",
+          "dateCreated": "2025-11-11T18:56:14Z",
+          "dateTime": "2025-11-11T18:56:14Z",
+          "id": "82C581B5-6652-497B-9F12-38835E247DB9"
         }
-      ]
+      ],
+      "activityTypes": [
+        {
+          "dateCreated": "2025-10-28T03:43:45Z",
+          "hasLocation": false,
+          "hasQuantity": false,
+          "icon": "💩",
+          "id": "2850FEF9-45CF-4E7C-9FF4-A12446EA7FCA",
+          "listOrder": 2,
+          "name": "Diaper - Poop"
+        }
+      ],
+      "dateCreated": "2025-10-28T03:46:17Z",
+      "id": "ACA13710-4B2D-4315-94DF-C3D649F0D739",
+      "imageData": "\/9j\/4AAQSkZJRgABAQAASABIAAD\/...",
+      "listOrder": 2,
+      "name": "Newborn"
     }
-  ]
+  ],
+  "exportDate": "2025-11-11T23:23:10Z",
+  "version": "2.0"
 }
 ```
 

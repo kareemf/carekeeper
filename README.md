@@ -2,6 +2,12 @@
 
 A simple yet flexible collaborative activity tracking app for caregivers on iOS and watchOS. Built with SwiftUI and SwiftData, featuring CloudKit integration for sharing across devices and between multiple caregivers.
 
+<p align="center">
+  <img src="docs/screenshots/app-overview-caree-list.png" alt="Caree list on iOS" width="30%" />
+  <img src="docs/screenshots/app-overview-caree-detail.png" alt="Caree detail on iOS" width="30%" />
+  <img src="docs/screenshots/watch-activity-type-buttons.PNG" alt="Watch activity type buttons" width="30%" />
+</p>
+
 ## Features
 
 - **Fast Activity Tracking**: Quick data entry inspired by Apple Workouts app design

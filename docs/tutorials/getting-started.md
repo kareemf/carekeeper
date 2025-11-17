@@ -27,7 +27,7 @@ By the end of this tutorial, you'll know how to:
 5. Authenticate with your iCloud account
 6. Wait for the app to install
 
-![App Store listing for CareKeeper](../screenshots/app-store-listing-for-carekeeper.png)
+![App Store listing for CareKeeper](../screenshots/app-store-listing-for-carekeeper.png){: .doc-screenshot }
 
 ### On Apple Watch
 
@@ -57,7 +57,7 @@ CareKeeper may request permissions for:
 !!! tip "Permissions"
     You can always change these permissions later in Settings > CareKeeper
 
-[SCREENSHOT: Permission request screens]
+![Permission request screens](../screenshots/permission-request-screens.png)
 
 ## Step 4: Verify iCloud Sync
 

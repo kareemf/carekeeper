@@ -109,7 +109,7 @@ If your device is offline:
 3. **Synced when online** - Automatic retry
 4. **Conflict resolution** - CloudKit handles concurrent edits
 
-![Sync status indicator showing offline state](../screenshots/sync-status-indicator-showing-offline-state.png)
+![Sync status indicator showing offline state](../screenshots/sync-status-indicator-showing-offline-state.png){: .doc-screenshot }
 
 !!! tip "Offline Confidence"
     Don't worry about losing data offline. Everything is saved locally and will sync when you're back online.
@@ -213,7 +213,7 @@ Tap notification to:
 - ⏰ Track promptly (don't rely on memory)
 - 📊 Review activity history together
 
-[SCREENSHOT: Notes used for communication]
+![Notes used for communication](../screenshots/notes-used-for-communication.png)
 
 ### Consistency
 

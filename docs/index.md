@@ -4,12 +4,23 @@
 
 CareKeeper helps caregivers track care activities for children, pets, or anyone who they support. Track feedings, activities, and more - all synced in real-time across devices.
 
-[SCREENSHOT: App overview showing iOS app with caree list and activity tracking]
+<div class="app-overview-grid">
+  <img src="screenshots/app-overview-caree-list.png" alt="Caree list on iOS" />
+  <img src="screenshots/app-overview-caree-detail.png" alt="Caree detail on iOS" />
+  <img src="screenshots/ios-activity-detail-view-showing-reminder-toggle-and-date-picker.PNG" alt="iOS activity detail view showing reminder toggle and date picker" />
+  <img src="screenshots/watch-activity-type-buttons.PNG" alt="Watch activity type buttons" />
+</div>
 
 ## Features
 
 ### Simple: Fast Activity Tracking
 Prioritizes speed of data entry. Quick tracking inspired by Apple Workouts. Track an activity in seconds with customizable types, quantities, locations, and notes.
+
+* Once set up, you can **track an activity to take as few as 3 taps**, typically 4-5
+  * On iOS: Launch app -> Select caree -> Select activity type -> Save
+  * On watchOS: Launch app -> Select caree -> Select activity type -> Save
+    * App stays on the "Select activity type" screen, so subsequent entries can be as quick as: Launch app -> Select activity type -> Save
+* Available lock/home screen widgets make launch the app as quick as possible.
 
 #### watchOS Companion
 Track activities from your wrist and schedule quick reminders with the Digital Crown.
@@ -31,7 +42,7 @@ Works offline with automatic sync when connected. Track activities anywhere, any
 Export your data to or import it from JSON at any time.
 
 ### Personal Reminders
-Set on-device reminders (separate per iPhone and Apple Watch) for activities that need a follow-up nudge.
+Set on-device reminders (separate per iPhone and Apple Watch) for activities that need a follow-up.
 
 ## Getting Started
 

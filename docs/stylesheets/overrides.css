@@ -1,0 +1,44 @@
+:root {
+  --doc-screenshot-max-width: 360px;
+  --doc-screenshot-radius: 18px;
+  --doc-screenshot-shadow: 0 18px 40px rgba(15, 18, 40, 0.25);
+  --doc-screenshot-border: 1px solid var(--md-default-fg-color--lighter, rgba(0, 0, 0, 0.15));
+}
+
+/* Keep large hardware screenshots readable without overwhelming the layout */
+.md-typeset img.doc-screenshot,
+.md-typeset img[src*="screenshots/"] {
+  display: block;
+  margin: 1.5rem auto;
+  width: 100%;
+  max-width: var(--doc-screenshot-max-width);
+  height: auto;
+  border-radius: var(--doc-screenshot-radius);
+  border: var(--doc-screenshot-border);
+  background-color: var(--md-default-bg-color, #fff);
+  box-shadow: var(--doc-screenshot-shadow);
+}
+
+/* Allow opt-out when a wider asset is required */
+.md-typeset img.doc-screenshot.full-width {
+  max-width: 100%;
+  box-shadow: none;
+}
+
+/* Allow landing-page overview screenshots to sit side-by-side */
+.md-typeset .app-overview-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: flex-start;
+  margin: 2rem 0;
+}
+
+.md-typeset .app-overview-grid img {
+  flex: 1 1 240px;
+  max-width: min(45%, 320px);
+  width: auto;
+  height: auto;
+  margin: 0;
+}

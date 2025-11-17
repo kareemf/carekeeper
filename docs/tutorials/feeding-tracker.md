@@ -31,7 +31,7 @@ This tutorial will focus on the bottle feeding setup.
 
 Create a single **"Bottle"** activity type with quantity enabled.
 
-![Single "Bottle" activity type](../screenshots/single-bottle-activity-type.PNG)
+![Single "Bottle" activity type](../screenshots/single-bottle-activity-type.PNG){: .doc-screenshot }
 
 ### Logging an Activity
 
@@ -66,7 +66,7 @@ Create separate activity types for each feeding type:
 - Bottle - Pumped (with quantity)
 - Bottle - Frozen (with quantity)
 
-[SCREENSHOT: Three activity types listed]
+![Three activity types listed](../screenshots/three-activity-types-listed.png)
 
 ### Logging an Activity
 
@@ -102,7 +102,7 @@ The watch app makes tracking even faster:
 3. Tap Track 
 4. You'll see all activity types as large buttons
 
-[SCREENSHOT: Watch showing activity type buttons]
+![Watch showing activity type buttons](../screenshots/watch-showing-activity-type-buttons.PNG)
 
 ### Quick Track (No Quantity)
 
@@ -111,7 +111,7 @@ For activity types without quantity:
 2. Tap "Save". 
 3. You'll see a confirmation checkmark
 
-[SCREENSHOT: Watch confirmation checkmark]
+![Watch confirmation checkmark](../screenshots/watch-confirmation-checkmark.PNG)
 
 ### Track with Quantity
 
@@ -136,7 +136,7 @@ To see all activities for a caree:
 2. Scroll to "Recent Activities"
 3. Tap **See All Activities** to view complete history
 
-![Activity history list](../screenshots/activity-history-list.PNG)
+![Activity history list](../screenshots/activity-history-list.PNG){: .doc-screenshot }
 
 ### Activity List Features
 

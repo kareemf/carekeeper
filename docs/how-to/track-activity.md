@@ -135,7 +135,7 @@ For activities with quantity:
    - Faster spin: larger jumps
 5. Tap **Save** or press the crown
 
-[SCREENSHOT: Watch quantity adjustment with Digital Crown highlighted]
+![Watch quantity adjustment with Digital Crown highlighted](../screenshots/watch-quantity-adjustment-with-digital-crown-highlighted.PNG)
 
 !!! tip "Digital Crown Control"
     The Digital Crown is the best way to adjust values on Apple Watch—much easier than trying to type!
@@ -175,11 +175,17 @@ By default, activities are tracked at the current time. To change:
 
 1. Open CareKeeper on your watch
 2. Tap your caree
-3. Scroll down below activity type buttons
+3. Swipe left on the list of activity types to see the Activities button
 4. Tap **Activities**
-5. Swipe through activities or use the Digital Crown
+5. Scroll through activities or use the Digital Crown
 
-[SCREENSHOT: Watch activity list]
+<!-- ![Button to load watch activity list](../screenshots/watch-activity-list-button.png) -->
+<!-- ![Watch activity list](../screenshots/watch-activity-list.png) -->
+
+<div class="app-overview-grid">
+  <img src="/screenshots/watch-activity-list-button.png" alt="Button to load watch activity list" />
+  <img src="/screenshots/watch-activity-list.png" alt="Watch activity list" />
+</div>
 
 ## Editing Activities
 
@@ -222,7 +228,7 @@ Alternatively:
 3. Tap **Delete**
 4. Confirm deletion
 
-![Swipe left to delete](../screenshots/swipe-left-to-delete.PNG)
+![Swipe left to delete](../screenshots/swipe-left-to-delete.PNG){: .doc-screenshot }
 
 ### On Watch
 
@@ -231,7 +237,7 @@ Alternatively:
 3. Scroll down and tap **Delete Activity**
 4. Confirm deletion
 
-![Watch delete confirmation](../screenshots/watch-delete-confirmation.PNG)
+![Watch delete confirmation](../screenshots/watch-delete-confirmation.PNG){: .doc-screenshot }
 
 ### Location Not Capturing
 - Check that location permission is granted in Settings
@@ -251,8 +257,6 @@ Alternatively:
 ### Cannot Edit Activity
 - Make sure you're the creator or owner
 - Check that you have internet connection (for shared activities)
-
-For more help, see the [Troubleshooting Guide](../reference/troubleshooting.md).
 
 ## Best Practices
 
