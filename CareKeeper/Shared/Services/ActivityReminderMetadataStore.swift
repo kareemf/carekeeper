@@ -36,6 +36,7 @@ final class ActivityReminderMetadataStore {
         record["CD_reminderSourceRawValue"] = metadata.reminderSource?.rawValue
 
         _ = try await database.save(record)
+        AppLogger.cloudkit.info("💾 Saved reminder metadata for activity \\(metadata.activityID.uuidString, privacy: .public)")
     }
 
     func deleteMetadata(for activityID: UUID) async {
