@@ -16,6 +16,7 @@ class LocalCacheService: ObservableObject {
     // MARK: - Private Properties
 
     private let modelContext: ModelContext
+    private let reminderMetadataStore = ActivityReminderMetadataStore.shared
     private let logger = AppLogger.cloudkit
     private let cacheTTL: TimeInterval = 300 // 5 minutes
 
@@ -368,6 +369,20 @@ class LocalCacheService: ObservableObject {
 
         try modelContext.save()
         scheduleRefresh(reason: "updateReminderMetadata")
+
+        Task {
+            if identifier != nil || dueDate != nil || source != nil {
+                let metadata = ActivityReminderMetadata(
+                    activityID: activityID,
+                    reminderIdentifier: identifier,
+                    reminderDueDate: dueDate,
+                    reminderSource: source
+                )
+                try? await reminderMetadataStore.save(metadata: metadata)
+            } else {
+                await reminderMetadataStore.deleteMetadata(for: activityID)
+            }
+        }
     }
 
     // MARK: - Cache Read Operations

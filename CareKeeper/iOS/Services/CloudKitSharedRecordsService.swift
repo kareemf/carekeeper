@@ -8,6 +8,7 @@ import SwiftUI
 class CloudKitSharedRecordsService: ObservableObject {
     private let container = CKContainer(identifier: CloudKitConfig.containerID)
     private let logger = AppLogger.cloudkit
+    private let reminderMetadataStore = ActivityReminderMetadataStore.shared
 
     var cacheService: LocalCacheService?
 
@@ -461,6 +462,13 @@ class CloudKitSharedRecordsService: ObservableObject {
             }
         }
 
+        do {
+            let metadata = try await reminderMetadataStore.fetchMetadata(for: Array(activityTypeIDByActivity.keys))
+            applyReminderMetadata(metadata, to: &activitiesByCaree)
+        } catch {
+            logger.warning("⚠️ Failed to fetch reminder metadata for shared carees: \(error.localizedDescription)")
+        }
+
         let carees = Array(careesByID.values).sorted { $0.listOrder < $1.listOrder }
         return (carees, activityTypesByCaree, activitiesByCaree, activityTypeIDByActivity)
     }
@@ -511,6 +519,24 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
 
         // No direct refreshPublishedProperties() here; the batch will coalesce refresh.
+    }
+
+    private func applyReminderMetadata(
+        _ metadata: [UUID: ActivityReminderMetadata],
+        to activitiesByCaree: inout [UUID: [Activity]]
+    ) {
+        guard !metadata.isEmpty else { return }
+        for (careeID, activities) in activitiesByCaree {
+            let updated = activities.map { activity -> Activity in
+                if let entry = metadata[activity.id] {
+                    activity.reminderIdentifier = entry.reminderIdentifier
+                    activity.reminderDueDate = entry.reminderDueDate
+                    activity.reminderSource = entry.reminderSource
+                }
+                return activity
+            }
+            activitiesByCaree[careeID] = updated
+        }
     }
 
     private func cloneCareeForCaching(_ caree: Caree, isShared: Bool) -> Caree {

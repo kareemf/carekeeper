@@ -34,6 +34,7 @@ class WatchDataProvider: ObservableObject {
 
     private let selectiveService: SelectiveCloudKitServiceProtocol
     private let cacheService: WatchCacheService
+    private let reminderMetadataStore = ActivityReminderMetadataStore.shared
     private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data")
     private let signposter = OSSignposter(logger: Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data-signpost"))
     private let careeRefreshThrottleInterval: TimeInterval = 60
@@ -315,9 +316,12 @@ class WatchDataProvider: ObservableObject {
 
                 guard !Task.isCancelled else { return }
 
+                let metadata = try await reminderMetadataStore.fetchMetadata(for: activities.map(\.id))
+                let enrichedActivities = applyReminderMetadata(metadata, to: activities)
+
                 let pendingForCaree = pendingActivities.filter { $0.careeID == careeID }
                 let mergedActivities = await Task.detached(priority: .utility) {
-                    mergeActivitiesForCaching(pending: pendingForCaree, fetched: activities)
+                    mergeActivitiesForCaching(pending: pendingForCaree, fetched: enrichedActivities)
                 }.value
                 signposter.emitEvent("loadRecent.merge", id: signpostID)
 
@@ -404,6 +408,7 @@ class WatchDataProvider: ObservableObject {
                     }
                 }
 
+                await self.syncReminderMetadataStore(for: activity)
                 self.logger.info("✅ Activity synced successfully")
 
             } catch {
@@ -462,6 +467,7 @@ class WatchDataProvider: ObservableObject {
                     }
                 }
 
+                await self.syncReminderMetadataStore(for: activity)
                 self.logger.info("✅ Activity updated successfully")
 
             } catch {
@@ -519,6 +525,7 @@ class WatchDataProvider: ObservableObject {
                 }
 
                 self.logger.info("✅ Activity deleted successfully")
+                await self.reminderMetadataStore.deleteMetadata(for: activity.id)
 
             } catch {
                 // Restore activity on failure
@@ -596,6 +603,22 @@ class WatchDataProvider: ObservableObject {
         return mergeActivitiesForCaching(pending: pendingForCaree, fetched: activities)
     }
 
+    private func applyReminderMetadata(
+        _ metadata: [UUID: ActivityReminderMetadata],
+        to activities: [ActivitySnapshot]
+    ) -> [ActivitySnapshot] {
+        guard !metadata.isEmpty else { return activities }
+        return activities.map { activity in
+            var updated = activity
+            if let entry = metadata[activity.id] {
+                updated.reminderIdentifier = entry.reminderIdentifier
+                updated.reminderDueDate = entry.reminderDueDate
+                updated.reminderSourceRawValue = entry.reminderSource?.rawValue
+            }
+            return updated
+        }
+    }
+
     private func mergeCareesWithCachedImages(_ carees: [CareeSnapshot], allowCacheFallback: Bool) -> [CareeSnapshot] {
         guard allowCacheFallback, cacheService.isAppGroupAvailable else { return carees }
 
@@ -611,6 +634,24 @@ class WatchDataProvider: ObservableObject {
                 return caree
             }
             return caree.updating(imageData: cachedImage)
+        }
+    }
+
+    private func syncReminderMetadataStore(for activity: ActivitySnapshot) async {
+        if activity.reminderIdentifier != nil || activity.reminderDueDate != nil || activity.reminderSourceRawValue != nil {
+            let metadata = ActivityReminderMetadata(
+                activityID: activity.id,
+                reminderIdentifier: activity.reminderIdentifier,
+                reminderDueDate: activity.reminderDueDate,
+                reminderSource: activity.reminderSource
+            )
+            do {
+                try await reminderMetadataStore.save(metadata: metadata)
+            } catch {
+                logger.error("❌ Failed to save reminder metadata: \(error.localizedDescription)")
+            }
+        } else {
+            await reminderMetadataStore.deleteMetadata(for: activity.id)
         }
     }
 

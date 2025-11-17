@@ -12,6 +12,7 @@
 		093D4C626797B5318B2CC8F4 /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4015C2BC2F6B99E499249 /* CloudKitConfig.swift */; };
 		09D4CE34A53AABF790AD56EA /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3C92BA7C6FAC2EA172D01D /* AppError.swift */; };
 		0C83CF568B6644CF371FE573 /* CloudKitSyncMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5370AF5DE7F498E397A75893 /* CloudKitSyncMonitor.swift */; };
+		0E094394EBA19757C3A07A3B /* ActivityReminderMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA86B6B432A36E2F2D65828 /* ActivityReminderMetadata.swift */; };
 		10AF144FF8DD99A406C57E72 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA88B88D62AF42A8D039CEF /* Activity.swift */; };
 		10F399117B45CC73C0B44831 /* CareKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21723E30B697002E61F47A31 /* CareKeeperApp.swift */; };
 		1358B9D3286B3C8C31AF2D1A /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA88B88D62AF42A8D039CEF /* Activity.swift */; };
@@ -25,6 +26,7 @@
 		20CCA053BB059C5AC15B6FC4 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE48EB682E50DF9AB2518345 /* LocationManager.swift */; };
 		229D7094BDED8370D210C7CB /* CareeEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5953B6E09F3D41DCD28FB3 /* CareeEditView.swift */; };
 		27517BDA8152C117A8611D20 /* MetricsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A931C81A5ED3A43CBAECAC /* MetricsManager.swift */; };
+		27A560CC898569156958BDE5 /* ActivityReminderMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA86B6B432A36E2F2D65828 /* ActivityReminderMetadata.swift */; };
 		2AE6F0B5667E58000BF31695 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A8D35563F0827622269172EA /* Assets.xcassets */; };
 		2B35CC212777BDD33EC5F138 /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4015C2BC2F6B99E499249 /* CloudKitConfig.swift */; };
 		2BF1D1726E96E5DEB843604A /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A15DD7991742E0B0DA3CCA2 /* WebKit.framework */; };
@@ -54,6 +56,7 @@
 		4B3EF7D06655DA8BB467DAEF /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6555DB259153675DB8F72BA /* ContentView.swift */; };
 		4CFA2E49933D71FA97FAD472 /* CloudKitSharedDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7623E17E0308BEEAD85973D /* CloudKitSharedDataService.swift */; };
 		4D990DB2DB02F1A66DBA5C6B /* ActivityRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596EB3086EB602BDF6D96E13 /* ActivityRowView.swift */; };
+		4E98F36DBFC48E482D78738C /* ActivityReminderMetadataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106ED8FB62F241B81C96AE81 /* ActivityReminderMetadataStore.swift */; };
 		5203B98170F0E24816C70D9D /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC0E109E23C5BF63FAF7777 /* ShareSheet.swift */; };
 		54F55ABD141F4A6D4A7678E3 /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74AAF2CA7657295C86F2D04 /* ActivityType.swift */; };
 		55BFB4F90A35463A9C34B7A2 /* ActivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 006FB7D6F3CF5C1F82A959E6 /* ActivityDetailView.swift */; };
@@ -64,6 +67,7 @@
 		5F70ED238471FE040C9B3326 /* ActivityTypeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7FC66039C53C043A170CDEB /* ActivityTypeTests.swift */; };
 		6061D8F17924BD2E2147CD4A /* Snapshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7775B2FAAD7AFC371698ED /* Snapshots.swift */; };
 		628D3C39DBA7D8652A8285D5 /* CareKeeperWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFF0F7407FAB7635569FDB8F /* CareKeeperWidget.swift */; };
+		654869C79ECDEA63675C3032 /* ActivityReminderMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA86B6B432A36E2F2D65828 /* ActivityReminderMetadata.swift */; };
 		668CC28D100250AACEF4E2B6 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64492941EF7F5D103F0861FA /* Caree.swift */; };
 		68661CE3F9D2B4561C65D01B /* SharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8437D59195E6520DF4FF83E4 /* SharingView.swift */; };
 		6A1BA576792FDB0F054B6C75 /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = B513542CE8B64599249C0038 /* ShakeEffect.swift */; };
@@ -75,6 +79,7 @@
 		70BDB6AFB29853B326E1743C /* CloudKitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F4015C2BC2F6B99E499249 /* CloudKitConfig.swift */; };
 		73EF8777FD02248038A72C2B /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF4BD38CBFBB8FF9F46CE8A /* ErrorAlert.swift */; };
 		751E2ACE37527AC8019AD2AB /* CloudKitSharedRecordsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850E95460BA25DE867600209 /* CloudKitSharedRecordsService.swift */; };
+		77FB28373A76809806323253 /* ActivityReminderMetadataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106ED8FB62F241B81C96AE81 /* ActivityReminderMetadataStore.swift */; };
 		79D2D91E0AA09CE1B70489DB /* FileLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF53BD91CA672373C73D285 /* FileLogger.swift */; };
 		7A2BB82649AD27703CFCE99C /* WatchDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BCEBD704F9701E5F4440BD /* WatchDataProvider.swift */; };
 		7D0CA705DD647B43B1D82943 /* ReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1510F991F0E3BF573541CB5E /* ReminderScheduler.swift */; };
@@ -86,6 +91,7 @@
 		8A3FF19EB2F916DA89E201FA /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 47A269A73093A163B18A4DD6 /* Config.plist */; };
 		8B08616C6353BB2C80AF784C /* ShareAcceptanceNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55F08D9E981ECDC8A5194BE4 /* ShareAcceptanceNotifier.swift */; };
 		8B99E46297CE77B9634F7E7F /* FileLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF53BD91CA672373C73D285 /* FileLogger.swift */; };
+		8F2194CBA6222D0750709903 /* ActivityReminderMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA86B6B432A36E2F2D65828 /* ActivityReminderMetadata.swift */; };
 		930B14ABC3D4F90FFED9BF7A /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF4BD38CBFBB8FF9F46CE8A /* ErrorAlert.swift */; };
 		95165D5FC6F608B99D0F1EA0 /* WatchCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF447B47F331C1AC5E93FB9 /* WatchCacheService.swift */; };
 		954AF1830552A69BBBBF3E75 /* ActivityTypeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194DC4FBABE800B5E10FB6CB /* ActivityTypeRowView.swift */; };
@@ -139,6 +145,7 @@
 		E133DFD237FAC2AB60072D84 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F4AFF9F279FD468529AC8C /* CareeListView.swift */; };
 		E2049D6CD591770B8FE336D8 /* Caree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64492941EF7F5D103F0861FA /* Caree.swift */; };
 		E26F6FE04FF10F8095FC1B69 /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 47A269A73093A163B18A4DD6 /* Config.plist */; };
+		E290652E1DF511FDF67205EB /* ActivityReminderMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA86B6B432A36E2F2D65828 /* ActivityReminderMetadata.swift */; };
 		E5A238654E741E8FFFA199EB /* SnapshotCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054BD6209D8813C92EC12F97 /* SnapshotCodableTests.swift */; };
 		E6EDA6DEEF494275463B0C56 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE48EB682E50DF9AB2518345 /* LocationManager.swift */; };
 		E7247A81A38C2D8E04F3F233 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3C92BA7C6FAC2EA172D01D /* AppError.swift */; };
@@ -149,6 +156,7 @@
 		ECCBC9D36E555258A2184798 /* Snapshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7775B2FAAD7AFC371698ED /* Snapshots.swift */; };
 		EE6535793DDAD7198B687A05 /* CloudKitDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864595D44F7F815E63F99B04 /* CloudKitDataService.swift */; };
 		EFB2EABE9D61C45711F04047 /* WatchDataProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC4150639AD6E23B5DF5856 /* WatchDataProviderTests.swift */; };
+		F01CF68E28DF1D0755D2F472 /* ActivityReminderMetadataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106ED8FB62F241B81C96AE81 /* ActivityReminderMetadataStore.swift */; };
 		F14BBD8E304D7694ACC00468 /* LocalCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 453B098EAF3B2DCBDF614CAE /* LocalCacheService.swift */; };
 		F308997BB6F53ACB26559A33 /* CareeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602A75653E2F86CB58273405 /* CareeTests.swift */; };
 		F7AE656E20B0B482DBC20E41 /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2606EF2CF9DC30ED71920DFB /* CloudKitSyncService.swift */; };
@@ -239,6 +247,7 @@
 		0AB799BD4D39BD6CEAB99CBC /* TrackActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackActivityView.swift; sourceTree = "<group>"; };
 		0D16A365A7CB69E3FF4A955A /* CareeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeDetailView.swift; sourceTree = "<group>"; };
 		0EC90A00357B4C68FB47705C /* CloudKitNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitNotificationService.swift; sourceTree = "<group>"; };
+		106ED8FB62F241B81C96AE81 /* ActivityReminderMetadataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityReminderMetadataStore.swift; sourceTree = "<group>"; };
 		110225D18E7ECADB0C65749C /* CareeListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListRowView.swift; sourceTree = "<group>"; };
 		12A931C81A5ED3A43CBAECAC /* MetricsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsManager.swift; sourceTree = "<group>"; };
 		1510F991F0E3BF573541CB5E /* ReminderScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderScheduler.swift; sourceTree = "<group>"; };
@@ -253,6 +262,7 @@
 		39B9C9FF21B8739B2795815D /* ImportProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportProgressView.swift; sourceTree = "<group>"; };
 		3D048976DFEF3092C2BD1B19 /* SyncStatusIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusIndicator.swift; sourceTree = "<group>"; };
 		3DFCCEC6CA0F87A004C26762 /* ReminderSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderSource.swift; sourceTree = "<group>"; };
+		3FA86B6B432A36E2F2D65828 /* ActivityReminderMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityReminderMetadata.swift; sourceTree = "<group>"; };
 		453B098EAF3B2DCBDF614CAE /* LocalCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalCacheService.swift; sourceTree = "<group>"; };
 		47A269A73093A163B18A4DD6 /* Config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Config.plist; sourceTree = "<group>"; };
 		532BD9A9DD1376130D5EECB7 /* XCUIElementExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCUIElementExtensions.swift; sourceTree = "<group>"; };
@@ -441,6 +451,7 @@
 		5A025A5D7A487212583DA815 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				106ED8FB62F241B81C96AE81 /* ActivityReminderMetadataStore.swift */,
 				DC3C92BA7C6FAC2EA172D01D /* AppError.swift */,
 				9848D72C9BBFC2CAB5E6D661 /* AppLogger.swift */,
 				30F4015C2BC2F6B99E499249 /* CloudKitConfig.swift */,
@@ -528,6 +539,7 @@
 			isa = PBXGroup;
 			children = (
 				ADA88B88D62AF42A8D039CEF /* Activity.swift */,
+				3FA86B6B432A36E2F2D65828 /* ActivityReminderMetadata.swift */,
 				A74AAF2CA7657295C86F2D04 /* ActivityType.swift */,
 				64492941EF7F5D103F0861FA /* Caree.swift */,
 				3DFCCEC6CA0F87A004C26762 /* ReminderSource.swift */,
@@ -890,6 +902,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				10AF144FF8DD99A406C57E72 /* Activity.swift in Sources */,
+				27A560CC898569156958BDE5 /* ActivityReminderMetadata.swift in Sources */,
 				9D2AEA9F3A49C6CAFEDC1AB6 /* ActivityType.swift in Sources */,
 				09D4CE34A53AABF790AD56EA /* AppError.swift in Sources */,
 				6CF820CD6C6387394D6A792A /* CareKeeperWidget.swift in Sources */,
@@ -919,6 +932,8 @@
 				A58BFCB99F970A51DD79561D /* Activity.swift in Sources */,
 				EAF7DBB5B30AB1C88A5AD9A7 /* ActivityDetailView.swift in Sources */,
 				5E7D0910C4FC03C5B1FE2FDD /* ActivityListView.swift in Sources */,
+				654869C79ECDEA63675C3032 /* ActivityReminderMetadata.swift in Sources */,
+				F01CF68E28DF1D0755D2F472 /* ActivityReminderMetadataStore.swift in Sources */,
 				4D990DB2DB02F1A66DBA5C6B /* ActivityRowView.swift in Sources */,
 				2C10919F9EC1E6254D54F93B /* ActivityType.swift in Sources */,
 				88AADE3324C37848C70CE9CB /* ActivityTypeEditView.swift in Sources */,
@@ -984,6 +999,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF665F36FF101BE3FB4C58C2 /* Activity.swift in Sources */,
+				E290652E1DF511FDF67205EB /* ActivityReminderMetadata.swift in Sources */,
 				54F55ABD141F4A6D4A7678E3 /* ActivityType.swift in Sources */,
 				E7247A81A38C2D8E04F3F233 /* AppError.swift in Sources */,
 				628D3C39DBA7D8652A8285D5 /* CareKeeperWidget.swift in Sources */,
@@ -1000,6 +1016,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB58354CD68A976EC43C11CC /* Activity.swift in Sources */,
+				0E094394EBA19757C3A07A3B /* ActivityReminderMetadata.swift in Sources */,
+				4E98F36DBFC48E482D78738C /* ActivityReminderMetadataStore.swift in Sources */,
 				406E8C951037236B6E9AE368 /* ActivityTests.swift in Sources */,
 				30EDBCDDE1471F92D6A2F9CA /* ActivityType.swift in Sources */,
 				5F70ED238471FE040C9B3326 /* ActivityTypeTests.swift in Sources */,
@@ -1034,6 +1052,8 @@
 				1358B9D3286B3C8C31AF2D1A /* Activity.swift in Sources */,
 				55BFB4F90A35463A9C34B7A2 /* ActivityDetailView.swift in Sources */,
 				A1074D868C422C77494D523B /* ActivityListView.swift in Sources */,
+				8F2194CBA6222D0750709903 /* ActivityReminderMetadata.swift in Sources */,
+				77FB28373A76809806323253 /* ActivityReminderMetadataStore.swift in Sources */,
 				BFD29868C4BDA100D939500F /* ActivityType.swift in Sources */,
 				3CC581D13CB1611883D3DE02 /* ActivityTypeIconView.swift in Sources */,
 				A075FF98205DF5BB853754BC /* AppError.swift in Sources */,

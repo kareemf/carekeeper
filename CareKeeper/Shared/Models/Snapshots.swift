@@ -378,9 +378,9 @@ struct ActivitySnapshot: Identifiable, Hashable, Codable, Sendable {
         self.activityTypeID = typeID
         self.careeID = careeID
         self.dateCreated = (record["CD_dateCreated"] as? Date) ?? Date()
-        self.reminderIdentifier = record["CD_reminderIdentifier"] as? String
-        self.reminderDueDate = record["CD_reminderDueDate"] as? Date
-        self.reminderSourceRawValue = record["CD_reminderSourceRawValue"] as? String
+        self.reminderIdentifier = nil
+        self.reminderDueDate = nil
+        self.reminderSourceRawValue = nil
         self.syncState = .synced
     }
 

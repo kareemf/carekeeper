@@ -35,8 +35,6 @@ In this tutorial, you'll learn how to create your first caree and understand how
 2. Enter the caree's name (e.g., "Emma", "Max the Dog", "Mom")
 3. The name will appear in lists and on the watch app
 
-[SCREENSHOT: Name field being filled in]
-
 ### Profile Photo (Optional)
 1. Tap **Add Photo**
 2. Choose from:
@@ -44,8 +42,6 @@ In this tutorial, you'll learn how to create your first caree and understand how
    - **Choose Photo**: Select from your photo library
 3. Crop and adjust as desired
 4. Tap **Choose** to confirm
-
-[SCREENSHOT: Photo picker showing options]
 
 !!! note "Photo Privacy"
     Profile photos are synced via iCloud and visible to anyone you share this caree with. Choose appropriate photos if sharing with other caregivers.

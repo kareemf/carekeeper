@@ -60,10 +60,14 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
   - `reminderIdentifier` (String) – EventKit UID for cancellation/update on the originating device.
   - `reminderDueDate` (Date, optional) – used for UI display and conversions.
   - `reminderSource` (enum: `.phone` / `.watch`) – indicates which device scheduled the reminder so UI can label it.
-- Storage options:
-  - Extend `LocalCacheService` snapshots with reminder metadata (similar to streaming logs).
-  - On watch, extend `WatchCacheService` payloads.
-  - Not synced to CloudKit; metadata only exists on the device that created it.
+- Metadata is **per-user**, not shared:
+  - Add a new CloudKit record type `CD_ActivityReminderMetadata` in the **private database** keyed by `activityID`.
+  - Record fields mirror the local metadata (`CD_activityID`, `CD_reminderIdentifier`, `CD_reminderDueDate`, `CD_reminderSourceRawValue`).
+  - iOS/watch clients fetch/save/delete these records via a shared `ActivityReminderMetadataStore` so the same Apple ID sees consistent reminders across devices.
+- Storage integrations:
+  - Extend `LocalCacheService` and `WatchCacheService` snapshots with reminder metadata (similar to streaming logs).
+  - When metadata changes locally, update the cache and upsert/delete the per-user CloudKit record.
+  - When fetching activities from CloudKit (owned or shared), overlay the per-user metadata records onto the fetched activities before caching.
 
 ### Phase 2 flag (`ActivityType.hasReminders`)
 - New boolean on `ActivityType` (default true).
@@ -96,9 +100,11 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
    - Ensure metadata appears when editing (requires provider/snapshot updates).
 4. **Data plumbing**
    - Extend shared models (`ActivitySnapshot`, local cache DB) to retain reminder metadata.
-   - Ensure editing flows propagate `reminderIdentifier` and `reminderDueDate`.
+   - Create `CD_ActivityReminderMetadata` in the private CloudKit database plus an `ActivityReminderMetadataStore` wrapper (save/fetch/delete).
+   - Ensure refresh flows fetch metadata records for the signed-in user and overlay them on the fetched activities before caching.
 5. **Lifecycle hooks**
    - When saving/deleting activities (both platforms), call scheduler to create/update/remove reminders.
+   - After local metadata changes, upsert/delete the per-user metadata record via the store.
    - When viewing activities, cleanup reminders whose due date already passed? (Optional future enhancement.)
 
 ### Phase 2 – Deferred (future) ActivityType flag

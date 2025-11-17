@@ -11,6 +11,7 @@ class CloudKitSharedDataService: ObservableObject {
     private let converter = CloudKitRecordConverter()
     private let zoneDiscovery: CloudKitZoneDiscoveryService
     private let retryService: CloudKitRetryService
+    private let reminderMetadataStore = ActivityReminderMetadataStore.shared
 
     // Optional local cache for immediate UI updates after successful mutations
     private var cacheService: LocalCacheService?
@@ -336,6 +337,8 @@ class CloudKitSharedDataService: ObservableObject {
                 // Post notification for immediate UI update
                 NotificationCenter.default.post(name: NSNotification.Name("SharedCareeDataUpdated"), object: caree.id)
             }
+
+            await reminderMetadataStore.deleteMetadata(for: activity.id)
         } catch {
             logger.error("❌ Failed to delete Activity: \(error.localizedDescription)")
             throw error

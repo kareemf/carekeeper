@@ -29,6 +29,7 @@ class CloudKitDataService: ObservableObject {
     private let logger = AppLogger.cloudkit
     private let maxRetries = 3
     private let retryDelay: TimeInterval = 2.0
+    private let reminderMetadataStore = ActivityReminderMetadataStore.shared
     #if canImport(UIKit)
         private let careeImageMaxDimension: CGFloat = 256
     #endif
@@ -762,6 +763,8 @@ class CloudKitDataService: ObservableObject {
                 logger.info("✅ Activity removed from cache")
             }
 
+            await reminderMetadataStore.deleteMetadata(for: activity.id)
+
             logger.info("✅ Activity deleted: \(activity.id)")
             syncStatus = .synced
 
@@ -1032,6 +1035,13 @@ class CloudKitDataService: ObservableObject {
             } catch {
                 logger.warning("⚠️ Convert activity failed: \(error.localizedDescription)")
             }
+        }
+
+        do {
+            let metadata = try await reminderMetadataStore.fetchMetadata(for: Array(activityTypeIDByActivity.keys))
+            applyReminderMetadata(metadata, to: &activitiesByCaree)
+        } catch {
+            logger.warning("⚠️ Failed to fetch reminder metadata for owned carees: \(error.localizedDescription)")
         }
 
         // Populate relationships for transient objects used outside the cache.
@@ -1324,6 +1334,24 @@ class CloudKitDataService: ObservableObject {
         #else
             return data
         #endif
+    }
+
+    private func applyReminderMetadata(
+        _ metadata: [UUID: ActivityReminderMetadata],
+        to activitiesByCaree: inout [UUID: [Activity]]
+    ) {
+        guard !metadata.isEmpty else { return }
+        for (careeID, activities) in activitiesByCaree {
+            let updated = activities.map { activity -> Activity in
+                if let entry = metadata[activity.id] {
+                    activity.reminderIdentifier = entry.reminderIdentifier
+                    activity.reminderDueDate = entry.reminderDueDate
+                    activity.reminderSource = entry.reminderSource
+                }
+                return activity
+            }
+            activitiesByCaree[careeID] = updated
+        }
     }
 }
 

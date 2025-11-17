@@ -489,9 +489,6 @@ class SelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
         record["CD_latitude"] = activity.latitude
         record["CD_longitude"] = activity.longitude
         record["CD_dateCreated"] = activity.dateCreated
-        record["CD_reminderIdentifier"] = activity.reminderIdentifier
-        record["CD_reminderDueDate"] = activity.reminderDueDate
-        record["CD_reminderSourceRawValue"] = activity.reminderSourceRawValue
 
         // Creator tracking (for notification filtering and shared activity attribution)
         record["CD_creatorUserRecordID"] = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
@@ -574,9 +571,6 @@ class SelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
         record["CD_dateTime"] = activity.dateTime
         record["CD_notes"] = activity.notes
         record["CD_quantity"] = activity.quantity
-        record["CD_reminderIdentifier"] = activity.reminderIdentifier
-        record["CD_reminderDueDate"] = activity.reminderDueDate
-        record["CD_reminderSourceRawValue"] = activity.reminderSourceRawValue
         // Note: latitude/longitude are not editable
 
         // Save to CloudKit with retry
