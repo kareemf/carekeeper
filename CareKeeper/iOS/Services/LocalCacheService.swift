@@ -370,25 +370,23 @@ class LocalCacheService: ObservableObject {
         try modelContext.save()
         scheduleRefresh(reason: "updateReminderMetadata")
 
-        Task {
-            do {
-                if identifier != nil || dueDate != nil || source != nil {
-                    let metadata = ActivityReminderMetadata(
-                        activityID: activityID,
-                        reminderIdentifier: identifier,
-                        reminderDueDate: dueDate,
-                        reminderSource: source
-                    )
-                    try await reminderMetadataStore.save(metadata: metadata)
-                } else {
-                    await reminderMetadataStore.deleteMetadata(for: activityID)
-                }
-            } catch {
-                logger
-                    .error(
-                        "❌ Failed to sync reminder metadata for activity \(activityID): \(error.localizedDescription, privacy: .public)"
-                    )
+        do {
+            if identifier != nil || dueDate != nil || source != nil {
+                let metadata = ActivityReminderMetadata(
+                    activityID: activityID,
+                    reminderIdentifier: identifier,
+                    reminderDueDate: dueDate,
+                    reminderSource: source
+                )
+                try await reminderMetadataStore.save(metadata: metadata)
+            } else {
+                await reminderMetadataStore.deleteMetadata(for: activityID)
             }
+        } catch {
+            logger
+                .error(
+                    "❌ Failed to sync reminder metadata for activity \(activityID): \(error.localizedDescription, privacy: .public)"
+                )
         }
     }
 

@@ -7,7 +7,9 @@ final class ActivityReminderMetadataStore {
 
     private let container: CKContainer
     private let database: CKDatabase
+    private let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
     private let recordType = "CD_ActivityReminderMetadata"
+    private var zoneEnsured = false
 
     init(containerID: String = CloudKitConfig.containerID) {
         container = CKContainer(identifier: containerID)
@@ -15,10 +17,36 @@ final class ActivityReminderMetadataStore {
     }
 
     private func recordID(for activityID: UUID) -> CKRecord.ID {
-        CKRecord.ID(recordName: "\(recordType)/\(activityID.uuidString)")
+        CKRecord.ID(recordName: "\(recordType)/\(activityID.uuidString)", zoneID: zoneID)
+    }
+
+    private func ensureZoneExists() async throws {
+        guard !zoneEnsured else { return }
+        do {
+            let zones = try await database.allRecordZones()
+            if zones.contains(where: { $0.zoneID == zoneID }) {
+                zoneEnsured = true
+                return
+            }
+        } catch {
+            AppLogger.cloudkit
+                .warning("⚠️ Failed to list zones for reminder metadata: \(error.localizedDescription)")
+        }
+
+        do {
+            let zone = CKRecordZone(zoneID: zoneID)
+            try await database.save(zone)
+            zoneEnsured = true
+        } catch let error as CKError where error.code == .serverRecordChanged {
+            zoneEnsured = true
+        } catch {
+            zoneEnsured = false
+            throw error
+        }
     }
 
     func save(metadata: ActivityReminderMetadata) async throws {
+        try await ensureZoneExists()
         let recordID = recordID(for: metadata.activityID)
         let record: CKRecord
 
@@ -36,10 +64,17 @@ final class ActivityReminderMetadataStore {
         record["CD_reminderSourceRawValue"] = metadata.reminderSource?.rawValue
 
         _ = try await database.save(record)
-        AppLogger.cloudkit.info("💾 Saved reminder metadata for activity \\(metadata.activityID.uuidString, privacy: .public)")
+        AppLogger.cloudkit
+            .info("💾 Saved reminder metadata for activity \(metadata.activityID.uuidString, privacy: .public)")
     }
 
     func deleteMetadata(for activityID: UUID) async {
+        do {
+            try await ensureZoneExists()
+        } catch {
+            AppLogger.cloudkit
+                .warning("⚠️ Failed to ensure zone before deleting reminder metadata: \(error.localizedDescription)")
+        }
         let recordID = recordID(for: activityID)
         do {
             _ = try await database.deleteRecord(withID: recordID)
@@ -52,6 +87,7 @@ final class ActivityReminderMetadataStore {
 
     func fetchMetadata(for activityIDs: [UUID]) async throws -> [UUID: ActivityReminderMetadata] {
         guard !activityIDs.isEmpty else { return [:] }
+        try await ensureZoneExists()
 
         let recordIDs = activityIDs.map(recordID(for:))
         let operation = CKFetchRecordsOperation(recordIDs: recordIDs)

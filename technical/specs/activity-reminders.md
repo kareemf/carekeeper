@@ -61,7 +61,7 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
   - `reminderDueDate` (Date, optional) – used for UI display and conversions.
   - `reminderSource` (enum: `.phone` / `.watch`) – indicates which device scheduled the reminder so UI can label it.
 - Metadata is **per-user**, not shared:
-  - Add a new CloudKit record type `CD_ActivityReminderMetadata` in the **private database** keyed by `activityID`.
+  - Add a new CloudKit record type `CD_ActivityReminderMetadata` in the **private database** (same custom zone as owned carees) keyed by `activityID`.
   - Record fields mirror the local metadata (`CD_activityID`, `CD_reminderIdentifier`, `CD_reminderDueDate`, `CD_reminderSourceRawValue`).
   - iOS/watch clients fetch/save/delete these records via a shared `ActivityReminderMetadataStore` so the same Apple ID sees consistent reminders across devices.
 - Storage integrations:
