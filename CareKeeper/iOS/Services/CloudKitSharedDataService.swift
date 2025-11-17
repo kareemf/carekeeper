@@ -11,15 +11,19 @@ class CloudKitSharedDataService: ObservableObject {
     private let converter = CloudKitRecordConverter()
     private let zoneDiscovery: CloudKitZoneDiscoveryService
     private let retryService: CloudKitRetryService
-    private let reminderMetadataStore = ActivityReminderMetadataStore.shared
+    private let reminderMetadataStore: any ReminderMetadataStoreProtocol
 
     // Optional local cache for immediate UI updates after successful mutations
     private var cacheService: LocalCacheService?
 
-    init(containerIdentifier: String = CloudKitConfig.containerID) {
+    init(
+        containerIdentifier: String = CloudKitConfig.containerID,
+        reminderMetadataStore: (any ReminderMetadataStoreProtocol)? = nil
+    ) {
         self.container = CKContainer(identifier: containerIdentifier)
         self.zoneDiscovery = CloudKitZoneDiscoveryService(containerIdentifier: containerIdentifier)
         self.retryService = CloudKitRetryService()
+        self.reminderMetadataStore = reminderMetadataStore ?? ActivityReminderMetadataStore.shared
     }
 
     func setCacheService(_ cacheService: LocalCacheService) {

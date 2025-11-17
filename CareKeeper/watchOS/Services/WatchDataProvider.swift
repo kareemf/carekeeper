@@ -34,7 +34,7 @@ class WatchDataProvider: ObservableObject {
 
     private let selectiveService: SelectiveCloudKitServiceProtocol
     private let cacheService: WatchCacheService
-    private let reminderMetadataStore = ActivityReminderMetadataStore.shared
+    private let reminderMetadataStore: any ReminderMetadataStoreProtocol
     private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data")
     private let signposter = OSSignposter(logger: Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data-signpost"))
     private let careeRefreshThrottleInterval: TimeInterval = 60
@@ -54,11 +54,13 @@ class WatchDataProvider: ObservableObject {
     init(
         cacheService: WatchCacheService? = nil,
         selectiveService: SelectiveCloudKitServiceProtocol? = nil,
+        reminderMetadataStore: (any ReminderMetadataStoreProtocol)? = nil,
         perCareeRefreshThrottleInterval: TimeInterval = 30
     ) {
         let resolvedCache = cacheService ?? WatchCacheService()
         self.cacheService = resolvedCache
         self.selectiveService = selectiveService ?? SelectiveCloudKitService()
+        self.reminderMetadataStore = reminderMetadataStore ?? ActivityReminderMetadataStore.shared
         self.perCareeRefreshThrottleInterval = perCareeRefreshThrottleInterval
 
         guard resolvedCache.isAppGroupAvailable else {

@@ -29,7 +29,7 @@ class CloudKitDataService: ObservableObject {
     private let logger = AppLogger.cloudkit
     private let maxRetries = 3
     private let retryDelay: TimeInterval = 2.0
-    private let reminderMetadataStore = ActivityReminderMetadataStore.shared
+    private let reminderMetadataStore: any ReminderMetadataStoreProtocol
     #if canImport(UIKit)
         private let careeImageMaxDimension: CGFloat = 256
     #endif
@@ -41,7 +41,8 @@ class CloudKitDataService: ObservableObject {
 
     // MARK: - Initialization
 
-    init() {
+    init(reminderMetadataStore: (any ReminderMetadataStoreProtocol)? = nil) {
+        self.reminderMetadataStore = reminderMetadataStore ?? ActivityReminderMetadataStore.shared
         // Observe CloudKit push notifications and refresh owned data (private DB) reactively.
         NotificationCenter.default.addObserver(
             forName: NSNotification.Name("CloudKitNotificationReceived"),

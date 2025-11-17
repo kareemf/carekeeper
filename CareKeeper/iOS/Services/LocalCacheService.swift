@@ -16,7 +16,7 @@ class LocalCacheService: ObservableObject {
     // MARK: - Private Properties
 
     private let modelContext: ModelContext
-    private let reminderMetadataStore = ActivityReminderMetadataStore.shared
+    private let reminderMetadataStore: any ReminderMetadataStoreProtocol
     private let logger = AppLogger.cloudkit
     private let cacheTTL: TimeInterval = 300 // 5 minutes
 
@@ -31,8 +31,12 @@ class LocalCacheService: ObservableObject {
 
     // MARK: - Initialization
 
-    init(modelContext: ModelContext) {
+    init(
+        modelContext: ModelContext,
+        reminderMetadataStore: (any ReminderMetadataStoreProtocol)? = nil
+    ) {
         self.modelContext = modelContext
+        self.reminderMetadataStore = reminderMetadataStore ?? ActivityReminderMetadataStore.shared
     }
 
     // MARK: - Cache Write Operations

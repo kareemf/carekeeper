@@ -6,9 +6,9 @@ import SwiftUI
 /// Queries all zones in the shared database to discover carees shared with the user
 @MainActor
 class CloudKitSharedRecordsService: ObservableObject {
-    private let container = CKContainer(identifier: CloudKitConfig.containerID)
+    private let container: CKContainer
     private let logger = AppLogger.cloudkit
-    private let reminderMetadataStore = ActivityReminderMetadataStore.shared
+    private let reminderMetadataStore: any ReminderMetadataStoreProtocol
 
     var cacheService: LocalCacheService?
 
@@ -17,7 +17,12 @@ class CloudKitSharedRecordsService: ObservableObject {
     @Published var isLoading = false
     @Published var error: Error?
 
-    init() {
+    init(
+        container: CKContainer = CKContainer(identifier: CloudKitConfig.containerID),
+        reminderMetadataStore: (any ReminderMetadataStoreProtocol)? = nil
+    ) {
+        self.container = container
+        self.reminderMetadataStore = reminderMetadataStore ?? ActivityReminderMetadataStore.shared
         setupNotificationObservers()
     }
 

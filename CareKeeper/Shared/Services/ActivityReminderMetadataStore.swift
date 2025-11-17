@@ -1,9 +1,14 @@
 import CloudKit
 import Foundation
 
-@MainActor
-final class ActivityReminderMetadataStore {
-    static let shared = ActivityReminderMetadataStore()
+protocol ReminderMetadataStoreProtocol: AnyObject {
+    func save(metadata: ActivityReminderMetadata) async throws
+    func deleteMetadata(for activityID: UUID) async
+    func fetchMetadata(for activityIDs: [UUID]) async throws -> [UUID: ActivityReminderMetadata]
+}
+
+final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
+    static let shared: any ReminderMetadataStoreProtocol = ActivityReminderMetadataStore()
 
     private let container: CKContainer
     private let database: CKDatabase
