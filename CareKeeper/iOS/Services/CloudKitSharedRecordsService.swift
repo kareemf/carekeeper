@@ -464,6 +464,7 @@ class CloudKitSharedRecordsService: ObservableObject {
 
         do {
             let metadata = try await reminderMetadataStore.fetchMetadata(for: Array(activityTypeIDByActivity.keys))
+            logger.info("🔔 Overlaying reminder metadata (shared) for \(metadata.count, privacy: .public) activities.")
             applyReminderMetadata(metadata, to: &activitiesByCaree)
         } catch {
             logger.warning("⚠️ Failed to fetch reminder metadata for shared carees: \(error.localizedDescription)")
