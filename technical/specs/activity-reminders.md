@@ -131,22 +131,17 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
 - Reminder indicators render correctly immediately after scheduling.
 
 ### Known Issues
-1. **Reminder overlay QA still pending** – After fixing the async fetch, exercise owned + shared pull-to-refresh plus watch sync paths to confirm activities retain reminder metadata and the bell glyph is present in list/detail.
-2. **Reminder notifications intermittently not firing** – Even with logs showing `Scheduled reminder …`, some devices never display the reminder. Need to inspect EventKit permission status and confirm Reminders app contains the entries.
-3. **watchOS permission drift** – watch reminders currently use `UNUserNotificationCenter` as an interim solution; need to harden how we prompt/educate when notification permissions are denied so the toggle reverts gracefully.
+1. **watchOS reminder QA** – Need an end-to-end pass on hardware to ensure Track/Edit/Delete flows schedule/cancel the local notification, persist metadata, and keep indicators in sync after cache refreshes.
+2. **watch permission guidance** – When `UNUserNotificationCenter` reports `.denied`, surface the same Settings hand-off we added on iOS so the toggle reverts gracefully.
+3. **Docs & screenshots** – README/docs still need new copy + imagery before releasing reminders publicly.
 
 ### Next Actions
-1. **Cross-device QA pass**
-   - Exercise owned + shared pull-to-refresh, offline edits, and watch sync flows to confirm reminder metadata sticks and the bell glyph reflects the right source after cache refreshes.
-   - Capture profiler/log output (`🔔 Overlaying reminder metadata …`) for each path so we can compare refresh timings before/after the overlay step.
-2. **Diagnose non-firing reminders**
-   - Expand scheduler logging to include explicit permission states + calendar identifiers when saving fails; surface actionable messaging when we detect `.denied`.
-   - On devices that reported missed reminders, inspect the Reminders app contents and EventKit error payloads; consider fallback local notifications if EK saves continue to fail.
-3. **watchOS permission/UX hardening**
-   - Add denial messaging + Settings shortcut when the watch toggle is enabled but `UNUserNotificationCenter` reports `.denied`.
-   - Ensure edit flows convert overdue reminders to a disabled state with context so the crown picker doesn’t misrepresent already-fired alerts.
-4. **Docs & screenshots prep**
-   - Once QA completes, capture refreshed screenshots + finalize README/docs copy so the reminder feature ships with accurate guidance.
+1. **Watch wiring + QA**
+   - iOS overlay + reminder QA complete; replicate those validation steps on watch hardware (owned + shared carees) to confirm metadata sync back to iPhone, including bell/device glyphs in list/detail views.
+   - Harden denial flows by guiding users to watch Settings when authorization fails (mirroring the new logging in `ReminderScheduler`).
+   - Capture logs from `ReminderScheduler`’s new authorization instrumentation to verify status transitions.
+2. **Docs & screenshots prep**
+   - Once watch QA wraps, capture refreshed screenshots + finalize README/docs copy so the reminder feature ships with accurate guidance.
 
 Testing:
 - ✅ Unit tests for `ReminderScheduler` permission branching now live (`CareKeeperTests/ReminderSchedulerTests.swift`) using the injectable initializer to avoid UI prompts.

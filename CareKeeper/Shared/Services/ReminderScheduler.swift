@@ -8,9 +8,10 @@ import Foundation
 @MainActor
 final class ReminderScheduler {
     static let shared = ReminderScheduler()
+    private let logger = AppLogger.app
 
-    #if !os(watchOS)
-        private let store: EKEventStore
+#if !os(watchOS)
+    private let store: EKEventStore
         private let authorizationStatusProvider: () -> EKAuthorizationStatus
         private let requestAuthorizationHandler: (() async -> Bool)?
 
@@ -33,6 +34,7 @@ final class ReminderScheduler {
         #if os(watchOS)
             let center = UNUserNotificationCenter.current()
             let settings = await notificationSettings()
+            logger.info("🔐 watch reminder authorization status: \(settings.authorizationStatus.rawValue, privacy: .public)")
             switch settings.authorizationStatus {
             case .authorized, .provisional, .ephemeral:
                 return true
@@ -43,7 +45,7 @@ final class ReminderScheduler {
                             if let error {
                                 continuation.resume(throwing: error)
                             } else {
-                                AppLogger.app.info("🔐 UNUserNotificationCenter granted? \(granted, privacy: .public)")
+                                self.logger.info("🔐 watch reminder request granted? \(granted, privacy: .public)")
                                 continuation.resume(returning: granted)
                             }
                         }
@@ -52,10 +54,12 @@ final class ReminderScheduler {
                     return false
                 }
             default:
+                logger.warning("🔐 watch reminder access denied")
                 return false
             }
         #else
             let status = authorizationStatusProvider()
+            logger.info("🔐 EventKit reminder authorization status: \(status.rawValue, privacy: .public)")
             switch status {
             case .authorized:
                 return true
@@ -65,7 +69,7 @@ final class ReminderScheduler {
                 }
                 return await requestReminderAuthorization()
             default:
-                AppLogger.app.warning("🔐 EventKit reminder status: \(status.rawValue, privacy: .public)")
+                logger.warning("🔐 EventKit reminder status denied")
                 return false
             }
         #endif
@@ -107,7 +111,7 @@ final class ReminderScheduler {
         reminder.addAlarm(EKAlarm(absoluteDate: dueDate))
 
         try store.save(reminder, commit: true)
-        AppLogger.app.info("🔔 Scheduled reminder \(reminder.calendarItemIdentifier, privacy: .public) for \(careeName, privacy: .public)")
+        logger.info("🔔 Scheduled reminder \(reminder.calendarItemIdentifier, privacy: .public) for \(careeName, privacy: .public)")
         return (reminder.calendarItemIdentifier, dueDate)
         #endif
     }
@@ -143,7 +147,7 @@ final class ReminderScheduler {
                 reminder.alarms?.forEach { reminder.removeAlarm($0) }
                 reminder.addAlarm(EKAlarm(absoluteDate: dueDate))
                 try store.save(reminder, commit: true)
-                AppLogger.app.info("🔔 Updated reminder \(identifier, privacy: .public)")
+                logger.info("🔔 Updated reminder \(identifier, privacy: .public)")
                 return (identifier, dueDate)
             }
         } else {
@@ -168,6 +172,7 @@ final class ReminderScheduler {
             guard let identifier else { return }
             let center = UNUserNotificationCenter.current()
             center.removePendingNotificationRequests(withIdentifiers: [identifier])
+            logger.info("🔔 Cleared watch reminder \(identifier, privacy: .public)")
         #else
         guard let identifier,
               let reminder = store.calendarItem(withIdentifier: identifier) as? EKReminder
@@ -273,6 +278,8 @@ final class ReminderScheduler {
                     }
                 }
             }
+
+            logger.info("🔔 Scheduled watch reminder \(identifier, privacy: .public) for \(careeName, privacy: .public)")
 
             return (identifier, dueDate)
         }
