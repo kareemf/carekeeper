@@ -191,7 +191,10 @@ class LocalCacheService: ObservableObject {
                 notes: activity.notes,
                 quantity: activity.quantity,
                 latitude: activity.latitude,
-                longitude: activity.longitude
+                longitude: activity.longitude,
+                reminderIdentifier: activity.reminderIdentifier,
+                reminderDueDate: activity.reminderDueDate,
+                reminderSource: activity.reminderSource
             )
             newActivity.id = activity.id
             newActivity.dateCreated = activity.dateCreated

@@ -12,12 +12,12 @@ enum ReminderSource: String, Codable, Sendable {
         #endif
     }
 
-    var glyph: String {
+    var symbolName: String {
         switch self {
         case .phone:
-            "📱"
+            "iphone"
         case .watch:
-            "⌚️"
+            "applewatch"
         }
     }
 }

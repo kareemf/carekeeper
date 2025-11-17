@@ -4,8 +4,6 @@ struct ActivityRowView: View {
     let activity: Activity
     @State private var showingDetail = false
 
-    private let bellSymbol = "🔔"
-    
     var body: some View {
         HStack {
             // Activity type icon
@@ -50,11 +48,12 @@ struct ActivityRowView: View {
 
                     if let reminderInfo = reminderStatus(for: activity) {
                         HStack(spacing: 4) {
-                            Text(bellSymbol)
-                            Text("\(reminderInfo.deviceGlyph) \(reminderInfo.timeText)")
+                            Image(systemName: "bell.fill")
+                            Image(systemName: reminderInfo.deviceSymbolName)
+                            Text(reminderInfo.timeText)
                         }
                         .font(.caption)
-                        .foregroundColor(.orange)
+                        .foregroundColor(.secondary)
                     }
                 }
             }
@@ -72,14 +71,14 @@ struct ActivityRowView: View {
 }
 
 private extension ActivityRowView {
-    func reminderStatus(for activity: Activity) -> (deviceGlyph: String, timeText: String)? {
+    func reminderStatus(for activity: Activity) -> (deviceSymbolName: String, timeText: String)? {
         guard activity.reminderIdentifier != nil else { return nil }
-        let glyph = activity.reminderSource?.glyph ?? ReminderSource.phone.glyph
+        let symbolName = activity.reminderSource?.symbolName ?? ReminderSource.phone.symbolName
         let timeText = activity.reminderDueDateRelativeDescription ?? NSLocalizedString(
             "scheduled",
             comment: "Reminder scheduled fallback"
         )
-        return (glyph, timeText)
+        return (symbolName, timeText)
     }
 }
 

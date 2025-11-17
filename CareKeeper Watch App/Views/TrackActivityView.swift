@@ -349,7 +349,8 @@ struct TrackActivityView: View {
         let result = try await scheduler.scheduleReminder(
             careeName: careeSnapshot.name,
             activityTypeName: activityTypeSnapshot.name,
-            dueDate: dueDate
+            dueDate: dueDate,
+            note: activity.notes
         )
 
         activity.reminderIdentifier = result.identifier

@@ -292,7 +292,8 @@ struct TrackActivityView: View {
             let result = try await scheduler.scheduleReminder(
                 careeName: caree.name,
                 activityTypeName: activityType.name,
-                dueDate: dueDate
+                dueDate: dueDate,
+                note: activity.notes
             )
 
             if let cacheService = cloudKitService.cacheService {

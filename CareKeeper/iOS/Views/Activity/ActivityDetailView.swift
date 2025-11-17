@@ -271,11 +271,13 @@ struct ActivityDetailView: View {
                       let dueText = activity.reminderDueDateRelativeDescription
             {
                 HStack(spacing: 8) {
-                    Text("🔔")
-                    Text("\(activity.reminderSource?.glyph ?? ReminderSource.phone.glyph) \(dueText)")
+                    Image(systemName: "bell.fill")
+                    Image(systemName: activity.reminderSource?.symbolName ?? ReminderSource.phone.symbolName)
+                    Text(dueText)
                         .foregroundColor(.secondary)
                 }
                 .font(.subheadline)
+                .foregroundColor(.secondary)
             }
         }
         .confirmationDialog(
@@ -433,13 +435,15 @@ struct ActivityDetailView: View {
                     identifier: previousIdentifier,
                     careeName: caree.name,
                     activityTypeName: activityType.name,
-                    dueDate: dueDate
+                    dueDate: dueDate,
+                    note: activity.notes
                 )
             } else {
                 try await scheduler.scheduleReminder(
                     careeName: caree.name,
                     activityTypeName: activityType.name,
-                    dueDate: dueDate
+                    dueDate: dueDate,
+                    note: activity.notes
                 )
             }
 
@@ -464,9 +468,11 @@ struct ActivityDetailView: View {
 
     private var reminderPickerRange: ClosedRange<Date> {
         let now = Date()
-        let minDate = now.addingTimeInterval(60)
-        let maxDate = now.addingTimeInterval(reminderWindow)
-        return minDate ... maxDate
+        let minFutureDate = now.addingTimeInterval(60)
+        let maxFutureDate = now.addingTimeInterval(reminderWindow)
+        let lowerBound = min(reminderDate, minFutureDate)
+        let upperBound = max(reminderDate, maxFutureDate)
+        return lowerBound ... upperBound
     }
 
     private func clampedReminderDate() -> Date {

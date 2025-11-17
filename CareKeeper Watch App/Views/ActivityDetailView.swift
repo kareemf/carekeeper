@@ -618,13 +618,16 @@ struct ActivityDetailView: View {
 
     @ViewBuilder
     private var reminderReadOnlyView: some View {
-        if let reminderText = reminderDisplayText {
+        if let reminderInfo = reminderDisplayInfo {
             HStack {
                 Label("Reminder", systemImage: "bell.fill")
                     .font(.caption)
                     .foregroundColor(.secondary)
                 Spacer()
-                Text(reminderText)
+                HStack(spacing: 4) {
+                    Image(systemName: reminderInfo.deviceSymbolName)
+                    Text(reminderInfo.relativeText)
+                }
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -643,14 +646,14 @@ struct ActivityDetailView: View {
         }
     }
 
-    private var reminderDisplayText: String? {
+    private var reminderDisplayInfo: (deviceSymbolName: String, relativeText: String)? {
         guard currentActivity.reminderIdentifier != nil else { return nil }
-        let glyph = currentActivity.reminderSource?.glyph ?? "🔔"
+        let symbolName = currentActivity.reminderSource?.symbolName ?? ReminderSource.phone.symbolName
         let relative = currentActivity.reminderDueDateRelativeDescription ?? NSLocalizedString(
             "Soon",
             comment: "Reminder fallback text"
         )
-        return "\(glyph) \(relative)"
+        return (symbolName, relative)
     }
 
     private var reminderMinutesRange: ClosedRange<Double> {
@@ -697,13 +700,15 @@ struct ActivityDetailView: View {
                     identifier: previousIdentifier,
                     careeName: careeName(for: originalActivity),
                     activityTypeName: activityTypeName(for: originalActivity),
-                    dueDate: dueDate
+                    dueDate: dueDate,
+                    note: originalActivity.notes
                 )
             } else {
                 result = try await scheduler.scheduleReminder(
                     careeName: careeName(for: originalActivity),
                     activityTypeName: activityTypeName(for: originalActivity),
-                    dueDate: dueDate
+                    dueDate: dueDate,
+                    note: originalActivity.notes
                 )
             }
 

@@ -10,10 +10,24 @@ final class ReminderScheduler {
     static let shared = ReminderScheduler()
 
     #if !os(watchOS)
-        private let store = EKEventStore()
-    #endif
+        private let store: EKEventStore
+        private let authorizationStatusProvider: () -> EKAuthorizationStatus
+        private let requestAuthorizationHandler: (() async -> Bool)?
 
-    private init() {}
+        init(
+            store: EKEventStore = EKEventStore(),
+            authorizationStatusProvider: @escaping () -> EKAuthorizationStatus = {
+                EKEventStore.authorizationStatus(for: .reminder)
+            },
+            requestAuthorizationHandler: (() async -> Bool)? = nil
+        ) {
+            self.store = store
+            self.authorizationStatusProvider = authorizationStatusProvider
+            self.requestAuthorizationHandler = requestAuthorizationHandler
+        }
+    #else
+        private init() {}
+    #endif
 
     func ensureAuthorization() async -> Bool {
         #if os(watchOS)
@@ -41,11 +55,14 @@ final class ReminderScheduler {
                 return false
             }
         #else
-            let status = EKEventStore.authorizationStatus(for: .reminder)
+            let status = authorizationStatusProvider()
             switch status {
             case .authorized:
                 return true
             case .notDetermined:
+                if let requestAuthorizationHandler {
+                    return await requestAuthorizationHandler()
+                }
                 return await requestReminderAuthorization()
             default:
                 AppLogger.app.warning("🔐 EventKit reminder status: \(status.rawValue, privacy: .public)")
@@ -57,14 +74,16 @@ final class ReminderScheduler {
     func scheduleReminder(
         careeName: String,
         activityTypeName: String,
-        dueDate: Date
+        dueDate: Date,
+        note: String? = nil
     ) async throws -> (identifier: String, dueDate: Date) {
         #if os(watchOS)
             return try await scheduleNotification(
                 identifier: nil,
                 careeName: careeName,
                 activityTypeName: activityTypeName,
-                dueDate: dueDate
+                dueDate: dueDate,
+                note: note
             )
         #else
         guard try await ensureDefaultCalendarAvailable() else {
@@ -80,11 +99,12 @@ final class ReminderScheduler {
             ])
         }
         reminder.calendar = calendar
-        let relativeString = relativeDescription(for: dueDate)
         reminder.title = "\(careeName): \(activityTypeName)"
-        reminder.notes = "\(activityTypeName) | \(relativeString)"
+        reminder.notes = reminderBody(activityTypeName: activityTypeName, dueDate: dueDate, note: note)
         reminder.dueDateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: dueDate)
         reminder.startDateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: Date())
+        reminder.alarms?.forEach { reminder.removeAlarm($0) }
+        reminder.addAlarm(EKAlarm(absoluteDate: dueDate))
 
         try store.save(reminder, commit: true)
         AppLogger.app.info("🔔 Scheduled reminder \(reminder.calendarItemIdentifier, privacy: .public) for \(careeName, privacy: .public)")
@@ -96,30 +116,50 @@ final class ReminderScheduler {
         identifier: String,
         careeName: String,
         activityTypeName: String,
-        dueDate: Date
+        dueDate: Date,
+        note: String? = nil
     ) async throws -> (identifier: String, dueDate: Date) {
         #if os(watchOS)
             return try await scheduleNotification(
                 identifier: identifier,
                 careeName: careeName,
                 activityTypeName: activityTypeName,
-                dueDate: dueDate
+                dueDate: dueDate,
+                note: note
             )
         #else
         if let reminder = store.calendarItem(withIdentifier: identifier) as? EKReminder {
-            reminder.dueDateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: dueDate)
-            reminder.title = "\(careeName): \(activityTypeName)"
-            reminder.notes = "\(activityTypeName) | \(relativeDescription(for: dueDate))"
-            try store.save(reminder, commit: true)
-            AppLogger.app.info("🔔 Updated reminder \(identifier, privacy: .public)")
-            return (identifier, dueDate)
+            if reminder.isCompleted {
+                AppLogger.app.info("🔔 Existing reminder completed, creating a new one for \(identifier, privacy: .public)")
+                do {
+                    try store.remove(reminder, commit: true)
+                } catch {
+                    AppLogger.app.warning("⚠️ Failed to remove completed reminder before recreating: \(error.localizedDescription, privacy: .public)")
+                }
+            } else {
+                reminder.dueDateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: dueDate)
+                reminder.title = "\(careeName): \(activityTypeName)"
+                reminder.notes = reminderBody(activityTypeName: activityTypeName, dueDate: dueDate, note: note)
+                reminder.alarms?.forEach { reminder.removeAlarm($0) }
+                reminder.addAlarm(EKAlarm(absoluteDate: dueDate))
+                try store.save(reminder, commit: true)
+                AppLogger.app.info("🔔 Updated reminder \(identifier, privacy: .public)")
+                return (identifier, dueDate)
+            }
         } else {
             return try await scheduleReminder(
                 careeName: careeName,
                 activityTypeName: activityTypeName,
-                dueDate: dueDate
+                dueDate: dueDate,
+                note: note
             )
         }
+        return try await scheduleReminder(
+            careeName: careeName,
+            activityTypeName: activityTypeName,
+            dueDate: dueDate,
+            note: note
+        )
         #endif
     }
 
@@ -189,6 +229,14 @@ final class ReminderScheduler {
         return formatter.localizedString(for: dueDate, relativeTo: Date())
     }
 
+    private func reminderBody(activityTypeName: String, dueDate: Date, note: String?) -> String {
+        var components = ["\(activityTypeName) | \(relativeDescription(for: dueDate))"]
+        if let trimmed = note?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty {
+            components.append(trimmed)
+        }
+        return components.joined(separator: "\n")
+    }
+
     #if os(watchOS)
         private func notificationSettings() async -> UNNotificationSettings {
             await withCheckedContinuation { (continuation: CheckedContinuation<UNNotificationSettings, Never>) in
@@ -202,11 +250,12 @@ final class ReminderScheduler {
             identifier: String?,
             careeName: String,
             activityTypeName: String,
-            dueDate: Date
+            dueDate: Date,
+            note: String?
         ) async throws -> (identifier: String, dueDate: Date) {
             let content = UNMutableNotificationContent()
             content.title = "\(careeName): \(activityTypeName)"
-            content.body = "\(activityTypeName) | \(relativeDescription(for: dueDate))"
+            content.body = reminderBody(activityTypeName: activityTypeName, dueDate: dueDate, note: note)
             content.sound = .default
 
             let triggerDate = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: dueDate)

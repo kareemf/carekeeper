@@ -265,16 +265,17 @@ struct ActivityRowView: View {
                     .lineLimit(2)
             }
 
-            if let reminderText = reminderDisplayText {
+            if let reminderInfo = reminderDisplayInfo {
                 HStack(spacing: 4) {
                     Image(systemName: "bell.fill")
                         .font(.caption2)
-                        .foregroundColor(.yellow)
-                    Text(reminderText)
+                    Image(systemName: reminderInfo.deviceSymbolName)
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                    Text(reminderInfo.relativeText)
+                        .font(.caption2)
                     Spacer()
                 }
+                .foregroundColor(.secondary)
             }
         }
         .padding(.vertical, 4)
@@ -299,11 +300,11 @@ struct ActivityRowView: View {
         }
     }
 
-    private var reminderDisplayText: String? {
+    private var reminderDisplayInfo: (deviceSymbolName: String, relativeText: String)? {
         guard activity.reminderIdentifier != nil else { return nil }
-        let glyph = activity.reminderSource?.glyph ?? "🔔"
+        let symbolName = activity.reminderSource?.symbolName ?? ReminderSource.phone.symbolName
         let relative = activity.reminderDueDateRelativeDescription ?? NSLocalizedString("Soon", comment: "Reminder fallback")
-        return "\(glyph) \(relative)"
+        return (symbolName, relative)
     }
 }
 

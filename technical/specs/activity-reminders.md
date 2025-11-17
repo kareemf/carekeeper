@@ -90,22 +90,23 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
 
 ### Phase 1 – Reminder Toggle + EventKit plumbing
 1. **EventKit Utilities**
-   - Add `ReminderScheduler` service (shared) handling permission requests, create/update/delete by identifier.
-   - Store metadata (identifier + dueDate) inside activity snapshots/cache models.
+   - ✅ `ReminderScheduler` implemented (shared) handling permission requests plus create/update/delete by identifier; logs permission state so we can troubleshoot failures.
+   - ✅ Reminder metadata (`identifier`, `dueDate`, `source`) now lives in shared models (`Activity`, `ActivitySnapshot`), cache DB entities, and user-specific `CD_ActivityReminderMetadata` records via `ActivityReminderMetadataStore`.
+   - ✅ Added a dependency-injection friendly initializer plus unit coverage for `ensureAuthorization` so permission branches are verified without launching UI alerts.
+   - ✅ iOS reminders now attach explicit `EKAlarm` entries so Reminders.app delivers notifications (previously due dates existed without alarms, so no alert fired even though records appeared).
 2. **iOS UI**
-   - Update activity create/edit forms with toggle + date picker.
-   - Add list/detail indicator icon binding to metadata.
+   - ✅ Activity create/edit forms expose the reminder toggle + date picker; reminder indicators render in list/detail rows with bell + device glyph.
+   - ✅ Editing flows now initialize the reminder picker with the existing due date (even if it’s already in the past) so users don’t see a random future timestamp when adjusting a previously scheduled reminder.
 3. **watchOS UI**
-   - Similar toggle + minutes-from-now control in `TrackActivityView` and edit flows.
-   - Ensure metadata appears when editing (requires provider/snapshot updates).
+   - ✅ Toggle + minutes-from-now picker UI in `TrackActivityView` with Digital Crown.
+   - ✅ Reminder scheduling/canceling now flows through `ReminderScheduler` (UNUserNotificationCenter-based on watch), and `WatchDataProvider` syncs metadata to the shared store for the paired phone.
 4. **Data plumbing**
-   - Extend shared models (`ActivitySnapshot`, local cache DB) to retain reminder metadata.
-   - Create `CD_ActivityReminderMetadata` in the private CloudKit database plus an `ActivityReminderMetadataStore` wrapper (save/fetch/delete).
-   - Ensure refresh flows fetch metadata records for the signed-in user and overlay them on the fetched activities before caching.
+   - ✅ `ActivityReminderMetadataStore` persists records in the private database + custom zone.
+   - ✅ Owned + shared refresh flows now fetch reminder metadata before caching, the watch data provider overlays the same payload when syncing snapshots, the `CKFetchRecordsOperation` fetch awaits completion, and `LocalCacheService.replaceCaree` copies reminder fields when rebuilding the cache so list/detail views retain the bell state after pull-to-refresh.
 5. **Lifecycle hooks**
-   - When saving/deleting activities (both platforms), call scheduler to create/update/remove reminders.
-   - After local metadata changes, upsert/delete the per-user metadata record via the store.
-   - When viewing activities, cleanup reminders whose due date already passed? (Optional future enhancement.)
+   - ✅ Saving/deleting activities schedules/cancels reminders and upserts/deletes metadata records.
+   - ⏳ Run a regression/soak pass after the overlay fetch to ensure edits/deletes from either device keep metadata in sync (especially when offline then reconnecting).
+   - Optional future enhancement: cleanup overdue reminders or reschedule logic.
 
 ### Phase 2 – Deferred (future) ActivityType flag
 - Currently tracked as a follow-up, not in active scope. Captured in Potential Improvements below.
@@ -120,16 +121,35 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
 ---
 
 ## Tracking
-- **Open questions** listed above – resolve before implementation.
-- After approval, create subtasks:
-  - `feat/reminders-phase1` (EventKit service + UI)
-  - `feat/reminders-phase2` (ActivityType flag)
-- Testing:
-  - Unit tests for reminder scheduler (identifier persistence).
-  - Manual tests on device + watch simulator for scheduling, editing, deleting.
+### Current Progress
+- Branch `feat/reminders-phase1` contains the implemented EventKit scheduler, reminder metadata models, iOS UI, and metadata store.
+- Metadata records successfully save to the private custom zone when reminders are scheduled; logs confirm creation.
+- Reminder indicators render correctly immediately after scheduling.
 
-Once we iterate on this spec and lock the remaining details, we can start Phase 1 implementation. Let me know if anything needs refinement or if there are additional UX considerations (e.g., deep linking from notifications to specific caree/activity). 
+### Known Issues
+1. **Reminder overlay QA still pending** – After fixing the async fetch, exercise owned + shared pull-to-refresh plus watch sync paths to confirm activities retain reminder metadata and the bell glyph is present in list/detail.
+2. **Reminder notifications intermittently not firing** – Even with logs showing `Scheduled reminder …`, some devices never display the reminder. Need to inspect EventKit permission status and confirm Reminders app contains the entries.
+3. **watchOS permission drift** – watch reminders currently use `UNUserNotificationCenter` as an interim solution; need to harden how we prompt/educate when notification permissions are denied so the toggle reverts gracefully.
+
+### Next Actions
+1. **Cross-device QA pass**
+   - Exercise owned + shared pull-to-refresh, offline edits, and watch sync flows to confirm reminder metadata sticks and the bell glyph reflects the right source after cache refreshes.
+   - Capture profiler/log output (`🔔 Overlaying reminder metadata …`) for each path so we can compare refresh timings before/after the overlay step.
+2. **Diagnose non-firing reminders**
+   - Expand scheduler logging to include explicit permission states + calendar identifiers when saving fails; surface actionable messaging when we detect `.denied`.
+   - On devices that reported missed reminders, inspect the Reminders app contents and EventKit error payloads; consider fallback local notifications if EK saves continue to fail.
+3. **watchOS permission/UX hardening**
+   - Add denial messaging + Settings shortcut when the watch toggle is enabled but `UNUserNotificationCenter` reports `.denied`.
+   - Ensure edit flows convert overdue reminders to a disabled state with context so the crown picker doesn’t misrepresent already-fired alerts.
+4. **Docs & screenshots prep**
+   - Once QA completes, capture refreshed screenshots + finalize README/docs copy so the reminder feature ships with accurate guidance.
+
+Testing:
+- ✅ Unit tests for `ReminderScheduler` permission branching now live (`CareKeeperTests/ReminderSchedulerTests.swift`) using the injectable initializer to avoid UI prompts.
+- ⏳ Manual verification on device + watch once the overlay QA pass is scheduled; capture test cases covering edit/delete paths and denied-permission flows.
+
+Once the outstanding items above are complete, Phase 1 can be considered feature-complete and we can move on to Phase 3 documentation/screenshots.
 
 ## Potential Improvements (Future Work)
-1. **ActivityType `hasReminders` flag** – gate the reminder UI by activity type to reduce watch UI clutter. Requires CloudKit schema update + snapshot/service changes.
+1. **ActivityType `hasReminders` flag** – gate the reminder UI by activity type to reduce watch UI clutter. Requires CloudKit schema update + snapshot/service changes. Capture as a future enhancement rather than current scope.
 2. **Cross-device auto scheduling** – when iOS receives a watch-originated reminder metadata update (or vice versa), consider auto-creating/canceling the local reminder so actions propagate between devices.
