@@ -608,6 +608,7 @@ class WatchDataProvider: ObservableObject {
         to activities: [ActivitySnapshot]
     ) -> [ActivitySnapshot] {
         guard !metadata.isEmpty else { return activities }
+        logger.info("⌚️ Overlaying reminder metadata for \(metadata.count, privacy: .public) activities on watch")
         return activities.map { activity in
             var updated = activity
             if let entry = metadata[activity.id] {

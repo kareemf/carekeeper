@@ -1341,6 +1341,7 @@ class CloudKitDataService: ObservableObject {
         to activitiesByCaree: inout [UUID: [Activity]]
     ) {
         guard !metadata.isEmpty else { return }
+        logger.info("🔔 Overlaying reminder metadata for \(metadata.count, privacy: .public) activities")
         for (careeID, activities) in activitiesByCaree {
             let updated = activities.map { activity -> Activity in
                 if let entry = metadata[activity.id] {

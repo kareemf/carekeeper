@@ -29,6 +29,7 @@ final class ReminderScheduler {
                             if let error {
                                 continuation.resume(throwing: error)
                             } else {
+                                AppLogger.app.info("🔐 UNUserNotificationCenter granted? \(granted, privacy: .public)")
                                 continuation.resume(returning: granted)
                             }
                         }
@@ -40,12 +41,14 @@ final class ReminderScheduler {
                 return false
             }
         #else
-            switch EKEventStore.authorizationStatus(for: .reminder) {
+            let status = EKEventStore.authorizationStatus(for: .reminder)
+            switch status {
             case .authorized:
                 return true
             case .notDetermined:
                 return await requestReminderAuthorization()
             default:
+                AppLogger.app.warning("🔐 EventKit reminder status: \(status.rawValue, privacy: .public)")
                 return false
             }
         #endif
@@ -84,6 +87,7 @@ final class ReminderScheduler {
         reminder.startDateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: Date())
 
         try store.save(reminder, commit: true)
+        AppLogger.app.info("🔔 Scheduled reminder \(reminder.calendarItemIdentifier, privacy: .public) for \(careeName, privacy: .public)")
         return (reminder.calendarItemIdentifier, dueDate)
         #endif
     }
@@ -107,6 +111,7 @@ final class ReminderScheduler {
             reminder.title = "\(careeName): \(activityTypeName)"
             reminder.notes = "\(activityTypeName) | \(relativeDescription(for: dueDate))"
             try store.save(reminder, commit: true)
+            AppLogger.app.info("🔔 Updated reminder \(identifier, privacy: .public)")
             return (identifier, dueDate)
         } else {
             return try await scheduleReminder(
@@ -158,6 +163,7 @@ final class ReminderScheduler {
                         if let error {
                             continuation.resume(throwing: error)
                         } else {
+                            AppLogger.app.info("🔐 requestFullAccessToReminders granted? \(granted, privacy: .public)")
                             continuation.resume(returning: granted)
                         }
                     }
@@ -167,7 +173,9 @@ final class ReminderScheduler {
             }
         } else {
             do {
-                return try await store.requestAccess(to: .reminder)
+                let granted = try await store.requestAccess(to: .reminder)
+                AppLogger.app.info("🔐 requestAccess(to:) granted? \(granted, privacy: .public)")
+                return granted
             } catch {
                 return false
             }
