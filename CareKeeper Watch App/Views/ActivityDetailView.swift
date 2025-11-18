@@ -55,10 +55,6 @@ struct ActivityDetailView: View {
         return activitySnapshot
     }
 
-    private var isReminderEditableOnThisDevice: Bool {
-        currentActivity.reminderSource == nil || currentActivity.reminderSource == .watch
-    }
-
     private var editedDateTime: Date {
         Date().addingTimeInterval(-minutesAgo * 60)
     }
@@ -437,9 +433,7 @@ struct ActivityDetailView: View {
         let activity = currentActivity
         Task {
             await MainActor.run {
-                if activity.reminderSource == .watch,
-                   let reminderID = activity.reminderIdentifier
-                {
+                if let reminderID = activity.reminderIdentifier {
                     ReminderScheduler.shared.deleteReminder(with: reminderID)
                 }
             }
@@ -469,11 +463,7 @@ struct ActivityDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             if isEditing {
                 editingTimeView
-                if isReminderEditableOnThisDevice {
-                    reminderEditor
-                } else {
-                    reminderUnavailableNotice
-                }
+                reminderEditor
             } else {
                 readOnlyTimeView
                 reminderReadOnlyView
@@ -664,18 +654,6 @@ struct ActivityDetailView: View {
         }
     }
 
-    private var reminderUnavailableNotice: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Label("Reminder", systemImage: "bell")
-                .font(.caption)
-                .foregroundColor(.secondary)
-
-            Text("View-only. Edit this reminder on your iPhone.")
-                .font(.caption2)
-                .foregroundColor(.secondary)
-        }
-    }
-
     private var reminderDisplayInfo: (deviceSymbolName: String, relativeText: String)? {
         guard currentActivity.reminderIdentifier != nil else { return nil }
         let symbolName = currentActivity.reminderSource?.symbolName ?? ReminderSource.phone.symbolName
@@ -730,8 +708,6 @@ struct ActivityDetailView: View {
         updatedActivity: inout ActivitySnapshot,
         originalActivity: ActivitySnapshot
     ) async throws {
-        guard isReminderEditableOnThisDevice else { return }
-
         let scheduler = ReminderScheduler.shared
         let previousIdentifier = originalActivity.reminderIdentifier
 

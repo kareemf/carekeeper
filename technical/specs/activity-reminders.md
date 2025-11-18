@@ -32,6 +32,7 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
 - Reminders auto-cancel when:
   - Activity is deleted.
   - Reminder toggle is turned off in edit view (confirm dialog).
+- Edits can occur from any of the user’s devices (iPhone or Apple Watch) because both platforms now rely on the same EventKit reminder identifier; whichever device saves becomes the current “source” in metadata, but the underlying EKReminder stays in sync via iCloud.
 - Editing an existing activity:
   - Shows the reminder toggle in the “on” state when metadata exists.
   - Allows users to adjust the due date or disable it.
@@ -104,6 +105,7 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
    - ✅ Toggle + minutes-from-now picker UI in `TrackActivityView` with Digital Crown.
    - ✅ Reminder scheduling/canceling now flows through the same EventKit-based `ReminderScheduler` as iOS (watch no longer relies on ad-hoc UNNotifications), and `WatchDataProvider` syncs metadata to the shared store for the paired phone.
    - ✅ Reminder chips in list/detail screens also use `bell.fill` + device SF Symbols with the same neutral styling as iOS.
+   - ✅ Watch edit/delete flows no longer display “view-only” messaging—reminders created on iPhone can be adjusted or removed on watch (and vice versa) because they share the same EKReminder identifier.
 4. **Data plumbing**
    - ✅ `ActivityReminderMetadataStore` persists records in the private database + custom zone.
    - ✅ Owned + shared refresh flows now fetch reminder metadata before caching, the watch data provider overlays the same payload when syncing snapshots, the `CKFetchRecordsOperation` fetch awaits completion, and `LocalCacheService.replaceCaree` copies reminder fields when rebuilding the cache so list/detail views retain the bell state after pull-to-refresh.

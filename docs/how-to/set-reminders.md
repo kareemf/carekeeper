@@ -22,9 +22,9 @@ CareKeeper lets you attach personal reminders to specific activities so you get 
 
 ## Managing Existing Reminders
 
-- Edit the activity on the same device that created the reminder to adjust or delete it.
-- Turning off the toggle prompts you to confirm; accepting deletes the pending reminder on that device.
-- Deleting the activity also deletes its reminder locally.
+- Edit the activity from either device—updates propagate via the shared reminder metadata and EventKit’s iCloud sync.
+- Turning off the toggle prompts you to confirm; accepting deletes the pending reminder across your devices.
+- Deleting the activity also deletes its reminder.
 
 ## Screenshots
 

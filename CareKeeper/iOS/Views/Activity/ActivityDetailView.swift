@@ -30,10 +30,6 @@ struct ActivityDetailView: View {
         return nil
     }
 
-    private func isReminderEditableOnThisDevice(for activity: Activity) -> Bool {
-        activity.reminderSource != .watch
-    }
-
     @State private var isEditing = false
     @State private var editingNotes: String = ""
     @State private var editingQuantity: String = ""
@@ -241,11 +237,9 @@ struct ActivityDetailView: View {
     }
 
     private func reminderSection(for activity: Activity) -> some View {
-        let canEditReminder = isReminderEditableOnThisDevice(for: activity)
         return Section {
             if isEditing {
                 Toggle(NSLocalizedString("Set Reminder", comment: "Reminder toggle"), isOn: $reminderEnabled.animation())
-                    .disabled(!canEditReminder)
                     .onChange(of: reminderEnabled) { _, newValue in
                         if !newValue, activity.reminderIdentifier != nil {
                             showReminderDisableConfirmation = true
@@ -255,17 +249,13 @@ struct ActivityDetailView: View {
                         }
                     }
 
-                if reminderEnabled && canEditReminder {
+                if reminderEnabled {
                     DatePicker(
                         NSLocalizedString("Remind me on", comment: "Reminder date picker"),
                         selection: $reminderDate,
                         in: reminderPickerRange,
                         displayedComponents: [.date, .hourAndMinute]
                     )
-                } else if isEditing && !canEditReminder {
-                    Text("View-only. Edit this reminder on your Apple Watch.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
                 }
             } else if activity.reminderIdentifier != nil,
                       let dueText = activity.reminderDueDateRelativeDescription
@@ -293,7 +283,7 @@ struct ActivityDetailView: View {
                 showReminderDisableConfirmation = false
             }
         } message: {
-            Text(NSLocalizedString("This deletes the pending reminder on this device.", comment: "Reminder disable message"))
+            Text(NSLocalizedString("This deletes the pending reminder.", comment: "Reminder disable message"))
         }
     }
     
@@ -407,8 +397,6 @@ struct ActivityDetailView: View {
         activityType: ActivityType,
         previousIdentifier: String?
     ) async throws {
-        guard isReminderEditableOnThisDevice(for: activity) else { return }
-
         let scheduler = ReminderScheduler.shared
         let cacheService = cloudKitService.cacheService
 
@@ -508,9 +496,7 @@ struct ActivityDetailView: View {
             do {
                 // Delete activity (unified API routes internally)
                 try await cloudKitService.deleteActivity(activity: activity, caree: caree)
-                if isReminderEditableOnThisDevice(for: activity) {
-                    ReminderScheduler.shared.deleteReminder(with: reminderID)
-                }
+                ReminderScheduler.shared.deleteReminder(with: reminderID)
 
                 // Cache is automatically updated by service
                 await MainActor.run {
