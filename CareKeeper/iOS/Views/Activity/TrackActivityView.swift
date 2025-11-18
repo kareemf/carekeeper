@@ -320,14 +320,15 @@ struct TrackActivityView: View {
 
     private func clampedReminderDate() -> Date {
         let range = reminderPickerRange
-        return min(max(reminderDate, range.lowerBound), range.upperBound)
+        let bounded = min(max(reminderDate, range.lowerBound), range.upperBound)
+        return bounded.roundedDownToMinute()
     }
 
     private func defaultReminderDate() -> Date {
         let now = Date()
         let defaultDate = now.addingTimeInterval(300) // 5 minutes from now
         let range = reminderPickerRange
-        return min(max(defaultDate, range.lowerBound), range.upperBound)
+        return min(max(defaultDate, range.lowerBound), range.upperBound).roundedDownToMinute()
     }
 }
 

@@ -477,13 +477,14 @@ struct ActivityDetailView: View {
 
     private func clampedReminderDate() -> Date {
         let range = reminderPickerRange
-        return min(max(reminderDate, range.lowerBound), range.upperBound)
+        let bounded = min(max(reminderDate, range.lowerBound), range.upperBound)
+        return bounded.roundedDownToMinute()
     }
 
     private func defaultReminderDate() -> Date {
         let defaultDate = Date().addingTimeInterval(300)
         let range = reminderPickerRange
-        return min(max(defaultDate, range.lowerBound), range.upperBound)
+        return min(max(defaultDate, range.lowerBound), range.upperBound).roundedDownToMinute()
     }
 
     private func openInMaps(for activity: Activity) {

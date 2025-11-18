@@ -326,7 +326,8 @@ struct TrackActivityView: View {
 
     private func clampedReminderDueDate() -> Date {
         let minutes = clampReminderMinutes(reminderMinutesAhead)
-        return Date().addingTimeInterval(minutes * 60)
+        let candidate = Date().addingTimeInterval(minutes * 60)
+        return candidate.roundedDownToMinute()
     }
 
     private func clampReminderMinutes(_ value: Double) -> Double {
