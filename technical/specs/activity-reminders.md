@@ -102,7 +102,7 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
    - ✅ Reminder badges in list/detail views now use SF Symbols (`bell.fill`, `iphone`, `applewatch`) with neutral colors instead of emojis/orange text for consistency with the rest of the UI.
 3. **watchOS UI**
    - ✅ Toggle + minutes-from-now picker UI in `TrackActivityView` with Digital Crown.
-   - ✅ Reminder scheduling/canceling now flows through `ReminderScheduler` (UNUserNotificationCenter-based on watch), and `WatchDataProvider` syncs metadata to the shared store for the paired phone.
+   - ✅ Reminder scheduling/canceling now flows through the same EventKit-based `ReminderScheduler` as iOS (watch no longer relies on ad-hoc UNNotifications), and `WatchDataProvider` syncs metadata to the shared store for the paired phone.
    - ✅ Reminder chips in list/detail screens also use `bell.fill` + device SF Symbols with the same neutral styling as iOS.
 4. **Data plumbing**
    - ✅ `ActivityReminderMetadataStore` persists records in the private database + custom zone.

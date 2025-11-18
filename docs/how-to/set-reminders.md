@@ -18,7 +18,7 @@ CareKeeper lets you attach personal reminders to specific activities so you get 
 3. Use the Digital Crown to choose the number of minutes in the future (up to 24 hours).
 4. Save the activity. The list and detail screens show a bell with either `📱` or `⌚️` depending on which device scheduled the reminder.
 
-Watch reminders use the watch’s notification permissions. If they’re disabled, you’ll get an error explaining how to enable notifications in the Watch app before you can schedule reminders.
+> watchOS now uses the same Reminders permission as iOS. If the toggle shows an error, tap **Open Settings** and grant Reminders access (Settings → Privacy & Security → Reminders, or via the Watch app) before retrying.
 
 ## Managing Existing Reminders
 

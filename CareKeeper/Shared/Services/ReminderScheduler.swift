@@ -1,78 +1,42 @@
 import EventKit
 import Foundation
-#if os(watchOS)
-    import UserNotifications
-#endif
 
 /// Thin wrapper around EKEventStore so both iOS and watchOS can create local reminders.
 @MainActor
 final class ReminderScheduler {
     static let shared = ReminderScheduler()
     private let logger = AppLogger.app
-
-#if !os(watchOS)
     private let store: EKEventStore
-        private let authorizationStatusProvider: () -> EKAuthorizationStatus
-        private let requestAuthorizationHandler: (() async -> Bool)?
+    private let authorizationStatusProvider: () -> EKAuthorizationStatus
+    private let requestAuthorizationHandler: (() async -> Bool)?
 
-        init(
-            store: EKEventStore = EKEventStore(),
-            authorizationStatusProvider: @escaping () -> EKAuthorizationStatus = {
-                EKEventStore.authorizationStatus(for: .reminder)
-            },
-            requestAuthorizationHandler: (() async -> Bool)? = nil
-        ) {
-            self.store = store
-            self.authorizationStatusProvider = authorizationStatusProvider
-            self.requestAuthorizationHandler = requestAuthorizationHandler
-        }
-    #else
-        private init() {}
-    #endif
+    init(
+        store: EKEventStore = EKEventStore(),
+        authorizationStatusProvider: @escaping () -> EKAuthorizationStatus = {
+            EKEventStore.authorizationStatus(for: .reminder)
+        },
+        requestAuthorizationHandler: (() async -> Bool)? = nil
+    ) {
+        self.store = store
+        self.authorizationStatusProvider = authorizationStatusProvider
+        self.requestAuthorizationHandler = requestAuthorizationHandler
+    }
 
     func ensureAuthorization() async -> Bool {
-        #if os(watchOS)
-            let center = UNUserNotificationCenter.current()
-            let settings = await notificationSettings()
-            logger.info("🔐 watch reminder authorization status: \(settings.authorizationStatus.rawValue, privacy: .public)")
-            switch settings.authorizationStatus {
-            case .authorized, .provisional, .ephemeral:
-                return true
-            case .notDetermined:
-                do {
-                    return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Bool, Error>) in
-                        center.requestAuthorization(options: [.alert, .sound]) { granted, error in
-                            if let error {
-                                continuation.resume(throwing: error)
-                            } else {
-                                self.logger.info("🔐 watch reminder request granted? \(granted, privacy: .public)")
-                                continuation.resume(returning: granted)
-                            }
-                        }
-                    }
-                } catch {
-                    return false
-                }
-            default:
-                logger.warning("🔐 watch reminder access denied")
-                return false
+        let status = authorizationStatusProvider()
+        logger.info("🔐 EventKit reminder authorization status: \(status.rawValue, privacy: .public)")
+        switch status {
+        case .authorized:
+            return true
+        case .notDetermined:
+            if let requestAuthorizationHandler {
+                return await requestAuthorizationHandler()
             }
-        #else
-            let status = authorizationStatusProvider()
-            logger.info("🔐 EventKit reminder authorization status: \(status.rawValue, privacy: .public)")
-            switch status {
-            case .authorized:
-                return true
-            case .notDetermined:
-                if let requestAuthorizationHandler {
-                    return await requestAuthorizationHandler()
-                }
-                return await requestReminderAuthorization()
-            default:
-                logger.warning("🔐 EventKit reminder status denied")
-                return false
-            }
-        #endif
+            return await requestReminderAuthorization()
+        default:
+            logger.warning("🔐 EventKit reminder status denied")
+            return false
+        }
     }
 
     func scheduleReminder(
@@ -81,15 +45,6 @@ final class ReminderScheduler {
         dueDate: Date,
         note: String? = nil
     ) async throws -> (identifier: String, dueDate: Date) {
-        #if os(watchOS)
-            return try await scheduleNotification(
-                identifier: nil,
-                careeName: careeName,
-                activityTypeName: activityTypeName,
-                dueDate: dueDate,
-                note: note
-            )
-        #else
         guard try await ensureDefaultCalendarAvailable() else {
             throw NSError(domain: "ReminderScheduler", code: 1, userInfo: [
                 NSLocalizedDescriptionKey: "No reminders calendar available. Open the Reminders app once to create the default list.",
@@ -113,7 +68,6 @@ final class ReminderScheduler {
         try store.save(reminder, commit: true)
         logger.info("🔔 Scheduled reminder \(reminder.calendarItemIdentifier, privacy: .public) for \(careeName, privacy: .public)")
         return (reminder.calendarItemIdentifier, dueDate)
-        #endif
     }
 
     func updateReminder(
@@ -123,15 +77,6 @@ final class ReminderScheduler {
         dueDate: Date,
         note: String? = nil
     ) async throws -> (identifier: String, dueDate: Date) {
-        #if os(watchOS)
-            return try await scheduleNotification(
-                identifier: identifier,
-                careeName: careeName,
-                activityTypeName: activityTypeName,
-                dueDate: dueDate,
-                note: note
-            )
-        #else
         if let reminder = store.calendarItem(withIdentifier: identifier) as? EKReminder {
             if reminder.isCompleted {
                 AppLogger.app.info("🔔 Existing reminder completed, creating a new one for \(identifier, privacy: .public)")
@@ -164,16 +109,9 @@ final class ReminderScheduler {
             dueDate: dueDate,
             note: note
         )
-        #endif
     }
 
     func deleteReminder(with identifier: String?) {
-        #if os(watchOS)
-            guard let identifier else { return }
-            let center = UNUserNotificationCenter.current()
-            center.removePendingNotificationRequests(withIdentifiers: [identifier])
-            logger.info("🔔 Cleared watch reminder \(identifier, privacy: .public)")
-        #else
         guard let identifier,
               let reminder = store.calendarItem(withIdentifier: identifier) as? EKReminder
         else {
@@ -184,10 +122,8 @@ final class ReminderScheduler {
         } catch {
             // Swallow – failure to delete a reminder shouldn't block UI.
         }
-        #endif
     }
 
-    #if !os(watchOS)
     private func ensureDefaultCalendarAvailable() async throws -> Bool {
         if store.defaultCalendarForNewReminders() != nil {
             return true
@@ -201,7 +137,7 @@ final class ReminderScheduler {
     }
 
     private func requestReminderAuthorization() async -> Bool {
-        if #available(iOS 17.0, macOS 14.0, visionOS 1.0, *) {
+        if #available(iOS 17.0, macOS 14.0, visionOS 1.0, watchOS 10.0, *) {
             do {
                 return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Bool, Error>) in
                     store.requestFullAccessToReminders { granted, error in
@@ -226,7 +162,6 @@ final class ReminderScheduler {
             }
         }
     }
-    #endif
 
     private func relativeDescription(for dueDate: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
@@ -241,47 +176,4 @@ final class ReminderScheduler {
         }
         return components.joined(separator: "\n")
     }
-
-    #if os(watchOS)
-        private func notificationSettings() async -> UNNotificationSettings {
-            await withCheckedContinuation { (continuation: CheckedContinuation<UNNotificationSettings, Never>) in
-                UNUserNotificationCenter.current().getNotificationSettings { settings in
-                    continuation.resume(returning: settings)
-                }
-            }
-        }
-
-        private func scheduleNotification(
-            identifier: String?,
-            careeName: String,
-            activityTypeName: String,
-            dueDate: Date,
-            note: String?
-        ) async throws -> (identifier: String, dueDate: Date) {
-            let content = UNMutableNotificationContent()
-            content.title = "\(careeName): \(activityTypeName)"
-            content.body = reminderBody(activityTypeName: activityTypeName, dueDate: dueDate, note: note)
-            content.sound = .default
-
-            let triggerDate = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: dueDate)
-            let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
-
-            let identifier = identifier ?? UUID().uuidString
-            let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-
-            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-                UNUserNotificationCenter.current().add(request) { error in
-                    if let error {
-                        continuation.resume(throwing: error)
-                    } else {
-                        continuation.resume(returning: ())
-                    }
-                }
-            }
-
-            logger.info("🔔 Scheduled watch reminder \(identifier, privacy: .public) for \(careeName, privacy: .public)")
-
-            return (identifier, dueDate)
-        }
-    #endif
 }

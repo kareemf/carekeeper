@@ -177,6 +177,7 @@ targets:
         WKCompanionAppBundleIdentifier: com.kareemf.CareKeeper
         WKApplication: true
         NSLocationWhenInUseUsageDescription: "CareKeeper can optionally track location for activities when you enable location tracking for specific activity types."
+        NSRemindersUsageDescription: "CareKeeper can optionally use Reminders to notify you about scheduled activities."
         UIBackgroundModes:
           - remote-notification
     entitlements:
