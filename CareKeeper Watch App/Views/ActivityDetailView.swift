@@ -19,6 +19,10 @@ struct ActivityDetailView: View {
     @State private var captureNewLocation: Bool = false
     @State private var reminderEnabled: Bool = false
     @State private var reminderMinutesAhead: Double = 5
+    @State private var reminderAnchorDueDate: Date?
+    @State private var hasAdjustedReminderMinutes = false
+    @State private var isSettingReminderMinutes = false
+    @State private var reminderWasOriginallyEnabled = false
     @State private var showReminderDisableConfirmation = false
     @State private var isSaving = false
     @State private var showingDeleteConfirmation = false
@@ -182,6 +186,9 @@ struct ActivityDetailView: View {
             titleVisibility: .visible
         ) {
             Button("Remove", role: .destructive) {
+                reminderWasOriginallyEnabled = false
+                reminderAnchorDueDate = nil
+                hasAdjustedReminderMinutes = true
                 reminderEnabled = false
                 showReminderDisableConfirmation = false
             }
@@ -321,12 +328,19 @@ struct ActivityDetailView: View {
         let timeDiff = Date().timeIntervalSince(currentActivity.dateTime)
         minutesAgo = max(0, timeDiff / 60)
 
-        reminderEnabled = currentActivity.reminderIdentifier != nil
+        reminderWasOriginallyEnabled = currentActivity.reminderIdentifier != nil
+        reminderAnchorDueDate = currentActivity.reminderDueDate
+        hasAdjustedReminderMinutes = false
+        reminderEnabled = reminderWasOriginallyEnabled
+
+        isSettingReminderMinutes = true
         if let dueDate = currentActivity.reminderDueDate {
             reminderMinutesAhead = clampReminderMinutes(minutesUntil(date: dueDate))
         } else {
             reminderMinutesAhead = defaultReminderMinutesAhead()
+            reminderAnchorDueDate = nil
         }
+        isSettingReminderMinutes = false
     }
 
     private func startEditing() {
@@ -566,26 +580,37 @@ struct ActivityDetailView: View {
                 Text("Set Reminder")
                     .font(.body)
             }
-            .onChange(of: reminderEnabled) { _, newValue in
-                if !newValue,
-                   currentActivity.reminderIdentifier != nil
-                {
-                    reminderEnabled = true
-                    showReminderDisableConfirmation = true
-                } else if newValue,
-                          currentActivity.reminderIdentifier == nil
-                {
-                    reminderMinutesAhead = defaultReminderMinutesAhead()
-                    reminderInputFocused = true
+            .onChange(of: reminderEnabled) { oldValue, newValue in
+                guard oldValue != newValue else { return }
+                if !newValue {
+                    if reminderWasOriginallyEnabled {
+                        reminderEnabled = true
+                        showReminderDisableConfirmation = true
+                    } else {
+                        reminderAnchorDueDate = nil
+                        hasAdjustedReminderMinutes = false
+                        reminderInputFocused = false
+                    }
                 } else {
-                    reminderInputFocused = false
+                    if !oldValue {
+                        if reminderWasOriginallyEnabled,
+                           reminderAnchorDueDate != nil
+                        {
+                            reminderInputFocused = false
+                        } else {
+                            reminderAnchorDueDate = nil
+                            hasAdjustedReminderMinutes = false
+                            setReminderMinutesAhead(defaultReminderMinutesAhead())
+                            reminderInputFocused = true
+                        }
+                    }
                 }
             }
 
             if reminderEnabled {
                 VStack(spacing: 4) {
                     HStack {
-                        Text(clampedReminderDueDate(), style: .time)
+                        Text(currentEditingReminderDueDate(), style: .time)
                             .font(.title3)
                             .fontWeight(.semibold)
                         Spacer()
@@ -612,6 +637,11 @@ struct ActivityDetailView: View {
                     isContinuous: false,
                     isHapticFeedbackEnabled: true
                 )
+                .onChange(of: reminderMinutesAhead) { _, _ in
+                    guard !isSettingReminderMinutes else { return }
+                    reminderAnchorDueDate = nil
+                    hasAdjustedReminderMinutes = true
+                }
             }
         }
     }
@@ -660,9 +690,21 @@ struct ActivityDetailView: View {
         1 ... reminderWindowMinutes
     }
 
-    private func clampedReminderDueDate() -> Date {
+    private func currentEditingReminderDueDate() -> Date {
+        if reminderEnabled,
+           !hasAdjustedReminderMinutes,
+           let anchor = reminderAnchorDueDate
+        {
+            return anchor
+        }
+
         let minutes = clampReminderMinutes(reminderMinutesAhead)
-        return Date().addingTimeInterval(minutes * 60)
+        let candidate = Date().addingTimeInterval(minutes * 60)
+        return candidate.roundedDownToMinute()
+    }
+
+    private func clampedReminderDueDate() -> Date {
+        currentEditingReminderDueDate()
     }
 
     private func clampReminderMinutes(_ value: Double) -> Double {
@@ -671,6 +713,12 @@ struct ActivityDetailView: View {
 
     private func defaultReminderMinutesAhead() -> Double {
         clampReminderMinutes(5)
+    }
+
+    private func setReminderMinutesAhead(_ value: Double) {
+        isSettingReminderMinutes = true
+        reminderMinutesAhead = value
+        isSettingReminderMinutes = false
     }
 
     private func minutesUntil(date: Date) -> Double {
