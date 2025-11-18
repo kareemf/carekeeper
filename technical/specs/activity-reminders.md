@@ -144,7 +144,7 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
    - Capture logs from `ReminderScheduler`’s new authorization instrumentation to verify status transitions.
 2. **Docs & screenshots prep**
    - ✅ `docs/how-to/set-reminders.md` now covers iOS + watch reminder creation with populated screenshots.
-   - ✅ README.md and docs/index.md now link to the reminder how-to so users can find it quickly.
+   - ✅ README.md, docs/index.md, and docs/reference/faq.md now call out reminders explicitly (with links to the how-to).
    - Once watch QA wraps, capture any remaining screenshots (e.g., bell indicators, Settings prompts) and update README/docs feature blurbs if we need additional visuals.
 
 Testing:

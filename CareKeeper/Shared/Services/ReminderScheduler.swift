@@ -65,7 +65,7 @@ final class ReminderScheduler {
         reminder.alarms?.forEach { reminder.removeAlarm($0) }
         reminder.addAlarm(EKAlarm(absoluteDate: dueDate))
 
-        try store.save(reminder, commit: true)
+        try await save(reminder: reminder)
         logger.info("🔔 Scheduled reminder \(reminder.calendarItemIdentifier, privacy: .public) for \(careeName, privacy: .public)")
         return (reminder.calendarItemIdentifier, dueDate)
     }
@@ -81,7 +81,7 @@ final class ReminderScheduler {
             if reminder.isCompleted {
                 AppLogger.app.info("🔔 Existing reminder completed, creating a new one for \(identifier, privacy: .public)")
                 do {
-                    try store.remove(reminder, commit: true)
+                    try await remove(reminder: reminder)
                 } catch {
                     AppLogger.app.warning("⚠️ Failed to remove completed reminder before recreating: \(error.localizedDescription, privacy: .public)")
                 }
@@ -91,7 +91,7 @@ final class ReminderScheduler {
                 reminder.notes = reminderBody(activityTypeName: activityTypeName, dueDate: dueDate, note: note)
                 reminder.alarms?.forEach { reminder.removeAlarm($0) }
                 reminder.addAlarm(EKAlarm(absoluteDate: dueDate))
-                try store.save(reminder, commit: true)
+                try await save(reminder: reminder)
                 logger.info("🔔 Updated reminder \(identifier, privacy: .public)")
                 return (identifier, dueDate)
             }
@@ -117,10 +117,12 @@ final class ReminderScheduler {
         else {
             return
         }
-        do {
-            try store.remove(reminder, commit: true)
-        } catch {
-            // Swallow – failure to delete a reminder shouldn't block UI.
+        Task {
+            do {
+                try await remove(reminder: reminder)
+            } catch {
+                // Swallow – failure to delete a reminder shouldn't block UI.
+            }
         }
     }
 
@@ -175,5 +177,21 @@ final class ReminderScheduler {
             components.append(trimmed)
         }
         return components.joined(separator: "\n")
+    }
+
+    private func save(reminder: EKReminder) async throws {
+        if #available(iOS 17.0, macOS 14.0, watchOS 10.0, *) {
+            try await store.save(reminder)
+        } else {
+            try store.save(reminder, commit: true)
+        }
+    }
+
+    private func remove(reminder: EKReminder) async throws {
+        if #available(iOS 17.0, macOS 14.0, watchOS 10.0, *) {
+            try await store.remove(reminder)
+        } else {
+            try store.remove(reminder, commit: true)
+        }
     }
 }

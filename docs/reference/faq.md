@@ -125,6 +125,16 @@ You can backfill data from weeks or months ago.
 
 ---
 
+### How do reminders work across my devices?
+
+- Reminders are personal—each caregiver’s Apple ID has its own reminders list. Scheduling on iPhone or Apple Watch uses Apple’s Reminders database, so the alert syncs automatically to that user’s other Apple devices.
+- The watch and phone share reminder metadata in CareKeeper, which is why the bell indicator shows whether the phone (`📱`) or watch (`⌚️`) created it, but edits can be made from either platform.
+- Toggling reminders off deletes them everywhere you’re signed in; deleting the activity does the same.
+
+See [How to Schedule Reminders](../how-to/set-reminders.md) for a step-by-step walkthrough.
+
+---
+
 ### Can I export my data?
 
 **Yes.** Export to JSON format:

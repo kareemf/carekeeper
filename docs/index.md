@@ -42,7 +42,7 @@ Works offline with automatic sync when connected. Track activities anywhere, any
 Export your data to or import it from JSON at any time.
 
 ### Personal Reminders
-Set on-device reminders (separate per iPhone and Apple Watch) for activities that need a follow-up.
+Set reminders on either iPhone or Apple Watch, edit/cancel them from any device tied to your Apple ID.
 
 ## Getting Started
 
