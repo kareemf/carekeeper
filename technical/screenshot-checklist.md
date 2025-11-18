@@ -131,8 +131,8 @@
 
 <!-- - Empty carees list with "Add your first caree" prompt (`empty-carees-list-with-add-your-first-caree-prompt`) -->
 <!-- - New caree form (`new-caree-form`) -->
-- Name field being filled in (`name-field-being-filled-in`)
-- Photo picker showing options (`photo-picker-showing-options`)
+<!-- - Name field being filled in (`name-field-being-filled-in`) -->
+<!-- - Photo picker showing options (`photo-picker-showing-options`) -->
 - Saved caree appearing in list (`saved-caree-appearing-in-list`)
 <!-- - Caree detail view (`new-caree-detail-view`) -->
 - Edit caree screen (`edit-caree-screen`)

@@ -56,6 +56,7 @@ New to CareKeeper? Follow these tutorials to get up and running:
 
 ### For New Users
 - [How to Track an Activity](how-to/track-activity.md)
+- [How to Schedule Reminders](how-to/set-reminders.md)
 - [Understanding Security & Privacy](explanation/security-privacy.md)
 
 ### For Collaborative Care

@@ -141,7 +141,9 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
    - Harden denial flows by guiding users to watch Settings when authorization fails (mirroring the new logging in `ReminderScheduler`).
    - Capture logs from `ReminderScheduler`’s new authorization instrumentation to verify status transitions.
 2. **Docs & screenshots prep**
-   - Once watch QA wraps, capture refreshed screenshots + finalize README/docs copy so the reminder feature ships with accurate guidance.
+   - ✅ `docs/how-to/set-reminders.md` now covers iOS + watch reminder creation with populated screenshots.
+   - ✅ README.md and docs/index.md now link to the reminder how-to so users can find it quickly.
+   - Once watch QA wraps, capture any remaining screenshots (e.g., bell indicators, Settings prompts) and update README/docs feature blurbs if we need additional visuals.
 
 Testing:
 - ✅ Unit tests for `ReminderScheduler` permission branching now live (`CareKeeperTests/ReminderSchedulerTests.swift`) using the injectable initializer to avoid UI prompts.

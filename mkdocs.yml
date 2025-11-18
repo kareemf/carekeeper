@@ -9,6 +9,8 @@ site_url: https://carekeeper.example.com
 
 theme:
   name: material
+  favicon: assets/carekeeper-favicon.png
+  logo: assets/carekeeper-favicon.png
   palette:
     # Light mode
     - media: "(prefers-color-scheme: light)"
@@ -76,6 +78,7 @@ nav:
     - Track an Activity: how-to/track-activity.md
     - Share a Caree: how-to/share-caree.md
     - Use the Watch App: how-to/use-watch-app.md
+    - Set Reminders: how-to/set-reminders.md
     - Export Your Data: how-to/export-data.md
 
   - Explanation:
