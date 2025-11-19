@@ -4,42 +4,36 @@ struct ActivityReminderMetadata: Codable, Sendable {
     let activityID: UUID
     var reminderDueDate: Date?
     var reminderSource: ReminderSource?
-    var phoneReminderIdentifier: String?
-    var watchReminderIdentifier: String?
+    var ekReminderIdentifier: String?
+    var unNotificationIdentifier: String?
 
     init(
         activityID: UUID,
         reminderDueDate: Date? = nil,
         reminderSource: ReminderSource? = nil,
-        phoneReminderIdentifier: String? = nil,
-        watchReminderIdentifier: String? = nil
+        ekReminderIdentifier: String? = nil,
+        unNotificationIdentifier: String? = nil
     ) {
         self.activityID = activityID
         self.reminderDueDate = reminderDueDate
         self.reminderSource = reminderSource
-        self.phoneReminderIdentifier = phoneReminderIdentifier
-        self.watchReminderIdentifier = watchReminderIdentifier
+        self.ekReminderIdentifier = ekReminderIdentifier
+        self.unNotificationIdentifier = unNotificationIdentifier
     }
 
     var reminderIdentifier: String? {
-        phoneReminderIdentifier ?? watchReminderIdentifier
+        ekReminderIdentifier ?? unNotificationIdentifier
     }
 
     func identifier(for owner: ReminderSource) -> String? {
-        switch owner {
-        case .phone:
-            phoneReminderIdentifier
-        case .watch:
-            watchReminderIdentifier
-        }
+        owner == .phone ? ekReminderIdentifier : unNotificationIdentifier
     }
 
     mutating func setIdentifier(_ identifier: String?, for owner: ReminderSource) {
-        switch owner {
-        case .phone:
-            phoneReminderIdentifier = identifier
-        case .watch:
-            watchReminderIdentifier = identifier
+        if owner == .phone {
+            ekReminderIdentifier = identifier
+        } else {
+            unNotificationIdentifier = identifier
         }
     }
 }

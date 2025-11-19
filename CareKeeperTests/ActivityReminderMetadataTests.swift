@@ -7,8 +7,8 @@ final class ActivityReminderMetadataTests: XCTestCase {
             activityID: UUID(),
             reminderDueDate: Date(),
             reminderSource: .phone,
-            phoneReminderIdentifier: "phone-id",
-            watchReminderIdentifier: "watch-id"
+            ekReminderIdentifier: "phone-id",
+            unNotificationIdentifier: "watch-id"
         )
 
         XCTAssertEqual(metadata.identifier(for: .phone), "phone-id")

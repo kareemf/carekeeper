@@ -647,7 +647,7 @@ class WatchDataProvider: ObservableObject {
                 activityID: activity.id,
                 reminderDueDate: activity.reminderDueDate,
                 reminderSource: activity.reminderSource,
-                watchReminderIdentifier: activity.reminderIdentifier
+                unNotificationIdentifier: activity.reminderIdentifier
             )
             do {
                 try await reminderMetadataStore.save(metadata: metadata)

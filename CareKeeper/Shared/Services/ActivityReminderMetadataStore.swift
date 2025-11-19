@@ -66,8 +66,8 @@ final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
 
         record["CD_reminderDueDate"] = metadata.reminderDueDate
         record["CD_reminderSourceRawValue"] = metadata.reminderSource?.rawValue
-        record["CD_phoneReminderIdentifier"] = metadata.phoneReminderIdentifier
-        record["CD_watchReminderIdentifier"] = metadata.watchReminderIdentifier
+        record["CD_phoneReminderIdentifier"] = metadata.ekReminderIdentifier
+        record["CD_watchReminderIdentifier"] = metadata.unNotificationIdentifier
 
         _ = try await database.save(record)
         AppLogger.cloudkit
@@ -121,8 +121,8 @@ final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
                         activityID: activityID,
                         reminderDueDate: record["CD_reminderDueDate"] as? Date,
                         reminderSource: (record["CD_reminderSourceRawValue"] as? String).flatMap { ReminderSource(rawValue: $0) },
-                        phoneReminderIdentifier: record["CD_phoneReminderIdentifier"] as? String ?? legacyIdentifier,
-                        watchReminderIdentifier: record["CD_watchReminderIdentifier"] as? String
+                        ekReminderIdentifier: record["CD_phoneReminderIdentifier"] as? String ?? legacyIdentifier,
+                        unNotificationIdentifier: record["CD_watchReminderIdentifier"] as? String
                     )
                     lock.lock()
                     metadata[activityID] = entry

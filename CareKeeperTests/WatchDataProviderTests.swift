@@ -39,7 +39,7 @@ final class WatchDataProviderTests: XCTestCase {
             activityID: activityID,
             reminderDueDate: Date().addingTimeInterval(300),
             reminderSource: .phone,
-            watchReminderIdentifier: "owned-reminder"
+            unNotificationIdentifier: "owned-reminder"
         )
 
         let provider = WatchDataProvider(
@@ -93,7 +93,7 @@ final class WatchDataProviderTests: XCTestCase {
             activityID: activityID,
             reminderDueDate: Date().addingTimeInterval(600),
             reminderSource: .watch,
-            watchReminderIdentifier: "shared-reminder"
+            unNotificationIdentifier: "shared-reminder"
         )
 
         let provider = WatchDataProvider(

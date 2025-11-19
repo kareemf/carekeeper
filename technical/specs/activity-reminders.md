@@ -108,7 +108,7 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
    - ✅ Watch edit/delete flows warn users that the reminder they adjust only affects the watch notification; the iOS Reminders entry remains unchanged unless they edit it from the phone.
 4. **Data plumbing**
    - ✅ `ActivityReminderMetadataStore` persists records in the private database + custom zone.
-   - ✅ Metadata now stores per-device identifiers (`phoneReminderIdentifier`, `watchReminderIdentifier`) plus the shared due date/source so each platform can manage its own reminder/notification without clobbering the other.
+   - ✅ Metadata now stores per-device identifiers (`ekReminderIdentifier`, `unNotificationIdentifier`) plus the shared due date/source so each platform can manage its own reminder/notification without clobbering the other.
    - ✅ Owned + shared refresh flows now fetch reminder metadata before caching, the watch data provider overlays the same payload when syncing snapshots, the `CKFetchRecordsOperation` fetch awaits completion, and `LocalCacheService.replaceCaree` copies reminder fields when rebuilding the cache so list/detail views retain the bell state after pull-to-refresh.
 5. **Lifecycle hooks**
    - ✅ Saving/deleting activities schedules/cancels reminders (Reminders.app on iOS, notifications on watch) and upserts/deletes metadata records.

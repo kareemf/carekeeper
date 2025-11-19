@@ -379,12 +379,12 @@ class LocalCacheService: ObservableObject {
 
        do {
            if identifier != nil || dueDate != nil || source != nil {
-               let metadata = ActivityReminderMetadata(
-                   activityID: activityID,
+                let metadata = ActivityReminderMetadata(
+                    activityID: activityID,
                     reminderDueDate: dueDate,
                     reminderSource: source,
-                    phoneReminderIdentifier: identifier
-               )
+                    ekReminderIdentifier: identifier
+                )
                try await reminderMetadataStore.save(metadata: metadata)
            } else {
                await reminderMetadataStore.deleteMetadata(for: activityID)
