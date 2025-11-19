@@ -614,7 +614,7 @@ class WatchDataProvider: ObservableObject {
         return activities.map { activity in
             var updated = activity
             if let entry = metadata[activity.id] {
-                updated.reminderIdentifier = entry.reminderIdentifier
+                updated.reminderIdentifier = entry.identifier(for: .watch)
                 updated.reminderDueDate = entry.reminderDueDate
                 updated.reminderSourceRawValue = entry.reminderSource?.rawValue
             }
@@ -644,9 +644,9 @@ class WatchDataProvider: ObservableObject {
         if activity.reminderIdentifier != nil || activity.reminderDueDate != nil || activity.reminderSourceRawValue != nil {
             let metadata = ActivityReminderMetadata(
                 activityID: activity.id,
-                reminderIdentifier: activity.reminderIdentifier,
                 reminderDueDate: activity.reminderDueDate,
-                reminderSource: activity.reminderSource
+                reminderSource: activity.reminderSource,
+                watchReminderIdentifier: activity.reminderIdentifier
             )
             do {
                 try await reminderMetadataStore.save(metadata: metadata)

@@ -42,7 +42,7 @@ Works offline with automatic sync when connected. Track activities anywhere, any
 Export your data to or import it from JSON at any time.
 
 ### Personal Reminders
-Set reminders on either iPhone or Apple Watch, edit/cancel them from any device tied to your Apple ID.
+On iPhone, reminders are saved into Apple’s Reminders app (and sync via iCloud). On Apple Watch, CareKeeper schedules local notifications.
 
 ## Getting Started
 

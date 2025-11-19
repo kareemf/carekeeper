@@ -64,9 +64,10 @@ final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
             throw error
         }
 
-        record["CD_reminderIdentifier"] = metadata.reminderIdentifier
         record["CD_reminderDueDate"] = metadata.reminderDueDate
         record["CD_reminderSourceRawValue"] = metadata.reminderSource?.rawValue
+        record["CD_phoneReminderIdentifier"] = metadata.phoneReminderIdentifier
+        record["CD_watchReminderIdentifier"] = metadata.watchReminderIdentifier
 
         _ = try await database.save(record)
         AppLogger.cloudkit
@@ -99,9 +100,11 @@ final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
             let operation = CKFetchRecordsOperation(recordIDs: recordIDs)
             operation.desiredKeys = [
                 "CD_activityID",
-                "CD_reminderIdentifier",
                 "CD_reminderDueDate",
                 "CD_reminderSourceRawValue",
+                "CD_phoneReminderIdentifier",
+                "CD_watchReminderIdentifier",
+                "CD_reminderIdentifier",
             ]
 
             let lock = NSLock()
@@ -113,11 +116,13 @@ final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
                     guard let idString = record["CD_activityID"] as? String,
                           let activityID = UUID(uuidString: idString)
                     else { return }
+                    let legacyIdentifier = record["CD_reminderIdentifier"] as? String
                     let entry = ActivityReminderMetadata(
                         activityID: activityID,
-                        reminderIdentifier: record["CD_reminderIdentifier"] as? String,
                         reminderDueDate: record["CD_reminderDueDate"] as? Date,
-                        reminderSource: (record["CD_reminderSourceRawValue"] as? String).flatMap { ReminderSource(rawValue: $0) }
+                        reminderSource: (record["CD_reminderSourceRawValue"] as? String).flatMap { ReminderSource(rawValue: $0) },
+                        phoneReminderIdentifier: record["CD_phoneReminderIdentifier"] as? String ?? legacyIdentifier,
+                        watchReminderIdentifier: record["CD_watchReminderIdentifier"] as? String
                     )
                     lock.lock()
                     metadata[activityID] = entry

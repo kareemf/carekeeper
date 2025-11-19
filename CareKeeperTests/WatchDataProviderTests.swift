@@ -37,9 +37,9 @@ final class WatchDataProviderTests: XCTestCase {
         let reminderStore = MockReminderMetadataStore()
         reminderStore.fetchResults[activityID] = ActivityReminderMetadata(
             activityID: activityID,
-            reminderIdentifier: "owned-reminder",
             reminderDueDate: Date().addingTimeInterval(300),
-            reminderSource: .phone
+            reminderSource: .phone,
+            watchReminderIdentifier: "owned-reminder"
         )
 
         let provider = WatchDataProvider(
@@ -91,9 +91,9 @@ final class WatchDataProviderTests: XCTestCase {
         let reminderStore = MockReminderMetadataStore()
         reminderStore.fetchResults[activityID] = ActivityReminderMetadata(
             activityID: activityID,
-            reminderIdentifier: "shared-reminder",
             reminderDueDate: Date().addingTimeInterval(600),
-            reminderSource: .watch
+            reminderSource: .watch,
+            watchReminderIdentifier: "shared-reminder"
         )
 
         let provider = WatchDataProvider(
@@ -311,9 +311,11 @@ final class WatchDataProviderTests: XCTestCase {
             ),
         ]
 
+        let reminderStore = MockReminderMetadataStore()
         let provider = WatchDataProvider(
             cacheService: WatchCacheService(),
             selectiveService: selectiveService,
+            reminderMetadataStore: reminderStore,
             perCareeRefreshThrottleInterval: 0
         )
         provider.carees = [caree]
@@ -360,6 +362,7 @@ final class WatchDataProviderTests: XCTestCase {
         let provider = WatchDataProvider(
             cacheService: WatchCacheService(),
             selectiveService: selectiveService,
+            reminderMetadataStore: MockReminderMetadataStore(),
             perCareeRefreshThrottleInterval: 300
         )
         provider.carees = [caree]

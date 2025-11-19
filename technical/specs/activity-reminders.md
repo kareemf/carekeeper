@@ -103,16 +103,17 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
    - ✅ Reminder badges in list/detail views now use SF Symbols (`bell.fill`, `iphone`, `applewatch`) with neutral colors instead of emojis/orange text for consistency with the rest of the UI.
 3. **watchOS UI**
    - ✅ Toggle + minutes-from-now picker UI in `TrackActivityView` with Digital Crown.
-   - ✅ Reminder scheduling/canceling now flows through the same EventKit-based `ReminderScheduler` as iOS (watch no longer relies on ad-hoc UNNotifications), and `WatchDataProvider` syncs metadata to the shared store for the paired phone.
+   - ✅ Reminder scheduling/canceling uses `UNUserNotificationCenter` so the alert fires locally on the watch (no EventKit dependency). Metadata still records the shared due date + ownership so iOS knows when the watch has a pending notification.
    - ✅ Reminder chips in list/detail screens also use `bell.fill` + device SF Symbols with the same neutral styling as iOS.
-   - ✅ Watch edit/delete flows no longer display “view-only” messaging—reminders created on iPhone can be adjusted or removed on watch (and vice versa) because they share the same EKReminder identifier.
+   - ✅ Watch edit/delete flows warn users that the reminder they adjust only affects the watch notification; the iOS Reminders entry remains unchanged unless they edit it from the phone.
 4. **Data plumbing**
    - ✅ `ActivityReminderMetadataStore` persists records in the private database + custom zone.
+   - ✅ Metadata now stores per-device identifiers (`phoneReminderIdentifier`, `watchReminderIdentifier`) plus the shared due date/source so each platform can manage its own reminder/notification without clobbering the other.
    - ✅ Owned + shared refresh flows now fetch reminder metadata before caching, the watch data provider overlays the same payload when syncing snapshots, the `CKFetchRecordsOperation` fetch awaits completion, and `LocalCacheService.replaceCaree` copies reminder fields when rebuilding the cache so list/detail views retain the bell state after pull-to-refresh.
 5. **Lifecycle hooks**
-   - ✅ Saving/deleting activities schedules/cancels reminders and upserts/deletes metadata records.
-   - ⏳ Run a regression/soak pass after the overlay fetch to ensure edits/deletes from either device keep metadata in sync (especially when offline then reconnecting).
-   - Optional future enhancement: cleanup overdue reminders or reschedule logic.
+   - ✅ Saving/deleting activities schedules/cancels reminders (Reminders.app on iOS, notifications on watch) and upserts/deletes metadata records.
+   - ⏳ Run a regression/soak pass after the overlay fetch to ensure edits/deletes triggered on one device don’t leave orphaned reminders on the other (especially when offline then reconnecting).
+   - Optional future enhancement: automatically create a matching watch notification whenever an iOS reminder is created (and vice versa) so users don’t have to manage them per device.
 
 ### Phase 2 – Deferred (future) ActivityType flag
 - Currently tracked as a follow-up, not in active scope. Captured in Potential Improvements below.
