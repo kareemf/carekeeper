@@ -98,6 +98,55 @@ final class ReminderSyncCoordinatorTests: XCTestCase {
         XCTAssertEqual(metadataStore.savedMetadata[activityID]?.unNotificationIdentifier, scheduler.scheduleResultIdentifier)
         XCTAssertEqual(updates[activityID], scheduler.scheduleResultIdentifier)
     }
+
+    func testSynchronizeSkipsDuplicateSchedulesUntilMetadataUpdated() async {
+        // Given a watch-originated reminder that needs a phone counterpart
+        let scheduler = MockReminderScheduler()
+        let metadataStore = MockReminderMetadataStore()
+        let coordinator = ReminderSyncCoordinator(scheduler: scheduler, metadataStore: metadataStore)
+
+        let activityID = UUID()
+        let dueDate = Date().addingTimeInterval(600)
+        let payload = ReminderSyncPayload(
+            activityID: activityID,
+            careeName: "Infant",
+            activityTypeName: "Check-in",
+            note: nil,
+            metadata: ActivityReminderMetadata(
+                activityID: activityID,
+                reminderDueDate: dueDate,
+                reminderSource: .watch,
+                ekReminderIdentifier: nil,
+                unNotificationIdentifier: "watch-id"
+            )
+        )
+
+        // When the phone sync runs twice before CloudKit reflects the new identifier
+        _ = await coordinator.synchronize(owner: .phone, payloads: [payload])
+        _ = await coordinator.synchronize(owner: .phone, payloads: [payload])
+
+        // Then the reminder is only scheduled once (no duplicate EK entries)
+        XCTAssertEqual(scheduler.scheduledReminders.count, 1)
+
+        // When metadata later contains the phone identifier
+        let resolvedPayload = ReminderSyncPayload(
+            activityID: activityID,
+            careeName: "Infant",
+            activityTypeName: "Check-in",
+            note: nil,
+            metadata: ActivityReminderMetadata(
+                activityID: activityID,
+                reminderDueDate: dueDate,
+                reminderSource: .watch,
+                ekReminderIdentifier: scheduler.scheduleResultIdentifier,
+                unNotificationIdentifier: "watch-id"
+            )
+        )
+        _ = await coordinator.synchronize(owner: .phone, payloads: [resolvedPayload])
+
+        // Then future syncs treat it as an update
+        XCTAssertEqual(scheduler.updatedIdentifiers, [scheduler.scheduleResultIdentifier])
+    }
 }
 
 private final class MockReminderScheduler: ReminderScheduling {

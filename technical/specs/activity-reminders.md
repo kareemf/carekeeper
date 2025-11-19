@@ -23,6 +23,7 @@ Reminders remain *personal* (local EventKit/UNNotification stores only). CloudKi
 
 ### Reminder behavior
 - Uses EventKit Reminders API (EKReminder) on iOS and local `UNUserNotificationCenter` notifications on watchOS (watchOS omits EventKit until Apple reintroduces support).
+  - Apple’s watchOS SDK currently marks `EKEventStore` reminder operations (`save(_:commit:)`, `remove(_:commit:)`, etc.) as **unavailable** for third-party apps, even though the system Reminders app ships on watchOS 10+. Attempts to compile those calls (e.g., commit `cf54ff5`) fail with “unavailable in watchOS” errors at the SDK level, so CareKeeper schedules `UNUserNotificationCenter` notifications on watch until Apple allows EventKit reminder access again.
 - Permissions requested lazily the first time the toggle is enabled (same as location flow).
 - Reminders include:
   - Title `"<CareeName>: <ActivityTypeName>"`
@@ -66,7 +67,7 @@ Reminders remain *personal* (local EventKit/UNNotification stores only). CloudKi
   - `reminderSource` (enum: `.phone` / `.watch`) – indicates which device scheduled the reminder so UI can label it.
 - Metadata is **per-user**, not shared:
   - Add a new CloudKit record type `CD_ActivityReminderMetadata` in the **private database** (same custom zone as owned carees) keyed by `activityID`.
-  - Record fields mirror the local metadata (`CD_activityID`, `CD_reminderDueDate`, `CD_reminderSourceRawValue`, `CD_ekReminderIdentifier`, `CD_unNotificationIdentifier`). Legacy `CD_reminderIdentifier` values are still read for backwards compatibility but always written to the new keys.
+  - Record fields mirror the local metadata (`CD_activityID`, `CD_reminderDueDate`, `CD_reminderSourceRawValue`, `CD_ekReminderIdentifier`, `CD_unNotificationIdentifier`). Older `CD_reminderIdentifier` values are ignored so stale identifiers don’t resurrect deleted reminders.
   - iOS/watch clients fetch/save/delete these records via a shared `ActivityReminderMetadataStore` so the same Apple ID sees consistent reminders across devices.
 - Storage integrations:
   - Extend `LocalCacheService` and `WatchCacheService` snapshots with reminder metadata (similar to streaming logs).

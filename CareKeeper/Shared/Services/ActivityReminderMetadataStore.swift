@@ -59,15 +59,10 @@ final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
         do {
             record = try await database.record(for: recordID)
             if mergedMetadata.ekReminderIdentifier == nil {
-                mergedMetadata.ekReminderIdentifier =
-                    record["CD_ekReminderIdentifier"] as? String ??
-                    record["CD_phoneReminderIdentifier"] as? String ??
-                    record["CD_reminderIdentifier"] as? String
+                mergedMetadata.ekReminderIdentifier = record["CD_ekReminderIdentifier"] as? String
             }
             if mergedMetadata.unNotificationIdentifier == nil {
-                mergedMetadata.unNotificationIdentifier =
-                    record["CD_unNotificationIdentifier"] as? String ??
-                    record["CD_watchReminderIdentifier"] as? String
+                mergedMetadata.unNotificationIdentifier = record["CD_unNotificationIdentifier"] as? String
             }
         } catch let error as CKError where error.code == .unknownItem {
             record = CKRecord(recordType: recordType, recordID: recordID)
@@ -116,9 +111,6 @@ final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
                 "CD_reminderSourceRawValue",
                 "CD_ekReminderIdentifier",
                 "CD_unNotificationIdentifier",
-                "CD_phoneReminderIdentifier",
-                "CD_watchReminderIdentifier",
-                "CD_reminderIdentifier",
             ]
 
             let lock = NSLock()
@@ -130,18 +122,12 @@ final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
                     guard let idString = record["CD_activityID"] as? String,
                           let activityID = UUID(uuidString: idString)
                     else { return }
-                    let legacyIdentifier = record["CD_reminderIdentifier"] as? String
                     let entry = ActivityReminderMetadata(
                         activityID: activityID,
                         reminderDueDate: record["CD_reminderDueDate"] as? Date,
                         reminderSource: (record["CD_reminderSourceRawValue"] as? String).flatMap { ReminderSource(rawValue: $0) },
-                        ekReminderIdentifier:
-                            record["CD_ekReminderIdentifier"] as? String ??
-                            record["CD_phoneReminderIdentifier"] as? String ??
-                            legacyIdentifier,
-                        unNotificationIdentifier:
-                            record["CD_unNotificationIdentifier"] as? String ??
-                            record["CD_watchReminderIdentifier"] as? String
+                        ekReminderIdentifier: record["CD_ekReminderIdentifier"] as? String,
+                        unNotificationIdentifier: record["CD_unNotificationIdentifier"] as? String
                     )
                     lock.lock()
                     metadata[activityID] = entry

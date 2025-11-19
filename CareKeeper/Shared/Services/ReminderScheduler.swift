@@ -322,6 +322,10 @@ final class ReminderSyncCoordinator: ReminderSyncCoordinating {
     private let scheduler: ReminderScheduling
     private let metadataStore: ReminderMetadataStoreProtocol
     private let logger = AppLogger.app
+    private var pendingIdentifiers: [ReminderSource: Set<UUID>] = [
+        .phone: [],
+        .watch: [],
+    ]
 
     init(
         scheduler: ReminderScheduling = ReminderScheduler.shared,
@@ -340,6 +344,7 @@ final class ReminderSyncCoordinator: ReminderSyncCoordinating {
 
             do {
                 if let identifier = payload.metadata.identifier(for: owner) {
+                    pendingIdentifiers[owner]?.remove(payload.activityID)
                     _ = try await scheduler.updateReminder(
                         identifier: identifier,
                         careeName: payload.careeName,
@@ -348,18 +353,24 @@ final class ReminderSyncCoordinator: ReminderSyncCoordinating {
                         note: payload.note
                     )
                 } else {
+                    if pendingIdentifiers[owner, default: []].contains(payload.activityID) {
+                        logger.info("🔔 Reminder sync already pending for \(payload.activityID.uuidString, privacy: .public); skipping duplicate schedule")
+                        continue
+                    }
                     let result = try await scheduler.scheduleReminder(
                         careeName: payload.careeName,
                         activityTypeName: payload.activityTypeName,
                         dueDate: dueDate,
                         note: payload.note
                     )
+                    pendingIdentifiers[owner, default: []].insert(payload.activityID)
                     var updatedMetadata = payload.metadata
                     updatedMetadata.setIdentifier(result.identifier, for: owner)
                     try await metadataStore.save(metadata: updatedMetadata)
                     updates[payload.activityID] = result.identifier
                 }
             } catch {
+                pendingIdentifiers[owner]?.remove(payload.activityID)
                 logger.warning(
                     "⚠️ Failed syncing reminder \(payload.activityID.uuidString, privacy: .public): \(error.localizedDescription, privacy: .public)"
                 )
