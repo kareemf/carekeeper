@@ -765,6 +765,7 @@ class CloudKitDataService: ObservableObject {
             }
 
             await reminderMetadataStore.deleteMetadata(for: activity.id)
+            ReminderScheduler.shared.deleteReminder(with: activity.reminderIdentifier)
 
             logger.info("✅ Activity deleted: \(activity.id)")
             syncStatus = .synced

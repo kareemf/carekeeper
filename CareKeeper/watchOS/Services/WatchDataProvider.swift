@@ -528,6 +528,7 @@ class WatchDataProvider: ObservableObject {
 
                 self.logger.info("✅ Activity deleted successfully")
                 await self.reminderMetadataStore.deleteMetadata(for: activity.id)
+                await ReminderScheduler.shared.deleteReminder(with: activity.reminderIdentifier)
 
             } catch {
                 // Restore activity on failure

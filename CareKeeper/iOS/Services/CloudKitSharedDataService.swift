@@ -343,6 +343,7 @@ class CloudKitSharedDataService: ObservableObject {
             }
 
             await reminderMetadataStore.deleteMetadata(for: activity.id)
+            ReminderScheduler.shared.deleteReminder(with: activity.reminderIdentifier)
         } catch {
             logger.error("❌ Failed to delete Activity: \(error.localizedDescription)")
             throw error
