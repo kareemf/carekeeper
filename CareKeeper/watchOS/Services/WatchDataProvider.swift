@@ -35,6 +35,7 @@ class WatchDataProvider: ObservableObject {
     private let selectiveService: SelectiveCloudKitServiceProtocol
     private let cacheService: WatchCacheService
     private let reminderMetadataStore: any ReminderMetadataStoreProtocol
+    private let reminderSyncCoordinator: ReminderSyncCoordinating
     private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data")
     private let signposter = OSSignposter(logger: Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data-signpost"))
     private let careeRefreshThrottleInterval: TimeInterval = 60
@@ -55,12 +56,14 @@ class WatchDataProvider: ObservableObject {
         cacheService: WatchCacheService? = nil,
         selectiveService: SelectiveCloudKitServiceProtocol? = nil,
         reminderMetadataStore: (any ReminderMetadataStoreProtocol)? = nil,
+        reminderSyncCoordinator: (any ReminderSyncCoordinating)? = nil,
         perCareeRefreshThrottleInterval: TimeInterval = 30
     ) {
         let resolvedCache = cacheService ?? WatchCacheService()
         self.cacheService = resolvedCache
         self.selectiveService = selectiveService ?? SelectiveCloudKitService()
         self.reminderMetadataStore = reminderMetadataStore ?? ActivityReminderMetadataStore.shared
+        self.reminderSyncCoordinator = reminderSyncCoordinator ?? ReminderSyncCoordinator.shared
         self.perCareeRefreshThrottleInterval = perCareeRefreshThrottleInterval
 
         guard resolvedCache.isAppGroupAvailable else {
@@ -319,9 +322,19 @@ class WatchDataProvider: ObservableObject {
                 guard !Task.isCancelled else { return }
 
                 let metadata = try await reminderMetadataStore.fetchMetadata(for: activities.map(\.id))
-                let enrichedActivities = applyReminderMetadata(metadata, to: activities)
+                var enrichedActivities = applyReminderMetadata(metadata, to: activities)
+                let syncPayloads = reminderSyncPayloads(
+                    metadata: metadata,
+                    activities: enrichedActivities,
+                    caree: caree
+                )
+                let syncUpdates = await reminderSyncCoordinator.synchronize(owner: .watch, payloads: syncPayloads)
+                if !syncUpdates.isEmpty {
+                    enrichedActivities = applyReminderIdentifierUpdates(syncUpdates, to: enrichedActivities)
+                }
 
                 let pendingForCaree = pendingActivities.filter { $0.careeID == careeID }
+                let previousActivities = self.recentActivitiesByCaree[careeID] ?? []
                 let mergedActivities = await Task.detached(priority: .utility) {
                     mergeActivitiesForCaching(pending: pendingForCaree, fetched: enrichedActivities)
                 }.value
@@ -329,6 +342,7 @@ class WatchDataProvider: ObservableObject {
 
                 try Task.checkCancellation()
 
+                removeStaleReminders(previous: previousActivities, next: mergedActivities)
                 applyRecentActivities(mergedActivities, to: careeID)
                 signposter.emitEvent("loadRecent.apply", id: signpostID)
 
@@ -621,6 +635,60 @@ class WatchDataProvider: ObservableObject {
             }
             return updated
         }
+    }
+
+    private func reminderSyncPayloads(
+        metadata: [UUID: ActivityReminderMetadata],
+        activities: [ActivitySnapshot],
+        caree: CareeSnapshot
+    ) -> [ReminderSyncPayload] {
+        guard !metadata.isEmpty else { return [] }
+        return activities.compactMap { activity in
+            guard let entry = metadata[activity.id] else { return nil }
+            return ReminderSyncPayload(
+                activityID: activity.id,
+                careeName: caree.name,
+                activityTypeName: activityTypeName(for: activity, careeID: caree.id),
+                note: activity.notes,
+                metadata: entry
+            )
+        }
+    }
+
+    private func applyReminderIdentifierUpdates(
+        _ updates: [UUID: String],
+        to activities: [ActivitySnapshot]
+    ) -> [ActivitySnapshot] {
+        guard !updates.isEmpty else { return activities }
+        return activities.map { activity in
+            var updated = activity
+            if let identifier = updates[activity.id] {
+                updated.reminderIdentifier = identifier
+            }
+            return updated
+        }
+    }
+
+    private func removeStaleReminders(previous: [ActivitySnapshot], next: [ActivitySnapshot]) {
+        guard !previous.isEmpty else { return }
+        let nextByID = Dictionary(uniqueKeysWithValues: next.map { ($0.id, $0) })
+        for activity in previous {
+            guard let identifier = activity.reminderIdentifier else { continue }
+            let nextMatch = nextByID[activity.id]
+            if let nextIdentifier = nextMatch?.reminderIdentifier, !nextIdentifier.isEmpty {
+                continue
+            }
+            ReminderScheduler.shared.deleteReminder(with: identifier)
+        }
+    }
+
+    private func activityTypeName(for activity: ActivitySnapshot, careeID: UUID) -> String {
+        if let types = activityTypesByCaree[careeID],
+           let match = types.first(where: { $0.id == activity.activityTypeID })
+        {
+            return match.name
+        }
+        return NSLocalizedString("Activity", comment: "Fallback reminder type name")
     }
 
     private func mergeCareesWithCachedImages(_ carees: [CareeSnapshot], allowCacheFallback: Bool) -> [CareeSnapshot] {

@@ -281,3 +281,91 @@ final class ReminderScheduler {
         }
     #endif
 }
+
+protocol ReminderScheduling {
+    func scheduleReminder(
+        careeName: String,
+        activityTypeName: String,
+        dueDate: Date,
+        note: String?
+    ) async throws -> (identifier: String, dueDate: Date)
+
+    func updateReminder(
+        identifier: String,
+        careeName: String,
+        activityTypeName: String,
+        dueDate: Date,
+        note: String?
+    ) async throws -> (identifier: String, dueDate: Date)
+
+    func deleteReminder(with identifier: String?)
+}
+
+extension ReminderScheduler: ReminderScheduling {}
+
+struct ReminderSyncPayload: Sendable {
+    let activityID: UUID
+    let careeName: String
+    let activityTypeName: String
+    let note: String?
+    let metadata: ActivityReminderMetadata
+}
+
+protocol ReminderSyncCoordinating: AnyObject {
+    func synchronize(owner: ReminderSource, payloads: [ReminderSyncPayload]) async -> [UUID: String]
+}
+
+@MainActor
+final class ReminderSyncCoordinator: ReminderSyncCoordinating {
+    static let shared = ReminderSyncCoordinator()
+
+    private let scheduler: ReminderScheduling
+    private let metadataStore: ReminderMetadataStoreProtocol
+    private let logger = AppLogger.app
+
+    init(
+        scheduler: ReminderScheduling = ReminderScheduler.shared,
+        metadataStore: ReminderMetadataStoreProtocol = ActivityReminderMetadataStore.shared
+    ) {
+        self.scheduler = scheduler
+        self.metadataStore = metadataStore
+    }
+
+    func synchronize(owner: ReminderSource, payloads: [ReminderSyncPayload]) async -> [UUID: String] {
+        guard !payloads.isEmpty else { return [:] }
+
+        var updates: [UUID: String] = [:]
+        for payload in payloads {
+            guard let dueDate = payload.metadata.reminderDueDate else { continue }
+
+            do {
+                if let identifier = payload.metadata.identifier(for: owner) {
+                    _ = try await scheduler.updateReminder(
+                        identifier: identifier,
+                        careeName: payload.careeName,
+                        activityTypeName: payload.activityTypeName,
+                        dueDate: dueDate,
+                        note: payload.note
+                    )
+                } else {
+                    let result = try await scheduler.scheduleReminder(
+                        careeName: payload.careeName,
+                        activityTypeName: payload.activityTypeName,
+                        dueDate: dueDate,
+                        note: payload.note
+                    )
+                    var updatedMetadata = payload.metadata
+                    updatedMetadata.setIdentifier(result.identifier, for: owner)
+                    try await metadataStore.save(metadata: updatedMetadata)
+                    updates[payload.activityID] = result.identifier
+                }
+            } catch {
+                logger.warning(
+                    "⚠️ Failed syncing reminder \(payload.activityID.uuidString, privacy: .public): \(error.localizedDescription, privacy: .public)"
+                )
+            }
+        }
+
+        return updates
+    }
+}

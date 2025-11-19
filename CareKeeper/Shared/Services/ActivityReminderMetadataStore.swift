@@ -53,10 +53,22 @@ final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
     func save(metadata: ActivityReminderMetadata) async throws {
         try await ensureZoneExists()
         let recordID = recordID(for: metadata.activityID)
+        var mergedMetadata = metadata
         let record: CKRecord
 
         do {
             record = try await database.record(for: recordID)
+            if mergedMetadata.ekReminderIdentifier == nil {
+                mergedMetadata.ekReminderIdentifier =
+                    record["CD_ekReminderIdentifier"] as? String ??
+                    record["CD_phoneReminderIdentifier"] as? String ??
+                    record["CD_reminderIdentifier"] as? String
+            }
+            if mergedMetadata.unNotificationIdentifier == nil {
+                mergedMetadata.unNotificationIdentifier =
+                    record["CD_unNotificationIdentifier"] as? String ??
+                    record["CD_watchReminderIdentifier"] as? String
+            }
         } catch let error as CKError where error.code == .unknownItem {
             record = CKRecord(recordType: recordType, recordID: recordID)
             record["CD_activityID"] = metadata.activityID.uuidString as CKRecordValue
@@ -64,10 +76,10 @@ final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
             throw error
         }
 
-        record["CD_reminderDueDate"] = metadata.reminderDueDate
-        record["CD_reminderSourceRawValue"] = metadata.reminderSource?.rawValue
-        record["CD_phoneReminderIdentifier"] = metadata.ekReminderIdentifier
-        record["CD_watchReminderIdentifier"] = metadata.unNotificationIdentifier
+        record["CD_reminderDueDate"] = mergedMetadata.reminderDueDate
+        record["CD_reminderSourceRawValue"] = mergedMetadata.reminderSource?.rawValue
+        record["CD_ekReminderIdentifier"] = mergedMetadata.ekReminderIdentifier
+        record["CD_unNotificationIdentifier"] = mergedMetadata.unNotificationIdentifier
 
         _ = try await database.save(record)
         AppLogger.cloudkit
@@ -102,6 +114,8 @@ final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
                 "CD_activityID",
                 "CD_reminderDueDate",
                 "CD_reminderSourceRawValue",
+                "CD_ekReminderIdentifier",
+                "CD_unNotificationIdentifier",
                 "CD_phoneReminderIdentifier",
                 "CD_watchReminderIdentifier",
                 "CD_reminderIdentifier",
@@ -121,8 +135,13 @@ final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
                         activityID: activityID,
                         reminderDueDate: record["CD_reminderDueDate"] as? Date,
                         reminderSource: (record["CD_reminderSourceRawValue"] as? String).flatMap { ReminderSource(rawValue: $0) },
-                        ekReminderIdentifier: record["CD_phoneReminderIdentifier"] as? String ?? legacyIdentifier,
-                        unNotificationIdentifier: record["CD_watchReminderIdentifier"] as? String
+                        ekReminderIdentifier:
+                            record["CD_ekReminderIdentifier"] as? String ??
+                            record["CD_phoneReminderIdentifier"] as? String ??
+                            legacyIdentifier,
+                        unNotificationIdentifier:
+                            record["CD_unNotificationIdentifier"] as? String ??
+                            record["CD_watchReminderIdentifier"] as? String
                     )
                     lock.lock()
                     metadata[activityID] = entry

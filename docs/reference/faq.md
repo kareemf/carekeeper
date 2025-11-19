@@ -127,10 +127,11 @@ You can backfill data from weeks or months ago.
 
 ### How do reminders work across my devices?
 
-- **iPhone/iPad** – CareKeeper saves a reminder to Apple’s Reminders app. That reminder syncs through iCloud like any other reminder tied to your Apple ID. Editing/canceling from CareKeeper updates the Reminders entry.
-- **Apple Watch** – CareKeeper schedules a local notification (not an EKReminder). It’s delivered only on that watch. Editing/canceling from CareKeeper updates the watch notification but does not touch the iOS reminder.
-- The bell indicator shows which device scheduled the most recent reminder (`📱` for phone, `⌚️` for watch). If you want alerts on both devices, set the reminder on each device separately.
-- Deleting the activity removes the reminder/notification on all devices where it exists.
+- **iPhone/iPad** – CareKeeper saves a reminder to Apple’s Reminders app. That reminder syncs through iCloud like any other reminder tied to your Apple ID.
+- **Apple Watch** – CareKeeper schedules a local notification (not an EKReminder). It’s delivered only on that watch.
+- **Cross-device syncing** – When you schedule or edit a reminder on either device, CareKeeper stores the metadata in CloudKit and automatically creates/updates the matching reminder/notification on your other device. There’s no need to toggle both manually.
+- The bell indicator shows which device you interacted with most recently (`📱` for phone, `⌚️` for watch), but the reminder exists on both.
+- Toggling the reminder off or deleting the activity removes the reminder/notification on all of your devices.
 
 See [How to Schedule Reminders](../how-to/set-reminders.md) for a step-by-step walkthrough.
 

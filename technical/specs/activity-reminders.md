@@ -15,14 +15,14 @@ CareKeeper currently records historical data. We want to prototype personal, on-
 **Phase 3 objectives**
 1. Update README “Features” list, docs/index.md “Features” section, and user-facing docs (FAQ, how-to) to mention reminders and how they work per device.
 
-Reminders remain *personal* (local EventKit store only). No CloudKit syncing at this phase—each caregiver configures their own reminders.
+Reminders remain *personal* (local EventKit/UNNotification stores only). CloudKit stores the metadata so each caregiver’s devices stay in sync, but reminders themselves never leave the user’s devices or iCloud account.
 
 ---
 
 ## Requirements
 
 ### Reminder behavior
-- Uses EventKit Reminders API (EKReminder) on both iOS and watchOS (watchOS 10+ supports EventKit).
+- Uses EventKit Reminders API (EKReminder) on iOS and local `UNUserNotificationCenter` notifications on watchOS (watchOS omits EventKit until Apple reintroduces support).
 - Permissions requested lazily the first time the toggle is enabled (same as location flow).
 - Reminders include:
   - Title `"<CareeName>: <ActivityTypeName>"`
@@ -32,7 +32,10 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
 - Reminders auto-cancel when:
   - Activity is deleted.
   - Reminder toggle is turned off in edit view (confirm dialog).
-- Edits can occur from any of the user’s devices (iPhone or Apple Watch) because both platforms now rely on the same EventKit reminder identifier; whichever device saves becomes the current “source” in metadata, but the underlying EKReminder stays in sync via iCloud.
+- Cross-device edits:
+  - Metadata now stores per-device identifiers (`ekReminderIdentifier`, `unNotificationIdentifier`).
+  - A shared `ReminderSyncCoordinator` watches for metadata changes and automatically schedules/updates the missing device’s reminder/notification, so users can toggle or edit a reminder on either device and the other platform mirrors the change without manual intervention.
+  - Whichever device the user interacted with last still drives `reminderSource` for UI glyphs.
 - Editing an existing activity:
   - Shows the reminder toggle in the “on” state when metadata exists.
   - Allows users to adjust the due date or disable it.
@@ -58,17 +61,18 @@ Reminders remain *personal* (local EventKit store only). No CloudKit syncing at 
 
 ### Data model / persistence
 - Reminder metadata stored locally per activity and synchronized between phone/watch caches so edits on either device know the reminder state:
-  - `reminderIdentifier` (String) – EventKit UID for cancellation/update on the originating device.
+  - `reminderIdentifier` (String) – Device-specific identifier injected into UI models (resolved from metadata per device).
   - `reminderDueDate` (Date, optional) – used for UI display and conversions.
   - `reminderSource` (enum: `.phone` / `.watch`) – indicates which device scheduled the reminder so UI can label it.
 - Metadata is **per-user**, not shared:
   - Add a new CloudKit record type `CD_ActivityReminderMetadata` in the **private database** (same custom zone as owned carees) keyed by `activityID`.
-  - Record fields mirror the local metadata (`CD_activityID`, `CD_reminderIdentifier`, `CD_reminderDueDate`, `CD_reminderSourceRawValue`).
+  - Record fields mirror the local metadata (`CD_activityID`, `CD_reminderDueDate`, `CD_reminderSourceRawValue`, `CD_ekReminderIdentifier`, `CD_unNotificationIdentifier`). Legacy `CD_reminderIdentifier` values are still read for backwards compatibility but always written to the new keys.
   - iOS/watch clients fetch/save/delete these records via a shared `ActivityReminderMetadataStore` so the same Apple ID sees consistent reminders across devices.
 - Storage integrations:
   - Extend `LocalCacheService` and `WatchCacheService` snapshots with reminder metadata (similar to streaming logs).
   - When metadata changes locally, update the cache and upsert/delete the per-user CloudKit record.
   - When fetching activities from CloudKit (owned or shared), overlay the per-user metadata records onto the fetched activities before caching.
+  - The overlay now produces per-device reminder identifiers and hands them to `ReminderSyncCoordinator`, which handles auto-creating the matching reminder/notification on whichever device is missing one.
 
 ### Phase 2 flag (`ActivityType.hasReminders`)
 - New boolean on `ActivityType` (default true).
@@ -156,4 +160,4 @@ Once the outstanding items above are complete, Phase 1 can be considered feature
 
 ## Potential Improvements (Future Work)
 1. **ActivityType `hasReminders` flag** – gate the reminder UI by activity type to reduce watch UI clutter. Requires CloudKit schema update + snapshot/service changes. Capture as a future enhancement rather than current scope.
-2. **Cross-device auto scheduling** – when iOS receives a watch-originated reminder metadata update (or vice versa), consider auto-creating/canceling the local reminder so actions propagate between devices.
+2. _(reserved for future enhancements)_

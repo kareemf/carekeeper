@@ -111,6 +111,68 @@ final class WatchDataProviderTests: XCTestCase {
         XCTAssertEqual(reminderStore.fetchRequests.first?.sorted(), [activityID])
     }
 
+    func testLoadRecentActivitiesSchedulesWatchReminderWhenMissing() async {
+        let caree = CareeSnapshot(
+            id: UUID(),
+            name: "Emerson",
+            imageData: nil,
+            isShared: false,
+            listOrder: 0,
+            dateCreated: Date()
+        )
+
+        let activityID = UUID()
+        let activityTypeID = UUID()
+        let selectiveService = MockSelectiveCloudKitService()
+        selectiveService.recentActivitiesByCaree[caree.id] = [
+            ActivitySnapshot(
+                id: activityID,
+                dateTime: Date(),
+                notes: "Check vitals",
+                quantity: nil,
+                latitude: nil,
+                longitude: nil,
+                activityTypeID: activityTypeID,
+                careeID: caree.id,
+                dateCreated: Date(),
+                reminderIdentifier: nil,
+                reminderDueDate: nil,
+                reminderSource: nil,
+                syncState: .synced
+            ),
+        ]
+        selectiveService.activityTypesByCaree[caree.id] = [
+            ActivityTypeSnapshot(name: "Vitals", icon: "waveform.path.ecg", careeID: caree.id),
+        ]
+
+        let reminderStore = MockReminderMetadataStore()
+        reminderStore.fetchResults[activityID] = ActivityReminderMetadata(
+            activityID: activityID,
+            reminderDueDate: Date().addingTimeInterval(600),
+            reminderSource: .phone,
+            ekReminderIdentifier: "phone-id",
+            unNotificationIdentifier: nil
+        )
+        let syncCoordinator = MockReminderSyncCoordinator()
+        syncCoordinator.result[activityID] = "watch-generated"
+
+        let provider = WatchDataProvider(
+            cacheService: WatchCacheService(),
+            selectiveService: selectiveService,
+            reminderMetadataStore: reminderStore,
+            reminderSyncCoordinator: syncCoordinator,
+            perCareeRefreshThrottleInterval: 0
+        )
+        provider.carees = [caree]
+
+        await provider.loadRecentActivities(for: caree.id, force: true)
+
+        let fetched = provider.recentActivitiesByCaree[caree.id]?.first
+        XCTAssertEqual(fetched?.reminderIdentifier, "watch-generated")
+        XCTAssertEqual(syncCoordinator.lastOwner, .watch)
+        XCTAssertEqual(syncCoordinator.receivedPayloads.first?.activityID, activityID)
+    }
+
     func testTrackActivitySavesReminderMetadata() async {
         let careeID = UUID()
         let activityTypeID = UUID()
@@ -433,4 +495,16 @@ final class MockSelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
     }
 
     func deleteActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws {}
+}
+
+final class MockReminderSyncCoordinator: ReminderSyncCoordinating {
+    var lastOwner: ReminderSource?
+    var receivedPayloads: [ReminderSyncPayload] = []
+    var result: [UUID: String] = [:]
+
+    func synchronize(owner: ReminderSource, payloads: [ReminderSyncPayload]) async -> [UUID: String] {
+        lastOwner = owner
+        receivedPayloads = payloads
+        return result
+    }
 }

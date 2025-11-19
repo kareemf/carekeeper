@@ -151,14 +151,22 @@ class LocalCacheService: ObservableObject {
         }
 
         // Remove existing children so we can rebuild authoritative lists.
+        let incomingActivitiesByID = Dictionary(uniqueKeysWithValues: activities.map { ($0.id, $0) })
+        if let existingActivities = managedCaree.activities {
+            for activity in existingActivities {
+                if let previousIdentifier = activity.reminderIdentifier,
+                   incomingActivitiesByID[activity.id]?.reminderIdentifier == nil
+                {
+                    ReminderScheduler.shared.deleteReminder(with: previousIdentifier)
+                }
+            }
+            for activity in existingActivities {
+                modelContext.delete(activity)
+            }
+        }
         if let existingTypes = managedCaree.activityTypes {
             for type in existingTypes {
                 modelContext.delete(type)
-            }
-        }
-        if let existingActivities = managedCaree.activities {
-            for activity in existingActivities {
-                modelContext.delete(activity)
             }
         }
         managedCaree.activityTypes = []

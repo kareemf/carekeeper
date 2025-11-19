@@ -1,6 +1,6 @@
 # How to Schedule Reminders
 
-CareKeeper lets you attach personal reminders to specific activities so you get a nudge when it’s time to follow up. On iPhone/iPad, a true Reminder gets created in Apple’s Reminders app (which syncs through iCloud to your other Apple devices signed in with the same Apple ID). On Apple Watch we schedule an on-device notification; it’s personal to that watch and does not appear in the Reminders app.
+CareKeeper lets you attach personal reminders to specific activities so you get a nudge when it’s time to follow up. On iPhone/iPad, a true Reminder gets created in Apple’s Reminders app (which syncs through iCloud to your other Apple devices signed in with the same Apple ID). On Apple Watch we schedule an on-device notification. Behind the scenes we keep the metadata in sync, so creating or editing a reminder on either device automatically creates/updates the counterpart on the other device—no need to manage them separately.
 
 ## iPhone/iPad
 
@@ -16,15 +16,15 @@ CareKeeper lets you attach personal reminders to specific activities so you get 
 1. Open the Track Activity view.
 2. Toggle **Set Reminder**.
 3. Use the Digital Crown to choose the number of minutes in the future (up to 24 hours).
-4. Save the activity. The list and detail screens show a bell with either `📱` or `⌚️` depending on which device scheduled the reminder.
+4. Save the activity. The list and detail screens show a bell with either `📱` or `⌚️` indicating the device you used most recently; CareKeeper still schedules the matching reminder/notification on your other device automatically.
 
 > watchOS relies on Notification permission. If the toggle shows an error, open the Settings app on your watch (or the Watch app on iPhone) and enable **Notifications → CareKeeper → Allow Notifications** before retrying.
 
 ## Managing Existing Reminders
 
-- Edit the activity on the device that owns the reminder. Edits made on iPhone update the Reminders entry. Edits made on Apple Watch update the watch notification only.
-- Toggling the reminder off on a device deletes the reminder for that device. To remove reminders everywhere, turn it off from both iPhone and Apple Watch (or delete the activity).
-- Deleting the activity removes any reminders/notifications tied to it on your devices.
+- Edit the activity on whatever device is convenient. Changes made on iPhone update the Reminders entry and push the same change (date/time, notes) to the matching watch notification, and vice versa.
+- Toggling the reminder off on either device deletes the reminder/notification everywhere. You no longer need to toggle both devices.
+- Deleting the activity removes all reminders/notifications tied to it on your devices.
 
 ## Screenshots
 

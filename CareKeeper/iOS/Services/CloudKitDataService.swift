@@ -30,6 +30,7 @@ class CloudKitDataService: ObservableObject {
     private let maxRetries = 3
     private let retryDelay: TimeInterval = 2.0
     private let reminderMetadataStore: any ReminderMetadataStoreProtocol
+    private let reminderSyncCoordinator: ReminderSyncCoordinating
     #if canImport(UIKit)
         private let careeImageMaxDimension: CGFloat = 256
     #endif
@@ -41,8 +42,12 @@ class CloudKitDataService: ObservableObject {
 
     // MARK: - Initialization
 
-    init(reminderMetadataStore: (any ReminderMetadataStoreProtocol)? = nil) {
+    init(
+        reminderMetadataStore: (any ReminderMetadataStoreProtocol)? = nil,
+        reminderSyncCoordinator: (any ReminderSyncCoordinating)? = nil
+    ) {
         self.reminderMetadataStore = reminderMetadataStore ?? ActivityReminderMetadataStore.shared
+        self.reminderSyncCoordinator = reminderSyncCoordinator ?? ReminderSyncCoordinator.shared
         // Observe CloudKit push notifications and refresh owned data (private DB) reactively.
         NotificationCenter.default.addObserver(
             forName: NSNotification.Name("CloudKitNotificationReceived"),
@@ -1039,14 +1044,6 @@ class CloudKitDataService: ObservableObject {
             }
         }
 
-        do {
-            let metadata = try await reminderMetadataStore.fetchMetadata(for: Array(activityTypeIDByActivity.keys))
-            logger.info("🔔 Overlaying reminder metadata for \(metadata.count, privacy: .public) owned activities.")
-            applyReminderMetadata(metadata, to: &activitiesByCaree)
-        } catch {
-            logger.warning("⚠️ Failed to fetch reminder metadata for owned carees: \(error.localizedDescription)")
-        }
-
         // Populate relationships for transient objects used outside the cache.
         for (careeID, caree) in careesByID {
             let types = activityTypesByCaree[careeID] ?? []
@@ -1069,6 +1066,20 @@ class CloudKitDataService: ObservableObject {
                 }
                 activity.caree = caree
             }
+        }
+
+        do {
+            let metadata = try await reminderMetadataStore.fetchMetadata(for: Array(activityTypeIDByActivity.keys))
+            logger.info("🔔 Overlaying reminder metadata for \(metadata.count, privacy: .public) owned activities.")
+            applyReminderMetadata(metadata, to: &activitiesByCaree)
+            let payloads = reminderSyncPayloads(
+                metadata: metadata,
+                activitiesByCaree: activitiesByCaree
+            )
+            let updates = await reminderSyncCoordinator.synchronize(owner: .phone, payloads: payloads)
+            applyReminderIdentifierUpdates(updates, to: &activitiesByCaree)
+        } catch {
+            logger.warning("⚠️ Failed to fetch reminder metadata for owned carees: \(error.localizedDescription)")
         }
 
         // Perform cache mutations in a single coalesced batch to avoid per-write refreshes.
@@ -1348,9 +1359,54 @@ class CloudKitDataService: ObservableObject {
         for (careeID, activities) in activitiesByCaree {
             let updated = activities.map { activity -> Activity in
                 if let entry = metadata[activity.id] {
-                    activity.reminderIdentifier = entry.reminderIdentifier
+                    activity.reminderIdentifier = entry.identifier(for: .phone)
                     activity.reminderDueDate = entry.reminderDueDate
                     activity.reminderSource = entry.reminderSource
+                }
+                return activity
+            }
+            activitiesByCaree[careeID] = updated
+        }
+    }
+
+    private func reminderSyncPayloads(
+        metadata: [UUID: ActivityReminderMetadata],
+        activitiesByCaree: [UUID: [Activity]]
+    ) -> [ReminderSyncPayload] {
+        guard !metadata.isEmpty else { return [] }
+
+        var payloads: [ReminderSyncPayload] = []
+        for activities in activitiesByCaree.values {
+            for activity in activities {
+                guard let entry = metadata[activity.id],
+                      let careeName = activity.caree?.name,
+                      let activityTypeName = activity.activityType?.name
+                else {
+                    continue
+                }
+                payloads.append(
+                    ReminderSyncPayload(
+                        activityID: activity.id,
+                        careeName: careeName,
+                        activityTypeName: activityTypeName,
+                        note: activity.notes,
+                        metadata: entry
+                    )
+                )
+            }
+        }
+        return payloads
+    }
+
+    private func applyReminderIdentifierUpdates(
+        _ updates: [UUID: String],
+        to activitiesByCaree: inout [UUID: [Activity]]
+    ) {
+        guard !updates.isEmpty else { return }
+        for (careeID, activities) in activitiesByCaree {
+            let updated = activities.map { activity -> Activity in
+                if let identifier = updates[activity.id] {
+                    activity.reminderIdentifier = identifier
                 }
                 return activity
             }
