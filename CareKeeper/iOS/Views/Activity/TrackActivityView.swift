@@ -19,6 +19,7 @@ struct TrackActivityView: View {
     @State private var isSaving: Bool = false
     @State private var reminderEnabled: Bool = false
     @State private var reminderDate: Date = .init().addingTimeInterval(300)
+    @State private var reminderInfoMessage: String?
 
     // Use unified API from CloudKitDataService
     @EnvironmentObject private var cloudKitService: CloudKitDataService
@@ -166,6 +167,11 @@ struct TrackActivityView: View {
                 .onChange(of: reminderEnabled) { _, isOn in
                     if isOn {
                         reminderDate = defaultReminderDate()
+                        if reminderInfoMessage != nil, reminderDate > Date() {
+                            reminderInfoMessage = nil
+                        }
+                    } else {
+                        reminderInfoMessage = nil
                     }
                 }
 
@@ -176,6 +182,16 @@ struct TrackActivityView: View {
                     in: reminderPickerRange,
                     displayedComponents: [.date, .hourAndMinute]
                 )
+                .onChange(of: reminderDate) { _, newValue in
+                    if reminderInfoMessage != nil, newValue > Date() {
+                        reminderInfoMessage = nil
+                    }
+                }
+                if let reminderInfoMessage {
+                    Text(reminderInfoMessage)
+                        .font(.footnote)
+                        .foregroundColor(.orange)
+                }
             }
         }
     }
@@ -289,6 +305,16 @@ struct TrackActivityView: View {
 
         let dueDate = clampedReminderDate()
         do {
+            try ReminderDateValidator.validate(dueDate: dueDate)
+        } catch {
+            AppLogger.app.warning("Skipping reminder creation for past due date \(dueDate)")
+            await MainActor.run {
+                reminderInfoMessage = pastReminderNotice
+            }
+            return
+        }
+
+        do {
             let result = try await scheduler.scheduleReminder(
                 careeName: caree.name,
                 activityTypeName: activityType.name,
@@ -304,12 +330,18 @@ struct TrackActivityView: View {
                     source: ReminderSource.current
                 )
             }
+            await MainActor.run { reminderInfoMessage = nil }
         } catch {
             await MainActor.run {
                 self.error = AppError.saveFailed(error.localizedDescription)
             }
         }
     }
+
+    private let pastReminderNotice = NSLocalizedString(
+        "Reminders aren’t recreated for past times. Pick a future time to schedule one.",
+        comment: "Reminder stale notice"
+    )
 
     private var reminderPickerRange: ClosedRange<Date> {
         let now = Date()

@@ -39,6 +39,7 @@ struct ActivityDetailView: View {
     @State private var isSaving = false
     @State private var reminderEnabled = false
     @State private var reminderDate = Date().addingTimeInterval(300)
+    @State private var reminderInfoMessage: String?
     @State private var showReminderDisableConfirmation = false
 
     init(activityID: UUID) {
@@ -269,6 +270,16 @@ struct ActivityDetailView: View {
                         in: reminderPickerRange,
                         displayedComponents: [.date, .hourAndMinute]
                     )
+                    .onChange(of: reminderDate) { _, newValue in
+                        if reminderInfoMessage != nil, newValue > Date() {
+                            reminderInfoMessage = nil
+                        }
+                    }
+                    if let reminderInfoMessage {
+                        Text(reminderInfoMessage)
+                            .font(.footnote)
+                            .foregroundColor(.orange)
+                    }
                 }
             } else if activity.reminderDueDate != nil,
                       let dueText = activity.reminderDueDateRelativeDescription
@@ -290,6 +301,7 @@ struct ActivityDetailView: View {
             Button(NSLocalizedString("Remove", comment: "Remove reminder"), role: .destructive) {
                 reminderEnabled = false
                 showReminderDisableConfirmation = false
+                reminderInfoMessage = nil
             }
             Button(NSLocalizedString("Cancel", comment: "Cancel"), role: .cancel) {
                 reminderEnabled = true
@@ -431,6 +443,15 @@ struct ActivityDetailView: View {
             }
 
             let dueDate = clampedReminderDate()
+            do {
+                try ReminderDateValidator.validate(dueDate: dueDate)
+            } catch {
+                AppLogger.app.warning("Skipping reminder recreation for past due date \(dueDate)")
+                await MainActor.run {
+                    reminderInfoMessage = pastReminderNotice
+                }
+                return
+            }
             let result: (identifier: String, dueDate: Date) = if let previousIdentifier {
                 try await scheduler.updateReminder(
                     identifier: previousIdentifier,
@@ -454,6 +475,7 @@ struct ActivityDetailView: View {
                 dueDate: result.dueDate,
                 source: ReminderSource.current
             )
+            await MainActor.run { reminderInfoMessage = nil }
         } else if let previousIdentifier {
             scheduler.deleteReminder(with: previousIdentifier)
             try await cacheService?.updateReminderMetadata(
@@ -462,8 +484,16 @@ struct ActivityDetailView: View {
                 dueDate: nil,
                 source: nil
             )
+            await MainActor.run { reminderInfoMessage = nil }
+        } else {
+            await MainActor.run { reminderInfoMessage = nil }
         }
     }
+
+    private let pastReminderNotice = NSLocalizedString(
+        "Reminders aren’t recreated for past times. Pick a future time to schedule one.",
+        comment: "Reminder stale notice"
+    )
 
     private var reminderWindow: TimeInterval { 7 * 24 * 60 * 60 }
 
