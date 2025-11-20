@@ -127,11 +127,10 @@ You can backfill data from weeks or months ago.
 
 ### How do reminders work across my devices?
 
-- **iPhone/iPad** – CareKeeper saves a reminder to Apple’s Reminders app. That reminder syncs through iCloud like any other reminder tied to your Apple ID.
-- **Apple Watch** – CareKeeper schedules a local notification (not an EKReminder). It’s delivered only on that watch.
-- **Cross-device syncing** – When you schedule or edit a reminder on either device, CareKeeper stores the metadata in CloudKit and automatically creates/updates the matching reminder/notification on your other device. There’s no need to toggle both manually.
-- The bell indicator shows which device you interacted with most recently (`📱` for phone, `⌚️` for watch), but the reminder exists on both.
-- Toggling the reminder off or deleting the activity removes the reminder/notification on all of your devices.
+- **iPhone/iPad** – CareKeeper saves a reminder to Apple’s Reminders app. That reminder syncs through iCloud like any other reminder tied to your Apple ID, so you’ll see it (and get the alert) on every Apple device signed into the same account, including Apple Watch.
+- **Apple Watch** – Apple does not let third-party apps create Reminders.app entries on watchOS, so CareKeeper schedules a device-local notification on the watch instead. It fires only on that watch until you edit the reminder on iPhone/iPad; saving there “upgrades” it into an iCloud reminder. The original watch notification may still fire at its original time, so you might see one extra alert during the transition.
+- **Cross-device behavior** – The bell indicator shows the device you touched most recently (`📱` for phone, `⌚️` for watch). Turning the reminder off on iPhone removes the Reminders.app entry and clears any watch notification. Turning it off on watch cancels just the watch notification. Deleting the activity removes reminders/notifications everywhere.
+- **Why this split?** – This isn’t a design choice; Apple’s watchOS SDK simply doesn’t expose EventKit reminders to third-party apps.
 
 See [How to Schedule Reminders](../how-to/set-reminders.md) for a step-by-step walkthrough.
 
