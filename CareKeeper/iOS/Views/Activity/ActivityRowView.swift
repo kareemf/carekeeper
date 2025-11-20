@@ -72,7 +72,7 @@ struct ActivityRowView: View {
 
 private extension ActivityRowView {
     func reminderStatus(for activity: Activity) -> (deviceSymbolName: String, timeText: String)? {
-        guard activity.reminderIdentifier != nil else { return nil }
+        guard activity.reminderIdentifier != nil || activity.reminderDueDate != nil else { return nil }
         let symbolName = activity.reminderSource?.symbolName ?? ReminderSource.phone.symbolName
         let timeText = activity.reminderDueDateRelativeDescription ?? NSLocalizedString(
             "scheduled",

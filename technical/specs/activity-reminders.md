@@ -162,3 +162,16 @@ Once the outstanding items above are complete, Phase 1 can be considered feature
 ## Potential Improvements (Future Work)
 1. **ActivityType `hasReminders` flag** – gate the reminder UI by activity type to reduce watch UI clutter. Requires CloudKit schema update + snapshot/service changes. Capture as a future enhancement rather than current scope.
 2. _(reserved for future enhancements)_
+
+## Design Decision – Pause Cross-Device Reminder Sync
+**Commit reference**: `#ecfed6d`
+
+- **Issue**: Automatically mirroring watch reminders to iOS (and vice versa) proved fragile. Users reported reminders being recreated on every refresh, completed reminders reappearing, and duplicate scheduling loops that were difficult to reason about or test.  
+- **Root cause**: The sync coordinator blindly replayed every metadata record each time CloudKit data refreshed. Because metadata doesn’t track local completion states, the coordinator could not tell when a reminder was intentionally resolved or deleted on-device, so it kept creating new EKReminders/UNNotifications.  
+- **Decision / migration**:
+  - Remove the `ReminderSyncCoordinator` pipeline entirely. Metadata is still fetched for display, but no automatic scheduling happens during refresh.  
+  - Phone remains the authoritative device for EKReminders: iOS can always create, edit, or delete reminders (including those originally created on watch). Editing a watch reminder on iOS now schedules a fresh EKReminder; the watch-originated UNNotification may still fire once, which we’ll call out in UI copy and user docs.  
+  - Watch reverts to view-only behavior for phone reminders. When metadata indicates the reminder was created on iOS, the watch shows explanatory text and disables its reminder controls so users edit from the phone. Watch can still create or edit its own reminders (UNNotifications).  
+  - Change tokens (`CKRecord.changeTag`) are now captured on `ActivityReminderMetadata` models so future sync attempts have the data needed to differentiate real metadata edits from repeated refreshes.  
+- **User-facing note**: Because editing a watch reminder on iOS now creates a separate EKReminder instead of mutating the original watch notification, users might receive both the original watch alert and the new iPhone reminder once. This is acceptable for now and will be documented in-app and in the reminder how-to guide.  
+- **Next steps**: Update UI strings, FAQ/how-to docs, and this spec whenever the watch regains the ability to edit phone reminders automatically.

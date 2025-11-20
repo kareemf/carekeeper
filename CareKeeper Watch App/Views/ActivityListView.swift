@@ -301,7 +301,7 @@ struct ActivityRowView: View {
     }
 
     private var reminderDisplayInfo: (deviceSymbolName: String, relativeText: String)? {
-        guard activity.reminderIdentifier != nil else { return nil }
+        guard activity.reminderIdentifier != nil || activity.reminderDueDate != nil else { return nil }
         let symbolName = activity.reminderSource?.symbolName ?? ReminderSource.phone.symbolName
         let relative = activity.reminderDueDateRelativeDescription ?? NSLocalizedString("Soon", comment: "Reminder fallback")
         return (symbolName, relative)

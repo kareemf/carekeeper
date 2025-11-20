@@ -127,7 +127,8 @@ final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
                         reminderDueDate: record["CD_reminderDueDate"] as? Date,
                         reminderSource: (record["CD_reminderSourceRawValue"] as? String).flatMap { ReminderSource(rawValue: $0) },
                         ekReminderIdentifier: record["CD_ekReminderIdentifier"] as? String,
-                        unNotificationIdentifier: record["CD_unNotificationIdentifier"] as? String
+                        unNotificationIdentifier: record["CD_unNotificationIdentifier"] as? String,
+                        changeTag: record.recordChangeTag
                     )
                     lock.lock()
                     metadata[activityID] = entry

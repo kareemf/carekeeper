@@ -6,19 +6,22 @@ struct ActivityReminderMetadata: Codable, Sendable {
     var reminderSource: ReminderSource?
     var ekReminderIdentifier: String?
     var unNotificationIdentifier: String?
+    var changeTag: String?
 
     init(
         activityID: UUID,
         reminderDueDate: Date? = nil,
         reminderSource: ReminderSource? = nil,
         ekReminderIdentifier: String? = nil,
-        unNotificationIdentifier: String? = nil
+        unNotificationIdentifier: String? = nil,
+        changeTag: String? = nil
     ) {
         self.activityID = activityID
         self.reminderDueDate = reminderDueDate
         self.reminderSource = reminderSource
         self.ekReminderIdentifier = ekReminderIdentifier
         self.unNotificationIdentifier = unNotificationIdentifier
+        self.changeTag = changeTag
     }
 
     var reminderIdentifier: String? {

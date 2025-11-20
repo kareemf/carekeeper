@@ -111,7 +111,7 @@ final class WatchDataProviderTests: XCTestCase {
         XCTAssertEqual(reminderStore.fetchRequests.first?.sorted(), [activityID])
     }
 
-    func testLoadRecentActivitiesSchedulesWatchReminderWhenMissing() async {
+    func testLoadRecentActivitiesShowsPhoneReminderReadOnly() async {
         let caree = CareeSnapshot(
             id: UUID(),
             name: "Emerson",
@@ -153,14 +153,11 @@ final class WatchDataProviderTests: XCTestCase {
             ekReminderIdentifier: "phone-id",
             unNotificationIdentifier: nil
         )
-        let syncCoordinator = MockReminderSyncCoordinator()
-        syncCoordinator.result[activityID] = "watch-generated"
 
         let provider = WatchDataProvider(
             cacheService: WatchCacheService(),
             selectiveService: selectiveService,
             reminderMetadataStore: reminderStore,
-            reminderSyncCoordinator: syncCoordinator,
             perCareeRefreshThrottleInterval: 0
         )
         provider.carees = [caree]
@@ -168,9 +165,9 @@ final class WatchDataProviderTests: XCTestCase {
         await provider.loadRecentActivities(for: caree.id, force: true)
 
         let fetched = provider.recentActivitiesByCaree[caree.id]?.first
-        XCTAssertEqual(fetched?.reminderIdentifier, "watch-generated")
-        XCTAssertEqual(syncCoordinator.lastOwner, .watch)
-        XCTAssertEqual(syncCoordinator.receivedPayloads.first?.activityID, activityID)
+        XCTAssertNil(fetched?.reminderIdentifier)
+        XCTAssertEqual(fetched?.reminderSourceRawValue, ReminderSource.phone.rawValue)
+        XCTAssertNotNil(fetched?.reminderDueDate)
     }
 
     func testTrackActivitySavesReminderMetadata() async {
@@ -495,16 +492,4 @@ final class MockSelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
     }
 
     func deleteActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws {}
-}
-
-final class MockReminderSyncCoordinator: ReminderSyncCoordinating {
-    var lastOwner: ReminderSource?
-    var receivedPayloads: [ReminderSyncPayload] = []
-    var result: [UUID: String] = [:]
-
-    func synchronize(owner: ReminderSource, payloads: [ReminderSyncPayload]) async -> [UUID: String] {
-        lastOwner = owner
-        receivedPayloads = payloads
-        return result
-    }
 }

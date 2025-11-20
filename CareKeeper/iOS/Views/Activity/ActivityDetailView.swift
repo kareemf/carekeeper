@@ -241,13 +241,26 @@ struct ActivityDetailView: View {
             if isEditing {
                 Toggle(NSLocalizedString("Set Reminder", comment: "Reminder toggle"), isOn: $reminderEnabled.animation())
                     .onChange(of: reminderEnabled) { _, newValue in
-                        if !newValue, activity.reminderIdentifier != nil {
+                        if !newValue, activity.reminderDueDate != nil {
                             showReminderDisableConfirmation = true
+                            reminderEnabled = true
                         }
-                        if newValue, activity.reminderIdentifier == nil {
+                        if newValue, activity.reminderDueDate == nil {
                             reminderDate = defaultReminderDate()
                         }
                     }
+
+                if activity.reminderSource == .watch,
+                   activity.reminderIdentifier == nil,
+                   activity.reminderDueDate != nil
+                {
+                    Text(NSLocalizedString(
+                        "Editing a Watch reminder here will also schedule a copy on your iPhone. The original Watch alert may still fire once.",
+                        comment: "Watch reminder migration note"
+                    ))
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                }
 
                 if reminderEnabled {
                     DatePicker(
@@ -257,7 +270,7 @@ struct ActivityDetailView: View {
                         displayedComponents: [.date, .hourAndMinute]
                     )
                 }
-            } else if activity.reminderIdentifier != nil,
+            } else if activity.reminderDueDate != nil,
                       let dueText = activity.reminderDueDateRelativeDescription
             {
                 HStack(spacing: 8) {
@@ -334,7 +347,7 @@ struct ActivityDetailView: View {
         editingNotes = activity.notes ?? ""
         editingQuantity = activity.quantity?.description ?? ""
         editingDateTime = activity.dateTime
-        reminderEnabled = activity.reminderIdentifier != nil
+        reminderEnabled = activity.reminderDueDate != nil
         if let dueDate = activity.reminderDueDate {
             reminderDate = dueDate
         } else {

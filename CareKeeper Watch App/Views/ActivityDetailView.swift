@@ -55,6 +55,10 @@ struct ActivityDetailView: View {
         return activitySnapshot
     }
 
+    private var isPhoneReminderReadOnly: Bool {
+        currentActivity.reminderSource == .phone && currentActivity.reminderDueDate != nil
+    }
+
     private var editedDateTime: Date {
         Date().addingTimeInterval(-minutesAgo * 60)
     }
@@ -324,7 +328,7 @@ struct ActivityDetailView: View {
         let timeDiff = Date().timeIntervalSince(currentActivity.dateTime)
         minutesAgo = max(0, timeDiff / 60)
 
-        reminderWasOriginallyEnabled = currentActivity.reminderIdentifier != nil
+        reminderWasOriginallyEnabled = currentActivity.reminderSource == .watch && currentActivity.reminderDueDate != nil
         reminderAnchorDueDate = currentActivity.reminderDueDate
         hasAdjustedReminderMinutes = false
         reminderEnabled = reminderWasOriginallyEnabled
@@ -463,7 +467,12 @@ struct ActivityDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             if isEditing {
                 editingTimeView
-                reminderEditor
+                if isPhoneReminderReadOnly {
+                    reminderReadOnlyView
+                    phoneReminderReadOnlyNotice
+                } else {
+                    reminderEditor
+                }
             } else {
                 readOnlyTimeView
                 reminderReadOnlyView
@@ -651,11 +660,25 @@ struct ActivityDetailView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+            if isPhoneReminderReadOnly {
+                Text("Created on iPhone. Edit that reminder from your phone.")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var phoneReminderReadOnlyNotice: some View {
+        if isPhoneReminderReadOnly {
+            Text("Reminders created on your iPhone can be viewed here but edited on the phone.")
+                .font(.footnote)
+                .foregroundColor(.secondary)
         }
     }
 
     private var reminderDisplayInfo: (deviceSymbolName: String, relativeText: String)? {
-        guard currentActivity.reminderIdentifier != nil else { return nil }
+        guard currentActivity.reminderIdentifier != nil || currentActivity.reminderDueDate != nil else { return nil }
         let symbolName = currentActivity.reminderSource?.symbolName ?? ReminderSource.phone.symbolName
         let relative = currentActivity.reminderDueDateRelativeDescription ?? NSLocalizedString(
             "Soon",
@@ -710,6 +733,13 @@ struct ActivityDetailView: View {
     ) async throws {
         let scheduler = ReminderScheduler.shared
         let previousIdentifier = originalActivity.reminderIdentifier
+
+        if originalActivity.reminderSource == .phone && originalActivity.reminderDueDate != nil {
+            updatedActivity.reminderIdentifier = originalActivity.reminderIdentifier
+            updatedActivity.reminderDueDate = originalActivity.reminderDueDate
+            updatedActivity.reminderSourceRawValue = originalActivity.reminderSourceRawValue
+            return
+        }
 
         if reminderEnabled {
             let authorized = await scheduler.ensureAuthorization()

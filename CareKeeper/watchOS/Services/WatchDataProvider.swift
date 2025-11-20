@@ -35,7 +35,6 @@ class WatchDataProvider: ObservableObject {
     private let selectiveService: SelectiveCloudKitServiceProtocol
     private let cacheService: WatchCacheService
     private let reminderMetadataStore: any ReminderMetadataStoreProtocol
-    private let reminderSyncCoordinator: ReminderSyncCoordinating
     private let logger = Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data")
     private let signposter = OSSignposter(logger: Logger(subsystem: "com.kareemf.CareKeeper", category: "watch-data-signpost"))
     private let careeRefreshThrottleInterval: TimeInterval = 60
@@ -56,14 +55,12 @@ class WatchDataProvider: ObservableObject {
         cacheService: WatchCacheService? = nil,
         selectiveService: SelectiveCloudKitServiceProtocol? = nil,
         reminderMetadataStore: (any ReminderMetadataStoreProtocol)? = nil,
-        reminderSyncCoordinator: (any ReminderSyncCoordinating)? = nil,
         perCareeRefreshThrottleInterval: TimeInterval = 30
     ) {
         let resolvedCache = cacheService ?? WatchCacheService()
         self.cacheService = resolvedCache
         self.selectiveService = selectiveService ?? SelectiveCloudKitService()
         self.reminderMetadataStore = reminderMetadataStore ?? ActivityReminderMetadataStore.shared
-        self.reminderSyncCoordinator = reminderSyncCoordinator ?? ReminderSyncCoordinator.shared
         self.perCareeRefreshThrottleInterval = perCareeRefreshThrottleInterval
 
         guard resolvedCache.isAppGroupAvailable else {
@@ -322,16 +319,7 @@ class WatchDataProvider: ObservableObject {
                 guard !Task.isCancelled else { return }
 
                 let metadata = try await reminderMetadataStore.fetchMetadata(for: activities.map(\.id))
-                var enrichedActivities = applyReminderMetadata(metadata, to: activities)
-                let syncPayloads = reminderSyncPayloads(
-                    metadata: metadata,
-                    activities: enrichedActivities,
-                    caree: caree
-                )
-                let syncUpdates = await reminderSyncCoordinator.synchronize(owner: .watch, payloads: syncPayloads)
-                if !syncUpdates.isEmpty {
-                    enrichedActivities = applyReminderIdentifierUpdates(syncUpdates, to: enrichedActivities)
-                }
+                let enrichedActivities = applyReminderMetadata(metadata, to: activities)
 
                 let pendingForCaree = pendingActivities.filter { $0.careeID == careeID }
                 let previousActivities = self.recentActivitiesByCaree[careeID] ?? []
@@ -632,38 +620,6 @@ class WatchDataProvider: ObservableObject {
                 updated.reminderIdentifier = entry.identifier(for: .watch)
                 updated.reminderDueDate = entry.reminderDueDate
                 updated.reminderSourceRawValue = entry.reminderSource?.rawValue
-            }
-            return updated
-        }
-    }
-
-    private func reminderSyncPayloads(
-        metadata: [UUID: ActivityReminderMetadata],
-        activities: [ActivitySnapshot],
-        caree: CareeSnapshot
-    ) -> [ReminderSyncPayload] {
-        guard !metadata.isEmpty else { return [] }
-        return activities.compactMap { activity in
-            guard let entry = metadata[activity.id] else { return nil }
-            return ReminderSyncPayload(
-                activityID: activity.id,
-                careeName: caree.name,
-                activityTypeName: activityTypeName(for: activity, careeID: caree.id),
-                note: activity.notes,
-                metadata: entry
-            )
-        }
-    }
-
-    private func applyReminderIdentifierUpdates(
-        _ updates: [UUID: String],
-        to activities: [ActivitySnapshot]
-    ) -> [ActivitySnapshot] {
-        guard !updates.isEmpty else { return activities }
-        return activities.map { activity in
-            var updated = activity
-            if let identifier = updates[activity.id] {
-                updated.reminderIdentifier = identifier
             }
             return updated
         }
