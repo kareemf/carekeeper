@@ -268,7 +268,7 @@
 		3D048976DFEF3092C2BD1B19 /* SyncStatusIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusIndicator.swift; sourceTree = "<group>"; };
 		3DFCCEC6CA0F87A004C26762 /* ReminderSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderSource.swift; sourceTree = "<group>"; };
 		3FA86B6B432A36E2F2D65828 /* ActivityReminderMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityReminderMetadata.swift; sourceTree = "<group>"; };
-		5A9D6A9B74FF6B5A13F6004E /* ReminderDateValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities/ReminderDateValidator.swift; sourceTree = "<group>"; };
+		5A9D6A9B74FF6B5A13F6004E /* ReminderDateValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderDateValidator.swift; sourceTree = "<group>"; };
 		9E2E5E0D77EC4AA9854E2B3C /* MockReminderMetadataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mocks/MockReminderMetadataStore.swift; sourceTree = "<group>"; };
 		4E7748F74F09457997CEEC52 /* ReminderSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderSchedulerTests.swift; sourceTree = "<group>"; };
 		0C87D4F769E97203E6301890 /* ReminderDateValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderDateValidatorTests.swift; sourceTree = "<group>"; };
