@@ -191,6 +191,8 @@ Add CareKeeper to your watch face for instant access:
 
 ![Watch face editing with CareKeeper complication](../screenshots/watch-face-editing-with-carekeeper-complication.PNG){: .doc-screenshot }
 
+Using the Complication: tap the complication from any face to jump straight to your last-used caree list
+
 ### Carees Not Appearing
 **Solutions:**
 - Open the iPhone app to trigger sync
