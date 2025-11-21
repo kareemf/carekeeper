@@ -282,6 +282,7 @@ final class ReminderScheduler {
     #endif
 }
 
+@MainActor
 protocol ReminderScheduling {
     func scheduleReminder(
         careeName: String,
@@ -301,4 +302,5 @@ protocol ReminderScheduling {
     func deleteReminder(with identifier: String?)
 }
 
+@MainActor
 extension ReminderScheduler: ReminderScheduling {}

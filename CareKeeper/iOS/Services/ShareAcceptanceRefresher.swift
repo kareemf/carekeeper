@@ -41,7 +41,9 @@ final class ShareAcceptanceRefresher {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.handleShareAcceptance()
+            Task { @MainActor [weak self] in
+                self?.handleShareAcceptance()
+            }
         }
     }
 

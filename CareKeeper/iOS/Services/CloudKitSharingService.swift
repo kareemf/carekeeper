@@ -160,20 +160,8 @@ class CloudKitSharingService: ObservableObject {
         }
 
         let existingData = share[CKShare.SystemFieldKey.thumbnailImageData] as? Data
-        let existingFileURL = share[CKShare.SystemFieldKey.thumbnailImageDataFileURL] as? URL
-
         share[CKShare.SystemFieldKey.thumbnailImageData] = thumbnailData
-
-        let didUpdateData = existingData != thumbnailData
-        let shouldUpdateFileURL = didUpdateData || existingFileURL == nil
-
-        let fileURL = shouldUpdateFileURL ? ShareThumbnailProvider.thumbnailFileURL(for: thumbnailData) : existingFileURL
-        if let fileURL {
-            share[CKShare.SystemFieldKey.thumbnailImageDataFileURL] = fileURL
-        }
-
-        let didUpdateURL = shouldUpdateFileURL && (fileURL != existingFileURL)
-        return didUpdateData || didUpdateURL
+        return existingData != thumbnailData
     }
 
     /// Persist updated thumbnail metadata for existing shares without re-saving the root record.
