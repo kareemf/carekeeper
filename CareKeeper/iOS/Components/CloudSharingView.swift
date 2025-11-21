@@ -5,11 +5,13 @@ import UIKit
 struct CloudSharingView: UIViewControllerRepresentable {
     let share: CKShare
     let container: CKContainer
+    let caree: Caree?
     let onDismiss: () -> Void
 
-    init(share: CKShare, container: CKContainer, onDismiss: @escaping () -> Void) {
+    init(share: CKShare, container: CKContainer, caree: Caree? = nil, onDismiss: @escaping () -> Void) {
         self.share = share
         self.container = container
+        self.caree = caree
         self.onDismiss = onDismiss
     }
 
@@ -29,14 +31,16 @@ struct CloudSharingView: UIViewControllerRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(onDismiss: onDismiss)
+        Coordinator(caree: caree, onDismiss: onDismiss)
     }
 
     class Coordinator: NSObject, UICloudSharingControllerDelegate {
+        let caree: Caree?
         let onDismiss: () -> Void
         private let logger = AppLogger.sharing
 
-        init(onDismiss: @escaping () -> Void) {
+        init(caree: Caree?, onDismiss: @escaping () -> Void) {
+            self.caree = caree
             self.onDismiss = onDismiss
         }
 
@@ -46,7 +50,15 @@ struct CloudSharingView: UIViewControllerRepresentable {
         }
 
         func itemTitle(for csc: UICloudSharingController) -> String? {
-            "Caree"
+            caree?.name ?? "Caree"
+        }
+
+        func itemThumbnailImage(for csc: UICloudSharingController) -> UIImage? {
+            ShareThumbnailProvider.thumbnailImage(for: caree)
+        }
+
+        func itemThumbnailData(for csc: UICloudSharingController) -> Data? {
+            ShareThumbnailProvider.thumbnailData(for: caree)
         }
 
         func cloudSharingControllerDidStopSharing(_ csc: UICloudSharingController) {

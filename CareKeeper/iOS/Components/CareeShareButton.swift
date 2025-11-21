@@ -62,6 +62,7 @@ struct CareeShareButton: View {
                 CloudSharingView(
                     share: share,
                     container: container,
+                    caree: caree,
                     onDismiss: {
                         showingShareSheet = false
                         self.share = nil

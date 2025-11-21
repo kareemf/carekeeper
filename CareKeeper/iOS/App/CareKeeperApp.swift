@@ -14,6 +14,7 @@ struct CareKeeperApp: App {
     @StateObject private var cloudKitService = CloudKitDataService()
     @StateObject private var notificationService = CloudKitNotificationService()
     @State private var cacheService: LocalCacheService?
+    @State private var shareAcceptanceRefresher: ShareAcceptanceRefresher?
     @State private var startupError: Error?
 
     // Initialize diagnostics
@@ -224,6 +225,11 @@ struct CareKeeperApp: App {
                         // Wire services to CloudKitSyncMonitor for status tracking
                         CloudKitSyncMonitor.shared.configureServices(
                             cloudKitService: cloudKitService,
+                            sharedRecordsService: sharedRecordsService,
+                            cacheService: newCacheService
+                        )
+
+                        shareAcceptanceRefresher = ShareAcceptanceRefresher(
                             sharedRecordsService: sharedRecordsService,
                             cacheService: newCacheService
                         )

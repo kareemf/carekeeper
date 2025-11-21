@@ -55,6 +55,10 @@ class CloudKitSharingService: ObservableObject {
     func createOrGetShare(for caree: Caree, in modelContext: ModelContext) async throws -> CKShare {
         // Check if share already exists
         if let existingShare = try await getShare(for: caree, in: modelContext) {
+            let updated = applyThumbnailMetadata(to: existingShare, caree: caree)
+            if updated {
+                await persistThumbnailMetadata(for: existingShare)
+            }
             return existingShare
         }
 
@@ -121,6 +125,7 @@ class CloudKitSharingService: ObservableObject {
         let share = CKShare(rootRecord: careeCKRecord)
         share[CKShare.SystemFieldKey.title] = caree.name
         share.publicPermission = .none
+        _ = applyThumbnailMetadata(to: share, caree: caree)
 
         do {
             // Save both the updated root record and the share
@@ -143,6 +148,41 @@ class CloudKitSharingService: ObservableObject {
         } catch {
             logger.error("❌ Failed to create share: \(error.localizedDescription)")
             throw error
+        }
+    }
+
+    /// Attach thumbnail metadata to a CKShare and return whether it changed.
+    @discardableResult
+    private func applyThumbnailMetadata(to share: CKShare, caree: Caree) -> Bool {
+        guard let thumbnailData = ShareThumbnailProvider.thumbnailData(for: caree) else {
+            logger.debug("ℹ️ No thumbnail data available for share \(share.recordID.recordName)")
+            return false
+        }
+
+        let existingData = share[CKShare.SystemFieldKey.thumbnailImageData] as? Data
+        let existingFileURL = share[CKShare.SystemFieldKey.thumbnailImageDataFileURL] as? URL
+
+        share[CKShare.SystemFieldKey.thumbnailImageData] = thumbnailData
+
+        let didUpdateData = existingData != thumbnailData
+        let shouldUpdateFileURL = didUpdateData || existingFileURL == nil
+
+        let fileURL = shouldUpdateFileURL ? ShareThumbnailProvider.thumbnailFileURL(for: thumbnailData) : existingFileURL
+        if let fileURL {
+            share[CKShare.SystemFieldKey.thumbnailImageDataFileURL] = fileURL
+        }
+
+        let didUpdateURL = shouldUpdateFileURL && (fileURL != existingFileURL)
+        return didUpdateData || didUpdateURL
+    }
+
+    /// Persist updated thumbnail metadata for existing shares without re-saving the root record.
+    private func persistThumbnailMetadata(for share: CKShare) async {
+        do {
+            _ = try await container.privateCloudDatabase.save(share)
+            logger.info("✅ Share thumbnail metadata saved for \(share.recordID.recordName)")
+        } catch {
+            logger.warning("⚠️ Failed to save share thumbnail metadata: \(error.localizedDescription)")
         }
     }
 
