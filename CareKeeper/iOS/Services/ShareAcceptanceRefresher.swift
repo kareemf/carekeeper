@@ -11,7 +11,9 @@ protocol CacheRefreshing: AnyObject {
     func invalidateAndRefresh() async throws
 }
 
+@MainActor
 extension CloudKitSharedRecordsService: SharedCareeRefreshable {}
+@MainActor
 extension LocalCacheService: CacheRefreshing {}
 
 /// Listens for CloudKit share acceptance and proactively refreshes the shared caree list with backoff.
@@ -54,12 +56,12 @@ final class ShareAcceptanceRefresher {
         refreshTask?.cancel()
     }
 
-    private func handleShareAcceptance() {
+    func handleShareAcceptance() {
         logger.info("🔔 Share accepted; scheduling shared caree refresh with backoff.")
         refreshTask?.cancel()
 
         let baselineIDs = Set(sharedRecordsService.sharedCarees.map(\.id))
-        refreshTask = Task { [weak self] in
+        refreshTask = Task { @MainActor [weak self] in
             guard let self else { return }
             await performRefresh(baselineIDs: baselineIDs)
         }

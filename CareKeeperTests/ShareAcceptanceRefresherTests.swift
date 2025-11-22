@@ -7,8 +7,10 @@ final class ShareAcceptanceRefresherTests: XCTestCase {
         let sharedService = MockSharedCareeService()
         let cacheService = MockCacheRefreshingService()
         let center = NotificationCenter()
+        let fetchExpectation = expectation(description: "Fetch called twice")
+        let cacheExpectation = expectation(description: "Cache refreshed twice")
 
-        _ = ShareAcceptanceRefresher(
+        let refresher = ShareAcceptanceRefresher(
             sharedRecordsService: sharedService,
             cacheService: cacheService,
             notificationCenter: center,
@@ -17,13 +19,19 @@ final class ShareAcceptanceRefresherTests: XCTestCase {
 
         sharedService.onFetch = {
             if sharedService.fetchCallCount == 2 {
-                sharedService.sharedCarees = [Caree(name: "New Caree")]
+                sharedService.setSharedCarees([CareKeeper.Caree(name: "New Caree")])
+                fetchExpectation.fulfill()
+            }
+        }
+        cacheService.onRefresh = {
+            if cacheService.refreshCount == 2 {
+                cacheExpectation.fulfill()
             }
         }
 
-        center.post(name: .cloudKitShareAccepted, object: nil)
+        refresher.handleShareAcceptance()
 
-        try await Task.sleep(nanoseconds: 300_000_000)
+        await fulfillment(of: [fetchExpectation, cacheExpectation], timeout: 2.0)
 
         XCTAssertEqual(sharedService.fetchCallCount, 2, "Should stop retries after detecting new caree")
         XCTAssertEqual(cacheService.refreshCount, 2, "Cache refresh should run alongside each fetch")
@@ -33,8 +41,10 @@ final class ShareAcceptanceRefresherTests: XCTestCase {
         let sharedService = MockSharedCareeService()
         let cacheService = MockCacheRefreshingService()
         let center = NotificationCenter()
+        let fetchExpectation = expectation(description: "Fetch called once after restart")
+        let cacheExpectation = expectation(description: "Cache refreshed once after restart")
 
-        _ = ShareAcceptanceRefresher(
+        let refresher = ShareAcceptanceRefresher(
             sharedRecordsService: sharedService,
             cacheService: cacheService,
             notificationCenter: center,
@@ -43,15 +53,21 @@ final class ShareAcceptanceRefresherTests: XCTestCase {
 
         sharedService.onFetch = {
             if sharedService.fetchCallCount == 1 {
-                sharedService.sharedCarees = [Caree(name: "Second Acceptance Caree")]
+                sharedService.setSharedCarees([CareKeeper.Caree(name: "Second Acceptance Caree")])
+                fetchExpectation.fulfill()
+            }
+        }
+        cacheService.onRefresh = {
+            if cacheService.refreshCount == 1 {
+                cacheExpectation.fulfill()
             }
         }
 
-        center.post(name: .cloudKitShareAccepted, object: nil)
+        refresher.handleShareAcceptance()
         try await Task.sleep(nanoseconds: 50_000_000)
-        center.post(name: .cloudKitShareAccepted, object: nil)
+        refresher.handleShareAcceptance()
 
-        try await Task.sleep(nanoseconds: 400_000_000)
+        await fulfillment(of: [fetchExpectation, cacheExpectation], timeout: 2.0)
 
         XCTAssertEqual(sharedService.fetchCallCount, 1, "Earlier refresh should be cancelled when a new acceptance arrives")
         XCTAssertEqual(cacheService.refreshCount, 1, "Cache refresh should mirror the single active attempt")
@@ -62,7 +78,8 @@ final class ShareAcceptanceRefresherTests: XCTestCase {
 
 @MainActor
 private final class MockSharedCareeService: SharedCareeRefreshable {
-    var sharedCarees: [Caree] = []
+    private var stored: [CareKeeper.Caree] = []
+    @MainActor var sharedCarees: [CareKeeper.Caree] { stored }
     var fetchCallCount = 0
     var onFetch: (() -> Void)?
 
@@ -70,13 +87,19 @@ private final class MockSharedCareeService: SharedCareeRefreshable {
         fetchCallCount += 1
         onFetch?()
     }
+
+    func setSharedCarees(_ carees: [CareKeeper.Caree]) {
+        stored = carees
+    }
 }
 
 @MainActor
 private final class MockCacheRefreshingService: CacheRefreshing {
     var refreshCount = 0
+    var onRefresh: (() -> Void)?
 
     func invalidateAndRefresh() async throws {
         refreshCount += 1
+        onRefresh?()
     }
 }

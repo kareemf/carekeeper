@@ -9,6 +9,7 @@ class CloudKitSharedRecordsService: ObservableObject {
     private let container: CKContainer
     private let logger = AppLogger.cloudkit
     private let reminderMetadataStore: any ReminderMetadataStoreProtocol
+    private let changeTokenStore = SharedZoneChangeTokenStore()
 
     var cacheService: LocalCacheService?
 
@@ -84,6 +85,12 @@ class CloudKitSharedRecordsService: ObservableObject {
     /// Also presents user-facing notifications for new activities from other users
     private func handleCloudKitNotification(_ notification: CKNotification) async {
         logger.info("📨 Processing CloudKit notification: \(notification.notificationType.rawValue)")
+
+        if let zoneNotification = notification as? CKRecordZoneNotification,
+           zoneNotification.databaseScope == .shared
+        {
+            await handleSharedZoneNotification(zoneNotification)
+        }
 
         // Handle query notifications for new activities (user-facing alerts)
         if let queryNotification = notification as? CKQueryNotification,
@@ -174,6 +181,150 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
     }
 
+    func handleSharedZoneNotification(_ notification: CKRecordZoneNotification) async {
+        guard let zoneID = notification.recordZoneID else {
+            logger.warning("⚠️ Zone notification missing zone ID")
+            return
+        }
+
+        let existingActivityIDs: Set<UUID> = Set(
+            sharedCarees
+                .flatMap { $0.activities ?? [] }
+                .map(\.id)
+        )
+
+        await fetchSharedChanges(for: zoneID, existingActivityIDs: existingActivityIDs)
+        await fetchSharedCarees()
+    }
+
+    func fetchSharedChanges(for zoneID: CKRecordZone.ID, existingActivityIDs: Set<UUID>) async {
+        logger.info("🔁 Fetching shared zone changes for \(zoneID.zoneName, privacy: .public)")
+
+        let config = CKFetchRecordZoneChangesOperation.ZoneConfiguration()
+        config.previousServerChangeToken = changeTokenStore.token(for: zoneID)
+        let operation = CKFetchRecordZoneChangesOperation(
+            recordZoneIDs: [zoneID],
+            configurationsByRecordZoneID: [zoneID: config]
+        )
+
+        var newActivityRecords: [CKRecord] = []
+        var fetchError: Error?
+        var mutableExistingIDs = existingActivityIDs
+
+        operation.recordChangedBlock = { record in
+            if record.recordType == "CD_Activity" {
+                newActivityRecords.append(record)
+            }
+        }
+
+        operation.recordZoneChangeTokensUpdatedBlock = { [self] zoneID, token, _ in
+            if let token {
+                self.changeTokenStore.save(token, for: zoneID)
+            }
+        }
+
+        operation.recordZoneFetchCompletionBlock = { [self] zoneID, token, _, _, error in
+            if let token {
+                self.changeTokenStore.save(token, for: zoneID)
+            }
+            if let error {
+                fetchError = error
+            }
+        }
+
+        await withCheckedContinuation { continuation in
+            operation.fetchRecordZoneChangesResultBlock = { _ in
+                continuation.resume()
+            }
+            container.sharedCloudDatabase.add(operation)
+        }
+
+        if let error = fetchError {
+            if let ckError = error as? CKError, ckError.code == .changeTokenExpired {
+                logger.warning("⚠️ Change token expired for zone \(zoneID.zoneName, privacy: .public); clearing token")
+                changeTokenStore.clear(for: zoneID)
+            } else {
+                logger.error("❌ Failed fetching shared zone changes: \(error.localizedDescription)")
+            }
+            return
+        }
+
+        for record in newActivityRecords {
+            guard
+                let cdId = record["CD_id"] as? String,
+                let activityID = UUID(uuidString: cdId)
+            else {
+                logger.warning("⚠️ Activity record missing CD_id")
+                continue
+            }
+
+            if mutableExistingIDs.contains(activityID) {
+                continue
+            }
+
+            if await notifyForActivityRecord(record) {
+                mutableExistingIDs.insert(activityID)
+            }
+        }
+    }
+
+    @discardableResult
+    func notifyForActivityRecord(_ record: CKRecord) async -> Bool {
+        let creatorIDField = record["CD_creatorUserRecordID"] as? String
+        let creatorRecordID = record.creatorUserRecordID?.recordName
+        let creatorID = creatorIDField ?? creatorRecordID
+        let currentUserID = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
+        if creatorID == currentUserID { return false }
+
+        guard
+            let cdId = record["CD_id"] as? String,
+            let activityID = UUID(uuidString: cdId),
+            let dateTime = record["CD_dateTime"] as? Date
+        else {
+            logger.warning("⚠️ Activity record missing required fields")
+            return false
+        }
+
+        guard
+            let careeReference = record["CD_caree"] as? CKRecord.Reference,
+            let careeIDFromRef = careeReference.recordID.recordName.components(separatedBy: "/").last,
+            let careeID = UUID(uuidString: careeIDFromRef)
+        else {
+            logger.warning("⚠️ Could not extract caree ID from activity")
+            return false
+        }
+
+        let prefs = UserNotificationPreferences.shared
+        guard prefs.isEnabled(for: careeID) else { return false }
+
+        do {
+            let database = container.sharedCloudDatabase
+            let careeRecord = try await database.record(for: careeReference.recordID)
+            let careeName = careeRecord["CD_name"] as? String ?? "Unknown"
+
+            var activityTypeName = "Activity"
+            if let activityTypeRef = record["CD_activityType"] as? CKRecord.Reference {
+                if let activityTypeRecord = try? await database.record(for: activityTypeRef.recordID) {
+                    activityTypeName = activityTypeRecord["CD_name"] as? String ?? "Activity"
+                }
+            }
+
+            let notificationService = UserNotificationService.shared
+            await notificationService.presentNewActivityNotification(
+                activityID: activityID,
+                careeID: careeID,
+                careeName: careeName,
+                activityTypeName: activityTypeName,
+                creatorName: "Another caregiver",
+                timestamp: dateTime
+            )
+            return true
+        } catch {
+            logger.error("❌ Failed to present activity notification: \(error.localizedDescription)")
+            return false
+        }
+    }
+
     /// Fetch shared Caree records with their ActivityTypes and Activities using zone-based discovery
     func fetchSharedCarees() async {
         await MainActor.run {
@@ -210,6 +361,8 @@ class CloudKitSharedRecordsService: ObservableObject {
                 NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
                 return
             }
+
+            await ensureSharedZoneSubscriptions(zones)
 
             // Step 2: Query each zone
             var allCareeRecords: [CKRecord] = []
@@ -546,6 +699,37 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
     }
 
+    private func ensureSharedZoneSubscriptions(_ zones: [CKRecordZone]) async {
+        let sharedDatabase = container.sharedCloudDatabase
+        let existing: [CKSubscription]
+        do {
+            existing = try await sharedDatabase.allSubscriptions()
+        } catch {
+            logger.warning("⚠️ Unable to list shared subscriptions: \(error.localizedDescription)")
+            return
+        }
+
+        for zone in zones where zone.zoneID.zoneName != CKRecordZone.ID.defaultZoneName {
+            let subID = "shared-zone-\(zone.zoneID.zoneName)-\(zone.zoneID.ownerName)"
+            if existing.contains(where: { $0.subscriptionID == subID }) {
+                continue
+            }
+
+            let subscription = CKRecordZoneSubscription(zoneID: zone.zoneID, subscriptionID: subID)
+            let info = CKSubscription.NotificationInfo()
+            info.shouldSendContentAvailable = true
+            info.shouldBadge = false
+            subscription.notificationInfo = info
+
+            do {
+                _ = try await sharedDatabase.save(subscription)
+                logger.info("✅ Created shared zone subscription: \(subID)")
+            } catch {
+                logger.warning("⚠️ Failed to save shared zone subscription \(subID): \(error.localizedDescription)")
+            }
+        }
+    }
+
 
     private func cloneCareeForCaching(_ caree: Caree, isShared: Bool) -> Caree {
         let clone = Caree(name: caree.name, image: caree.image, listOrder: caree.listOrder)
@@ -607,5 +791,29 @@ class CloudKitSharedRecordsService: ObservableObject {
                 "  📥 Fetched \(records.count) \(recordType) records in zone \(zoneID.zoneName) (\(batchIndex) batch\(batchIndex == 1 ? "" : "es"))"
             )
         return records
+    }
+}
+
+private struct SharedZoneChangeTokenStore {
+    private let defaults = UserDefaults.standard
+
+    func token(for zoneID: CKRecordZone.ID) -> CKServerChangeToken? {
+        guard let data = defaults.data(forKey: key(for: zoneID)) else { return nil }
+        return try? NSKeyedUnarchiver.unarchivedObject(ofClass: CKServerChangeToken.self, from: data)
+    }
+
+    func save(_ token: CKServerChangeToken, for zoneID: CKRecordZone.ID) {
+        guard let data = try? NSKeyedArchiver.archivedData(withRootObject: token, requiringSecureCoding: true) else {
+            return
+        }
+        defaults.set(data, forKey: key(for: zoneID))
+    }
+
+    func clear(for zoneID: CKRecordZone.ID) {
+        defaults.removeObject(forKey: key(for: zoneID))
+    }
+
+    private func key(for zoneID: CKRecordZone.ID) -> String {
+        "sharedZoneToken-\(zoneID.zoneName)-\(zoneID.ownerName)"
     }
 }

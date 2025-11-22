@@ -84,11 +84,6 @@ class CloudKitNotificationService: ObservableObject {
             subscriptionID: "private-activity-created",
             database: container.privateCloudDatabase
         )
-        await setupActivitySubscription(
-            scope: .shared,
-            subscriptionID: "shared-activity-created",
-            database: container.sharedCloudDatabase
-        )
     }
 
     private func setupActivitySubscription(
