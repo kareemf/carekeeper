@@ -203,15 +203,13 @@ struct ActivityListView: View {
         // Find the specific caree from cache (owned or shared)
         let foundCaree = cacheService.getCachedCaree(id: careeID)
 
-        // Update caree and activities state
         caree = foundCaree
-
-        if let foundCaree {
-            Task {
-                await loadInitialPage()
-            }
-        } else {
+        if caree == nil {
             activities = []
+            return
+        }
+        Task {
+            await loadInitialPage()
         }
     }
 
