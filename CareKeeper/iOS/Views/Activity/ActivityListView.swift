@@ -19,12 +19,17 @@ struct ActivityListView: View {
     // Reactive state - updated when cache changes
     @State private var caree: Caree?
     @State private var activities: [Activity] = []
+    @State private var lastCursorDate: Date?
+    @State private var hasMorePages = true
+    @State private var isLoadingPage = false
 
     @State private var selectedActivityType: ActivityType?
     @State private var showingFilterMenu = false
     @State private var error: Error?
     @State private var activityToDelete: IndexSet?
     @State private var showingDeleteConfirmation = false
+
+    private let pageSize = 50
 
     init(careeID: UUID) {
         self.careeID = careeID
@@ -63,6 +68,10 @@ struct ActivityListView: View {
                         .onDelete { offsets in
                             activityToDelete = offsets
                             showingDeleteConfirmation = true
+                        }
+
+                        if hasMorePages {
+                            loadMoreRow
                         }
                     }
                 }
@@ -151,6 +160,11 @@ struct ActivityListView: View {
                 updateActivities()
             }
         }
+        .onChange(of: selectedActivityType) { _ in
+            Task {
+                await loadInitialPage()
+            }
+        }
     }
 
     private var emptyStateView: some View {
@@ -193,8 +207,9 @@ struct ActivityListView: View {
         caree = foundCaree
 
         if let foundCaree {
-            // Extract and sort activities
-            activities = (foundCaree.activities ?? []).sorted { $0.dateTime > $1.dateTime }
+            Task {
+                await loadInitialPage()
+            }
         } else {
             activities = []
         }
@@ -207,6 +222,21 @@ struct ActivityListView: View {
         }
 
         return activities
+    }
+
+    private var loadMoreRow: some View {
+        HStack {
+            Spacer()
+            if isLoadingPage {
+                ProgressView()
+            } else {
+                Button(NSLocalizedString("Load more", comment: "Load more activities")) {
+                    Task { await loadNextPage() }
+                }
+            }
+            Spacer()
+        }
+        .listRowSeparator(.hidden)
     }
 
     private func deleteActivities(at offsets: IndexSet, from caree: Caree) {
@@ -248,6 +278,53 @@ struct ActivityListView: View {
 
         await MainActor.run {
             updateActivities()
+        }
+    }
+
+    @MainActor
+    private func loadInitialPage() async {
+        guard let cacheService else {
+            caree = nil
+            activities = []
+            return
+        }
+
+        caree = cacheService.getCachedCaree(id: careeID)
+        activities = []
+        lastCursorDate = nil
+        hasMorePages = true
+        await loadNextPage()
+    }
+
+    @MainActor
+    private func loadNextPage() async {
+        guard !isLoadingPage, hasMorePages, let caree else { return }
+        isLoadingPage = true
+        defer { isLoadingPage = false }
+
+        let selectedTypeID = selectedActivityType?.id
+        let cursor = lastCursorDate
+
+        let fetch = FetchDescriptor<Activity>(
+            predicate: #Predicate<Activity> { activity in
+                activity.caree?.id == caree.id
+                    && (selectedTypeID == nil || activity.activityType?.id == selectedTypeID)
+                    && (cursor == nil || activity.dateTime < cursor!)
+            },
+            sortBy: [SortDescriptor(\.dateTime, order: .reverse)],
+            fetchLimit: pageSize
+        )
+
+        do {
+            let page = try modelContext.fetch(fetch)
+            activities.append(contentsOf: page)
+            lastCursorDate = activities.last?.dateTime
+            if page.count < pageSize {
+                hasMorePages = false
+            }
+        } catch {
+            self.error = error
+            hasMorePages = false
         }
     }
 }

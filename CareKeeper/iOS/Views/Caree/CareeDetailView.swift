@@ -43,6 +43,8 @@ struct CareeDetailView: View {
     @State private var showingDeleteActivityConfirmation = false
     @State private var isSyncedToCloudKit: Bool? = nil
     @State private var isCheckingSync = false
+    @State private var activityCount: Int?
+    @State private var activityTypeCount: Int?
     @State private var exportItem: ExportItem?
     @State private var error: Error?
     @State private var isLoadingSharedCaree = false
@@ -245,6 +247,9 @@ struct CareeDetailView: View {
         .task {
             // Initial resolve
             resolvedCaree = resolveCareeFromCache()
+            if let caree = resolvedCaree {
+                await loadCounts(for: caree)
+            }
 
             // Light-weight cache refresh (debounced/coalesced)
             try? await cacheService?.refreshCache()
@@ -255,6 +260,9 @@ struct CareeDetailView: View {
                 await sharedRecordsService.fetchSharedCarees()
                 // Re-resolve after fetch completes
                 resolvedCaree = resolveCareeFromCache()
+                if let caree = resolvedCaree {
+                    await loadCounts(for: caree)
+                }
                 isLoadingSharedCaree = false
             }
 
@@ -265,12 +273,21 @@ struct CareeDetailView: View {
         .task(id: careeID) {
             // Refresh when caree ID changes
             resolvedCaree = resolveCareeFromCache()
+            if let caree = resolvedCaree {
+                await loadCounts(for: caree)
+            } else {
+                activityCount = nil
+                activityTypeCount = nil
+            }
             try? await cacheService?.refreshCache()
 
             if resolvedCaree == nil || resolvedCaree?.isShared == true {
                 isLoadingSharedCaree = true
                 await sharedRecordsService.fetchSharedCarees()
                 resolvedCaree = resolveCareeFromCache()
+                if let caree = resolvedCaree {
+                    await loadCounts(for: caree)
+                }
                 isLoadingSharedCaree = false
             }
         }
@@ -282,22 +299,34 @@ struct CareeDetailView: View {
         // Re-resolve after any shared refresh completes (both services post this)
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CloudKitBackgroundRefreshFinished"))) { _ in
             resolvedCaree = resolveCareeFromCache()
+            if let caree = resolvedCaree {
+                Task { await loadCounts(for: caree) }
+            }
             isLoadingSharedCaree = false
         }
         // Also re-resolve when the in-memory shared list changes
         .onChange(of: sharedRecordsService.sharedCarees) { _, _ in
             resolvedCaree = resolveCareeFromCache()
+            if let caree = resolvedCaree {
+                Task { await loadCounts(for: caree) }
+            }
             isLoadingSharedCaree = false
         }
         // REACTIVE: Re-resolve when cache publishers update (for inline CRUD reactivity)
         .onReceive(cacheService?.$myCarees.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()) { _ in
             if let current = resolvedCaree, !current.isShared {
                 resolvedCaree = resolveCareeFromCache()
+                if let caree = resolvedCaree {
+                    Task { await loadCounts(for: caree) }
+                }
             }
         }
         .onReceive(cacheService?.$sharedCarees.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()) { _ in
             if let current = resolvedCaree, current.isShared {
                 resolvedCaree = resolveCareeFromCache()
+                if let caree = resolvedCaree {
+                    Task { await loadCounts(for: caree) }
+                }
             }
         }
         // REACTIVE: Listen for shared caree data updates (immediate notification)
@@ -317,12 +346,21 @@ struct CareeDetailView: View {
     
     private func handleCacheServiceAttachment() async {
         resolvedCaree = resolveCareeFromCache()
+        if let caree = resolvedCaree {
+            await loadCounts(for: caree)
+        } else {
+            activityCount = nil
+            activityTypeCount = nil
+        }
         try? await cacheService?.refreshCache()
 
         if resolvedCaree == nil || resolvedCaree?.isShared == true {
             isLoadingSharedCaree = true
             await sharedRecordsService.fetchSharedCarees()
             resolvedCaree = resolveCareeFromCache()
+            if let caree = resolvedCaree {
+                await loadCounts(for: caree)
+            }
             isLoadingSharedCaree = false
         }
 
@@ -390,14 +428,14 @@ struct CareeDetailView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text(NSLocalizedString(
-                    "\(caree.activityTypes?.count ?? 0) Activity Types",
+                    "\(activityTypeCount ?? 0) Activity Types",
                     comment: "Activity types count"
                 ))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
 
                 Text(NSLocalizedString(
-                    "\(caree.activities?.count ?? 0) Activities",
+                    "\(activityCount ?? 0) Activities",
                     comment: "Total activities count"
                 ))
                 .font(.subheadline)
@@ -656,6 +694,19 @@ struct CareeDetailView: View {
                 // Permission denied - show alert to open settings
                 showingPermissionAlert = true
             }
+        }
+    }
+
+    @MainActor
+    private func loadCounts(for caree: Caree) async {
+        let careeID = caree.id
+        do {
+            let activityPredicate = #Predicate<Activity> { $0.caree?.id == careeID }
+            let typePredicate = #Predicate<ActivityType> { $0.caree?.id == careeID }
+            activityCount = try modelContext.fetchCount(FetchDescriptor(predicate: activityPredicate))
+            activityTypeCount = try modelContext.fetchCount(FetchDescriptor(predicate: typePredicate))
+        } catch {
+            // Leave counts untouched on failure
         }
     }
 }

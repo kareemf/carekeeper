@@ -1,12 +1,16 @@
 import SwiftUI
 
 struct CareeListRowView: View {
+    @Environment(\.modelContext) private var modelContext
+
     let caree: Caree
     var isShared: Bool = false
 
     @State private var isCheckingSync = false
     @State private var isSyncedToCloudKit: Bool? = nil
     @StateObject private var syncService = CloudKitSyncService()
+    @State private var activityCount: Int?
+    @State private var activityTypeCount: Int?
 
     var body: some View {
         HStack {
@@ -26,7 +30,7 @@ struct CareeListRowView: View {
 
                 HStack(spacing: 12) {
                     Text(NSLocalizedString(
-                        "\(caree.activityTypes?.count ?? 0) Activity Types",
+                        "\(activityTypeCount ?? 0) Activity Types",
                         comment: "Activity types count in caree row"
                     ))
                     .font(.caption)
@@ -37,7 +41,7 @@ struct CareeListRowView: View {
                         .foregroundColor(.secondary)
 
                     Text(NSLocalizedString(
-                        "\(caree.activities?.count ?? 0) Activities",
+                        "\(activityCount ?? 0) Activities",
                         comment: "Activities count in caree row"
                     ))
                     .font(.caption)
@@ -78,6 +82,7 @@ struct CareeListRowView: View {
                 isSyncedToCloudKit = await syncService.isSynced(caree: caree)
                 isCheckingSync = false
             }
+            await loadCounts()
         }
     }
     
@@ -96,6 +101,20 @@ struct CareeListRowView: View {
         }
         .frame(width: 50, height: 50)
         .clipShape(Circle())
+    }
+
+    @MainActor
+    private func loadCounts() async {
+        guard activityCount == nil || activityTypeCount == nil else { return }
+        let careeID = caree.id
+        do {
+            let activityPredicate = #Predicate<Activity> { $0.caree?.id == careeID }
+            let typePredicate = #Predicate<ActivityType> { $0.caree?.id == careeID }
+            activityCount = try modelContext.fetchCount(FetchDescriptor(predicate: activityPredicate))
+            activityTypeCount = try modelContext.fetchCount(FetchDescriptor(predicate: typePredicate))
+        } catch {
+            // Leave counts nil; UI will show 0
+        }
     }
 }
 
