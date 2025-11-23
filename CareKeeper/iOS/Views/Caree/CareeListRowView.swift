@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 struct CareeListRowView: View {
@@ -107,14 +108,10 @@ struct CareeListRowView: View {
     private func loadCounts() async {
         guard activityCount == nil || activityTypeCount == nil else { return }
         let careeID = caree.id
-        do {
-            let activityPredicate = #Predicate<Activity> { $0.caree?.id == careeID }
-            let typePredicate = #Predicate<ActivityType> { $0.caree?.id == careeID }
-            activityCount = try modelContext.fetchCount(FetchDescriptor(predicate: activityPredicate))
-            activityTypeCount = try modelContext.fetchCount(FetchDescriptor(predicate: typePredicate))
-        } catch {
-            // Leave counts nil; UI will show 0
-        }
+        let activityPredicate = #Predicate<Activity> { $0.caree?.id == careeID }
+        let typePredicate = #Predicate<ActivityType> { $0.caree?.id == careeID }
+        activityCount = try? modelContext.fetchCount(FetchDescriptor(predicate: activityPredicate))
+        activityTypeCount = try? modelContext.fetchCount(FetchDescriptor(predicate: typePredicate))
     }
 }
 

@@ -237,9 +237,8 @@ class CloudKitSharedRecordsService: ObservableObject {
         operation.recordZoneFetchResultBlock = { [self] zoneID, result in
             switch result {
             case let .success(fetchResult):
-                if let token = fetchResult.serverChangeToken {
-                    logger.debug("🔁 Token received during shared change fetch for \(zoneID.zoneName, privacy: .public)")
-                }
+                let token = fetchResult.serverChangeToken
+                logger.debug("🔁 Token received during shared change fetch for \(zoneID.zoneName, privacy: .public)")
             case let .failure(error):
                 fetchError = error
             }
@@ -843,7 +842,7 @@ class CloudKitSharedRecordsService: ObservableObject {
                 hasChanges = true // treat error as potential change to force fetch
             }
         }
-        operation.recordWasDeletedBlock = { _, _ in
+        operation.recordWithIDWasDeletedBlock = { _, _ in
             hasChanges = true
         }
         operation.recordZoneChangeTokensUpdatedBlock = { _, token, _ in
@@ -854,9 +853,7 @@ class CloudKitSharedRecordsService: ObservableObject {
         operation.recordZoneFetchResultBlock = { _, result in
             switch result {
             case let .success(fetchResult):
-                if let token = fetchResult.serverChangeToken {
-                    latestToken = token
-                }
+                latestToken = fetchResult.serverChangeToken
             case let .failure(error):
                 fetchError = error
             }

@@ -160,7 +160,7 @@ struct ActivityListView: View {
                 updateActivities()
             }
         }
-        .onChange(of: selectedActivityType) { _ in
+        .onChange(of: selectedActivityType) { _, _ in
             Task {
                 await loadInitialPage()
             }
@@ -305,15 +305,15 @@ struct ActivityListView: View {
         let selectedTypeID = selectedActivityType?.id
         let cursor = lastCursorDate
 
-        let fetch = FetchDescriptor<Activity>(
+        var fetch = FetchDescriptor<Activity>(
             predicate: #Predicate<Activity> { activity in
                 activity.caree?.id == caree.id
                     && (selectedTypeID == nil || activity.activityType?.id == selectedTypeID)
                     && (cursor == nil || activity.dateTime < cursor!)
             },
-            sortBy: [SortDescriptor(\.dateTime, order: .reverse)],
-            fetchLimit: pageSize
+            sortBy: [SortDescriptor(\.dateTime, order: .reverse)]
         )
+        fetch.fetchLimit = pageSize
 
         do {
             let page = try modelContext.fetch(fetch)
