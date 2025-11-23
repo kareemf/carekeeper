@@ -660,17 +660,18 @@ class CloudKitSharedRecordsService: ObservableObject {
             for caree in carees {
                 do {
                     let cacheCaree = cloneCareeForCaching(caree, isShared: true)
-                    try await cacheService.cacheCaree(cacheCaree, isShared: true)
-                    for activityType in activityTypesByCaree[caree.id] ?? [] {
-                        try await cacheService.cacheActivityType(activityType, for: cacheCaree)
-                    }
-                    for activity in activitiesByCaree[caree.id] ?? [] {
-                        guard let activityTypeID = activityTypeIDByActivity[activity.id] else {
-                            logger.warning("⚠️ Missing activity type reference for shared activity \(activity.id)")
-                            continue
-                        }
-                        try await cacheService.cacheActivity(activity, for: cacheCaree, activityTypeID: activityTypeID)
-                    }
+                    let types = activityTypesByCaree[caree.id] ?? []
+                    let activities = activitiesByCaree[caree.id] ?? []
+                    let mapping = Dictionary(uniqueKeysWithValues: activities.compactMap { activity in
+                        activityTypeIDByActivity[activity.id].map { (activity.id, $0) }
+                    })
+
+                    try await cacheService.replaceCaree(
+                        cacheCaree,
+                        activityTypes: types,
+                        activities: activities,
+                        activityTypeIDsByActivity: mapping
+                    )
                 } catch {
                     logger.warning("⚠️ Failed caching shared records: \(error.localizedDescription)")
                 }
