@@ -213,10 +213,12 @@ with open('carekeeper_export.json') as f:
 activities = []
 for caree in data['carees']:
     for activity in caree['activities']:
+        if "quantity" not in activity:
+            continue
+        
         activities.append({
             'caree': caree['name'],
-            'type': next(at['name'] for at in caree['activityTypes']
-                        if at['id'] == activity['activityTypeId']),
+            'type': next(at['name'] for at in caree['activityTypes'] if at['id'] == activity['activityTypeID']),
             'dateTime': activity['dateTime'],
             'quantity': activity.get('quantity'),
             'notes': activity.get('notes')
