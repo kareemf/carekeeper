@@ -217,9 +217,14 @@ class CloudKitSharedRecordsService: ObservableObject {
         var fetchError: Error?
         var mutableExistingIDs = existingActivityIDs
 
-        operation.recordChangedBlock = { record in
-            if record.recordType == "CD_Activity" {
-                newActivityRecords.append(record)
+        operation.recordWasChangedBlock = { recordID, result in
+            switch result {
+            case let .success(record):
+                if record.recordType == "CD_Activity" {
+                    newActivityRecords.append(record)
+                }
+            case let .failure(error):
+                self.logger.warning("⚠️ Failed record change for \(recordID.recordName, privacy: .public): \(error.localizedDescription)")
             }
         }
 
@@ -229,11 +234,13 @@ class CloudKitSharedRecordsService: ObservableObject {
             }
         }
 
-        operation.recordZoneFetchCompletionBlock = { [self] zoneID, token, _, _, error in
-            if let token {
-                logger.debug("🔁 Token received during shared change fetch for \(zoneID.zoneName, privacy: .public)")
-            }
-            if let error {
+        operation.recordZoneFetchResultBlock = { [self] zoneID, result in
+            switch result {
+            case let .success(fetchResult):
+                if let token = fetchResult.serverChangeToken {
+                    logger.debug("🔁 Token received during shared change fetch for \(zoneID.zoneName, privacy: .public)")
+                }
+            case let .failure(error):
                 fetchError = error
             }
         }
@@ -822,16 +829,21 @@ class CloudKitSharedRecordsService: ObservableObject {
 
         let config = CKFetchRecordZoneChangesOperation.ZoneConfiguration()
         config.previousServerChangeToken = changeTokenStore.token(for: zoneID)
+        config.desiredKeys = ["CD_id"]
         let operation = CKFetchRecordZoneChangesOperation(
             recordZoneIDs: [zoneID],
             configurationsByRecordZoneID: [zoneID: config]
         )
-        operation.desiredKeys = ["CD_id"] // lightweight check
 
-        operation.recordChangedBlock = { _ in
-            hasChanges = true
+        operation.recordWasChangedBlock = { _, result in
+            switch result {
+            case .success:
+                hasChanges = true
+            case .failure:
+                hasChanges = true // treat error as potential change to force fetch
+            }
         }
-        operation.recordWithIDWasDeletedBlock = { _, _ in
+        operation.recordWasDeletedBlock = { _, _ in
             hasChanges = true
         }
         operation.recordZoneChangeTokensUpdatedBlock = { _, token, _ in
@@ -839,11 +851,13 @@ class CloudKitSharedRecordsService: ObservableObject {
                 latestToken = token
             }
         }
-        operation.recordZoneFetchCompletionBlock = { _, token, _, _, error in
-            if let token {
-                latestToken = token
-            }
-            if let error {
+        operation.recordZoneFetchResultBlock = { _, result in
+            switch result {
+            case let .success(fetchResult):
+                if let token = fetchResult.serverChangeToken {
+                    latestToken = token
+                }
+            case let .failure(error):
                 fetchError = error
             }
         }
