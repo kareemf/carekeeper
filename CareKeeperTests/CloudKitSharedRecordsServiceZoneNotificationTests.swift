@@ -38,6 +38,10 @@ private final class TestSharedRecordsService: CloudKitSharedRecordsService {
         fetchSharedChangesCalled = true
     }
 
+    override func fetchSharedCarees(force: Bool, reason: String) async {
+        fetchSharedCareesCalled = true
+    }
+
     override func fetchSharedCarees() async {
         fetchSharedCareesCalled = true
     }

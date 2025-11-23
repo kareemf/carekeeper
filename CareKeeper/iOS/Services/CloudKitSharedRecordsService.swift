@@ -10,6 +10,12 @@ class CloudKitSharedRecordsService: ObservableObject {
     private let logger = AppLogger.cloudkit
     private let reminderMetadataStore: any ReminderMetadataStoreProtocol
     private let changeTokenStore = SharedZoneChangeTokenStore()
+    private let fetchDebounceInterval: TimeInterval = 0.25
+
+    private var sharedFetchTask: Task<Void, Never>?
+    private var pendingSharedFetch = false
+    private var pendingSharedFetchForce = false
+    private var lastSharedFetchRequestedAt: Date?
 
     var cacheService: LocalCacheService?
 
@@ -100,7 +106,7 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
 
         // For any CloudKit change, refresh the shared carees
-        await fetchSharedCarees()
+        await fetchSharedCarees(force: true, reason: "cloudkit-notification")
     }
 
     /// Handle query notifications for new activities
@@ -194,7 +200,7 @@ class CloudKitSharedRecordsService: ObservableObject {
         )
 
         await fetchSharedChanges(for: zoneID, existingActivityIDs: existingActivityIDs)
-        await fetchSharedCarees()
+        await fetchSharedCarees(force: true, reason: "zone-notification")
     }
 
     func fetchSharedChanges(for zoneID: CKRecordZone.ID, existingActivityIDs: Set<UUID>) async {
@@ -219,13 +225,13 @@ class CloudKitSharedRecordsService: ObservableObject {
 
         operation.recordZoneChangeTokensUpdatedBlock = { [self] zoneID, token, _ in
             if let token {
-                self.changeTokenStore.save(token, for: zoneID)
+                logger.debug("🔁 Token updated during shared change fetch for \(zoneID.zoneName, privacy: .public)")
             }
         }
 
         operation.recordZoneFetchCompletionBlock = { [self] zoneID, token, _, _, error in
             if let token {
-                self.changeTokenStore.save(token, for: zoneID)
+                logger.debug("🔁 Token received during shared change fetch for \(zoneID.zoneName, privacy: .public)")
             }
             if let error {
                 fetchError = error
@@ -325,8 +331,48 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
     }
 
-    /// Fetch shared Caree records with their ActivityTypes and Activities using zone-based discovery
     func fetchSharedCarees() async {
+        await fetchSharedCarees(force: false, reason: "manual")
+    }
+
+    /// Debounced/concurrency-guarded entry point for shared refreshes (mirrors LocalCacheService.scheduleRefresh pattern).
+    func fetchSharedCarees(force: Bool, reason: String) async {
+        // Short debounce to coalesce bursty triggers (push + manual refresh).
+        if let last = lastSharedFetchRequestedAt {
+            let delta = Date().timeIntervalSince(last)
+            if delta < fetchDebounceInterval {
+                let remaining = fetchDebounceInterval - delta
+                try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
+            }
+        }
+        lastSharedFetchRequestedAt = Date()
+
+        if let task = sharedFetchTask {
+            // Another fetch is running; queue one follow-up and optionally upgrade to force.
+            pendingSharedFetch = true
+            pendingSharedFetchForce = pendingSharedFetchForce || force
+            await task.value
+
+            if pendingSharedFetch {
+                let nextForce = pendingSharedFetchForce
+                pendingSharedFetch = false
+                pendingSharedFetchForce = false
+                await fetchSharedCarees(force: nextForce, reason: "coalesced-\(reason)")
+            }
+            return
+        }
+
+        let task = Task { [weak self] in
+            guard let self else { return }
+            await self.performSharedFetch(force: force, reason: reason)
+        }
+        sharedFetchTask = task
+        await task.value
+        sharedFetchTask = nil
+    }
+
+    /// Fetch shared Caree records with their ActivityTypes and Activities using zone-based discovery
+    private func performSharedFetch(force: Bool, reason: String) async {
         await MainActor.run {
             isLoading = true
             error = nil
@@ -364,11 +410,37 @@ class CloudKitSharedRecordsService: ObservableObject {
 
             await ensureSharedZoneSubscriptions(zones)
 
+            // Step 1.5: Use change tokens to skip work when nothing changed unless forced.
+            var zonesWithChanges: [CKRecordZone.ID] = []
+            var pendingTokens: [CKRecordZone.ID: CKServerChangeToken] = [:]
+            for zone in zones where zone.zoneID.zoneName != CKRecordZone.ID.defaultZoneName {
+                let result = await inspectSharedZoneChanges(zone.zoneID)
+                if result.needsFetch {
+                    zonesWithChanges.append(zone.zoneID)
+                    if let token = result.token {
+                        pendingTokens[zone.zoneID] = token
+                    }
+                } else if let token = result.token {
+                    // No changes; token is safe to persist immediately.
+                    changeTokenStore.save(token, for: zone.zoneID)
+                }
+            }
+
+            if zonesWithChanges.isEmpty && !force {
+                await MainActor.run {
+                    self.isLoading = false
+                }
+                NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
+                logger.info("⏩ Skipping shared fetch; no changes detected (\(reason, privacy: .public))")
+                return
+            }
+
             // Step 2: Query each zone
             var allCareeRecords: [CKRecord] = []
             var allActivityTypeRecords: [CKRecord] = []
             var allActivityRecords: [CKRecord] = []
             var shares: [UUID: CKShare] = [:]
+            var zonesWithQueryErrors: Set<CKRecordZone.ID> = []
 
             for zone in zones {
                 if zone.zoneID.zoneName == CKRecordZone.ID.defaultZoneName { continue }
@@ -405,6 +477,7 @@ class CloudKitSharedRecordsService: ObservableObject {
                     }
                 } catch {
                     logger.warning("  ⚠️ Failed to query carees in zone \(zone.zoneID.zoneName): \(error.localizedDescription)")
+                    zonesWithQueryErrors.insert(zone.zoneID)
                 }
 
                 // ActivityTypes
@@ -425,6 +498,7 @@ class CloudKitSharedRecordsService: ObservableObject {
                         .warning(
                             "  ⚠️ Failed to query activity types in zone \(zone.zoneID.zoneName): \(error.localizedDescription)"
                         )
+                    zonesWithQueryErrors.insert(zone.zoneID)
                 }
 
                 // Activities
@@ -443,6 +517,7 @@ class CloudKitSharedRecordsService: ObservableObject {
                 } catch {
                     logger
                         .warning("  ⚠️ Failed to query activities in zone \(zone.zoneID.zoneName): \(error.localizedDescription)")
+                    zonesWithQueryErrors.insert(zone.zoneID)
                 }
             }
 
@@ -471,6 +546,9 @@ class CloudKitSharedRecordsService: ObservableObject {
                 activityTypeIDByActivity: activityTypeIDByActivity
             )
             NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
+            for (zoneID, token) in pendingTokens where !zonesWithQueryErrors.contains(zoneID) {
+                changeTokenStore.save(token, for: zoneID)
+            }
 
         } catch {
             await MainActor.run {
@@ -729,6 +807,67 @@ class CloudKitSharedRecordsService: ObservableObject {
                 logger.warning("⚠️ Failed to save shared zone subscription \(subID): \(error.localizedDescription)")
             }
         }
+    }
+
+    private struct SharedZoneChangeCheckResult {
+        let needsFetch: Bool
+        let token: CKServerChangeToken?
+    }
+
+    /// Lightweight change check to decide whether to run a full shared fetch and to capture the next token.
+    private func inspectSharedZoneChanges(_ zoneID: CKRecordZone.ID) async -> SharedZoneChangeCheckResult {
+        var hasChanges = false
+        var fetchError: Error?
+        var latestToken: CKServerChangeToken?
+
+        let config = CKFetchRecordZoneChangesOperation.ZoneConfiguration()
+        config.previousServerChangeToken = changeTokenStore.token(for: zoneID)
+        let operation = CKFetchRecordZoneChangesOperation(
+            recordZoneIDs: [zoneID],
+            configurationsByRecordZoneID: [zoneID: config]
+        )
+        operation.desiredKeys = ["CD_id"] // lightweight check
+
+        operation.recordChangedBlock = { _ in
+            hasChanges = true
+        }
+        operation.recordWithIDWasDeletedBlock = { _, _ in
+            hasChanges = true
+        }
+        operation.recordZoneChangeTokensUpdatedBlock = { _, token, _ in
+            if let token {
+                latestToken = token
+            }
+        }
+        operation.recordZoneFetchCompletionBlock = { _, token, _, _, error in
+            if let token {
+                latestToken = token
+            }
+            if let error {
+                fetchError = error
+            }
+        }
+
+        await withCheckedContinuation { continuation in
+            operation.fetchRecordZoneChangesResultBlock = { _ in
+                continuation.resume()
+            }
+            container.sharedCloudDatabase.add(operation)
+        }
+
+        if let error = fetchError {
+            if let ckError = error as? CKError, ckError.code == .changeTokenExpired {
+                logger.warning("⚠️ Change token expired for zone \(zoneID.zoneName, privacy: .public); clearing token")
+                changeTokenStore.clear(for: zoneID)
+            } else {
+                logger.warning("⚠️ Change check failed for zone \(zoneID.zoneName, privacy: .public); forcing full fetch: \(error.localizedDescription)")
+            }
+            return SharedZoneChangeCheckResult(needsFetch: true, token: nil)
+        }
+
+        // If we have no prior token or no token returned, run a full fetch to establish a baseline.
+        let needsBaseline = config.previousServerChangeToken == nil || latestToken == nil
+        return SharedZoneChangeCheckResult(needsFetch: hasChanges || needsBaseline, token: latestToken)
     }
 
 
