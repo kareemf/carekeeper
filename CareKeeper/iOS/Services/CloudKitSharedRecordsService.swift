@@ -228,17 +228,16 @@ class CloudKitSharedRecordsService: ObservableObject {
             }
         }
 
-        operation.recordZoneChangeTokensUpdatedBlock = { [self] zoneID, token, _ in
-            if token != nil {
-                logger.debug("🔁 Token updated during shared change fetch for \(zoneID.zoneName, privacy: .public)")
-            }
+        operation.recordZoneChangeTokensUpdatedBlock = { [self] zoneID, _, _ in
+            logger.debug("🔁 Token updated during shared change fetch for \(zoneID.zoneName, privacy: .public)")
         }
 
         operation.recordZoneFetchResultBlock = { [self] zoneID, result in
             switch result {
             case let .success(fetchResult):
-                let token = fetchResult.serverChangeToken
-                logger.debug("🔁 Token received during shared change fetch for \(zoneID.zoneName, privacy: .public)")
+                if fetchResult.serverChangeToken != nil {
+                    logger.debug("🔁 Token received during shared change fetch for \(zoneID.zoneName, privacy: .public)")
+                }
             case let .failure(error):
                 fetchError = error
             }

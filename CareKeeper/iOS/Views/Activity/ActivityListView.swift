@@ -300,30 +300,30 @@ struct ActivityListView: View {
         isLoadingPage = true
         defer { isLoadingPage = false }
 
+        let careeID = caree.id
         let selectedTypeID = selectedActivityType?.id
         let cursor = lastCursorDate
 
         let predicate: Predicate<Activity>
-        switch (selectedTypeID, cursor) {
-        case let (typeID?, cursorDate?):
+        if let typeID = selectedTypeID, let cursorDate = cursor {
             predicate = #Predicate<Activity> { activity in
-                activity.caree?.id == caree.id
+                activity.caree?.id == careeID
                     && activity.activityType?.id == typeID
                     && activity.dateTime < cursorDate
             }
-        case let (typeID?, nil):
+        } else if let typeID = selectedTypeID {
             predicate = #Predicate<Activity> { activity in
-                activity.caree?.id == caree.id
+                activity.caree?.id == careeID
                     && activity.activityType?.id == typeID
             }
-        case let (nil, cursorDate?):
+        } else if let cursorDate = cursor {
             predicate = #Predicate<Activity> { activity in
-                activity.caree?.id == caree.id
+                activity.caree?.id == careeID
                     && activity.dateTime < cursorDate
             }
-        case (nil, nil):
+        } else {
             predicate = #Predicate<Activity> { activity in
-                activity.caree?.id == caree.id
+                activity.caree?.id == careeID
             }
         }
 
