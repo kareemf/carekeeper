@@ -303,12 +303,32 @@ struct ActivityListView: View {
         let selectedTypeID = selectedActivityType?.id
         let cursor = lastCursorDate
 
-        var fetch = FetchDescriptor<Activity>(
-            predicate: #Predicate<Activity> { activity in
+        let predicate: Predicate<Activity>
+        switch (selectedTypeID, cursor) {
+        case let (typeID?, cursorDate?):
+            predicate = #Predicate<Activity> { activity in
                 activity.caree?.id == caree.id
-                    && (selectedTypeID == nil || activity.activityType?.id == selectedTypeID)
-                    && (cursor == nil || activity.dateTime < cursor!)
-            },
+                    && activity.activityType?.id == typeID
+                    && activity.dateTime < cursorDate
+            }
+        case let (typeID?, nil):
+            predicate = #Predicate<Activity> { activity in
+                activity.caree?.id == caree.id
+                    && activity.activityType?.id == typeID
+            }
+        case let (nil, cursorDate?):
+            predicate = #Predicate<Activity> { activity in
+                activity.caree?.id == caree.id
+                    && activity.dateTime < cursorDate
+            }
+        case (nil, nil):
+            predicate = #Predicate<Activity> { activity in
+                activity.caree?.id == caree.id
+            }
+        }
+
+        var fetch = FetchDescriptor<Activity>(
+            predicate: predicate,
             sortBy: [SortDescriptor(\.dateTime, order: .reverse)]
         )
         fetch.fetchLimit = pageSize

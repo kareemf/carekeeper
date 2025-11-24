@@ -229,7 +229,7 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
 
         operation.recordZoneChangeTokensUpdatedBlock = { [self] zoneID, token, _ in
-            if let token {
+            if token != nil {
                 logger.debug("🔁 Token updated during shared change fetch for \(zoneID.zoneName, privacy: .public)")
             }
         }
