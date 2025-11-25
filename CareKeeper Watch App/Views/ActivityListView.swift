@@ -191,9 +191,15 @@ struct ActivityListView: View {
 
     private var loadMoreButton: some View {
         Button {
-            hoursToLoad += 24 * 3600 // Add another 24h
+            hoursToLoad += 24 * 3600 // Add another 24h window
+            let before = activities.last?.dateTime
             Task {
-                await dataProvider.loadRecentActivities(for: careeSnapshot.id, hoursBack: hoursToLoad, force: true)
+                await dataProvider.loadRecentActivities(
+                    for: careeSnapshot.id,
+                    hoursBack: hoursToLoad,
+                    force: true,
+                    before: before
+                )
             }
         } label: {
             HStack {

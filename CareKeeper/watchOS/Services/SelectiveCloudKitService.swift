@@ -238,7 +238,9 @@ class SelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
         for careeID: UUID,
         activityTypeID: UUID? = nil,
         isShared: Bool,
-        hoursBack: TimeInterval? = nil
+        hoursBack: TimeInterval? = nil,
+        before: Date? = nil,
+        resultsLimit: Int = Self.maxActivitiesPerCaree
     ) async throws -> [ActivitySnapshot] {
         let hours = hoursBack ?? Self.activityHistoryHours
         logger.info("🔍 Fetching recent activities (last \(hours / 3600)h) for caree: \(careeID)")
@@ -260,6 +262,11 @@ class SelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
             let typeReference = CKRecord.Reference(recordID: typeRecordID, action: .none)
             predicateFormat += " AND CD_activityType == %@"
             predicateArgs.append(typeReference)
+        }
+
+        if let before {
+            predicateFormat += " AND CD_dateTime < %@"
+            predicateArgs.append(before)
         }
 
         let predicate = NSPredicate(format: predicateFormat, argumentArray: predicateArgs)
@@ -284,7 +291,7 @@ class SelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
                         matching: query,
                         inZoneWith: zone.zoneID,
                         desiredKeys: nil,
-                        resultsLimit: Self.maxActivitiesPerCaree
+                        resultsLimit: resultsLimit
                     )
                 }
 
@@ -301,8 +308,8 @@ class SelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
             activities.sort { $0.dateTime > $1.dateTime }
 
             // Apply overall limit
-            if activities.count > Self.maxActivitiesPerCaree {
-                activities = Array(activities.prefix(Self.maxActivitiesPerCaree))
+            if activities.count > resultsLimit {
+                activities = Array(activities.prefix(resultsLimit))
             }
         } else {
             // Private database - query from custom app zone (matches iOS app)
@@ -313,7 +320,7 @@ class SelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
                     matching: query,
                     inZoneWith: zoneID,
                     desiredKeys: nil,
-                    resultsLimit: Self.maxActivitiesPerCaree
+                    resultsLimit: resultsLimit
                 )
             }
 

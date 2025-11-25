@@ -267,7 +267,12 @@ class WatchDataProvider: ObservableObject {
     /// - Parameters:
     ///   - careeID: ID of the caree
     ///   - hoursBack: How many hours of history (default 24)
-    func loadRecentActivities(for careeID: UUID, hoursBack: TimeInterval = 24 * 3600, force: Bool = false) async {
+    func loadRecentActivities(
+        for careeID: UUID,
+        hoursBack: TimeInterval = 24 * 3600,
+        force: Bool = false,
+        before: Date? = nil
+    ) async {
         if cacheService.isAppGroupAvailable, recentActivitiesByCaree[careeID] == nil {
             let cachedActivities = cacheService.loadRecentActivities(for: careeID)
             if !cachedActivities.isEmpty {
@@ -311,7 +316,8 @@ class WatchDataProvider: ObservableObject {
                         for: careeID,
                         activityTypeID: nil,
                         isShared: caree.isShared,
-                        hoursBack: hoursBack
+                        hoursBack: hoursBack,
+                        before: before
                     )
                 }.value
                 signposter.emitEvent("loadRecent.fetch-end", id: signpostID)
@@ -324,7 +330,10 @@ class WatchDataProvider: ObservableObject {
                 let pendingForCaree = pendingActivities.filter { $0.careeID == careeID }
                 let previousActivities = self.recentActivitiesByCaree[careeID] ?? []
                 let mergedActivities = await Task.detached(priority: .utility) {
-                    mergeActivitiesForCaching(pending: pendingForCaree, fetched: enrichedActivities)
+                    mergeActivitiesForCaching(
+                        pending: pendingForCaree,
+                        fetched: enrichedActivities + previousActivities
+                    )
                 }.value
                 signposter.emitEvent("loadRecent.merge", id: signpostID)
 
