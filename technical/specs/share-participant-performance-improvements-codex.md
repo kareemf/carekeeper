@@ -77,3 +77,17 @@
 
 ## Branching/commits
 - Work on branch `feature/share-participant-perf`; commit after each milestone/phase (batched writes, change tokens, refresh throttling, UI pagination/counts) to keep reviews digestible.
+
+---
+
+## Addendum — 2026-02-21 (participant freezes after fresh install relief)
+- Reconfirmed current worst-case behavior (code inspection, not runtime profiling): `CloudKitSharedRecordsService.performSharedFetch` runs on the main actor, enumerates all shared zones, and fetches **all** `CD_Activity` records (no predicate/limit) before mapping to SwiftData. Push/manual/foreground triggers the same full pass; fresh installs feel fast only until the first few refresh cycles.
+- Additional mitigations to layer onto the existing plan (keep history visible):
+  - **Paging/time-bounded shared activity fetch**: Query `CD_Activity` per caree with `CD_caree` predicate, descending `CD_dateTime`, `before` cursor, and `resultsLimit` (e.g., 50). Add “Load more” pagination to ActivityList and CareeDetail recent list; cache first page for instant redraws.
+  - **Lightweight counts**: Maintain `activityCount`, `activityTypeCount`, `lastActivityAt` during ingestion; use cached counts in CareeList/ActivityTypeList, reconciling with occasional count-only queries when cache is uncertain.
+  - **Off-main decoding/mapping (implemented for shared iOS path)**: Record-to-model conversion now runs off the main actor (detached utility task), with a single apply on main. Matches watch pattern; only add chunked streaming if memory/profile data shows single-apply is insufficient.
+  - **Refresh coalescing (already present, verify metrics)**: Current implementation debounces and enforces a single in-flight shared fetch (`fetchSharedCarees`). Confirm it stays effective under load and consider reusing cached zone discovery to avoid repeated `allRecordZones()` when unchanged.
+    - Invalidate/bypass cached zones when: a share is accepted/removed (leaveShare), account switches, we receive a zone notification for an unknown zoneID, change tokens are cleared/expired, or CloudKit returns zone-not-found/partial-failure errors indicating zone topology changed. Periodic full refresh (e.g., daily) is acceptable as a safety net.
+  - **Memory guardrails**: Cap in-memory recent activities (e.g., latest 100); older pages only on demand. Consider optional history window toggle with explicit “Load older” if product approves.
+
+Tracking: retain this addendum to preserve decision history; do not remove prior rationale or phases. Future edits should append dated addenda rather than replacing sections. 

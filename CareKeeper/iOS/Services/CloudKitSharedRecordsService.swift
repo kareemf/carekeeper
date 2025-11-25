@@ -527,11 +527,19 @@ class CloudKitSharedRecordsService: ObservableObject {
             }
 
             // Step 3: Convert to objects with relationships
-            let (carees, activityTypesByCaree, activitiesByCaree, activityTypeIDByActivity) = try await convertRecordsToCarees(
+            var (carees, activityTypesByCaree, activitiesByCaree, activityTypeIDByActivity) = try await convertRecordsOffMain(
                 allCareeRecords,
                 activityTypeRecords: allActivityTypeRecords,
                 activityRecords: allActivityRecords
             )
+
+            do {
+                let metadata = try await reminderMetadataStore.fetchMetadata(for: Array(activityTypeIDByActivity.keys))
+                logger.info("🔔 Overlaying reminder metadata (shared) for \(metadata.count, privacy: .public) activities.")
+                applyReminderMetadata(metadata, to: &activitiesByCaree)
+            } catch {
+                logger.warning("⚠️ Failed to fetch reminder metadata for shared carees: \(error.localizedDescription)")
+            }
 
             await MainActor.run {
                 self.sharedCarees = carees
@@ -565,11 +573,28 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
     }
 
-    private func convertRecordsToCarees(
+    /// Perform record-to-model conversion off the main actor to keep UI responsive.
+    func convertRecordsOffMain(
         _ careeRecords: [CKRecord],
         activityTypeRecords: [CKRecord],
         activityRecords: [CKRecord]
     ) async throws -> ([Caree], [UUID: [ActivityType]], [UUID: [Activity]], [UUID: UUID]) {
+        try await Task.detached(priority: .utility) {
+            try Self.convertRecordsSync(
+                careeRecords,
+                activityTypeRecords: activityTypeRecords,
+                activityRecords: activityRecords
+            )
+        }.value
+    }
+
+    /// Pure conversion helper (no actor context) to enable detached processing.
+    nonisolated static func convertRecordsSync(
+        _ careeRecords: [CKRecord],
+        activityTypeRecords: [CKRecord],
+        activityRecords: [CKRecord]
+    ) throws -> ([Caree], [UUID: [ActivityType]], [UUID: [Activity]], [UUID: UUID]) {
+        let logger = AppLogger.cloudkit
         var careesByID: [UUID: Caree] = [:]
         var activityTypesByCaree: [UUID: [ActivityType]] = [:]
         var activitiesByCaree: [UUID: [Activity]] = [:]
@@ -701,14 +726,6 @@ class CloudKitSharedRecordsService: ObservableObject {
                 }
                 activity.caree = caree
             }
-        }
-
-        do {
-            let metadata = try await reminderMetadataStore.fetchMetadata(for: Array(activityTypeIDByActivity.keys))
-            logger.info("🔔 Overlaying reminder metadata (shared) for \(metadata.count, privacy: .public) activities.")
-            applyReminderMetadata(metadata, to: &activitiesByCaree)
-        } catch {
-            logger.warning("⚠️ Failed to fetch reminder metadata for shared carees: \(error.localizedDescription)")
         }
 
         let carees = Array(careesByID.values).sorted { $0.listOrder < $1.listOrder }
