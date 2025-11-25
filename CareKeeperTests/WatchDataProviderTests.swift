@@ -473,7 +473,9 @@ final class MockSelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
         for careeID: UUID,
         activityTypeID: UUID? = nil,
         isShared: Bool,
-        hoursBack: TimeInterval? = nil
+        hoursBack: TimeInterval? = nil,
+        before: Date? = nil,
+        resultsLimit: Int
     ) async throws -> [ActivitySnapshot] {
         recentActivityFetchCount[careeID, default: 0] += 1
         return recentActivitiesByCaree[careeID] ?? []

@@ -317,7 +317,8 @@ class WatchDataProvider: ObservableObject {
                         activityTypeID: nil,
                         isShared: caree.isShared,
                         hoursBack: hoursBack,
-                        before: before
+                        before: before,
+                        resultsLimit: SelectiveCloudKitService.maxActivitiesPerCaree
                     )
                 }.value
                 signposter.emitEvent("loadRecent.fetch-end", id: signpostID)

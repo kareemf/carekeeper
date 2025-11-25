@@ -11,7 +11,9 @@ protocol SelectiveCloudKitServiceProtocol: AnyObject {
         for careeID: UUID,
         activityTypeID: UUID?,
         isShared: Bool,
-        hoursBack: TimeInterval?
+        hoursBack: TimeInterval?,
+        before: Date?,
+        resultsLimit: Int
     ) async throws -> [ActivitySnapshot]
     func fetchActivityTypeCount(for careeID: UUID, isShared: Bool) async throws -> Int
     func createActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws -> ActivitySnapshot
@@ -240,7 +242,7 @@ class SelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
         isShared: Bool,
         hoursBack: TimeInterval? = nil,
         before: Date? = nil,
-        resultsLimit: Int = Self.maxActivitiesPerCaree
+        resultsLimit: Int
     ) async throws -> [ActivitySnapshot] {
         let hours = hoursBack ?? Self.activityHistoryHours
         logger.info("🔍 Fetching recent activities (last \(hours / 3600)h) for caree: \(careeID)")
