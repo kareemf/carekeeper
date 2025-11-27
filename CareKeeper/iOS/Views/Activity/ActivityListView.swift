@@ -97,7 +97,10 @@ struct ActivityListView: View {
                                     selectedActivityType = activityType
                                 } label: {
                                     Label {
-                                        Text("\(activityType.displayIcon) \(activityType.name)")
+                                        HStack(spacing: 6) {
+                                            ActivityTypeIconView(icon: activityType.displayIcon)
+                                            Text(activityType.name)
+                                        }
                                     } icon: {
                                         if selectedActivityType?.id == activityType.id {
                                             Image(systemName: "checkmark")

@@ -147,7 +147,7 @@ struct ActivityDetailView: View {
     private func headerSection(for activity: Activity) -> some View {
         HStack {
             if let icon = activity.activityType?.displayIcon, !icon.isEmpty {
-                Text(icon)
+                ActivityTypeIconView(icon: icon)
                     .font(.system(size: 50))
             }
 

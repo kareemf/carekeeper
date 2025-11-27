@@ -13,7 +13,7 @@ struct ActivityTypeRowView: View {
     var body: some View {
         HStack {
             // Icon
-            Text(activityType.displayIcon)
+            ActivityTypeIconView(icon: activityType.displayIcon)
                 .font(.title2)
                 .frame(width: 30)
             

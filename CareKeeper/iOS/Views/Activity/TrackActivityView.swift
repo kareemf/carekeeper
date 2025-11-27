@@ -99,7 +99,7 @@ struct TrackActivityView: View {
                         }
                     }) {
                         HStack {
-                            Text(activityType.displayIcon)
+                            ActivityTypeIconView(icon: activityType.displayIcon)
                                 .font(.title2)
                                 .scaleEffect(selectedActivityType?.id == activityType.id ? 1.1 : 1.0)
 
