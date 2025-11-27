@@ -92,6 +92,14 @@ class CloudKitSharedRecordsService: ObservableObject {
     private func handleCloudKitNotification(_ notification: CKNotification) async {
         logger.info("📨 Processing CloudKit notification: \(notification.notificationType.rawValue)")
 
+        if let databaseNotification = notification as? CKDatabaseNotification {
+            logger.info("📡 Database notification scope: \(databaseNotification.databaseScope.rawValue)")
+
+            if databaseNotification.databaseScope == .shared {
+                await handleSharedDatabaseNotification()
+            }
+        }
+
         if let zoneNotification = notification as? CKRecordZoneNotification,
            zoneNotification.databaseScope == .shared
         {
@@ -107,6 +115,40 @@ class CloudKitSharedRecordsService: ObservableObject {
 
         // For any CloudKit change, refresh the shared carees
         await fetchSharedCarees(force: true, reason: "cloudkit-notification")
+    }
+
+    /// Handle shared database-level notifications by doing a token-aware delta fetch for all shared zones.
+    private func handleSharedDatabaseNotification() async {
+        logger.info("📨 Shared database notification received; running delta fetch for all zones")
+
+        let existingActivityIDs: Set<UUID> = Set(
+            sharedCarees
+                .flatMap { $0.activities ?? [] }
+                .map(\.id)
+        )
+
+        let sharedDatabase = container.sharedCloudDatabase
+        let zones: [CKRecordZone]
+        do {
+            zones = try await sharedDatabase.allRecordZones()
+        } catch {
+            logger.warning("⚠️ Failed to list shared zones for database notification: \(error.localizedDescription)")
+            return
+        }
+
+        await ensureSharedZoneSubscriptions(zones)
+
+        for zone in zones where zone.zoneID.zoneName != CKRecordZone.ID.defaultZoneName {
+            let changeCheck = await inspectSharedZoneChanges(zone.zoneID)
+            if !changeCheck.needsFetch {
+                if let token = changeCheck.token {
+                    changeTokenStore.save(token, for: zone.zoneID)
+                }
+                continue
+            }
+
+            _ = await fetchSharedChanges(for: zone.zoneID, existingActivityIDs: existingActivityIDs)
+        }
     }
 
     /// Handle query notifications for new activities
@@ -203,7 +245,8 @@ class CloudKitSharedRecordsService: ObservableObject {
         await fetchSharedCarees(force: true, reason: "zone-notification")
     }
 
-    func fetchSharedChanges(for zoneID: CKRecordZone.ID, existingActivityIDs: Set<UUID>) async {
+    @discardableResult
+    func fetchSharedChanges(for zoneID: CKRecordZone.ID, existingActivityIDs: Set<UUID>) async -> CKServerChangeToken? {
         logger.info("🔁 Fetching shared zone changes for \(zoneID.zoneName, privacy: .public)")
 
         let config = CKFetchRecordZoneChangesOperation.ZoneConfiguration()
@@ -216,6 +259,7 @@ class CloudKitSharedRecordsService: ObservableObject {
         var newActivityRecords: [CKRecord] = []
         var fetchError: Error?
         var mutableExistingIDs = existingActivityIDs
+        var latestToken: CKServerChangeToken?
 
         operation.recordWasChangedBlock = { recordID, result in
             switch result {
@@ -235,7 +279,8 @@ class CloudKitSharedRecordsService: ObservableObject {
         operation.recordZoneFetchResultBlock = { [self] zoneID, result in
             switch result {
             case let .success(fetchResult):
-                if fetchResult.serverChangeToken != nil {
+                if let token = fetchResult.serverChangeToken {
+                    latestToken = token
                     logger.debug("🔁 Token received during shared change fetch for \(zoneID.zoneName, privacy: .public)")
                 }
             case let .failure(error):
@@ -257,7 +302,7 @@ class CloudKitSharedRecordsService: ObservableObject {
             } else {
                 logger.error("❌ Failed fetching shared zone changes: \(error.localizedDescription)")
             }
-            return
+            return nil
         }
 
         for record in newActivityRecords {
@@ -277,6 +322,12 @@ class CloudKitSharedRecordsService: ObservableObject {
                 mutableExistingIDs.insert(activityID)
             }
         }
+
+        if let token = latestToken {
+            changeTokenStore.save(token, for: zoneID)
+        }
+
+        return latestToken
     }
 
     @discardableResult
