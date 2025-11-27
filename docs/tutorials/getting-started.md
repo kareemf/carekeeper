@@ -37,7 +37,7 @@ CareKeeper automatically installs on your Apple Watch when you install it on you
 2. Scroll down to find CareKeeper
 3. Tap **Install**
 
-[SCREENSHOT: Watch app showing CareKeeper installation]
+![Watch app showing CareKeeper installation](../screenshots/watch-app-showing-carekeeper-installation.jpg)
 
 ## Step 2: Launch CareKeeper
 
@@ -45,7 +45,7 @@ CareKeeper automatically installs on your Apple Watch when you install it on you
 2. You'll see a welcome screen
 3. Tap **Get Started**
 
-[SCREENSHOT: CareKeeper welcome screen]
+![CareKeeper welcome screen](../screenshots/carekeeper-welcome-screen.png)
 
 ## Step 3: Grant Permissions
 
@@ -62,12 +62,6 @@ CareKeeper may request permissions for:
 ## Step 4: Verify iCloud Sync
 
 CareKeeper uses iCloud to sync your data across devices and enable sharing:
-
-1. Tap your profile icon in the top right (iOS) or settings gear (watchOS)
-2. Check that your iCloud account is shown
-3. You should see "Sync: Ready" or "Sync: Synced"
-
-[SCREENSHOT: Settings showing iCloud sync status]
 
 !!! warning "iCloud Required"
     CareKeeper requires iCloud to sync data between devices and share with other caregivers. Make sure you're signed into iCloud in Settings > [Your Name] > iCloud.

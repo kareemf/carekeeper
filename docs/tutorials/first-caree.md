@@ -52,7 +52,6 @@ In this tutorial, you'll learn how to create your first caree and understand how
 2. Your new caree appears in the list
 3. You'll see a success message briefly
 
-[SCREENSHOT: Saved caree appearing in list]
 
 !!! success "Syncing"
     Your caree is automatically synced to iCloud and will appear on all your devices within seconds.
@@ -76,8 +75,6 @@ In this tutorial, you'll learn how to create your first caree and understand how
 2. Tap **Edit** in the top-right corner
 3. Modify the name or photo
 4. Tap **Save**
-
-[SCREENSHOT: Edit caree screen]
 
 ### Delete a Caree
 

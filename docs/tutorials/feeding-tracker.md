@@ -40,7 +40,10 @@ Use the **notes field** to specify the type:
 - "Pumped milk"
 - "Donor milk"
   
-[SCREENSHOT: Track activity with notes field filled]
+<div class="app-overview-grid">
+  <img src="/screenshots/track-activity-with-notes-field-filled.PNG" alt="Track activity with notes field filled" />
+  <img src="/screenshots/track-activity-with-notes-field-watch.PNG" alt="Track activity with notes field filled - watch" />
+</div>
 
 ### Pros & Cons
 
@@ -71,7 +74,6 @@ Create separate activity types for each feeding type:
 ### Logging an Activity
 
 Just tap the appropriate activity type and enter quantity - no typing needed!
-[SCREENSHOT: watchoS showing three buttons, tap → enter quantity → done]
 
 ### Pros & Cons
 
@@ -121,7 +123,8 @@ For activity types with quantity:
 3. Turn clockwise to increase, counterclockwise to decrease
 4. Tap **Save** or press the crown
 
-[SCREENSHOT: Watch showing quantity adjustment with Digital Crown]
+![Watch quantity adjustment with Digital Crown highlighted](../screenshots/watch-quantity-adjustment-with-digital-crown-highlighted.PNG)
+
 
 !!! tip "Digital Crown Tips"
     - Spin faster for larger jumps
@@ -141,10 +144,12 @@ To see all activities for a caree:
 ### Activity List Features
 
 - **Filter by type**: Tap the filter button to show only specific activity types
-- **Delete**: Swipe left on an activity to delete
 - **Details**: Tap an activity to see and/or edit full details and notes
 
-[SCREENSHOT: Filtered activity list and swipe actions]
+<div class="app-overview-grid">
+  <img src="/screenshots/watch-activity-filter-cycling.PNG" alt="Watch activity filter cycling - bottle" />
+  <img src="/screenshots/watch-activity-filter-cycling-2.PNG" alt="Watch activity filter cycling - diaper" />
+</div>
 
 ## Reordering Activity Types
 

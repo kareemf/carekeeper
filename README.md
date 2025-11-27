@@ -247,6 +247,7 @@ CareKeeper/
 - **Caree**: Care recipients (children, pets, etc.)
 - **ActivityType**: User-defined activity categories with configurable attributes
 - **Activity**: Individual activity instances with timestamp and optional data
+- **ReminderMetadata**: Derived reminder identifiers/state stored per activity for cross-device reminder management
 
 ### Tech Features
 
@@ -328,7 +329,7 @@ All tests use in-memory SwiftData containers for fast, isolated execution.
 
 ### Code Style
 
-- Follow Apple's Swift API Design Guidelines
+- Follow Apple's Swift [API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/)
 - Use SwiftUI declarative patterns
 - Implement proper error handling
 
@@ -345,10 +346,9 @@ CareKeeper includes documentation for both developers and users.
 ### For Developers
 
 **Technical Documentation** (in `/technical/`):
-- **ADRs** (`technical/adr/`): Architecture Decision Records documenting key design choices
+- **ADRs** (`technical/adr/`): Architecture Decision Records documenting key design choices, post-implementation reviews and refactoring plans
 - **Specifications** (`technical/specs/`): Detailed feature specifications (CloudKit migration, push notifications)
 - **Troubleshooting** (`technical/troubleshooting/`): Debugging guides and diagnostics
-- **Retrospectives** (`technical/retrospectives/`): Post-implementation reviews and refactoring plans
 
 ### For Users
 
@@ -378,6 +378,8 @@ pip3 install -r requirements.txt
 
 # Output in site/ directory
 ```
+
+**Hosted site**: https://carekeeper.pages.dev
 
 The results are deployed to Cloudflare Pages
 

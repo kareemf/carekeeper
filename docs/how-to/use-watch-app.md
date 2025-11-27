@@ -28,8 +28,6 @@ CareKeeper installs automatically on your Apple Watch when you install it on you
 3. Wait a few seconds for initial sync
 4. Your carees appear automatically
 
-[SCREENSHOT: First launch sync screen]
-
 !!! note "Initial Sync"
     The first launch may take a few seconds to a few minutes (if you have a lot of data owned or shared) to sync carees and activity types from your iPhone. Subsequent launches should be instant.
 
@@ -125,7 +123,11 @@ Tap any activity to see:
 - Notes (if added on iPhone)
 - Location (if applicable)
 
-[SCREENSHOT: Watch activity detail view]
+<div class="app-overview-grid">
+  <img src="/screenshots/watch-activity-detail-view-1.PNG" alt="Watch activity detail view - 1" />
+  <img src="/screenshots/watch-activity-detail-view-2.PNG" alt="Watch activity detail view - 2" />
+  <img src="/screenshots/watch-activity-detail-view-3.PNG" alt="Watch activity detail view - 3" />
+</div>
 
 ### Filtering Activities
 

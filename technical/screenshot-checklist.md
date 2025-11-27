@@ -96,15 +96,15 @@
 
 ## docs/how-to/use-watch-app.md
 
-- Watch app showing CareKeeper in app list (`watch-app-showing-carekeeper-in-app-list`)
-- First launch sync screen (`first-launch-sync-screen`)
+<!-- - Watch app showing CareKeeper in app list (`watch-app-showing-carekeeper-in-app-list`) -->
+<!-- - First launch sync screen (`first-launch-sync-screen`) -->
 <!-- - Watch caree list (`watch-caree-list`) -->
 <!-- - Watch activity type buttons (`watch-activity-type-buttons`) -->
 <!-- - One-tap tracking with checkmark (`one-tap-tracking-with-checkmark`) -->
 <!-- - Quantity adjustment with Digital Crown arrows (`quantity-adjustment-with-digital-crown-arrows`) -->
 <!-- - Custom time toggle on watch (`custom-time-toggle-on-watch`) -->
 <!-- - Watch activity list (`watch-activity-list`) -->
-- Watch activity detail view (`watch-activity-detail-view`)
+<!-- - Watch activity detail view (`watch-activity-detail-view`) -->
 <!-- - Watch activity filter cycling (`watch-activity-filter-cycling`) -->
 <!-- - Watch edit activity screen (`watch-edit-activity-screen`) -->
 <!-- - Watch delete confirmation (`watch-delete-confirmation`) -->
@@ -117,14 +117,14 @@
 ## docs/tutorials/feeding-tracker.md
 
 <!-- - Single "Bottle" activity type (`single-bottle-activity-type`) -->
-- Track activity with notes field filled (`track-activity-with-notes-field-filled`)
+<!-- - Track activity with notes field filled (`track-activity-with-notes-field-filled`) -->
 <!-- - Three activity types listed (`three-activity-types-listed`) -->
-- watchoS showing three buttons, tap → enter quantity → done (`watchos-showing-three-buttons-tap-enter-quantity-done`)
+<!-- - watchoS showing three buttons, tap → enter quantity → done (`watchos-showing-three-buttons-tap-enter-quantity-done`) -->
 <!-- - Watch showing activity type buttons (`watch-showing-activity-type-buttons`) -->
 <!-- - Watch confirmation checkmark (`watch-confirmation-checkmark`) -->
-- Watch showing quantity adjustment with Digital Crown (`watch-showing-quantity-adjustment-with-digital-crown`)
-- Activity history list (`activity-history-list`)
-- Filtered activity list and swipe actions (`filtered-activity-list-and-swipe-actions`)
+<!-- - Watch showing quantity adjustment with Digital Crown (`watch-showing-quantity-adjustment-with-digital-crown`) -->
+<!-- - Activity history list (`activity-history-list`) -->
+<!-- - Filtered activity list and swipe actions (`filtered-activity-list-and-swipe-actions`) -->
 <!-- - Reordering activity types (`reordering-activity-types`) -->
 
 ## docs/tutorials/first-caree.md
@@ -133,16 +133,16 @@
 <!-- - New caree form (`new-caree-form`) -->
 <!-- - Name field being filled in (`name-field-being-filled-in`) -->
 <!-- - Photo picker showing options (`photo-picker-showing-options`) -->
-- Saved caree appearing in list (`saved-caree-appearing-in-list`)
+<!-- - Saved caree appearing in list (`saved-caree-appearing-in-list`) -->
 <!-- - Caree detail view (`new-caree-detail-view`) -->
-- Edit caree screen (`edit-caree-screen`)
+<!-- - Edit caree screen (`edit-caree-screen`) -->
 <!-- - Delete confirmation dialog (`delete-confirmation-dialog`) -->
 <!-- - Reordering carees with drag handles (`reordering-carees-with-drag-handles`) -->
 
 ## docs/tutorials/getting-started.md
 
 <!-- - App Store listing for CareKeeper (`app-store-listing-for-carekeeper`) -->
-- Watch app showing CareKeeper installation (`watch-app-showing-carekeeper-installation`)
-- CareKeeper welcome screen (`carekeeper-welcome-screen`)
+<!-- - Watch app showing CareKeeper installation (`watch-app-showing-carekeeper-installation`) -->
+<!-- - CareKeeper welcome screen (`carekeeper-welcome-screen`) -->
 <!-- - Permission request screens (`permission-request-screens`) -->
-- Settings showing iCloud sync status (`settings-showing-icloud-sync-status`)
+<!-- - Settings showing iCloud sync status (`settings-showing-icloud-sync-status`) -->
