@@ -34,9 +34,8 @@ Export your CareKeeper data to JSON format for backup, analysis, or migration to
 ### Step 1: Open Export Settings
 
 1. Open CareKeeper on your iPhone
-2. Tap the Settings icon (gear) in the top-right
-3. Scroll to the "Data Management" section
-4. Tap **Export Data**
+2. Tap the kebab icon ("..."") in the top-right
+3. Tap **Export Data**
 
 ![Settings screen with Export Data option](../screenshots/settings-screen-with-export-data-option.png){: .doc-screenshot }
 
@@ -54,12 +53,10 @@ You have two options:
 ![Export all data option](../screenshots/export-all-data-option.png){: .doc-screenshot }
 
 #### Export Single Caree
-- Select one caree from the list
+- Navigate to the caree's detail change and tap the export icon
 - Includes only that caree's activity types and activities
 - Smaller file size
 - Useful for sharing with specific caregivers or providers
-
-[SCREENSHOT: Select caree to export]
 
 ### Step 3: Export Process
 
@@ -67,8 +64,6 @@ You have two options:
 2. CareKeeper prepares the export (may take a few seconds for large datasets)
 3. The iOS share sheet appears
 4. Choose where to save or how to share
-
-[SCREENSHOT: Export in progress indicator]
 
 ### Step 4: Save or Share
 
@@ -79,19 +74,11 @@ Choose from these options:
 2. Choose a location (iCloud Drive, On My iPhone, etc.)
 3. Tap **Save**
 
-[SCREENSHOT: Save to Files interface]
-
-#### AirDrop
-1. Tap **AirDrop**
-2. Select the receiving device
-3. File transfers instantly
-
-[SCREENSHOT: AirDrop to Mac]
-
 #### Other Options
 - Save to cloud services (Dropbox, Google Drive, OneDrive)
 - Share to messaging apps
 - Copy to Notes app
+
 
 ## Understanding the Export Format
 
@@ -133,8 +120,6 @@ CareKeeper exports data as JSON (JavaScript Object Notation)—a standard, human
   "version": "2.0"
 }
 ```
-
-[SCREENSHOT: JSON file opened in text editor]
 
 ### What's Included
 
@@ -183,8 +168,6 @@ To analyze in Excel, Numbers, or Google Sheets:
 2. Convert JSON to CSV format
 3. Open CSV in your spreadsheet app
 
-[SCREENSHOT: JSON data in Excel]
-
 ### Import into Another App
 
 If migrating to another tracking app:
@@ -231,8 +214,6 @@ df = pd.DataFrame(activities)
 print(df.groupby('type')['quantity'].mean())
 ```
 
-[SCREENSHOT: Custom analysis output]
-
 ### Archive Old Data
 
 For long-term archival:
@@ -254,15 +235,14 @@ For long-term archival:
 
 To restore a previous export:
 
-1. Open CareKeeper settings
+1. From the Carees page, open the kebab menu (the "..."s button)
 2. Tap **Import Data**
 3. Choose the JSON file
 4. CareKeeper restores:
-   - Carees (if not already present)
-   - Activity types (if not already present)
+   - Carees
+   - Activity types
    - Activities
 
-[SCREENSHOT: Import data option in settings]
 
 ## Privacy & Security
 

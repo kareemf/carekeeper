@@ -43,14 +43,14 @@
 
 <!-- - Settings screen with Export Data option (`settings-screen-with-export-data-option`) -->
 <!-- - Export all data option (`export-all-data-option`) -->
-- Select caree to export (`select-caree-to-export`)
+<!-- - Select caree to export (`select-caree-to-export`)
 - Export in progress indicator (`export-in-progress-indicator`)
 - Save to Files interface (`save-to-files-interface`)
 - AirDrop to Mac (`airdrop-to-mac`)
 - JSON file opened in text editor (`json-file-opened-in-text-editor`)
 - JSON data in Excel (`json-data-in-excel`)
 - Custom analysis output (`custom-analysis-output`)
-- Import data option in settings (`import-data-option-in-settings`)
+- Import data option in settings (`import-data-option-in-settings`) -->
 
 ## docs/how-to/set-reminders.md
 
