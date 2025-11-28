@@ -4,7 +4,7 @@
 
 <!-- - Collaboration flow diagram (`collaboration-flow-diagram`) -->
 - Multi-device sync illustration (`multi-device-sync-illustration`)
-- Multiple carees with different participant lists (`multiple-carees-with-different-participant-lists`)
+<!-- - Multiple carees with different participant lists (`multiple-carees-with-different-participant-lists`) -->
 <!-- - Sync status indicator showing offline state (`sync-status-indicator-showing-offline-state`) -->
 <!-- - Conflict resolution illustration (`conflict-resolution-illustration`) -->
 - Example activity notification (`example-activity-notification`)
@@ -19,25 +19,26 @@
 
 ## docs/explanation/security-privacy.md
 
-- Data flow diagram (`data-flow-diagram`)
-- Encryption layers diagram (`encryption-layers-diagram`)
-- iCloud sign-in requirement (`icloud-sign-in-requirement`)
-- Access control diagram (`access-control-diagram`)
+<!-- - Data flow diagram (`data-flow-diagram`) -->
+<!-- - Encryption layers diagram (`encryption-layers-diagram`) -->
+<!-- - Access control diagram (`access-control-diagram`) -->
+<!-- - iCloud sign-in requirement (`icloud-sign-in-requirement`) -->
+
 
 ## docs/how-to/create-activity-type.md
 
 <!-- - New activity type form (`new-activity-type-form`) -->
 <!-- - Emoji picker (`emoji-picker`) -->
-- SF Symbol selection (`sf-symbol-selection`)
-- Quantity configuration (`quantity-configuration`)
+<!-- - SF Symbol selection (`sf-symbol-selection`) -->
+<!-- - Quantity configuration (`quantity-configuration`) -->
 <!-- - Location toggle and permission request (`location-toggle-and-permission-request`) -->
-- Saved activity type in list (`saved-activity-type-in-list`)
-- Swipe to edit activity type (`swipe-to-edit-activity-type`)
+<!-- - Saved activity type in list (`saved-activity-type-in-list`) -->
+<!-- - Swipe to edit activity type (`swipe-to-edit-activity-type`) -->
 <!-- - Delete confirmation (`delete-confirmation`) -->
 <!-- - Reordering with drag handles (`reordering-with-drag-handles`) -->
-- Bottle feeding activity type configuration (`bottle-feeding-activity-type-configuration`)
-- Walk activity type configuration (`walk-activity-type-configuration`)
-- Simple activity type configuration (`simple-activity-type-configuration`)
+<!-- - Bottle feeding activity type configuration (`bottle-feeding-activity-type-configuration`) -->
+<!-- - Walk activity type configuration (`walk-activity-type-configuration`) -->
+<!-- - Simple activity type configuration (`simple-activity-type-configuration`) -->
 
 ## docs/how-to/export-data.md
 
@@ -61,8 +62,8 @@
 
 - Share button location in caree detail view (`share-button-location-in-caree-detail-view`)
 <!-- - Share via Messages (`share-via-messages`) -->
-- Copy link option (`copy-link-option`)
-- Share sent confirmation (`share-sent-confirmation`)
+<!-- - Copy link option (`copy-link-option`) -->
+<!-- - Share sent confirmation (`share-sent-confirmation`) -->
 - Share acceptance screen (`share-acceptance-screen`)
 - App Store redirect for non-users (`app-store-redirect-for-non-users`)
 <!-- - Participant list (`participant-list`) -->
@@ -71,8 +72,8 @@
 - Notification settings (`notification-settings`)
 - Example notification (`example-notification`)
 - Per-caree notification toggle (`per-caree-notification-toggle`)
-- Shared caree for new parents (`shared-caree-for-new-parents`)
-- Shared caree for day care (`shared-caree-for-day-care`)
+<!-- - Shared caree for new parents (`shared-caree-for-new-parents`) -->
+<!-- - Shared caree for day care (`shared-caree-for-day-care`) -->
 
 ## docs/how-to/track-activity.md
 
@@ -92,7 +93,7 @@
 - Activity detail view with edit button (`activity-detail-view-with-edit-button`)
 - Watch activity edit view (`watch-activity-edit-view`)
 <!-- - Swipe left to delete (`swipe-left-to-delete`) -->
-- Watch delete confirmation (`watch-delete-confirmation`)
+<!-- - Watch delete confirmation (`watch-delete-confirmation`) -->
 
 ## docs/how-to/use-watch-app.md
 

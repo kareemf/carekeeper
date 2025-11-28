@@ -37,16 +37,19 @@ Icons help you quickly identify activity types. You can use:
 2. Your emoji keyboard appears
 3. Select any emoji (🍼, 😴, 🚶, etc.)
 
-[SCREENSHOT: Emoji picker]
+![Emoji picker](../screenshots/emoji-picker.png){: .doc-screenshot }
 
 #### SF Symbols
 1. Tap the **Icon** field
 2. Type an SF Symbol name (e.g., "drop.fill", "figure.walk")
 
-[SCREENSHOT: SF Symbol selection]
+<div class="app-overview-grid">
+  <img src="/screenshots/sf-symbol-selection-1.png" alt="SF Symbol selection - entry" />
+  <img src="/screenshots/sf-symbol-selection-2.png" alt="SF Symbol selection - display" />
+</div>
 
 !!! note "SF Symbols"
-    SF Symbols are Apple's icon library. Search for symbols at [sf-symbols.com](https://developer.apple.com/sf-symbols/) or use common names like:
+    [SF Symbols](https://developer.apple.com/sf-symbols/) are Apple's icon library. Search for symbols at [sf-symbols.com](https://developer.apple.com/sf-symbols/) or use common names like:
     - Activity: `figure.walk`, `figure.run`, `sportscourt.fill`
     - Food: `fork.knife`, `cup.and.saucer.fill`, `drop.fill`
     - Sleep: `bed.double.fill`, `moon.fill`
@@ -60,13 +63,11 @@ Enable this if you want to record amounts (e.g., ounces, milliliters, minutes):
 2. Enter a **Unit** (e.g., "oz", "ml", "min", "cups")
 3. This unit will appear when tracking activities
 
-[SCREENSHOT: Quantity configuration]
-
 #### Examples of Quantity Use
 
 | Activity Type | Quantity | Unit |
 |--------------|----------|------|
-| Bottle feeding | 3.5 | oz |
+| Bottle feeding | 3.5 | ml |
 | Nursing | 15 | min |
 | Walk | 30 | min |
 | Water | 8 | oz |
@@ -97,22 +98,15 @@ Enable this to record where activities occurred:
 2. Tap **Save** in the top-right corner
 3. The activity type appears in your list
 
-[SCREENSHOT: Saved activity type in list]
-
 ### Editing Activity Types
 
 To modify an existing activity type:
 
 1. Open the caree detail view
 2. Find the activity type in the list
-3. Swipe left and tap **Edit**
+3. Tap to edit
 4. Make your changes
 5. Tap **Save**
-
-[SCREENSHOT: Swipe to edit activity type]
-
-!!! note "Editing Limitations"
-    Changing an activity type affects how new activities are tracked, but doesn't modify existing activities.
 
 ### Deleting Activity Types
 
@@ -137,43 +131,6 @@ Set the order for easier access:
     Put frequently-used types at the top. The watch app shows them in the same order.
 
 ![Reordering with drag handles](../screenshots/reordering-with-drag-handles.png){: .doc-screenshot }
-
-## Examples
-
-### Example 1: Bottle Feeding
-
-**Scenario**: Track bottle feeding with volume
-
-- **Name**: "Bottle"
-- **Icon**: 🍼 or "drop.fill"
-- **Has Quantity**: ON
-- **Unit**: "oz"
-- **Has Location**: OFF
-
-[SCREENSHOT: Bottle feeding activity type configuration]
-
-### Example 2: Dog Walking
-
-**Scenario**: Track walks with duration and location
-
-- **Name**: "Walk"
-- **Icon**: 🚶 or "figure.walk"
-- **Has Quantity**: ON
-- **Unit**: "min"
-- **Has Location**: ON
-
-[SCREENSHOT: Walk activity type configuration]
-
-### Example 3: Simple Diaper Change
-
-**Scenario**: Quick tracking without extra data
-
-- **Name**: "Diaper Change"
-- **Icon**: 🚼 or "figure.and.child.holdinghands"
-- **Has Quantity**: OFF
-- **Has Location**: OFF
-
-[SCREENSHOT: Simple activity type configuration]
 
 ## Troubleshooting
 

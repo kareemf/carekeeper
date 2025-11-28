@@ -41,8 +41,8 @@ Use the **notes field** to specify the type:
 - "Donor milk"
   
 <div class="app-overview-grid">
-  <img src="/screenshots/track-activity-with-notes-field-filled.PNG" alt="Track activity with notes field filled" />
-  <img src="/screenshots/track-activity-with-notes-field-watch.PNG" alt="Track activity with notes field filled - watch" />
+  <img src="/screenshots/track-activity-with-notes-field-filled-ios.png" alt="Track activity with notes field filled" />
+  <img src="/screenshots/track-activity-with-notes-field-filled-watch.png" alt="Track activity with notes field filled - watch" />
 </div>
 
 ### Pros & Cons

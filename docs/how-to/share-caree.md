@@ -55,19 +55,14 @@ You can share via:
 1. Tap **Copy Link**
 2. Paste the link in any app (WhatsApp, Slack, etc.)
 
-[SCREENSHOT: Copy link option]
-
 !!! tip "Multiple Participants"
     You can share with multiple people—just send the share link to each person individually.
 
 ### Step 3: Confirmation
 
 After sending:
-- You'll see a confirmation message
 - The share is active immediately
 - Participants can accept at their convenience
-
-[SCREENSHOT: Share sent confirmation]
 
 ## Accepting a Share
 
@@ -77,27 +72,12 @@ When you receive a share invitation:
 
 1. Tap the share link in Messages, Mail, or other app
 2. CareKeeper opens automatically
-3. You'll see a preview of the caree being shared
-4. Review the details:
-   - Caree name
-   - Who's sharing it
-   - What access you'll have
-5. Tap **Accept** to join
+3. Tap **Accept** to join
 
 [SCREENSHOT: Share acceptance screen]
 
 !!! success "Instant Access"
-    Once you accept, the caree appears in your CareKeeper app immediately with all activity types and history.
-
-### If You Don't Have CareKeeper
-
-1. Tap the share link
-2. You'll be redirected to the App Store
-3. Install CareKeeper
-4. Open the app and sign in with iCloud
-5. The share invitation will appear automatically
-
-[SCREENSHOT: App Store redirect for non-users]
+    Once you accept, all activity types and history for the caree are fetched and cached for offline access. This may take a moment.
 
 ## Managing Participants
 
@@ -121,8 +101,6 @@ As the owner, you can remove participants:
 3. Tap **Remove Access**
 4. Confirm removal
 
-[SCREENSHOT: Remove participant confirmation]
-
 !!! warning "Immediate Effect"
     Removing a participant takes effect immediately. They lose access to the caree, activity types, and activities.
 
@@ -131,11 +109,10 @@ As the owner, you can remove participants:
 As a participant (non-owner), you can leave:
 
 1. Open the caree detail view
-2. Tap **Edit**
+1. Open the share sheet
 3. Scroll down and tap **Stop Sharing**
 4. Confirm
 
-[SCREENSHOT: Stop sharing button for participants]
 
 ## Understanding Permissions
 
@@ -197,64 +174,10 @@ You won't be notified about:
 **Global Settings**:
 - Turn off all notifications in iOS Settings > CareKeeper > Notifications
 
-## Real-World Scenarios
-
-### Scenario 1: New Parents
-
-**Situation**: Both parents want to track their newborn's feeding and sleep.
-
-**Setup**:
-1. Mom creates caree "Baby Emma"
-2. Creates activity types: Bottle, Nursing (L), Nursing (R), Diaper, Sleep
-3. Shares with Dad via Messages
-4. Dad accepts the share
-5. Both can now track from their phones or watches
-
-**Benefits**:
-- No more asking "When did you last feed her?"
-- Both parents see complete picture
-- Coordinate care when one parent is out
-
-[SCREENSHOT: Shared caree for new parents]
-
-### Scenario 2: Pet Care
-
-**Situation**: Roommates sharing care for a dog.
-
-**Setup**:
-1. Owner creates caree "Max the Dog"
-2. Creates activity types: Walk, Feed, Water, Play
-3. Shares with roommates
-4. Everyone tracks walks, feeding, etc.
-
-**Benefits**:
-- Know who walked the dog
-- Track feeding schedules
-- Fair distribution of care tasks
-
-### Scenario 3: Day Care Provider
-
-**Situation**: Day care provider tracks activities for parents to review.
-
-**Setup**:
-1. Parent creates caree for their child
-2. Shares with day care provider
-3. Provider tracks throughout the day
-4. Parents see updates in real-time
-
-**Benefits**:
-- Parents see what happened during the day
-- No handwritten logs
-- Provider can focus on care, not paperwork
-
-[SCREENSHOT: Shared caree for day care]
-
 ## Best Practices
 
 ### Communication Tips
-- 💬 Discuss what to track before sharing
 - 📋 Agree on activity type names and units
-- 🔔 Set notification preferences together
 - 👥 Share only with trusted caregivers
 
 ### Privacy Tips
@@ -262,12 +185,6 @@ You won't be notified about:
 - 👤 Use caree photos that all participants are comfortable with
 - 📍 Discuss location tracking preferences
 - 🚫 Remove participants who no longer need access
-
-### Collaboration Tips
-- ✅ Use notes to communicate between caregivers
-- 📅 Track consistently (don't skip activities)
-- 🏷️ Use consistent naming for activity types
-- 🔄 Review activity history together regularly
 
 ## Related Guides
 

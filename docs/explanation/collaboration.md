@@ -13,8 +13,6 @@ CareKeeper's collaboration features enable multiple caregivers to coordinate car
 5. **Data syncs automatically** via iCloud
 6. **Notifications alert** about others' activities
 
-[SCREENSHOT: Collaboration flow diagram]
-
 ```mermaid
 flowchart LR
     owner([Owner creates caree]) --> share([Share caree link])
@@ -59,8 +57,6 @@ Sharing happens at the **caree level**, not account level:
 - Share your entire CareKeeper account
 - Share multiple carees at once (share each individually)
 - Have different permissions for different carees
-
-[SCREENSHOT: Multiple carees with different participant lists]
 
 ### Automatic Inclusion
 
@@ -127,8 +123,6 @@ If two people edit the same activity simultaneously:
 **Rare edge cases:**
 - If both people delete and edit simultaneously, deletion wins
 - If sync fails repeatedly, manual intervention may be needed
-
-[SCREENSHOT: Conflict resolution illustration]
 
 ```mermaid
 sequenceDiagram

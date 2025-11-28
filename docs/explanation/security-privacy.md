@@ -20,7 +20,33 @@ Your CareKeeper data is stored in two places:
 - Shared database for carees others have shared with you
 - Stored in Apple's data centers
 
-[SCREENSHOT: Data flow diagram]
+```mermaid
+flowchart LR
+    subgraph OwnerDevices["Owner's devices"]
+        iOS["iOS app (SwiftUI + SwiftData)"]
+        Watch["watchOS app"]
+        AppGroup["App Group container"]
+        SwiftData["SwiftData store (owned + shared cache)"]
+    end
+
+    subgraph Cloud["iCloud (CloudKit)"]
+        PrivateDB["Private database (your carees)"]
+        SharedDB["Shared database (carees you accept)"]
+    end
+
+    subgraph Participants["Share participants"]
+        ParticipantApp["CareKeeper on their device"]
+    end
+
+    iOS -->|"reads/writes"| SwiftData
+    Watch -->|"reads/writes shared snapshots"| SharedDB
+    iOS <-->|"sync"| PrivateDB
+    iOS <-->|"sync"| SharedDB
+    AppGroup -->|"shared prefs/cache"| iOS
+    AppGroup -->|"prefs/cache"| Watch
+    SwiftData -->|"export/import JSON"| iOS
+    ParticipantApp <-->|"sync shared carees"| SharedDB
+```
 
 ### What Data Is Stored
 
@@ -53,7 +79,21 @@ CareKeeper does NOT store:
 - Encryption keys managed by Apple
 - Industry-standard AES-256 encryption
 
-[SCREENSHOT: Encryption layers diagram]
+```mermaid
+flowchart TD
+    Local["On-device files (SwiftData, app group)"]
+    FileProtection["iOS File Protection (Complete)"]
+    Keychain["Device passcode-derived keys"]
+    Transit["Data in transit"]
+    TLS["TLS 1.3 to CloudKit"]
+    Cloud["CloudKit storage (Apple data centers)"]
+    InfraEnc["Infrastructure encryption at rest (AES-256, Apple-managed keys)"]
+
+    Local --> FileProtection --> Keychain
+    Local --> Transit
+    Transit --> TLS --> Cloud --> InfraEnc
+    note right of InfraEnc: Enables sharing (not end-to-end)
+```
 
 !!! info "Infrastructure Encryption"
     CareKeeper uses infrastructure-level encryption rather than end-to-end encryption. This is necessary for CloudKit sharing to work—participants need to be able to decrypt shared data.
@@ -140,7 +180,23 @@ This is intentional—relying on Apple ID provides:
 - Not used for advertising or profiling
 - Protected by Apple's security practices
 
-[SCREENSHOT: Access control diagram]
+```mermaid
+flowchart LR
+    Owner["Owner (caree creator)"]
+    Participant["Share participant"]
+    Caree["Shared caree data\n(Activity types + activities)"]
+    OwnerOnly["Owner-only actions"]
+
+    Owner -->|"view/edit/create"| Caree
+    Participant -->|"view/edit/create"| Caree
+    Owner -.->|"delete caree\nrevoke participants"| OwnerOnly
+    Owner -.->|"stop sharing"| Caree
+
+    classDef owner fill:#dff3ff,stroke:#2b6cb0;
+    classDef participant fill:#e8f5e9,stroke:#2e7d32;
+    class Owner owner
+    class Participant participant
+```
 
 ### Share Acceptance Required
 

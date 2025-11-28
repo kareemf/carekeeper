@@ -57,7 +57,10 @@ CareKeeper may request permissions for:
 !!! tip "Permissions"
     You can always change these permissions later in Settings > CareKeeper
 
-![Permission request screens](../screenshots/permission-request-screens.png)
+<div class="app-overview-grid">
+  <img src="/screenshots/permission-request-screens-reminders.png" alt="Permission request screens - Reminders" />
+  <img src="/screenshots/permission-request-screens-notifications.png" alt="Permission request screens - Notifications" />
+</div>
 
 ## Step 4: Verify iCloud Sync
 
