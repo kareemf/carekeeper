@@ -81,18 +81,25 @@ CareKeeper does NOT store:
 
 ```mermaid
 flowchart TD
-    Local["On-device files (SwiftData, app group)"]
-    FileProtection["iOS File Protection (Complete)"]
-    Keychain["Device passcode-derived keys"]
-    Transit["Data in transit"]
-    TLS["TLS 1.3 to CloudKit"]
-    Cloud["CloudKit storage (Apple data centers)"]
-    InfraEnc["Infrastructure encryption at rest (AES-256, Apple-managed keys)"]
+    subgraph Device["On device"]
+        Local["App data (SwiftData, app group)"]
+        FileProtection["File Protection: Complete"]
+        Keychain["Passcode-derived keys"]
+    end
+
+    subgraph Transport["In transit"]
+        TLS["TLS 1.3 to CloudKit"]
+    end
+
+    subgraph Cloud["In iCloud"]
+        CKStore["CloudKit storage"]
+        InfraEnc["Infrastructure encryption at rest\n(AES-256, Apple-managed keys)"]
+    end
 
     Local --> FileProtection --> Keychain
-    Local --> Transit
-    Transit --> TLS --> Cloud --> InfraEnc
-    note right of InfraEnc: Enables sharing (not end-to-end)
+    Local --> Transport
+    Transport --> TLS --> CKStore --> InfraEnc
+    InfraEnc -.->|"Needed for sharing (not end-to-end)"| Local
 ```
 
 !!! info "Infrastructure Encryption"
@@ -183,19 +190,24 @@ This is intentional—relying on Apple ID provides:
 ```mermaid
 flowchart LR
     Owner["Owner (caree creator)"]
-    Participant["Share participant"]
     Caree["Shared caree data\n(Activity types + activities)"]
+    Participant["Share participant"]
     OwnerOnly["Owner-only actions"]
 
-    Owner -->|"view/edit/create"| Caree
-    Participant -->|"view/edit/create"| Caree
-    Owner -.->|"delete caree\nrevoke participants"| OwnerOnly
+    Owner -->|"view / edit / create"| Caree
+    Participant -->|"view / edit / create"| Caree
     Owner -.->|"stop sharing"| Caree
+    Owner -.->|"delete caree\nrevoke participants"| OwnerOnly
 
-    classDef owner fill:#dff3ff,stroke:#2b6cb0;
-    classDef participant fill:#e8f5e9,stroke:#2e7d32;
+    classDef owner fill:#1565c0,stroke:#0d47a1,color:#ffffff;
+    classDef participant fill:#2e7d32,stroke:#1b5e20,color:#ffffff;
+    classDef data fill:#37474f,stroke:#263238,color:#ffffff;
+    classDef owneronly fill:#6a1b9a,stroke:#4527a0,color:#ffffff;
+
     class Owner owner
     class Participant participant
+    class Caree data
+    class OwnerOnly owneronly
 ```
 
 ### Share Acceptance Required

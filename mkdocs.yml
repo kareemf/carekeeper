@@ -47,7 +47,11 @@ theme:
 markdown_extensions:
   - admonition              # Call-out boxes (notes, warnings)
   - pymdownx.details        # Collapsible admonitions
-  - pymdownx.superfences    # Nested code blocks
+  - pymdownx.superfences:   # Nested code blocks + Mermaid
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.highlight:     # Syntax highlighting
       anchor_linenums: true
   - pymdownx.inlinehilite   # Inline code highlighting
@@ -97,6 +101,11 @@ plugins:
 # Custom styling
 extra_css:
   - stylesheets/overrides.css
+
+# JavaScript (Mermaid)
+extra_javascript:
+  - https://unpkg.com/mermaid@10.9.1/dist/mermaid.min.js
+  - js/mermaid-init.js
 
 # Extra
 extra:

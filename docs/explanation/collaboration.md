@@ -13,14 +13,6 @@ CareKeeper's collaboration features enable multiple caregivers to coordinate car
 5. **Data syncs automatically** via iCloud
 6. **Notifications alert** about others' activities
 
-```mermaid
-flowchart LR
-    owner([Owner creates caree]) --> share([Share caree link])
-    share --> accept([Participants accept invite])
-    accept --> track([Everyone tracks activities])
-    track --> sync([iCloud sync + notifications])
-```
-
 ### Real-Time Sync
 
 When someone tracks an activity:
@@ -36,9 +28,7 @@ When someone tracks an activity:
 - Notifications sent (if enabled)
 - Conflict resolution handles concurrent edits
 
-[SCREENSHOT: Multi-device sync illustration]
-
-!!! success "Instant Feel"
+!!! success "Resoonsive Feel"
     CareKeeper uses optimistic UI—your changes appear immediately while syncing happens in the background. This makes the app feel instant even with slow connections.
 
 ## Sharing Model
@@ -200,31 +190,9 @@ Tap notification to:
 
 **During collaboration:**
 - 📝 Use notes to communicate
-- 🤝 Be consistent with naming
-- ⏰ Track promptly (don't rely on memory)
 - 📊 Review activity history together
 
 ![Notes used for communication](../screenshots/notes-used-for-communication.png)
-
-### Consistency
-
-Keep tracking consistent across participants:
-
-**Activity type usage:**
-- ✅ Use "Bottle" for all bottle feeding
-- ❌ Don't create "Bottle - Dad" and "Bottle - Mom"
-
-**Quantity standards:**
-- ✅ Always use same unit (oz or ml, not both)
-- ✅ Use decimals consistently (3.5 vs 3 1/2)
-
-**Time tracking:**
-- ✅ Track at actual time or use custom time
-- ❌ Don't estimate hours later
-
-**Notes style:**
-- ✅ Keep notes concise and relevant
-- ❌ Don't use notes for chat (use Messages for that)
 
 ### Privacy Within Groups
 
@@ -240,68 +208,6 @@ Even with trusted participants:
 - Don't include sensitive information others shouldn't see
 - Discuss privacy expectations upfront
 - Update sharing if expectations change
-
-## Common Scenarios
-
-### Scenario 1: New Parents, Day/Night Shifts
-
-**Setup:**
-- Mom creates caree "Baby Emma"
-- Shares with Dad
-- Both track feeding, sleep, diapers
-
-**Usage:**
-- Dad tracks night feedings while Mom sleeps
-- Mom wakes up and sees what happened overnight
-- Both coordinate next steps based on history
-- No need to wake each other for handoff
-
-[SCREENSHOT: Shift-based tracking example]
-
-### Scenario 2: Roommates Sharing Pet Care
-
-**Setup:**
-- Roommate A creates caree "Max the Dog"
-- Shares with Roommates B and C
-- All track walks, feeding, water
-
-**Usage:**
-- Roommate A walks dog at 7am
-- Roommate B sees walk logged, skips morning walk
-- Roommate C feeds dog after work
-- Everyone knows current status without asking
-
-[SCREENSHOT: Roommate pet care example]
-
-### Scenario 3: Day Care Provider Integration
-
-**Setup:**
-- Parent creates caree "Emma"
-- Shares with day care provider
-- Provider tracks throughout the day
-
-**Usage:**
-- Provider logs naps, meals, diaper changes
-- Parent gets notifications during work
-- Parent reviews full day at pickup
-- No paper logs needed
-
-[SCREENSHOT: Day care tracking example]
-
-### Scenario 4: Pet Care Coordination
-
-**Setup:**
-- Pet owner creates caree "Luna the Cat"
-- Shares with roommates
-- All track feeding, water changes, litter box cleaning
-
-**Usage:**
-- Roommate A feeds in morning
-- Roommate B checks app before feeding, sees already fed
-- Everyone coordinates without asking
-- Track patterns for vet visits
-
-[SCREENSHOT: Pet care coordination example]
 
 ## Advanced Topics
 
@@ -319,7 +225,34 @@ CareKeeper uses CloudKit's private and shared databases:
 - Activity types and activities for shared carees
 - Synced with all participants
 
-[SCREENSHOT: CloudKit database architecture]
+```mermaid
+flowchart TB
+    subgraph Private["Private database (owner)"]
+        CareeP["CD_Caree"]
+        TypeP["CD_ActivityType"]
+        ActivityP["CD_Activity"]
+    end
+
+    subgraph Shared["Shared database (per accepted caree)"]
+        CareeS["CD_Caree (shared)"]
+        TypeS["CD_ActivityType (shared)"]
+        ActivityS["CD_Activity (shared)"]
+    end
+
+    CareeP -->|"owns"| TypeP -->|"has"| ActivityP
+    CareeS -->|"owns"| TypeS -->|"has"| ActivityS
+
+    Owner["Owner device"] -.->|"create/share"| CareeS
+    Participant["Participant device"] -.->|"accept/share"| CareeS
+
+    classDef owned fill:#1565c0,stroke:#0d47a1,color:#ffffff;
+    classDef shared fill:#2e7d32,stroke:#1b5e20,color:#ffffff;
+    classDef device fill:#37474f,stroke:#263238,color:#ffffff;
+
+    class CareeP,TypeP,ActivityP owned
+    class CareeS,TypeS,ActivityS shared
+    class Owner,Participant device
+```
 
 ### Performance Optimization
 

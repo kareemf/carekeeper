@@ -3,7 +3,7 @@
 ## docs/explanation/collaboration.md
 
 <!-- - Collaboration flow diagram (`collaboration-flow-diagram`) -->
-- Multi-device sync illustration (`multi-device-sync-illustration`)
+<!-- - Multi-device sync illustration (`multi-device-sync-illustration`) -->
 <!-- - Multiple carees with different participant lists (`multiple-carees-with-different-participant-lists`) -->
 <!-- - Sync status indicator showing offline state (`sync-status-indicator-showing-offline-state`) -->
 <!-- - Conflict resolution illustration (`conflict-resolution-illustration`) -->
@@ -11,11 +11,11 @@
 - Notification settings (`notification-settings`)
 - Notification with tap action (`notification-with-tap-action`)
 - Notes used for communication (`notes-used-for-communication`)
-  - Shift-based tracking example (`shift-based-tracking-example`)
-  - Roommate pet care example (`roommate-pet-care-example`)
-  - Day care tracking example (`day-care-tracking-example`)
-  - Pet care coordination example (`pet-care-coordination-example`)
-- CloudKit database architecture (`cloudkit-database-architecture`)
+  <!-- - Shift-based tracking example (`shift-based-tracking-example`) -->
+  <!-- - Roommate pet care example (`roommate-pet-care-example`) -->
+  <!-- - Day care tracking example (`day-care-tracking-example`) -->
+  <!-- - Pet care coordination example (`pet-care-coordination-example`) -->
+<!-- - CloudKit database architecture (`cloudkit-database-architecture`) -->
 
 ## docs/explanation/security-privacy.md
 
