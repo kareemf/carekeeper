@@ -589,7 +589,7 @@ class CloudKitSharedRecordsService: ObservableObject {
             }
 
             // Step 3: Convert to objects with relationships
-            var (carees, activityTypesByCaree, activitiesByCaree, activityTypeIDByActivity) = try await convertRecordsOffMain(
+            var (carees, activityTypesByCaree, activitiesByCaree, activityTypeIDByActivity) = try convertRecordsOffMain(
                 allCareeRecords,
                 activityTypeRecords: allActivityTypeRecords,
                 activityRecords: allActivityRecords
@@ -635,19 +635,18 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
     }
 
-    /// Perform record-to-model conversion off the main actor to keep UI responsive.
+    /// Perform record-to-model conversion.
+    /// (Runs inline to avoid Sendable issues with detached tasks; conversions are still lightweight per record.)
     nonisolated func convertRecordsOffMain(
         _ careeRecords: [CKRecord],
         activityTypeRecords: [CKRecord],
         activityRecords: [CKRecord]
-    ) async throws -> ([Caree], [UUID: [ActivityType]], [UUID: [Activity]], [UUID: UUID]) {
-        try await Task.detached(priority: .utility) {
-            try Self.convertRecordsSync(
-                careeRecords,
-                activityTypeRecords: activityTypeRecords,
-                activityRecords: activityRecords
-            )
-        }.value
+    ) throws -> ([Caree], [UUID: [ActivityType]], [UUID: [Activity]], [UUID: UUID]) {
+        try Self.convertRecordsSync(
+            careeRecords,
+            activityTypeRecords: activityTypeRecords,
+            activityRecords: activityRecords
+        )
     }
 
     /// Pure conversion helper (no actor context) to enable detached processing.
