@@ -589,11 +589,12 @@ class CloudKitSharedRecordsService: ObservableObject {
             }
 
             // Step 3: Convert to objects with relationships
-            var (carees, activityTypesByCaree, activitiesByCaree, activityTypeIDByActivity) = try convertRecordsOffMain(
+            let payload = try await convertRecordsOffMain(
                 allCareeRecords,
                 activityTypeRecords: allActivityTypeRecords,
                 activityRecords: allActivityRecords
             )
+            let (carees, activityTypesByCaree, activitiesByCaree, activityTypeIDByActivity) = makeModels(from: payload)
 
             do {
                 let metadata = try await reminderMetadataStore.fetchMetadata(for: Array(activityTypeIDByActivity.keys))
@@ -635,31 +636,31 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
     }
 
-    /// Perform record-to-model conversion.
-    /// (Runs inline to avoid Sendable issues with detached tasks; conversions are still lightweight per record.)
+    /// Convert CKRecords into Sendable payloads off the main actor to keep UI responsive.
     nonisolated func convertRecordsOffMain(
         _ careeRecords: [CKRecord],
         activityTypeRecords: [CKRecord],
         activityRecords: [CKRecord]
-    ) throws -> ([Caree], [UUID: [ActivityType]], [UUID: [Activity]], [UUID: UUID]) {
-        try Self.convertRecordsSync(
-            careeRecords,
-            activityTypeRecords: activityTypeRecords,
-            activityRecords: activityRecords
-        )
+    ) async throws -> ConvertedSharedData {
+        try await Task.detached(priority: .utility) {
+            try Self.convertRecordsToPayload(
+                careeRecords,
+                activityTypeRecords: activityTypeRecords,
+                activityRecords: activityRecords
+            )
+        }.value
     }
 
     /// Pure conversion helper (no actor context) to enable detached processing.
-    nonisolated static func convertRecordsSync(
+    nonisolated static func convertRecordsToPayload(
         _ careeRecords: [CKRecord],
         activityTypeRecords: [CKRecord],
         activityRecords: [CKRecord]
-    ) throws -> ([Caree], [UUID: [ActivityType]], [UUID: [Activity]], [UUID: UUID]) {
+    ) throws -> ConvertedSharedData {
         let logger = AppLogger.cloudkit
-        var careesByID: [UUID: Caree] = [:]
-        var activityTypesByCaree: [UUID: [ActivityType]] = [:]
-        var activitiesByCaree: [UUID: [Activity]] = [:]
-        var activityTypesByID: [UUID: ActivityType] = [:]
+        var carees: [CareePayload] = []
+        var activityTypes: [UUID: [ActivityTypePayload]] = [:]
+        var activities: [UUID: [ActivityPayload]] = [:]
         var activityTypeIDByActivity: [UUID: UUID] = [:]
 
         for record in careeRecords {
@@ -671,23 +672,22 @@ class CloudKitSharedRecordsService: ObservableObject {
                 continue
             }
 
-            let caree = Caree(name: name, listOrder: record["CD_listOrder"] as? Int ?? 0)
-            caree.id = uuid
-            caree.isShared = true
-            caree.isOwned = false
-
+            var imageData: Data?
             if let imageAsset = record["CD_image_ckAsset"] as? CKAsset,
                let imageURL = imageAsset.fileURL,
-               let imageData = try? Data(contentsOf: imageURL)
+               let data = try? Data(contentsOf: imageURL)
             {
-                caree.image = imageData
+                imageData = data
             }
 
-            if let dateCreated = record["CD_dateCreated"] as? Date {
-                caree.dateCreated = dateCreated
-            }
-
-            careesByID[uuid] = caree
+            let payload = CareePayload(
+                id: uuid,
+                name: name,
+                listOrder: record["CD_listOrder"] as? Int ?? 0,
+                imageData: imageData,
+                dateCreated: record["CD_dateCreated"] as? Date
+            )
+            carees.append(payload)
         }
 
         for record in activityTypeRecords {
@@ -702,29 +702,26 @@ class CloudKitSharedRecordsService: ObservableObject {
             let hasQuantityInt = record["CD_hasQuantity"] as? Int ?? 0
             let hasLocationInt = record["CD_hasLocation"] as? Int ?? 0
 
-            let activityType = ActivityType(
+            guard let careeReference = record["CD_caree"] as? CKRecord.Reference,
+                  let careeIDString = careeReference.recordID.recordName.components(separatedBy: "/").last,
+                  let careeUUID = UUID(uuidString: careeIDString)
+            else {
+                logger.warning("⚠️ Skipping activity type missing caree reference: \(record.recordID.recordName)")
+                continue
+            }
+
+            let payload = ActivityTypePayload(
+                id: uuid,
                 name: name,
                 icon: record["CD_icon"] as? String,
                 hasQuantity: hasQuantityInt != 0,
                 quantityUnit: record["CD_quantityUnit"] as? String,
                 hasLocation: hasLocationInt != 0,
-                listOrder: record["CD_listOrder"] as? Int ?? 0
+                listOrder: record["CD_listOrder"] as? Int ?? 0,
+                dateCreated: record["CD_dateCreated"] as? Date,
+                careeID: careeUUID
             )
-            activityType.id = uuid
-
-            if let dateCreated = record["CD_dateCreated"] as? Date {
-                activityType.dateCreated = dateCreated
-            }
-
-            if let careeReference = record["CD_caree"] as? CKRecord.Reference,
-               let careeIDString = careeReference.recordID.recordName.components(separatedBy: "/").last,
-               let careeUUID = UUID(uuidString: careeIDString),
-               careesByID[careeUUID] != nil
-            {
-                activityTypesByCaree[careeUUID, default: []].append(activityType)
-            }
-
-            activityTypesByID[uuid] = activityType
+            activityTypes[careeUUID, default: []].append(payload)
         }
 
         for record in activityRecords {
@@ -736,33 +733,105 @@ class CloudKitSharedRecordsService: ObservableObject {
                 continue
             }
 
-            let activity = Activity(
+            guard let activityTypeReference = record["CD_activityType"] as? CKRecord.Reference,
+                  let activityTypeIDString = activityTypeReference.recordID.recordName.components(separatedBy: "/").last,
+                  let activityTypeUUID = UUID(uuidString: activityTypeIDString)
+            else {
+                logger.warning("⚠️ Skipping activity missing activity type reference: \(record.recordID.recordName)")
+                continue
+            }
+
+            guard let careeReference = record["CD_caree"] as? CKRecord.Reference,
+                  let careeIDString = careeReference.recordID.recordName.components(separatedBy: "/").last,
+                  let careeUUID = UUID(uuidString: careeIDString)
+            else {
+                logger.warning("⚠️ Skipping activity missing caree reference: \(record.recordID.recordName)")
+                continue
+            }
+
+            let payload = ActivityPayload(
+                id: uuid,
                 dateTime: dateTime,
                 notes: record["CD_notes"] as? String,
                 quantity: record["CD_quantity"] as? Double,
                 latitude: record["CD_latitude"] as? Double,
-                longitude: record["CD_longitude"] as? Double
+                longitude: record["CD_longitude"] as? Double,
+                dateCreated: record["CD_dateCreated"] as? Date,
+                careeID: careeUUID,
+                activityTypeID: activityTypeUUID
             )
-            activity.id = uuid
 
-            if let dateCreated = record["CD_dateCreated"] as? Date {
-                activity.dateCreated = dateCreated
+            activityTypeIDByActivity[uuid] = activityTypeUUID
+            activities[careeUUID, default: []].append(payload)
+        }
+
+        let sortedCarees = carees.sorted { $0.listOrder < $1.listOrder }
+        return ConvertedSharedData(
+            carees: sortedCarees,
+            activityTypesByCaree: activityTypes,
+            activitiesByCaree: activities,
+            activityTypeIDByActivity: activityTypeIDByActivity
+        )
+    }
+
+    /// Build SwiftData models on the main actor from sendable payloads.
+    @MainActor
+    private func makeModels(from payload: ConvertedSharedData) -> (
+        [Caree],
+        [UUID: [ActivityType]],
+        [UUID: [Activity]],
+        [UUID: UUID]
+    ) {
+        var careesByID: [UUID: Caree] = [:]
+        var activityTypesByCaree: [UUID: [ActivityType]] = [:]
+        var activitiesByCaree: [UUID: [Activity]] = [:]
+        var activityTypesByID: [UUID: ActivityType] = [:]
+
+        for careePayload in payload.carees {
+            let caree = Caree(name: careePayload.name, listOrder: careePayload.listOrder)
+            caree.id = careePayload.id
+            caree.isShared = true
+            caree.isOwned = false
+            caree.image = careePayload.imageData
+            if let dateCreated = careePayload.dateCreated {
+                caree.dateCreated = dateCreated
             }
+            careesByID[careePayload.id] = caree
+        }
 
-            if let activityTypeReference = record["CD_activityType"] as? CKRecord.Reference,
-               let activityTypeIDString = activityTypeReference.recordID.recordName.components(separatedBy: "/").last,
-               let activityTypeUUID = UUID(uuidString: activityTypeIDString),
-               activityTypesByID[activityTypeUUID] != nil
-            {
-                activityTypeIDByActivity[activity.id] = activityTypeUUID
+        for (_, typePayloads) in payload.activityTypesByCaree {
+            for typePayload in typePayloads {
+                let activityType = ActivityType(
+                    name: typePayload.name,
+                    icon: typePayload.icon,
+                    hasQuantity: typePayload.hasQuantity,
+                    quantityUnit: typePayload.quantityUnit,
+                    hasLocation: typePayload.hasLocation,
+                    listOrder: typePayload.listOrder
+                )
+                activityType.id = typePayload.id
+                if let dateCreated = typePayload.dateCreated {
+                    activityType.dateCreated = dateCreated
+                }
+                activityTypesByCaree[typePayload.careeID, default: []].append(activityType)
+                activityTypesByID[typePayload.id] = activityType
             }
+        }
 
-            if let careeReference = record["CD_caree"] as? CKRecord.Reference,
-               let careeIDString = careeReference.recordID.recordName.components(separatedBy: "/").last,
-               let careeUUID = UUID(uuidString: careeIDString),
-               careesByID[careeUUID] != nil
-            {
-                activitiesByCaree[careeUUID, default: []].append(activity)
+        for (_, activityPayloads) in payload.activitiesByCaree {
+            for activityPayload in activityPayloads {
+                let activity = Activity(
+                    dateTime: activityPayload.dateTime,
+                    notes: activityPayload.notes,
+                    quantity: activityPayload.quantity,
+                    latitude: activityPayload.latitude,
+                    longitude: activityPayload.longitude
+                )
+                activity.id = activityPayload.id
+                if let dateCreated = activityPayload.dateCreated {
+                    activity.dateCreated = dateCreated
+                }
+                activitiesByCaree[activityPayload.careeID, default: []].append(activity)
             }
         }
 
@@ -777,7 +846,7 @@ class CloudKitSharedRecordsService: ObservableObject {
             }
 
             for activity in activities {
-                if let activityTypeID = activityTypeIDByActivity[activity.id],
+                if let activityTypeID = payload.activityTypeIDByActivity[activity.id],
                    let activityType = activityTypesByID[activityTypeID]
                 {
                     activity.activityType = activityType
@@ -790,7 +859,48 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
 
         let carees = Array(careesByID.values).sorted { $0.listOrder < $1.listOrder }
-        return (carees, activityTypesByCaree, activitiesByCaree, activityTypeIDByActivity)
+        return (carees, activityTypesByCaree, activitiesByCaree, payload.activityTypeIDByActivity)
+    }
+
+    // MARK: - Payloads for Sendable cross-actor transport
+
+    private struct CareePayload: Sendable {
+        let id: UUID
+        let name: String
+        let listOrder: Int
+        let imageData: Data?
+        let dateCreated: Date?
+    }
+
+    private struct ActivityTypePayload: Sendable {
+        let id: UUID
+        let name: String
+        let icon: String?
+        let hasQuantity: Bool
+        let quantityUnit: String?
+        let hasLocation: Bool
+        let listOrder: Int
+        let dateCreated: Date?
+        let careeID: UUID
+    }
+
+    private struct ActivityPayload: Sendable {
+        let id: UUID
+        let dateTime: Date
+        let notes: String?
+        let quantity: Double?
+        let latitude: Double?
+        let longitude: Double?
+        let dateCreated: Date?
+        let careeID: UUID
+        let activityTypeID: UUID
+    }
+
+    private struct ConvertedSharedData: Sendable {
+        let carees: [CareePayload]
+        let activityTypesByCaree: [UUID: [ActivityTypePayload]]
+        let activitiesByCaree: [UUID: [ActivityPayload]]
+        let activityTypeIDByActivity: [UUID: UUID]
     }
 
     private func applySharedResultsToCache(
