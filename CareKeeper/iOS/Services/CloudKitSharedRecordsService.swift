@@ -636,7 +636,7 @@ class CloudKitSharedRecordsService: ObservableObject {
     }
 
     /// Perform record-to-model conversion off the main actor to keep UI responsive.
-    func convertRecordsOffMain(
+    nonisolated func convertRecordsOffMain(
         _ careeRecords: [CKRecord],
         activityTypeRecords: [CKRecord],
         activityRecords: [CKRecord]
