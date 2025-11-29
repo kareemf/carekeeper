@@ -924,9 +924,7 @@ class CloudKitSharedRecordsService: ObservableObject {
             hasChanges = true
         }
         operation.recordZoneChangeTokensUpdatedBlock = { _, token, _ in
-            if let token {
-                latestToken = token
-            }
+            latestToken = token
         }
         operation.recordZoneFetchResultBlock = { _, result in
             switch result {
