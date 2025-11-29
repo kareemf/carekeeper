@@ -14,12 +14,10 @@ CareKeeper helps caregivers track care activities for children, pets, or anyone 
 ## Features
 
 ### Simple: Fast Activity Tracking
-Prioritizes speed of data entry. Quick tracking inspired by Apple Workouts. Track an activity in seconds with customizable types, quantities, locations, and notes.
+Prioritizes speed of data entry. Quick tracking inspired by Apple Workouts. 
+Track an activity in seconds with customizable types, quantities, locations, and notes.
 
-* Once set up, you can **track an activity to take as few as 3 taps**, typically 4-5
-  * On iOS: Launch app -> Select caree -> Select activity type -> Save
-  * On watchOS: Launch app -> Select caree -> Select activity type -> Save
-    * App stays on the "Select activity type" screen, so subsequent entries can be as quick as: Launch app -> Select activity type -> Save
+* Once set up, you can **track an activity in as few as 3 taps**, typically 4-5
 * Available lock/home screen widgets make launch the app as quick as possible.
 
 #### watchOS Companion

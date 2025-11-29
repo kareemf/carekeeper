@@ -444,9 +444,8 @@ This is useful for:
 2. Export your data (Settings > Export Data) as backup
 
 **Contact methods:**
-- 📧 Email: [support email when available]
-- 🐛 GitHub Issues: [if open source]
-- 💬 Community: [forum/Discord if available]
+- 📧 Email: francis.kareem+carekeeper@gmail.com
+- 🐛 [Github Issues](https://github.com/kareemf/carekeeper/issues)
 
 Include:
 - iOS/watchOS version
@@ -478,13 +477,13 @@ CareKeeper is focused on fast, collaborative tracking. Feature requests are cons
 - Third-party integrations
 - HIPAA compliance
 
-Submit feature requests: [submission method when available]
+Submit feature requests: [Github Issues](https://github.com/kareemf/carekeeper/issues)
 
 ---
 
 ### Will CareKeeper be open source?
 
-**Under consideration.** The project may be open-sourced in the future to enable:
+The project will be open-sourced in the future to enable:
 - Community contributions
 - Transparency
 - Custom forks for specific use cases
@@ -525,22 +524,6 @@ No firm timeline yet.
 - But clunky on mobile, slow to track
 
 **Best of both:** Use CareKeeper for tracking, export to spreadsheet for analysis.
-
----
-
-### CareKeeper vs specialized baby/pet trackers?
-
-**CareKeeper advantages:**
-- ✅ Fully customizable (any care scenario)
-- ✅ True collaboration (not just "share reports")
-- ✅ Privacy-focused (no ads, no account)
-- ✅ Cross-category (baby + pet in one app)
-- ✅ Personal reminders per device (phone/watch)
-
-**Specialized trackers:**
-- Pre-configured for specific scenarios
-- May have specialized features (growth charts, vaccination reminders)
-- But less flexible, often subscription-based
 
 ---
 
