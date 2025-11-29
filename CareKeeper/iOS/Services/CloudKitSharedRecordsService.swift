@@ -97,6 +97,8 @@ class CloudKitSharedRecordsService: ObservableObject {
 
             if databaseNotification.databaseScope == .shared {
                 await handleSharedDatabaseNotification()
+            } else {
+                logger.debug("ℹ️ Ignoring database notification outside shared scope")
             }
         }
 
@@ -110,7 +112,10 @@ class CloudKitSharedRecordsService: ObservableObject {
         if let queryNotification = notification as? CKQueryNotification,
            queryNotification.queryNotificationReason == .recordCreated
         {
+            logger.info("🔔 Query notification for activity creation")
             await handleNewActivityNotification(queryNotification)
+        } else if notification is CKQueryNotification {
+            logger.debug("ℹ️ Query notification received but not a recordCreated event")
         }
 
         // For any CloudKit change, refresh the shared carees
@@ -336,7 +341,10 @@ class CloudKitSharedRecordsService: ObservableObject {
         let creatorRecordID = record.creatorUserRecordID?.recordName
         let creatorID = creatorIDField ?? creatorRecordID
         let currentUserID = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
-        if creatorID == currentUserID { return false }
+        if creatorID == currentUserID {
+            logger.debug("🔕 Skipping notification (self-authored activity)")
+            return false
+        }
 
         guard
             let cdId = record["CD_id"] as? String,
@@ -357,7 +365,10 @@ class CloudKitSharedRecordsService: ObservableObject {
         }
 
         let prefs = UserNotificationPreferences.shared
-        guard prefs.isEnabled(for: careeID) else { return false }
+        guard prefs.isEnabled(for: careeID) else {
+            logger.debug("🔕 Notifications disabled for caree \(careeID, privacy: .public)")
+            return false
+        }
 
         do {
             let database = container.sharedCloudDatabase
