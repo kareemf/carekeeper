@@ -776,7 +776,7 @@ class CloudKitSharedRecordsService: ObservableObject {
 
     /// Build SwiftData models on the main actor from sendable payloads.
     @MainActor
-    func makeModels(from payload: ConvertedSharedData) -> (
+    private func makeModels(from payload: ConvertedSharedData) -> (
         [Caree],
         [UUID: [ActivityType]],
         [UUID: [Activity]],
@@ -864,7 +864,7 @@ class CloudKitSharedRecordsService: ObservableObject {
 
     // MARK: - Payloads for Sendable cross-actor transport
 
-    struct CareePayload: Sendable {
+    private struct CareePayload: Sendable {
         let id: UUID
         let name: String
         let listOrder: Int
@@ -872,7 +872,7 @@ class CloudKitSharedRecordsService: ObservableObject {
         let dateCreated: Date?
     }
 
-    struct ActivityTypePayload: Sendable {
+    private struct ActivityTypePayload: Sendable {
         let id: UUID
         let name: String
         let icon: String?
@@ -884,7 +884,7 @@ class CloudKitSharedRecordsService: ObservableObject {
         let careeID: UUID
     }
 
-    struct ActivityPayload: Sendable {
+    private struct ActivityPayload: Sendable {
         let id: UUID
         let dateTime: Date
         let notes: String?
@@ -896,7 +896,7 @@ class CloudKitSharedRecordsService: ObservableObject {
         let activityTypeID: UUID
     }
 
-    struct ConvertedSharedData: Sendable {
+    private struct ConvertedSharedData: Sendable {
         let carees: [CareePayload]
         let activityTypesByCaree: [UUID: [ActivityTypePayload]]
         let activitiesByCaree: [UUID: [ActivityPayload]]

@@ -8,13 +8,11 @@ final class CloudKitSharedRecordsServiceConversionTests: XCTestCase {
         let service = CloudKitSharedRecordsService(container: CKContainer(identifier: CloudKitConfig.containerID))
 
         let sample = makeSampleRecords()
-        let payload = try await service.convertRecordsOffMain(
+        let (carees, typesByCaree, activitiesByCaree, mapping) = try await service.convertRecordsOffMain(
             sample.careeRecords,
             activityTypeRecords: sample.activityTypeRecords,
             activityRecords: sample.activityRecords
         )
-
-        let (carees, typesByCaree, activitiesByCaree, mapping) = service.makeModels(from: payload)
 
         XCTAssertEqual(carees.count, 1)
         let caree = try XCTUnwrap(carees.first)
@@ -32,11 +30,11 @@ final class CloudKitSharedRecordsServiceConversionTests: XCTestCase {
         XCTAssertEqual(mapping[activity.id], sample.activityTypeID)
     }
 
-    func testConvertRecordsToPayloadRunsOffMainThread() async throws {
+    func testConvertRecordsSyncRunsOffMainThread() async throws {
         let sample = makeSampleRecords()
 
         let ranOffMain = try await Task.detached(priority: .utility) { () throws -> Bool in
-            _ = try CloudKitSharedRecordsService.convertRecordsToPayload(
+            _ = try CloudKitSharedRecordsService.convertRecordsSync(
                 sample.careeRecords,
                 activityTypeRecords: sample.activityTypeRecords,
                 activityRecords: sample.activityRecords
