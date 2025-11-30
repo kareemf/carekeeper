@@ -284,10 +284,8 @@ class CloudKitSharedRecordsService: ObservableObject {
         operation.recordZoneFetchResultBlock = { [self] zoneID, result in
             switch result {
             case let .success(fetchResult):
-                if let token = fetchResult.serverChangeToken {
-                    latestToken = token
-                    logger.debug("🔁 Token received during shared change fetch for \(zoneID.zoneName, privacy: .public)")
-                }
+                latestToken = fetchResult.serverChangeToken
+                logger.debug("🔁 Token received during shared change fetch for \(zoneID.zoneName, privacy: .public)")
             case let .failure(error):
                 fetchError = error
             }
