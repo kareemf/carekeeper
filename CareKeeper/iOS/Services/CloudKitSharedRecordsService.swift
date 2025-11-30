@@ -594,8 +594,7 @@ class CloudKitSharedRecordsService: ObservableObject {
                 activityTypeRecords: allActivityTypeRecords,
                 activityRecords: allActivityRecords
             )
-            let (carees, activityTypesByCaree, activitiesByCareeList, activityTypeIDByActivity) = makeModels(from: payload)
-            var activitiesByCaree = activitiesByCareeList
+            let (carees, activityTypesByCaree, activitiesByCaree, activityTypeIDByActivity) = makeModels(from: payload)
 
             do {
                 let metadata = try await reminderMetadataStore.fetchMetadata(for: Array(activityTypeIDByActivity.keys))
