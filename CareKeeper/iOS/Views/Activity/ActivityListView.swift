@@ -22,6 +22,7 @@ struct ActivityListView: View {
     @State private var lastCursorDate: Date?
     @State private var hasMorePages = true
     @State private var isLoadingPage = false
+    @State private var hasLoadedInitialPage = false
 
     @State private var selectedActivityType: ActivityType?
     @State private var showingFilterMenu = false
@@ -96,15 +97,13 @@ struct ActivityListView: View {
                                 Button {
                                     selectedActivityType = activityType
                                 } label: {
-                                    Label {
-                                        HStack(spacing: 6) {
-                                            ActivityTypeIconView(icon: activityType.displayIcon)
-                                            Text(activityType.name)
-                                        }
-                                    } icon: {
+                                    HStack(spacing: 8) {
                                         if selectedActivityType?.id == activityType.id {
                                             Image(systemName: "checkmark")
+                                                .foregroundColor(.accentColor)
                                         }
+                                        ActivityTypeIconView(icon: activityType.displayIcon)
+                                        Text(activityType.name)
                                     }
                                 }
                             }
@@ -200,19 +199,27 @@ struct ActivityListView: View {
         guard let cacheService else {
             caree = nil
             activities = []
+            hasLoadedInitialPage = false
             return
         }
 
         // Find the specific caree from cache (owned or shared)
         let foundCaree = cacheService.getCachedCaree(id: careeID)
 
+        let careeChanged = caree?.id != foundCaree?.id
         caree = foundCaree
+
         if caree == nil {
             activities = []
+            hasLoadedInitialPage = false
             return
         }
-        Task {
-            await loadInitialPage()
+
+        // Only load initial page if we haven't loaded yet or caree changed
+        if !hasLoadedInitialPage || careeChanged {
+            Task {
+                await loadInitialPage()
+            }
         }
     }
 
@@ -277,7 +284,9 @@ struct ActivityListView: View {
             await sharedRecordsService.fetchSharedCarees()
         }
 
+        // Reset pagination to reload fresh data
         await MainActor.run {
+            hasLoadedInitialPage = false
             updateActivities()
         }
     }
@@ -287,6 +296,7 @@ struct ActivityListView: View {
         guard let cacheService else {
             caree = nil
             activities = []
+            hasLoadedInitialPage = false
             return
         }
 
@@ -295,6 +305,7 @@ struct ActivityListView: View {
         lastCursorDate = nil
         hasMorePages = true
         await loadNextPage()
+        hasLoadedInitialPage = true
     }
 
     @MainActor
