@@ -18,7 +18,8 @@ struct ActivityListView: View {
 
     // Reactive state - updated when cache changes
     @State private var caree: Caree?
-    @State private var activities: [Activity] = []
+    @State private var activityIDs: [UUID] = []
+    @State private var loadedActivityIDSet: Set<UUID> = []
     @State private var lastCursorDate: Date?
     @State private var hasMorePages = true
     @State private var isLoadingPage = false
@@ -34,6 +35,27 @@ struct ActivityListView: View {
 
     init(careeID: UUID) {
         self.careeID = careeID
+    }
+
+    // Fetch fresh Activity objects from modelContext based on stored IDs
+    // This prevents crashes from stale SwiftData object references
+    private var activities: [Activity] {
+        guard !activityIDs.isEmpty else { return [] }
+        let ids = activityIDs
+        let predicate = #Predicate<Activity> { activity in
+            ids.contains(activity.id)
+        }
+        var fetch = FetchDescriptor<Activity>(predicate: predicate)
+        fetch.fetchLimit = ids.count
+
+        do {
+            let fetched = try modelContext.fetch(fetch)
+            // Maintain the order from activityIDs
+            let idToActivity = Dictionary(uniqueKeysWithValues: fetched.map { ($0.id, $0) })
+            return ids.compactMap { idToActivity[$0] }
+        } catch {
+            return []
+        }
     }
 
     // Helper publishers to observe cache changes
@@ -97,13 +119,16 @@ struct ActivityListView: View {
                                 Button {
                                     selectedActivityType = activityType
                                 } label: {
-                                    HStack(spacing: 8) {
+                                    Label {
+                                        Text("\(activityType.displayIcon) \(activityType.name)")
+                                    } icon: {
                                         if selectedActivityType?.id == activityType.id {
                                             Image(systemName: "checkmark")
-                                                .foregroundColor(.accentColor)
+                                        } else {
+                                            // Empty space to maintain alignment
+                                            Image(systemName: "checkmark")
+                                                .hidden()
                                         }
-                                        ActivityTypeIconView(icon: activityType.displayIcon)
-                                        Text(activityType.name)
                                     }
                                 }
                             }
@@ -198,7 +223,8 @@ struct ActivityListView: View {
     private func updateActivities() {
         guard let cacheService else {
             caree = nil
-            activities = []
+            activityIDs = []
+            loadedActivityIDSet = []
             hasLoadedInitialPage = false
             return
         }
@@ -210,7 +236,8 @@ struct ActivityListView: View {
         caree = foundCaree
 
         if caree == nil {
-            activities = []
+            activityIDs = []
+            loadedActivityIDSet = []
             hasLoadedInitialPage = false
             return
         }
@@ -295,13 +322,15 @@ struct ActivityListView: View {
     private func loadInitialPage() async {
         guard let cacheService else {
             caree = nil
-            activities = []
+            activityIDs = []
+            loadedActivityIDSet = []
             hasLoadedInitialPage = false
             return
         }
 
         caree = cacheService.getCachedCaree(id: careeID)
-        activities = []
+        activityIDs = []
+        loadedActivityIDSet = []
         lastCursorDate = nil
         hasMorePages = true
         await loadNextPage()
@@ -316,24 +345,25 @@ struct ActivityListView: View {
 
         let careeID = caree.id
         let selectedTypeID = selectedActivityType?.id
-        let cursor = lastCursorDate
+        let cursorDate = lastCursorDate
 
+        // Build predicate - use cursor date with tiebreaker to handle same-time activities
         let predicate: Predicate<Activity>
-        if let typeID = selectedTypeID, let cursorDate = cursor {
+        if let typeID = selectedTypeID, let cursorDate {
             predicate = #Predicate<Activity> { activity in
                 activity.caree?.id == careeID
                     && activity.activityType?.id == typeID
-                    && activity.dateTime < cursorDate
+                    && activity.dateTime <= cursorDate
             }
         } else if let typeID = selectedTypeID {
             predicate = #Predicate<Activity> { activity in
                 activity.caree?.id == careeID
                     && activity.activityType?.id == typeID
             }
-        } else if let cursorDate = cursor {
+        } else if let cursorDate {
             predicate = #Predicate<Activity> { activity in
                 activity.caree?.id == careeID
-                    && activity.dateTime < cursorDate
+                    && activity.dateTime <= cursorDate
             }
         } else {
             predicate = #Predicate<Activity> { activity in
@@ -343,15 +373,36 @@ struct ActivityListView: View {
 
         var fetch = FetchDescriptor<Activity>(
             predicate: predicate,
-            sortBy: [SortDescriptor(\.dateTime, order: .reverse)]
+            sortBy: [SortDescriptor(\.dateTime, order: .reverse), SortDescriptor(\.id, order: .reverse)]
         )
-        fetch.fetchLimit = pageSize
+        // Fetch more than page size to account for filtering out already-loaded items
+        fetch.fetchLimit = pageSize + loadedActivityIDSet.count
 
         do {
             let page = try modelContext.fetch(fetch)
-            activities.append(contentsOf: page)
-            lastCursorDate = activities.last?.dateTime
-            if page.count < pageSize {
+
+            // Filter out already loaded activities and take pageSize new ones
+            var newIDs: [UUID] = []
+            for activity in page {
+                if !loadedActivityIDSet.contains(activity.id) {
+                    newIDs.append(activity.id)
+                    loadedActivityIDSet.insert(activity.id)
+                    if newIDs.count >= pageSize {
+                        break
+                    }
+                }
+            }
+
+            activityIDs.append(contentsOf: newIDs)
+
+            // Update cursor to last loaded activity
+            if let lastID = newIDs.last,
+               let lastActivity = page.first(where: { $0.id == lastID })
+            {
+                lastCursorDate = lastActivity.dateTime
+            }
+
+            if newIDs.count < pageSize {
                 hasMorePages = false
             }
         } catch {
