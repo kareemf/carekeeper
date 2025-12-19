@@ -90,13 +90,6 @@ final class ShareAcceptanceRefresher {
 
             if !newIDs.isEmpty {
                 logger.info("✅ Share acceptance refresh completed with \(newIDs.count) new caree(s) found.")
-
-                // Auto-enable notifications for newly shared carees
-                let prefs = UserNotificationPreferences.shared
-                for careeID in newIDs {
-                    prefs.enableForSharedCareeIfNeeded(careeID)
-                }
-
                 return
             }
 

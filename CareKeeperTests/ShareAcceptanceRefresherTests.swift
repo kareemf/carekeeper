@@ -36,16 +36,6 @@ final class ShareAcceptanceRefresherTests: XCTestCase {
 
         XCTAssertEqual(sharedService.fetchCallCount, 2, "Should stop retries after detecting new caree")
         XCTAssertEqual(cacheService.refreshCount, 2, "Cache refresh should run alongside each fetch")
-
-        // Verify notifications were auto-enabled for the new shared caree
-        let prefs = UserNotificationPreferences.shared
-        // Global notifications should be enabled
-        XCTAssertTrue(prefs.notificationsEnabled, "Global notifications should be enabled for shared carees")
-        // Per-caree notification should be enabled
-        XCTAssertTrue(prefs.isEnabled(for: newCaree.id), "Notifications should be auto-enabled for new shared carees")
-
-        // Clean up
-        prefs.removePreferences(for: newCaree.id)
     }
 
     func testSubsequentAcceptanceCancelsPendingRefresh() async throws {
