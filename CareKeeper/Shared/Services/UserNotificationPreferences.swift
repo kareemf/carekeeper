@@ -72,6 +72,20 @@ class UserNotificationPreferences: ObservableObject {
         return careePreferences[careeID.uuidString] ?? false
     }
 
+    /// Enable notifications for a shared caree if not explicitly set.
+    /// Called when a share is accepted or a caree is first shared.
+    /// This ensures notifications are enabled by default for collaborative carees.
+    /// - Parameter careeID: The caree's UUID
+    func enableForSharedCareeIfNeeded(_ careeID: UUID) {
+        // Only auto-enable if no preference has been explicitly set
+        guard careePreferences[careeID.uuidString] == nil else {
+            return
+        }
+
+        logger.info("🔔 Auto-enabling notifications for shared caree: \(careeID)")
+        setEnabled(true, for: careeID)
+    }
+
     /// Set notification preference for a specific caree
     /// - Parameters:
     ///   - enabled: Whether to enable notifications for this caree

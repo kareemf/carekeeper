@@ -10,6 +10,7 @@ final class ShareAcceptanceRefresherTests: XCTestCase {
         let fetchExpectation = expectation(description: "Fetch called twice")
         let cacheExpectation = expectation(description: "Cache refreshed twice")
 
+        let newCaree = CareKeeper.Caree(name: "New Caree")
         let refresher = ShareAcceptanceRefresher(
             sharedRecordsService: sharedService,
             cacheService: cacheService,
@@ -19,7 +20,7 @@ final class ShareAcceptanceRefresherTests: XCTestCase {
 
         sharedService.onFetch = {
             if sharedService.fetchCallCount == 2 {
-                sharedService.setSharedCarees([CareKeeper.Caree(name: "New Caree")])
+                sharedService.setSharedCarees([newCaree])
                 fetchExpectation.fulfill()
             }
         }
@@ -35,6 +36,16 @@ final class ShareAcceptanceRefresherTests: XCTestCase {
 
         XCTAssertEqual(sharedService.fetchCallCount, 2, "Should stop retries after detecting new caree")
         XCTAssertEqual(cacheService.refreshCount, 2, "Cache refresh should run alongside each fetch")
+
+        // Verify notifications were auto-enabled for the new shared caree
+        let prefs = UserNotificationPreferences.shared
+        // Global notifications should be enabled
+        XCTAssertTrue(prefs.notificationsEnabled, "Global notifications should be enabled for shared carees")
+        // Per-caree notification should be enabled
+        XCTAssertTrue(prefs.isEnabled(for: newCaree.id), "Notifications should be auto-enabled for new shared carees")
+
+        // Clean up
+        prefs.removePreferences(for: newCaree.id)
     }
 
     func testSubsequentAcceptanceCancelsPendingRefresh() async throws {

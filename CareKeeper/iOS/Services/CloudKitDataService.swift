@@ -30,6 +30,9 @@ class CloudKitDataService: ObservableObject {
     private let maxRetries = 3
     private let retryDelay: TimeInterval = 2.0
     private let reminderMetadataStore: any ReminderMetadataStoreProtocol
+    private let privateZoneChangeTokenStore = PrivateZoneChangeTokenStore()
+    /// Set of activity IDs we've already notified about (to prevent duplicates)
+    private var notifiedActivityIDs: Set<UUID> = []
     #if canImport(UIKit)
         private let careeImageMaxDimension: CGFloat = 256
     #endif
@@ -50,9 +53,18 @@ class CloudKitDataService: ObservableObject {
             forName: NSNotification.Name("CloudKitNotificationReceived"),
             object: nil,
             queue: .main
-        ) { [weak self] _ in
+        ) { [weak self] notification in
             guard let self else { return }
             Task { @MainActor in
+                // Check for activities from share participants (owner notifications)
+                // This uses change tokens to efficiently detect new activities from other users
+                if let ckNotification = notification.object as? CKNotification,
+                   let dbNotification = ckNotification as? CKDatabaseNotification,
+                   dbNotification.databaseScope == .private
+                {
+                    await self.fetchPrivateZoneChangesAndNotify()
+                }
+
                 do {
                     try await self.refreshOwnedCareesFromCloudKit()
                 } catch {
@@ -1360,6 +1372,189 @@ class CloudKitDataService: ObservableObject {
         }
     }
 
+    // MARK: - Private Zone Change Tracking for Owner Notifications
+
+    /// Fetch changes in the private database zone and notify for new activities from other users.
+    /// This is called after a push notification to detect activities created by share participants.
+    func fetchPrivateZoneChangesAndNotify() async {
+        logger.info("🔍 Fetching private zone changes to check for activities from other users")
+
+        let previousToken = privateZoneChangeTokenStore.token(for: zoneID)
+        let config = CKFetchRecordZoneChangesOperation.ZoneConfiguration()
+        config.previousServerChangeToken = previousToken
+
+        let operation = CKFetchRecordZoneChangesOperation(
+            recordZoneIDs: [zoneID],
+            configurationsByRecordZoneID: [zoneID: config]
+        )
+
+        var newActivityRecords: [CKRecord] = []
+        var latestToken: CKServerChangeToken?
+        var fetchError: Error?
+
+        operation.recordWasChangedBlock = { recordID, result in
+            switch result {
+            case let .success(record):
+                // Only track CD_Activity records for notifications
+                if record.recordType == "CD_Activity" {
+                    newActivityRecords.append(record)
+                }
+            case let .failure(error):
+                self.logger.warning("⚠️ Failed record change in private zone: \(recordID.recordName, privacy: .public): \(error.localizedDescription)")
+            }
+        }
+
+        operation.recordZoneFetchResultBlock = { [self] _, result in
+            switch result {
+            case let .success(fetchResult):
+                latestToken = fetchResult.serverChangeToken
+            case let .failure(error):
+                fetchError = error
+                logger.warning("⚠️ Zone fetch failed: \(error.localizedDescription)")
+            }
+        }
+
+        await withCheckedContinuation { continuation in
+            operation.fetchRecordZoneChangesResultBlock = { _ in
+                continuation.resume()
+            }
+            container.privateCloudDatabase.add(operation)
+        }
+
+        // Handle token expiration
+        if let error = fetchError {
+            if let ckError = error as? CKError, ckError.code == .changeTokenExpired {
+                logger.warning("⚠️ Private zone change token expired; clearing and will refetch on next push")
+                privateZoneChangeTokenStore.clear(for: zoneID)
+            }
+            return
+        }
+
+        // Save the new token
+        if let token = latestToken {
+            privateZoneChangeTokenStore.save(token, for: zoneID)
+        }
+
+        // Check each new activity record and notify if from another user
+        let currentUserID = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
+
+        for record in newActivityRecords {
+            await notifyForPrivateActivityIfNeeded(record, currentUserID: currentUserID)
+        }
+
+        if !newActivityRecords.isEmpty {
+            logger.info("🔔 Processed \(newActivityRecords.count) activity changes in private zone")
+        }
+    }
+
+    /// Check if an activity record was created by another user and present a notification if so.
+    private func notifyForPrivateActivityIfNeeded(_ record: CKRecord, currentUserID: String) async {
+        // Extract creator ID
+        let creatorIDField = record["CD_creatorUserRecordID"] as? String
+        let creatorRecordID = record.creatorUserRecordID?.recordName
+        let creatorID = creatorIDField ?? creatorRecordID
+
+        // Skip if created by current user
+        if creatorID == currentUserID {
+            logger.debug("🔕 Skipping notification for self-authored activity in private zone")
+            return
+        }
+
+        // Extract activity ID
+        guard let cdId = record["CD_id"] as? String,
+              let activityID = UUID(uuidString: cdId)
+        else {
+            logger.warning("⚠️ Activity record missing CD_id field")
+            return
+        }
+
+        // Skip if already notified
+        if notifiedActivityIDs.contains(activityID) {
+            logger.debug("🔕 Already notified for activity: \(activityID)")
+            return
+        }
+
+        // Extract required fields
+        guard let dateTime = record["CD_dateTime"] as? Date else {
+            logger.warning("⚠️ Activity record missing CD_dateTime field")
+            return
+        }
+
+        // Extract caree ID
+        guard let careeReference = record["CD_caree"] as? CKRecord.Reference,
+              let careeIDFromRef = careeReference.recordID.recordName.components(separatedBy: "/").last,
+              let careeID = UUID(uuidString: careeIDFromRef)
+        else {
+            logger.warning("⚠️ Could not extract caree ID from activity")
+            return
+        }
+
+        // Check notification preferences
+        let prefs = UserNotificationPreferences.shared
+        guard prefs.isEnabled(for: careeID) else {
+            logger.debug("🔕 Notifications disabled for caree \(careeID)")
+            return
+        }
+
+        // Fetch caree and activity type names
+        do {
+            let database = container.privateCloudDatabase
+            let careeRecord = try await database.record(for: careeReference.recordID)
+            let careeName = careeRecord["CD_name"] as? String ?? "Unknown"
+
+            var activityTypeName = "Activity"
+            if let activityTypeRef = record["CD_activityType"] as? CKRecord.Reference {
+                if let activityTypeRecord = try? await database.record(for: activityTypeRef.recordID) {
+                    activityTypeName = activityTypeRecord["CD_name"] as? String ?? "Activity"
+                }
+            }
+
+            // Mark as notified
+            notifiedActivityIDs.insert(activityID)
+
+            // Present the notification
+            let notificationService = UserNotificationService.shared
+            await notificationService.presentNewActivityNotification(
+                activityID: activityID,
+                careeID: careeID,
+                careeName: careeName,
+                activityTypeName: activityTypeName,
+                creatorName: "Another caregiver",
+                timestamp: dateTime
+            )
+
+            logger.info("🔔 Presented notification for activity from share participant: \(activityID)")
+
+        } catch {
+            logger.error("❌ Failed to present notification for private zone activity: \(error.localizedDescription)")
+        }
+    }
+}
+
+// MARK: - Private Zone Change Token Store
+
+private struct PrivateZoneChangeTokenStore {
+    private let defaults = UserDefaults.standard
+
+    func token(for zoneID: CKRecordZone.ID) -> CKServerChangeToken? {
+        guard let data = defaults.data(forKey: key(for: zoneID)) else { return nil }
+        return try? NSKeyedUnarchiver.unarchivedObject(ofClass: CKServerChangeToken.self, from: data)
+    }
+
+    func save(_ token: CKServerChangeToken, for zoneID: CKRecordZone.ID) {
+        guard let data = try? NSKeyedArchiver.archivedData(withRootObject: token, requiringSecureCoding: true) else {
+            return
+        }
+        defaults.set(data, forKey: key(for: zoneID))
+    }
+
+    func clear(for zoneID: CKRecordZone.ID) {
+        defaults.removeObject(forKey: key(for: zoneID))
+    }
+
+    private func key(for zoneID: CKRecordZone.ID) -> String {
+        "privateZoneToken-\(zoneID.zoneName)-\(zoneID.ownerName)"
+    }
 }
 
 // MARK: - Data Service Errors

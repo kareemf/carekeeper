@@ -141,6 +141,11 @@ class CloudKitSharingService: ObservableObject {
                let finalShare = savedShare as? CKShare
             {
                 logger.info("✅ Share created successfully")
+
+                // Auto-enable notifications for owner's shared caree
+                // This ensures owners get notified when participants add activities
+                UserNotificationPreferences.shared.enableForSharedCareeIfNeeded(caree.id)
+
                 return finalShare
             } else {
                 throw AppError.invalidInput("Failed to save share to CloudKit")
