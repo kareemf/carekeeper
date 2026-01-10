@@ -231,13 +231,36 @@ class CloudKitSharedDataService: ObservableObject {
 
             // Optimistically update local cache
             if let cache = cacheService {
-                try? await cache.withBatch {
-                    try await cache.cacheActivity(activity, for: caree, activityTypeID: activityType.id)
+                // Ensure parent caree is in cache (handles cold start case)
+                var cachedCaree = cache.getCachedCaree(id: caree.id)
+                if cachedCaree == nil {
+                    logger.info("⚠️ Shared caree not in cache (cold start), caching it first")
+                    try? await cache.cacheCaree(caree, isShared: true)
+                    cachedCaree = cache.getCachedCaree(id: caree.id)
                 }
-                // Force immediate refresh of published properties so views see the update
-                await cache.refreshPublishedProperties()
-                // Post notification for immediate UI update
-                NotificationCenter.default.post(name: NSNotification.Name("SharedCareeDataUpdated"), object: caree.id)
+
+                if let cachedCaree {
+                    // Ensure activity type is in cache
+                    var cachedActivityTypes = cache.getCachedActivityTypes(for: cachedCaree)
+                    if !cachedActivityTypes.contains(where: { $0.id == activityType.id }) {
+                        logger.info("⚠️ Shared ActivityType not in cache, caching it first")
+                        try? await cache.cacheActivityType(activityType, for: cachedCaree)
+                        cachedActivityTypes = cache.getCachedActivityTypes(for: cachedCaree)
+                    }
+
+                    if cachedActivityTypes.contains(where: { $0.id == activityType.id }) {
+                        try? await cache.withBatch {
+                            try await cache.cacheActivity(activity, for: cachedCaree, activityTypeID: activityType.id)
+                        }
+                        logger.info("✅ Shared activity cached locally")
+
+                        // Immediate refresh for "hot" operation (activity creation)
+                        await cache.refreshImmediately(reason: "createActivity-shared")
+
+                        // Post notification for immediate UI update
+                        NotificationCenter.default.post(name: NSNotification.Name("SharedCareeDataUpdated"), object: caree.id)
+                    }
+                }
             }
 
             return activity

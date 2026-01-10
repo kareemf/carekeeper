@@ -492,6 +492,33 @@ class LocalCacheService: ObservableObject {
         }
     }
 
+    /// Immediate refresh without debounce (for "hot" operations like activity creation)
+    /// Respects existing refresh state to prevent concurrent execution
+    func refreshImmediately(reason: String? = nil) async {
+        if isRefreshing {
+            // Another refresh is running; mark pending so it runs after
+            pendingRefresh = true
+            logger.info("⏭️ Immediate refresh coalesced with running refresh (\(reason ?? "unknown", privacy: .public))")
+            return
+        }
+
+        // Cancel any pending debounced refresh (we're doing it now)
+        refreshTask?.cancel()
+
+        isRefreshing = true
+        defer { isRefreshing = false }
+
+        await refreshPublishedProperties()
+        logger.info("⚡ Immediate refresh executed (\(reason ?? "unknown", privacy: .public))")
+
+        // If another refresh was requested during the run, perform one more pass
+        if pendingRefresh {
+            pendingRefresh = false
+            await refreshPublishedProperties()
+            logger.info("🔁 Follow-up refresh after immediate refresh")
+        }
+    }
+
     // MARK: - Cache Refresh
 
     /// Refresh the @Published properties from SwiftData

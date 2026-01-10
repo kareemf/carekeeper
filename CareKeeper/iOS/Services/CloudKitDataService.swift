@@ -666,14 +666,31 @@ class CloudKitDataService: ObservableObject {
             let syncedActivity = try converter.recordToActivity(savedRecord)
 
             // Cache the activity if cache service is available
-            if let cacheService,
-               let cachedCaree = cacheService.getCachedCaree(id: caree.id)
-            {
-                // Find cached activity type
-                let cachedActivityTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
-                if let cachedActivityType = cachedActivityTypes.first(where: { $0.id == activityType.id }) {
-                    try await cacheService.cacheActivity(syncedActivity, for: cachedCaree, activityTypeID: cachedActivityType.id)
-                    logger.info("✅ Activity cached locally")
+            if let cacheService {
+                // Ensure parent caree is in cache (handles cold start case)
+                var cachedCaree = cacheService.getCachedCaree(id: caree.id)
+                if cachedCaree == nil {
+                    logger.info("⚠️ Caree not in cache (cold start), caching it first")
+                    try await cacheService.cacheCaree(caree, isShared: isShared)
+                    cachedCaree = cacheService.getCachedCaree(id: caree.id)
+                }
+
+                if let cachedCaree {
+                    // Ensure activity type is in cache
+                    var cachedActivityTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
+                    if !cachedActivityTypes.contains(where: { $0.id == activityType.id }) {
+                        logger.info("⚠️ ActivityType not in cache, caching it first")
+                        try await cacheService.cacheActivityType(activityType, for: cachedCaree)
+                        cachedActivityTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
+                    }
+
+                    if let cachedActivityType = cachedActivityTypes.first(where: { $0.id == activityType.id }) {
+                        try await cacheService.cacheActivity(syncedActivity, for: cachedCaree, activityTypeID: cachedActivityType.id)
+                        logger.info("✅ Activity cached locally")
+
+                        // Immediate refresh for "hot" operation (activity creation)
+                        await cacheService.refreshImmediately(reason: "createActivity")
+                    }
                 }
             }
 

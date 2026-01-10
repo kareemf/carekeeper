@@ -1,0 +1,297 @@
+# iOS Activity Save Performance - Cold Start Issue
+
+## Problem Statement
+
+When the app hasn't been used for a while (cold start), tracking a new activity exhibits poor UX:
+
+1. **Save takes a long time** - spinner animation runs for 2-5+ seconds
+2. **List doesn't update immediately** - activity doesn't appear in the list until manual refresh (pull-to-refresh)
+3. **Subsequent saves work fine** - after the first activity, future saves complete quickly (~0.75s) and update the list in real-time
+
+## Root Cause Analysis
+
+### Issue 1: Race Condition on Cold Start
+
+**Timeline:**
+```
+App Launch (t=0s)
+  ↓
+ContentView.task block starts (async)
+  ├─ Initialize LocalCacheService
+  ├─ Call refreshOwnedCareesFromCloudKit() (takes 2-3s)
+  ↓
+User navigates to CareeDetailView (t=0.5s)
+  ↓
+User opens TrackActivityView (t=1s)
+  ↓
+User clicks Save (t=2s)
+  ├─ Cache may still be empty!
+  ├─ CloudKit save: 2-5s (zone setup, cold network)
+  ├─ Verify sync: 0.5s
+  ├─ getCachedCaree() returns nil ❌
+  └─ Activity not cached!
+```
+
+**Location:** `CareKeeperApp.swift:211-249`
+
+The cache service initializes asynchronously in a `.task` block and runs in parallel with view navigation. Users can reach the activity tracking screen before the cache is fully populated.
+
+### Issue 2: Debounced Refresh Delay
+
+**Problem:** Cache updates are debounced by 0.25 seconds to prevent excessive view refreshes.
+
+**Flow:**
+```swift
+CloudKitDataService.createActivity()
+  ↓ Save to CloudKit (2-5s cold, 0.5s warm)
+  ↓ Verify sync (0.5s)
+  ↓ cacheService.cacheActivity()
+  ↓ cacheService.scheduleRefresh() ← Debounced!
+  ↓ Task.sleep(0.25s) ← Delay
+  ↓ refreshPublishedProperties()
+
+// But TrackActivityView dismisses HERE ↑
+// Before the debounced refresh executes!
+```
+
+**Location:** `LocalCacheService.swift:452-472` (scheduleRefresh method)
+
+The view dismisses immediately after CloudKit save completes, but the debounced refresh hasn't run yet, so the list doesn't update.
+
+### Issue 3: Missing Cache Entries
+
+**Problem:** If cache is empty, activity doesn't get cached at all.
+
+**Location:** `CloudKitDataService.swift:669-678` (before fix)
+
+```swift
+if let cacheService,
+   let cachedCaree = cacheService.getCachedCaree(id: caree.id)  // Returns nil!
+{
+    // This block is skipped entirely
+    try await cacheService.cacheActivity(...)
+}
+```
+
+If `getCachedCaree()` returns `nil` (cache not initialized), the entire caching block is skipped. The activity saves to CloudKit successfully but never enters the local cache.
+
+### Why Subsequent Saves Work Fine
+
+1. **Cache is warm** - service is initialized and populated
+2. **CloudKit connection is hot** - custom zone exists, network latency reduced
+3. **Faster saves** - CloudKit operations complete in ~0.5s instead of 2-5s
+4. **Cache hits** - caree and activity type are already cached
+
+The 0.25s debounce delay still exists, but it's less noticeable when the total operation is <1s.
+
+## Solution: Approach A (Elected)
+
+**Fix #1:** Immediate cache refresh for "hot" operations
+**Fix #2:** Handle missing caree/activity type in cache
+
+### Implementation
+
+#### 1. Add Immediate Refresh Method
+
+**File:** `LocalCacheService.swift`
+
+```swift
+/// Immediate refresh without debounce (for "hot" operations like activity creation)
+/// Respects existing refresh state to prevent concurrent execution
+func refreshImmediately(reason: String? = nil) async {
+    if isRefreshing {
+        // Another refresh is running; mark pending so it runs after
+        pendingRefresh = true
+        return
+    }
+
+    // Cancel any pending debounced refresh (we're doing it now)
+    refreshTask?.cancel()
+
+    isRefreshing = true
+    defer { isRefreshing = false }
+
+    await refreshPublishedProperties()
+
+    // Handle any pending refreshes requested during execution
+    if pendingRefresh {
+        pendingRefresh = false
+        await refreshPublishedProperties()
+    }
+}
+```
+
+**Benefits:**
+- ✅ Skips 0.25s debounce delay for activity creation
+- ✅ Respects existing `isRefreshing` flag (no concurrent execution)
+- ✅ Uses existing coalescing infrastructure
+
+#### 2. Handle Missing Cache Entries
+
+**File:** `CloudKitDataService.swift` (createActivity method)
+
+```swift
+// Ensure parent caree is in cache (handles cold start case)
+var cachedCaree = cacheService.getCachedCaree(id: caree.id)
+if cachedCaree == nil {
+    logger.info("⚠️ Caree not in cache (cold start), caching it first")
+    try await cacheService.cacheCaree(caree, isShared: isShared)
+    cachedCaree = cacheService.getCachedCaree(id: caree.id)
+}
+
+if let cachedCaree {
+    // Ensure activity type is in cache
+    var cachedActivityTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
+    if !cachedActivityTypes.contains(where: { $0.id == activityType.id }) {
+        logger.info("⚠️ ActivityType not in cache, caching it first")
+        try await cacheService.cacheActivityType(activityType, for: cachedCaree)
+        cachedActivityTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
+    }
+
+    if let cachedActivityType = cachedActivityTypes.first(where: { $0.id == activityType.id }) {
+        try await cacheService.cacheActivity(syncedActivity, for: cachedCaree, activityTypeID: cachedActivityType.id)
+
+        // Immediate refresh for "hot" operation (activity creation)
+        await cacheService.refreshImmediately(reason: "createActivity")
+    }
+}
+```
+
+**File:** `CloudKitSharedDataService.swift` (createActivity method) - same pattern
+
+**Benefits:**
+- ✅ Handles missing caree by caching it first
+- ✅ Handles missing activity type by caching it first
+- ✅ Ensures activity is always cached, even on cold start
+- ✅ Immediate refresh provides instant UI feedback
+
+### Results
+
+**Cold start (first activity):**
+- CloudKit save: 2-5s (unavoidable network latency)
+- Spinner shows for 2-5s
+- Activity appears in list **immediately** after spinner stops ✅
+- No manual refresh needed ✅
+
+**Warm (subsequent activities):**
+- CloudKit save: ~0.5s
+- Brief spinner
+- Activity appears in list **immediately** ✅
+
+## Alternative Approaches Considered
+
+### Approach B: Optimistic Updates (Not Implemented)
+
+**Concept:** Add activity to cache **before** CloudKit save, update UI immediately, save in background.
+
+**Benefits:**
+- ⚡ Instant feedback (0ms perceived delay)
+- Modern iOS UX (like Messages, Notes)
+- Best-in-class user experience
+
+**Drawbacks:**
+- 🔴 Medium complexity (~120 lines of code)
+- 🔴 Requires rollback logic for failed saves
+- 🔴 Requires sync state tracking (pending/synced/failed)
+- 🔴 Requires UI indicators for sync status
+
+**Decision:** Not implemented for v1. Approach A provides 80% of the benefit with 20% of the work. Optimistic updates can be added later if needed.
+
+### Approach C: Block Until Cache Ready (Rejected)
+
+**Concept:** Show loading state until cache is fully initialized before allowing activity tracking.
+
+**Drawbacks:**
+- ❌ Poor UX (user has to wait)
+- ❌ Doesn't solve the real problem (CloudKit network latency)
+- ❌ Cache initializes quickly; real delay is CloudKit
+
+**Decision:** Rejected due to poor UX.
+
+## Technical Details
+
+### Concurrent Execution Prevention
+
+The existing `LocalCacheService` infrastructure already prevents concurrent cache refreshes:
+
+```swift
+private var isRefreshing = false  // Mutex flag
+private var pendingRefresh = false  // Coalescing flag
+
+private func runRefreshIfNeeded(reason: String) async {
+    if isRefreshing {
+        pendingRefresh = true  // Coalesce request
+        return
+    }
+
+    isRefreshing = true
+    defer { isRefreshing = false }
+
+    await refreshPublishedProperties()
+
+    // Handle coalesced requests
+    if pendingRefresh {
+        pendingRefresh = false
+        await refreshPublishedProperties()
+    }
+}
+```
+
+The `refreshImmediately()` method uses the same infrastructure, so there's no risk of concurrent execution or performance degradation.
+
+### Files Modified
+
+1. `CareKeeper/iOS/Services/LocalCacheService.swift`
+   - Added `refreshImmediately()` method
+
+2. `CareKeeper/iOS/Services/CloudKitDataService.swift`
+   - Updated `createActivity()` to handle missing cache entries
+   - Changed from `scheduleRefresh()` to `refreshImmediately()`
+
+3. `CareKeeper/iOS/Services/CloudKitSharedDataService.swift`
+   - Updated `createActivity()` with same pattern for shared carees
+   - Changed from `refreshPublishedProperties()` to `refreshImmediately()`
+
+### Testing Recommendations
+
+1. **Cold start test:**
+   - Force quit app
+   - Wait 10+ seconds
+   - Launch app and immediately navigate to track activity
+   - Verify activity appears in list without manual refresh
+
+2. **Warm test:**
+   - Track 2-3 activities in quick succession
+   - Verify each appears immediately
+
+3. **Shared caree test:**
+   - Repeat above tests with shared caree
+   - Verify same behavior
+
+4. **Network failure test:**
+   - Enable airplane mode
+   - Try to track activity
+   - Verify appropriate error handling
+
+## Performance Impact
+
+**Code complexity:** Low (~50 lines total across 3 files)
+**Risk level:** Low (uses existing infrastructure)
+**Memory impact:** None (no new data structures)
+**CPU impact:** Negligible (eliminates one 0.25s sleep)
+
+**UX improvement:**
+- Cold start: **Eliminates need for manual refresh** (major improvement)
+- Warm: **No perceptible change** (already fast)
+
+## Future Enhancements
+
+If "instant save" UX is desired in the future, implement **Approach B (Optimistic Updates)**:
+
+1. Add sync state tracking to Activity model
+2. Add optimistic cache update before CloudKit save
+3. Add rollback logic for failed saves
+4. Add UI indicators for sync status (syncing/synced/failed)
+5. Add retry capability
+
+This would provide instant feedback even on cold start, at the cost of ~120 lines of additional code.
