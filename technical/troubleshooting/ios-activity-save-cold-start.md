@@ -252,7 +252,28 @@ The `refreshImmediately()` method uses the same infrastructure, so there's no ri
    - Updated `createActivity()` with same pattern for shared carees
    - Changed from `refreshPublishedProperties()` to `refreshImmediately()`
 
-### Testing Recommendations
+### Unit Tests
+
+Comprehensive unit tests verify the fix:
+
+**File:** `CareKeeperTests/LocalCacheServiceTests.swift`
+
+**Test Coverage:**
+- `testRefreshImmediatelyUpdatesPublishedProperties` - verifies immediate refresh updates state
+- `testRefreshImmediatelyDoesNotDebounce` - verifies no 0.25s delay (completes in <200ms)
+- `testCacheCareeWhenMissing` - verifies missing caree handling
+- `testCacheActivityTypeWhenMissing` - verifies missing activity type handling
+- `testCacheActivityWhenParentsPresent` - verifies activity caching
+- `testScheduledRefreshHasDebounce` - verifies normal refresh still debounces
+- `testImmediateRefreshBypassesDebounce` - verifies immediate refresh bypasses debounce
+- `testColdStartScenario` - integration test for full cold start flow
+
+**Run Tests:**
+```bash
+xcodebuild test -scheme CareKeeper -destination 'platform=iOS Simulator,name=iPhone 15'
+```
+
+### Manual Testing Recommendations
 
 1. **Cold start test:**
    - Force quit app
