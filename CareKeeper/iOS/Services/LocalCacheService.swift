@@ -29,6 +29,11 @@ class LocalCacheService: ObservableObject {
     // Batching state
     private var batchDepth: Int = 0
 
+    // Background refresh preservation state
+    private var isBackgroundRefreshing = false
+    private var pendingLocalActivityIDs: Set<UUID> = []
+    private var pendingLocalActivityTypeIDs: Set<UUID> = []
+
     // MARK: - Initialization
 
     init(
@@ -151,24 +156,42 @@ class LocalCacheService: ObservableObject {
         }
 
         // Remove existing children so we can rebuild authoritative lists.
+        // PRESERVE locally-created records during background refresh
         let incomingActivitiesByID = Dictionary(uniqueKeysWithValues: activities.map { ($0.id, $0) })
+        var preservedActivities: [Activity] = []
+        var preservedActivityTypes: [ActivityType] = []
+
         if let existingActivities = managedCaree.activities {
             for activity in existingActivities {
-                if let previousIdentifier = activity.reminderIdentifier,
-                   incomingActivitiesByID[activity.id]?.reminderIdentifier == nil
-                {
-                    ReminderScheduler.shared.deleteReminder(with: previousIdentifier)
+                if pendingLocalActivityIDs.contains(activity.id) {
+                    // Preserve this activity - was created locally during background refresh
+                    preservedActivities.append(activity)
+                    logger.info("💾 Preserved local activity from background refresh deletion: \(activity.id)")
+                } else {
+                    // Safe to delete - came from CloudKit
+                    if let previousIdentifier = activity.reminderIdentifier,
+                       incomingActivitiesByID[activity.id]?.reminderIdentifier == nil
+                    {
+                        ReminderScheduler.shared.deleteReminder(with: previousIdentifier)
+                    }
+                    modelContext.delete(activity)
                 }
             }
-            for activity in existingActivities {
-                modelContext.delete(activity)
-            }
         }
+
         if let existingTypes = managedCaree.activityTypes {
             for type in existingTypes {
-                modelContext.delete(type)
+                if pendingLocalActivityTypeIDs.contains(type.id) {
+                    // Preserve this activity type - was created locally during background refresh
+                    preservedActivityTypes.append(type)
+                    logger.info("💾 Preserved local activity type from background refresh deletion: \(type.name)")
+                } else {
+                    // Safe to delete - came from CloudKit
+                    modelContext.delete(type)
+                }
             }
         }
+
         managedCaree.activityTypes = []
         managedCaree.activities = []
 
@@ -227,10 +250,20 @@ class LocalCacheService: ObservableObject {
             managedActivities.append(newActivity)
         }
 
+        // Merge preserved local records with CloudKit records
+        // Add preserved activity types to the managed list
+        managedCaree.activityTypes = (managedTypeList + preservedActivityTypes).sorted { $0.listOrder < $1.listOrder }
+
+        // Merge preserved activities with CloudKit activities
+        let allActivities = managedActivities + preservedActivities
+
         // Ensure caree and types have activities sorted by recency.
-        managedCaree.activities = managedActivities.sorted { $0.dateTime > $1.dateTime }
-        for type in managedTypeList {
-            type.activities = (type.activities ?? []).sorted { $0.dateTime > $1.dateTime }
+        managedCaree.activities = allActivities.sorted { $0.dateTime > $1.dateTime }
+
+        // Update each activity type's activities list
+        for type in managedCaree.activityTypes ?? [] {
+            type.activities = allActivities.filter { $0.activityType?.id == type.id }
+                .sorted { $0.dateTime > $1.dateTime }
         }
 
         try modelContext.save()
@@ -289,6 +322,13 @@ class LocalCacheService: ObservableObject {
         }
 
         try modelContext.save()
+
+        // Track if created during background refresh to preserve from deletion
+        if isBackgroundRefreshing {
+            pendingLocalActivityTypeIDs.insert(activityType.id)
+            logger.info("📍 Tracked activity type during background refresh: \(activityType.name)")
+        }
+
         scheduleRefresh(reason: "cacheActivityType")
     }
 
@@ -361,6 +401,13 @@ class LocalCacheService: ObservableObject {
         }
 
         try modelContext.save()
+
+        // Track if created during background refresh to preserve from deletion
+        if isBackgroundRefreshing {
+            pendingLocalActivityIDs.insert(activity.id)
+            logger.info("📍 Tracked activity during background refresh: \(activity.id)")
+        }
+
         scheduleRefresh(reason: "cacheActivity")
     }
 
@@ -683,6 +730,29 @@ class LocalCacheService: ObservableObject {
         beginBatch()
         defer { endBatch() }
         return try await operation()
+    }
+
+    // MARK: - Background Refresh Tracking
+
+    /// Begin tracking local changes during background refresh
+    /// Preserves locally-created records that haven't been fetched from CloudKit yet
+    func beginBackgroundRefresh() {
+        isBackgroundRefreshing = true
+        pendingLocalActivityIDs.removeAll()
+        pendingLocalActivityTypeIDs.removeAll()
+        logger.info("🔄 Begin background refresh - tracking local changes")
+    }
+
+    /// End background refresh tracking and clear preserved IDs
+    func endBackgroundRefresh() {
+        let activityCount = pendingLocalActivityIDs.count
+        let typeCount = pendingLocalActivityTypeIDs.count
+
+        isBackgroundRefreshing = false
+        pendingLocalActivityIDs.removeAll()
+        pendingLocalActivityTypeIDs.removeAll()
+
+        logger.info("✅ End background refresh - preserved \(activityCount) activities, \(typeCount) activity types")
     }
 
     private func attachActivityType(_ activityType: ActivityType, to caree: Caree) {

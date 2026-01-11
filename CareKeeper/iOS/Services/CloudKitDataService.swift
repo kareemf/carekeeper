@@ -1102,6 +1102,12 @@ class CloudKitDataService: ObservableObject {
             logger.warning("⚠️ Failed to fetch reminder metadata for owned carees: \(error.localizedDescription)")
         }
 
+        // Begin tracking local changes to preserve them from deletion during background refresh
+        cacheService.beginBackgroundRefresh()
+        defer {
+            cacheService.endBackgroundRefresh()
+        }
+
         // Perform cache mutations in a single coalesced batch to avoid per-write refreshes.
         await cacheService.withBatch {
             // Remove owned carees from cache that no longer exist remotely

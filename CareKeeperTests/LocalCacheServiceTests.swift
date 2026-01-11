@@ -281,4 +281,198 @@ final class LocalCacheServiceTests: XCTestCase {
         XCTAssertEqual(finalCaree.activityTypes?.count, 1, "Should have 1 activity type")
         XCTAssertEqual(finalCaree.activities?.count, 1, "Should have 1 activity")
     }
+
+    // MARK: - Background Refresh Preservation Tests
+
+    func testBackgroundRefreshPreservesLocalActivity() async throws {
+        // Simulates the race condition: background refresh completes while user is creating an activity
+
+        // Given: A caree already in cache (from an earlier refresh)
+        let caree = Caree(name: "Test Caree", listOrder: 0)
+        caree.isOwned = true
+        modelContext.insert(caree)
+
+        let activityType = ActivityType(name: "Feeding", icon: "🍼", caree: caree, listOrder: 0)
+        modelContext.insert(activityType)
+
+        try modelContext.save()
+
+        try await cacheService.cacheCaree(caree, isShared: false)
+        await cacheService.refreshImmediately(reason: "setup")
+
+        guard let cachedCaree = cacheService.getCachedCaree(id: caree.id) else {
+            XCTFail("Caree should be in cache")
+            return
+        }
+
+        // When: Background refresh starts
+        cacheService.beginBackgroundRefresh()
+
+        // And: User creates an activity during the refresh
+        let localActivity = Activity(dateTime: Date(), notes: "User created during refresh")
+        try await cacheService.cacheActivity(localActivity, for: cachedCaree, activityTypeID: activityType.id)
+        await cacheService.refreshImmediately(reason: "createActivity")
+
+        // And: Background refresh completes with stale CloudKit data (empty activities list)
+        try await cacheService.replaceCaree(
+            caree,
+            activityTypes: [activityType],
+            activities: [], // Empty - represents stale CloudKit snapshot
+            activityTypeIDsByActivity: [:]
+        )
+        cacheService.endBackgroundRefresh()
+
+        await cacheService.refreshImmediately(reason: "backgroundRefreshComplete")
+
+        // Then: The locally-created activity should still be in cache
+        let finalCaree = cacheService.getCachedCaree(id: caree.id)
+        XCTAssertNotNil(finalCaree, "Caree should still be in cache")
+        XCTAssertEqual(finalCaree?.activities?.count, 1, "Should preserve local activity")
+        XCTAssertEqual(finalCaree?.activities?.first?.notes, "User created during refresh")
+    }
+
+    func testBackgroundRefreshPreservesLocalActivityType() async throws {
+        // Given: A caree already in cache
+        let caree = Caree(name: "Test Caree", listOrder: 0)
+        caree.isOwned = true
+        modelContext.insert(caree)
+        try modelContext.save()
+
+        try await cacheService.cacheCaree(caree, isShared: false)
+        await cacheService.refreshImmediately(reason: "setup")
+
+        guard let cachedCaree = cacheService.getCachedCaree(id: caree.id) else {
+            XCTFail("Caree should be in cache")
+            return
+        }
+
+        // When: Background refresh starts
+        cacheService.beginBackgroundRefresh()
+
+        // And: User creates an activity type during the refresh
+        let localActivityType = ActivityType(name: "Sleep", icon: "😴", listOrder: 0)
+        try await cacheService.cacheActivityType(localActivityType, for: cachedCaree)
+        await cacheService.refreshImmediately(reason: "createActivityType")
+
+        // And: Background refresh completes with stale CloudKit data (empty activity types)
+        try await cacheService.replaceCaree(
+            caree,
+            activityTypes: [], // Empty - represents stale CloudKit snapshot
+            activities: [],
+            activityTypeIDsByActivity: [:]
+        )
+        cacheService.endBackgroundRefresh()
+
+        await cacheService.refreshImmediately(reason: "backgroundRefreshComplete")
+
+        // Then: The locally-created activity type should still be in cache
+        let finalCaree = cacheService.getCachedCaree(id: caree.id)
+        XCTAssertNotNil(finalCaree, "Caree should still be in cache")
+        XCTAssertEqual(finalCaree?.activityTypes?.count, 1, "Should preserve local activity type")
+        XCTAssertEqual(finalCaree?.activityTypes?.first?.name, "Sleep")
+    }
+
+    func testBackgroundRefreshMergesCloudKitAndLocalRecords() async throws {
+        // Given: A caree with an existing activity type in cache
+        let caree = Caree(name: "Test Caree", listOrder: 0)
+        caree.isOwned = true
+        modelContext.insert(caree)
+
+        let cloudActivityType = ActivityType(name: "Feeding", icon: "🍼", caree: caree, listOrder: 0)
+        modelContext.insert(cloudActivityType)
+
+        let cloudActivity = Activity(dateTime: Date().addingTimeInterval(-3600), notes: "From CloudKit")
+        cloudActivity.activityType = cloudActivityType
+        cloudActivity.caree = caree
+        modelContext.insert(cloudActivity)
+
+        try modelContext.save()
+
+        try await cacheService.cacheCaree(caree, isShared: false)
+        await cacheService.refreshImmediately(reason: "setup")
+
+        guard let cachedCaree = cacheService.getCachedCaree(id: caree.id) else {
+            XCTFail("Caree should be in cache")
+            return
+        }
+
+        // When: Background refresh starts
+        cacheService.beginBackgroundRefresh()
+
+        // And: User creates a new activity during the refresh
+        let localActivity = Activity(dateTime: Date(), notes: "Created locally")
+        try await cacheService.cacheActivity(localActivity, for: cachedCaree, activityTypeID: cloudActivityType.id)
+        await cacheService.refreshImmediately(reason: "createActivity")
+
+        // And: Background refresh completes with CloudKit data (only has the old activity)
+        try await cacheService.replaceCaree(
+            caree,
+            activityTypes: [cloudActivityType],
+            activities: [cloudActivity], // Only the old activity from CloudKit
+            activityTypeIDsByActivity: [cloudActivity.id: cloudActivityType.id]
+        )
+        cacheService.endBackgroundRefresh()
+
+        await cacheService.refreshImmediately(reason: "backgroundRefreshComplete")
+
+        // Then: Both activities should be in cache (merged)
+        let finalCaree = cacheService.getCachedCaree(id: caree.id)
+        XCTAssertNotNil(finalCaree, "Caree should still be in cache")
+        XCTAssertEqual(finalCaree?.activities?.count, 2, "Should have both CloudKit and local activities")
+
+        let activityNotes = Set(finalCaree?.activities?.compactMap { $0.notes } ?? [])
+        XCTAssertTrue(activityNotes.contains("From CloudKit"), "Should have CloudKit activity")
+        XCTAssertTrue(activityNotes.contains("Created locally"), "Should have local activity")
+    }
+
+    func testBackgroundRefreshWithoutLocalChanges() async throws {
+        // Verifies normal background refresh behavior when no local changes are made
+
+        // Given: A caree with activities in cache
+        let caree = Caree(name: "Test Caree", listOrder: 0)
+        caree.isOwned = true
+        modelContext.insert(caree)
+
+        let activityType = ActivityType(name: "Feeding", icon: "🍼", caree: caree, listOrder: 0)
+        modelContext.insert(activityType)
+
+        let oldActivity = Activity(dateTime: Date().addingTimeInterval(-3600), notes: "Old")
+        oldActivity.activityType = activityType
+        oldActivity.caree = caree
+        modelContext.insert(oldActivity)
+
+        try modelContext.save()
+
+        try await cacheService.cacheCaree(caree, isShared: false)
+        await cacheService.refreshImmediately(reason: "setup")
+
+        // When: Background refresh runs without any local changes
+        cacheService.beginBackgroundRefresh()
+
+        let newActivity = Activity(dateTime: Date(), notes: "New from CloudKit")
+        newActivity.activityType = activityType
+        newActivity.caree = caree
+
+        try await cacheService.replaceCaree(
+            caree,
+            activityTypes: [activityType],
+            activities: [oldActivity, newActivity], // Updated list from CloudKit
+            activityTypeIDsByActivity: [
+                oldActivity.id: activityType.id,
+                newActivity.id: activityType.id
+            ]
+        )
+        cacheService.endBackgroundRefresh()
+
+        await cacheService.refreshImmediately(reason: "backgroundRefreshComplete")
+
+        // Then: Cache should reflect CloudKit data (no local changes to preserve)
+        let finalCaree = cacheService.getCachedCaree(id: caree.id)
+        XCTAssertNotNil(finalCaree, "Caree should be in cache")
+        XCTAssertEqual(finalCaree?.activities?.count, 2, "Should have both activities from CloudKit")
+
+        let activityNotes = Set(finalCaree?.activities?.compactMap { $0.notes } ?? [])
+        XCTAssertTrue(activityNotes.contains("Old"), "Should have old activity")
+        XCTAssertTrue(activityNotes.contains("New from CloudKit"), "Should have new activity from CloudKit")
+    }
 }

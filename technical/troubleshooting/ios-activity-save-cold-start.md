@@ -294,7 +294,7 @@ xcodebuild test -scheme CareKeeper -destination 'platform=iOS Simulator,name=iPh
    - Try to track activity
    - Verify appropriate error handling
 
-## Performance Impact
+## Performance Impact (Fix #1)
 
 **Code complexity:** Low (~50 lines total across 3 files)
 **Risk level:** Low (uses existing infrastructure)
@@ -304,6 +304,238 @@ xcodebuild test -scheme CareKeeper -destination 'platform=iOS Simulator,name=iPh
 **UX improvement:**
 - Cold start: **Eliminates need for manual refresh** (major improvement)
 - Warm: **No perceptible change** (already fast)
+
+---
+
+# Issue #2: Activity Appears Then Disappears (Background Refresh Race)
+
+## Problem Statement (Discovered After Fix #1)
+
+After implementing Fix #1, a new issue was discovered:
+
+1. **Activity appears immediately** after save (Fix #1 working) ✅
+2. **Activity disappears** seconds later ❌
+3. **Activity reappears** after manual pull-to-refresh ✅
+
+This suggests the activity is being deleted from cache after being added.
+
+## Root Cause Analysis
+
+### The Race Condition
+
+**Timeline:**
+```
+t=0s:  App launches
+       refreshOwnedCareesFromCloudKit() starts
+       ↓ Fetches CloudKit snapshot (no new activity yet)
+
+t=2s:  User saves activity
+       ↓ CloudKit save succeeds ✅
+       ↓ Cache locally ✅
+       ↓ refreshImmediately() ✅
+       ↓ Activity appears in UI ✅
+
+t=3s:  Background refresh completes with STALE snapshot from t=0s
+       ↓ replaceCaree() deletes ALL existing activities
+       ↓ Recreates only activities from t=0s snapshot
+       ❌ New activity is deleted (wasn't in snapshot)
+
+t=10s: User pulls to refresh
+       ↓ Fresh CloudKit fetch (now includes new activity)
+       ✅ Activity reappears
+```
+
+### The Smoking Gun: `replaceCaree()`
+
+**File:** `LocalCacheService.swift:158-178` (before fix)
+
+```swift
+func replaceCaree(...) async throws {
+    // Remove existing children so we can rebuild authoritative lists.
+    if let existingActivities = managedCaree.activities {
+        for activity in existingActivities {
+            modelContext.delete(activity)  // ⚠️ DELETES EVERYTHING!
+        }
+    }
+
+    // Recreate activities from provided list
+    for activity in activities {
+        // ... recreate from OLD CloudKit snapshot
+    }
+}
+```
+
+This method **wipes out** any activities not in the provided list, including freshly-created ones!
+
+## Solution: Track and Preserve Local Changes During Background Refresh
+
+**Approach:** Track activities and activity types created locally while background refresh is running, then preserve them from deletion.
+
+### Implementation
+
+#### 1. Add Tracking State to LocalCacheService
+
+**File:** `LocalCacheService.swift`
+
+```swift
+// Background refresh preservation state
+private var isBackgroundRefreshing = false
+private var pendingLocalActivityIDs: Set<UUID> = []
+private var pendingLocalActivityTypeIDs: Set<UUID> = []
+
+/// Begin tracking local changes during background refresh
+func beginBackgroundRefresh() {
+    isBackgroundRefreshing = true
+    pendingLocalActivityIDs.removeAll()
+    pendingLocalActivityTypeIDs.removeAll()
+}
+
+/// End background refresh tracking and clear preserved IDs
+func endBackgroundRefresh() {
+    isBackgroundRefreshing = false
+    pendingLocalActivityIDs.removeAll()
+    pendingLocalActivityTypeIDs.removeAll()
+}
+```
+
+#### 2. Track Local Changes in `cacheActivity()` and `cacheActivityType()`
+
+```swift
+func cacheActivity(...) async throws {
+    // ... existing code ...
+
+    // Track if created during background refresh
+    if isBackgroundRefreshing {
+        pendingLocalActivityIDs.insert(activity.id)
+        logger.info("📍 Tracked activity during background refresh")
+    }
+}
+
+func cacheActivityType(...) async throws {
+    // ... existing code ...
+
+    // Track if created during background refresh
+    if isBackgroundRefreshing {
+        pendingLocalActivityTypeIDs.insert(activityType.id)
+        logger.info("📍 Tracked activity type during background refresh")
+    }
+}
+```
+
+#### 3. Preserve Tracked Records in `replaceCaree()`
+
+```swift
+func replaceCaree(...) async throws {
+    // ...
+
+    var preservedActivities: [Activity] = []
+    var preservedActivityTypes: [ActivityType] = []
+
+    if let existingActivities = managedCaree.activities {
+        for activity in existingActivities {
+            if pendingLocalActivityIDs.contains(activity.id) {
+                // Preserve - created locally during background refresh
+                preservedActivities.append(activity)
+            } else {
+                // Safe to delete - came from CloudKit
+                modelContext.delete(activity)
+            }
+        }
+    }
+
+    // Similar logic for activity types...
+
+    // Merge preserved local records with CloudKit records
+    let allActivities = managedActivities + preservedActivities
+    managedCaree.activities = allActivities.sorted { $0.dateTime > $1.dateTime }
+}
+```
+
+#### 4. Wrap Background Refresh with Tracking
+
+**File:** `CloudKitDataService.swift` (refreshOwnedCareesFromCloudKit method)
+
+```swift
+func refreshOwnedCareesFromCloudKit() async throws {
+    // ... fetch from CloudKit ...
+
+    // Begin tracking local changes
+    cacheService.beginBackgroundRefresh()
+    defer {
+        cacheService.endBackgroundRefresh()
+    }
+
+    await cacheService.withBatch {
+        // ... replaceCaree() calls ...
+    }
+}
+```
+
+### Benefits
+
+✅ **Preserves locally-created records** - activities and activity types created during refresh aren't deleted
+✅ **Still syncs remote changes** - watch and share participant data comes through
+✅ **Efficient** - single network call, no restarts
+✅ **Handles edge cases** - multiple concurrent local changes tracked in sets
+✅ **No CloudKit eventual consistency issues** - preserves local version regardless of CloudKit replication timing
+
+### Unit Tests
+
+**File:** `CareKeeperTests/LocalCacheServiceTests.swift`
+
+Additional test coverage:
+- `testBackgroundRefreshPreservesLocalActivity` - verifies local activity preserved during background refresh
+- `testBackgroundRefreshPreservesLocalActivityType` - verifies local activity type preserved
+- `testBackgroundRefreshMergesCloudKitAndLocalRecords` - verifies merge of CloudKit + local records
+- `testBackgroundRefreshWithoutLocalChanges` - verifies normal refresh when no local changes
+
+### Files Modified
+
+1. `CareKeeper/iOS/Services/LocalCacheService.swift`
+   - Added background refresh tracking state
+   - Added `beginBackgroundRefresh()` / `endBackgroundRefresh()` methods
+   - Updated `cacheActivity()` to track during background refresh
+   - Updated `cacheActivityType()` to track during background refresh
+   - Updated `replaceCaree()` to preserve tracked records
+
+2. `CareKeeper/iOS/Services/CloudKitDataService.swift`
+   - Updated `refreshOwnedCareesFromCloudKit()` to use tracking
+
+3. `CareKeeperTests/LocalCacheServiceTests.swift`
+   - Added 4 unit tests for background refresh preservation
+
+## Alternative Approaches Considered
+
+### Option A: Cancel and Restart Background Refresh
+
+**Concept:** When user creates activity, cancel background refresh and start new one.
+
+**Rejected because:**
+- ❌ CloudKit eventual consistency - new refresh might fetch BEFORE activity is replicated (~1-2s lag)
+- ❌ Wastes bandwidth (re-fetches everything)
+- ❌ Could create loop if user is very active
+- ❌ Delays sync of watch/share participant changes
+
+### Option B: Track and Preserve (Selected)
+
+**Why selected:**
+- ✅ No CloudKit race condition - preserves local version regardless
+- ✅ Efficient - one network call
+- ✅ Background refresh still completes (syncs remote changes)
+- ✅ Robust - handles edge cases
+- ✅ Predictable behavior
+
+## Performance Impact (Fix #2)
+
+**Code complexity:** Medium (~80 lines across 3 files)
+**Risk level:** Low (surgical changes to existing flow)
+**Memory impact:** Minimal (two small Sets during background refresh only)
+**CPU impact:** Negligible (Set lookups are O(1))
+
+**UX improvement:**
+- Activities stay visible after creation (no disappearing act)
+- Still syncs updates from watch/share participants
+- No user-facing changes to refresh behavior
 
 ## Future Enhancements
 
