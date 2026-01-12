@@ -41,6 +41,7 @@ class CloudKitDataService: ObservableObject {
 
     @Published private(set) var cacheService: LocalCacheService?
     private(set) var sharedDataService: CloudKitSharedDataService?
+    private var pendingActivityBuffer: PendingActivityBuffer?
 
     // MARK: - Initialization
 
@@ -97,6 +98,11 @@ class CloudKitDataService: ObservableObject {
         logger.info("Shared data service integrated with CloudKitDataService")
     }
 
+    func setPendingActivityBuffer(_ pendingActivityBuffer: PendingActivityBuffer) {
+        self.pendingActivityBuffer = pendingActivityBuffer
+        logger.info("Pending activity buffer integrated with CloudKitDataService")
+    }
+
     // MARK: - Sync Status
 
     enum SyncStatus {
@@ -141,6 +147,9 @@ class CloudKitDataService: ObservableObject {
 
     /// Ensure the custom zone exists in the private database
     private func ensureCustomZoneExists() async throws {
+        var pendingActivityID: UUID?
+        var didSaveToCloudKit = false
+
         do {
             let zones = try await container.privateCloudDatabase.allRecordZones()
             if zones.contains(where: { $0.zoneID == self.zoneID }) {
@@ -478,6 +487,8 @@ class CloudKitDataService: ObservableObject {
 
             // Save to CloudKit
             let savedRecord = try await saveWithRetry(record, to: db)
+            didSaveToCloudKit = true
+            didSaveToCloudKit = true
 
             // Verify sync
             let verified = try await verifySynced(recordID: savedRecord.recordID, in: db)
@@ -629,21 +640,34 @@ class CloudKitDataService: ObservableObject {
             }
             let db = database(for: isShared)
 
+            let activity = Activity(
+                dateTime: dateTime,
+                notes: notes,
+                quantity: quantity,
+                latitude: latitude,
+                longitude: longitude,
+                activityType: activityType,
+                caree: caree
+            )
+            pendingActivityID = activity.id
+
+            if let pendingActivityBuffer {
+                let mutation = PendingActivityBuffer.PendingActivityMutation(
+                    id: activity.id,
+                    careeID: caree.id,
+                    activityTypeID: activityType.id,
+                    activity: activity,
+                    createdAt: Date()
+                )
+                pendingActivityBuffer.enqueue(mutation)
+            }
+
             // Fetch parent records
             let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(caree.id.uuidString)", zoneID: zoneID)
             let careeRecord = try await fetchWithRetry(recordID: careeRecordID, from: db)
 
             let activityTypeRecordID = CKRecord.ID(recordName: "CD_ActivityType/\(activityType.id.uuidString)", zoneID: zoneID)
             let activityTypeRecord = try await fetchWithRetry(recordID: activityTypeRecordID, from: db)
-
-            // Create domain model
-            let activity = Activity(
-                dateTime: dateTime,
-                notes: notes,
-                quantity: quantity,
-                latitude: latitude,
-                longitude: longitude
-            )
 
             // Convert to CKRecord with parent references in custom zone
             let record = try converter.activityToRecord(
@@ -669,10 +693,10 @@ class CloudKitDataService: ObservableObject {
             if let cacheService,
                let cachedCaree = cacheService.getCachedCaree(id: caree.id)
             {
-                // Find cached activity type
                 let cachedActivityTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
                 if let cachedActivityType = cachedActivityTypes.first(where: { $0.id == activityType.id }) {
                     try await cacheService.cacheActivity(syncedActivity, for: cachedCaree, activityTypeID: cachedActivityType.id)
+                    pendingActivityBuffer?.remove(activityID: syncedActivity.id, careeID: caree.id)
                     logger.info("✅ Activity cached locally")
                 }
             }
@@ -682,6 +706,9 @@ class CloudKitDataService: ObservableObject {
             return syncedActivity
 
         } catch {
+            if let pendingActivityID, !didSaveToCloudKit {
+                pendingActivityBuffer?.remove(activityID: pendingActivityID, careeID: caree.id)
+            }
             logger.error("❌ Failed to create Activity: \(error.localizedDescription)")
             syncStatus = .failed(error)
             throw error
@@ -941,6 +968,8 @@ class CloudKitDataService: ObservableObject {
         } else {
             try await deleteActivity(activity, isShared: false)
         }
+
+        pendingActivityBuffer?.remove(activityID: activity.id, careeID: caree.id)
     }
 
     // MARK: - Reactive owned refresh (private DB)
@@ -1120,9 +1149,44 @@ class CloudKitDataService: ObservableObject {
             }
         }
 
+        await applyPendingActivityMutations()
+
         // No explicit refreshPublishedProperties call needed; the batch coalesces a single refresh.
         NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
         logger.info("✅ Owned records refreshed and cache updated")
+    }
+
+    @MainActor
+    private func applyPendingActivityMutations() async {
+        guard let pendingActivityBuffer, let cacheService else { return }
+
+        let pendingCareeIDs = pendingActivityBuffer.pendingCareeIDs
+        guard !pendingCareeIDs.isEmpty else { return }
+
+        for careeID in pendingCareeIDs {
+            guard let cachedCaree = cacheService.getCachedCaree(id: careeID) else { continue }
+            let cachedTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
+            let typeByID = Dictionary(uniqueKeysWithValues: cachedTypes.map { ($0.id, $0) })
+            let mutations = pendingActivityBuffer.pendingMutations(for: careeID)
+
+            if mutations.isEmpty { continue }
+
+            await cacheService.withBatch {
+                for mutation in mutations {
+                    guard let cachedType = typeByID[mutation.activityTypeID] else { continue }
+                    do {
+                        try await cacheService.cacheActivity(
+                            mutation.activity,
+                            for: cachedCaree,
+                            activityTypeID: cachedType.id
+                        )
+                        pendingActivityBuffer.remove(activityID: mutation.id, careeID: careeID)
+                    } catch {
+                        logger.warning("⚠️ Failed to cache pending activity \(mutation.id): \(error.localizedDescription)")
+                    }
+                }
+            }
+        }
     }
 
     private func fetchAllRecords(

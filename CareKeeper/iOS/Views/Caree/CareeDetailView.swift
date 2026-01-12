@@ -10,6 +10,7 @@ struct CareeDetailView: View {
     // Use services from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
     @EnvironmentObject private var sharedRecordsService: CloudKitSharedRecordsService
+    @EnvironmentObject private var pendingActivityBuffer: PendingActivityBuffer
 
     private let logger = AppLogger.cloudkit
 
@@ -90,12 +91,13 @@ struct CareeDetailView: View {
                     // Only show recent activities section if activity types exist
                     if !caree.sortedActivityTypes.isEmpty {
                         Section(header: recentActivitiesSectionHeader(for: caree)) {
-                            if caree.recentActivities.isEmpty {
+                            let recentActivities = mergedRecentActivities(for: caree)
+                            if recentActivities.isEmpty {
                                 emptyActivitiesView
                                     .listRowBackground(Color.clear)
                                     .listRowSeparator(.hidden)
                             } else {
-                                ForEach(Array(caree.recentActivities.prefix(5))) { activity in
+                                ForEach(Array(recentActivities.prefix(5))) { activity in
                                     ActivityRowView(activity: activity)
                                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                             Button(role: .destructive) {
@@ -329,6 +331,15 @@ struct CareeDetailView: View {
                 }
             }
         }
+        .onReceive(cacheService?.$cacheRevision.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()) { _ in
+            if let current = resolvedCaree, !current.isShared {
+                resolvedCaree = resolveCareeFromCache()
+                if let caree = resolvedCaree {
+                    Task { await loadCounts(for: caree) }
+                }
+                refreshID = UUID()
+            }
+        }
         // REACTIVE: Listen for shared caree data updates (immediate notification)
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SharedCareeDataUpdated"))) { notification in
             // Check if this notification is for our caree
@@ -435,7 +446,7 @@ struct CareeDetailView: View {
                 .foregroundColor(.secondary)
 
                 Text(NSLocalizedString(
-                    "\(activityCount ?? 0) Activities",
+                    "\(displayActivityCount(for: caree)) Activities",
                     comment: "Total activities count"
                 ))
                 .font(.subheadline)
@@ -695,6 +706,30 @@ struct CareeDetailView: View {
                 showingPermissionAlert = true
             }
         }
+    }
+
+    private func mergedRecentActivities(for caree: Caree) -> [Activity] {
+        let pending = pendingActivityBuffer.pendingActivities(for: caree.id)
+        guard !pending.isEmpty else { return caree.recentActivities }
+
+        var seen = Set(caree.recentActivities.map(\.id))
+        var merged = caree.recentActivities
+        for activity in pending where !seen.contains(activity.id) {
+            merged.append(activity)
+            seen.insert(activity.id)
+        }
+        merged.sort { lhs, rhs in
+            if lhs.dateTime == rhs.dateTime {
+                return lhs.id.uuidString > rhs.id.uuidString
+            }
+            return lhs.dateTime > rhs.dateTime
+        }
+        return merged
+    }
+
+    private func displayActivityCount(for caree: Caree) -> Int {
+        let pendingCount = pendingActivityBuffer.pendingActivities(for: caree.id).count
+        return (activityCount ?? 0) + pendingCount
     }
 
     @MainActor

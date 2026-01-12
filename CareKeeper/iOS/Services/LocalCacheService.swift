@@ -12,6 +12,7 @@ class LocalCacheService: ObservableObject {
     @Published var sharedCarees: [Caree] = []
     @Published var isLoading = false
     @Published var syncError: Error?
+    @Published var cacheRevision: Int = 0
 
     // MARK: - Private Properties
 
@@ -455,6 +456,8 @@ class LocalCacheService: ObservableObject {
             pendingRefresh = true
             return
         }
+
+        cacheRevision &+= 1
 
         // Cancel any scheduled-but-not-started refresh task.
         refreshTask?.cancel()

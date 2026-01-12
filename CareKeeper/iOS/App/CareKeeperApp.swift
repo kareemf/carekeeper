@@ -13,6 +13,7 @@ struct CareKeeperApp: App {
     @StateObject private var sharedDataService = CloudKitSharedDataService()
     @StateObject private var cloudKitService = CloudKitDataService()
     @StateObject private var notificationService = CloudKitNotificationService()
+    @StateObject private var pendingActivityBuffer = PendingActivityBuffer()
     @State private var cacheService: LocalCacheService?
     @State private var shareAcceptanceRefresher: ShareAcceptanceRefresher?
     @State private var startupError: Error?
@@ -208,6 +209,7 @@ struct CareKeeperApp: App {
                 .environmentObject(cloudKitService)
                 .environmentObject(sharedRecordsService)
                 .environmentObject(sharedDataService)
+                .environmentObject(pendingActivityBuffer)
                 .task {
                     // Initialize cache service with its own persisted ModelContainer
                     if cacheService == nil {
@@ -221,6 +223,7 @@ struct CareKeeperApp: App {
 
                         // Wire sharedDataService to cloudKitService for unified API
                         cloudKitService.setSharedDataService(sharedDataService)
+                        cloudKitService.setPendingActivityBuffer(pendingActivityBuffer)
 
                         // Wire services to CloudKitSyncMonitor for status tracking
                         CloudKitSyncMonitor.shared.configureServices(

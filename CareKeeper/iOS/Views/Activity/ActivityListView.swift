@@ -10,6 +10,7 @@ struct ActivityListView: View {
     // Use shared services from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
     @EnvironmentObject private var sharedRecordsService: CloudKitSharedRecordsService
+    @EnvironmentObject private var pendingActivityBuffer: PendingActivityBuffer
 
     // Get cache service from shared CloudKitDataService
     private var cacheService: LocalCacheService? {
@@ -182,6 +183,11 @@ struct ActivityListView: View {
         .onReceive(sharedRecordsService.$sharedCarees.eraseToAnyPublisher()) { _ in
             updateActivities()
         }
+        .onReceive(cacheService?.$cacheRevision.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()) { _ in
+            Task {
+                await loadInitialPage()
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SharedCareeDataUpdated"))) { notification in
             if let updatedCareeID = notification.object as? UUID, updatedCareeID == careeID {
                 updateActivities()
@@ -251,12 +257,32 @@ struct ActivityListView: View {
     }
 
     private func filteredActivities(for caree: Caree) -> [Activity] {
-        // Use state activities array instead of reading from caree
+        let merged = mergeActivities(base: activities, pending: pendingActivityBuffer.pendingActivities(for: caree.id))
+
         if let selectedType = selectedActivityType {
-            return activities.filter { $0.activityType?.id == selectedType.id }
+            return merged.filter { $0.activityType?.id == selectedType.id }
         }
 
-        return activities
+        return merged
+    }
+
+    private func mergeActivities(base: [Activity], pending: [Activity]) -> [Activity] {
+        guard !pending.isEmpty else { return base }
+
+        var seen = Set(base.map(\.id))
+        var merged = base
+        for activity in pending where !seen.contains(activity.id) {
+            merged.append(activity)
+            seen.insert(activity.id)
+        }
+
+        merged.sort { lhs, rhs in
+            if lhs.dateTime == rhs.dateTime {
+                return lhs.id.uuidString > rhs.id.uuidString
+            }
+            return lhs.dateTime > rhs.dateTime
+        }
+        return merged
     }
 
     private var loadMoreRow: some View {
