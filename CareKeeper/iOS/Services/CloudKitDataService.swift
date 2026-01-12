@@ -1145,7 +1145,10 @@ class CloudKitDataService: ObservableObject {
             // This ensures late-arrival activities (cached after their caree's replaceCaree) are merged
             try await cacheService.endBackgroundRefresh()
 
-            // No explicit refreshPublishedProperties call needed; the batch coalesces a single refresh.
+            // CRITICAL: Immediately refresh published properties to apply finalized state to UI
+            // Don't wait for debounced refresh - finalization just modified arrays, need to publish NOW
+            await cacheService.refreshImmediately(reason: "backgroundRefreshFinalized")
+
             NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
             logger.info("✅ Owned records refreshed and cache updated")
 
