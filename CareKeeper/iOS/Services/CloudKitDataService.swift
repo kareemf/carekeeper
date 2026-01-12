@@ -147,9 +147,6 @@ class CloudKitDataService: ObservableObject {
 
     /// Ensure the custom zone exists in the private database
     private func ensureCustomZoneExists() async throws {
-        var pendingActivityID: UUID?
-        var didSaveToCloudKit = false
-
         do {
             let zones = try await container.privateCloudDatabase.allRecordZones()
             if zones.contains(where: { $0.zoneID == self.zoneID }) {
@@ -487,8 +484,6 @@ class CloudKitDataService: ObservableObject {
 
             // Save to CloudKit
             let savedRecord = try await saveWithRetry(record, to: db)
-            didSaveToCloudKit = true
-            didSaveToCloudKit = true
 
             // Verify sync
             let verified = try await verifySynced(recordID: savedRecord.recordID, in: db)
@@ -633,6 +628,9 @@ class CloudKitDataService: ObservableObject {
         logger.info("Creating Activity for Caree: \(caree.id)")
         syncStatus = .syncing
 
+        var pendingActivityID: UUID?
+        var didSaveToCloudKit = false
+
         do {
             if isShared {
                 throw AppError
@@ -679,6 +677,7 @@ class CloudKitDataService: ObservableObject {
 
             // Save to CloudKit
             let savedRecord = try await saveWithRetry(record, to: db)
+            didSaveToCloudKit = true
 
             // Verify sync
             let verified = try await verifySynced(recordID: savedRecord.recordID, in: db)
@@ -1166,7 +1165,7 @@ class CloudKitDataService: ObservableObject {
         for careeID in pendingCareeIDs {
             guard let cachedCaree = cacheService.getCachedCaree(id: careeID) else { continue }
             let cachedTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
-            let typeByID = Dictionary(uniqueKeysWithValues: cachedTypes.map { ($0.id, $0) })
+            let typeByID: [UUID: ActivityType] = Dictionary(uniqueKeysWithValues: cachedTypes.map { ($0.id, $0) })
             let mutations = pendingActivityBuffer.pendingMutations(for: careeID)
 
             if mutations.isEmpty { continue }
