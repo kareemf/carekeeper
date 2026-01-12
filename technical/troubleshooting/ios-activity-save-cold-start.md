@@ -525,7 +525,7 @@ Additional test coverage:
 - ✅ Robust - handles edge cases
 - ✅ Predictable behavior
 
-## Performance Impact (Fix #2)
+## Performance Impact (Fix #2 Initial)
 
 **Code complexity:** Medium (~80 lines across 3 files)
 **Risk level:** Low (surgical changes to existing flow)
@@ -536,6 +536,214 @@ Additional test coverage:
 - Activities stay visible after creation (no disappearing act)
 - Still syncs updates from watch/share participants
 - No user-facing changes to refresh behavior
+
+---
+
+# Issue #3: Inconsistent Behavior After Fix #2 (Finalization Race)
+
+## Problem Statement (Discovered After Fix #2)
+
+After implementing Fix #2 (background refresh preservation), behavior became inconsistent:
+
+1. **Sometimes:** Activity appears → pops out → pops back in
+2. **Sometimes:** Activity appears → pops out → doesn't come back until manual refresh
+3. **Sometimes:** Activity doesn't appear until manual refresh
+
+This suggests a new race condition between tracking and finalization.
+
+## Root Cause Analysis
+
+### The New Race Condition
+
+**Timeline:**
+```
+t=2s:   cacheActivity(activity1) starts
+        modelContext.insert(activity1)
+
+t=3s:   replaceCaree() runs for this caree
+        ❌ activity1 not in pendingLocalActivityIDs yet (save hasn't completed)
+        ❌ Doesn't preserve activity1
+
+t=3.5s: cacheActivity() completes
+        modelContext.save() ✅
+        pendingLocalActivityIDs.insert(activity1.id) ✅
+        refreshImmediately() ✅
+        Activity appears in UI
+
+t=4s:   endBackgroundRefresh() OLD VERSION
+        isBackgroundRefreshing = false
+        pendingLocalActivityIDs.removeAll() ⚠️ Sets cleared!
+
+t=5s:   Some refresh triggers
+        activity1 gets deleted (not tracked anymore)
+        Activity disappears from UI ❌
+```
+
+### The Core Problem
+
+Two issues:
+
+1. **Tracking happens AFTER save completes** - if `replaceCaree()` runs before `cacheActivity()` saves, the activity isn't preserved
+2. **Sets cleared immediately** - tracked IDs are cleared before ensuring they're actually attached to their carees
+
+## Solution: Finalization Before Clearing
+
+**Approach:** Make `endBackgroundRefresh()` async and finalize tracked records before clearing the sets.
+
+### Implementation
+
+#### 1. Make `endBackgroundRefresh()` Async with Finalization
+
+**File:** `LocalCacheService.swift`
+
+```swift
+/// End background refresh: finalize tracked records, then clear tracking state
+/// CRITICAL: This must be called to ensure tracked records are merged before clearing
+func endBackgroundRefresh() async throws {
+    // CRITICAL: Ensure all tracked records are attached to their carees
+    // This handles "late arrivals" - records cached after their caree's replaceCaree() ran
+    try await finalizeTrackedRecords()
+
+    // Now safe to clear and mark as done
+    isBackgroundRefreshing = false
+    pendingLocalActivityIDs.removeAll()
+    pendingLocalActivityTypeIDs.removeAll()
+}
+```
+
+#### 2. Implement Finalization Logic
+
+```swift
+private func finalizeTrackedRecords() async throws {
+    // For each tracked activity, ensure it's in its caree's activities list
+    for activityID in pendingLocalActivityIDs {
+        guard let activity = try modelContext.fetch(...).first else { continue }
+        guard let caree = activity.caree else { continue }
+
+        // Ensure activity is in caree's activities list
+        var careeActivities = caree.activities ?? []
+        if !careeActivities.contains(where: { $0.id == activityID }) {
+            careeActivities.append(activity)
+            careeActivities.sort { $0.dateTime > $1.dateTime }
+            caree.activities = careeActivities
+        }
+
+        // Ensure activity is in its activity type's activities list
+        if let activityType = activity.activityType {
+            var typeActivities = activityType.activities ?? []
+            if !typeActivities.contains(where: { $0.id == activityID }) {
+                typeActivities.append(activity)
+                typeActivities.sort { $0.dateTime > $1.dateTime }
+                activityType.activities = typeActivities
+            }
+        }
+    }
+
+    // Similar logic for activity types...
+
+    // Save finalization changes
+    if !pendingLocalActivityIDs.isEmpty || !pendingLocalActivityTypeIDs.isEmpty {
+        try modelContext.save()
+    }
+}
+```
+
+#### 3. Update Call Site to Await
+
+**File:** `CloudKitDataService.swift`
+
+```swift
+func refreshOwnedCareesFromCloudKit() async throws {
+    // ... fetch from CloudKit ...
+
+    cacheService.beginBackgroundRefresh()
+
+    do {
+        await cacheService.withBatch {
+            // ... replaceCaree() calls ...
+        }
+
+        // CRITICAL: Finalize tracked records before clearing
+        try await cacheService.endBackgroundRefresh()
+
+    } catch {
+        // Ensure cleanup even on error
+        try? await cacheService.endBackgroundRefresh()
+        throw error
+    }
+}
+```
+
+### How Finalization Works
+
+**The finalization step ensures:**
+
+1. **All tracked activities are in their caree's activities array** - even if tracked after `replaceCaree()` ran
+2. **All tracked activities are in their activity type's activities array** - maintains bidirectional relationships
+3. **All tracked activity types are in their caree's activityTypes array** - same for types
+4. **Changes are saved** - persists the finalized state
+
+**Handles these cases:**
+
+- ✅ Activity tracked BEFORE `replaceCaree()` → preserved in `replaceCaree()`
+- ✅ Activity tracked AFTER `replaceCaree()` → merged in `finalizeTrackedRecords()`
+- ✅ Activity tracked but not in any array → added in `finalizeTrackedRecords()`
+
+### Benefits
+
+✅ **Guaranteed consistency** - all tracked records are merged before clearing
+✅ **Handles late arrivals** - activities cached after their caree's `replaceCaree()` ran
+✅ **Atomic operation** - finalization and cleanup happen together
+✅ **Can't forget to finalize** - built into `endBackgroundRefresh()`
+✅ **Clear semantics** - "ending" means "make sure everything is merged first"
+
+### Files Modified
+
+1. `CareKeeper/iOS/Services/LocalCacheService.swift`
+   - Changed `endBackgroundRefresh()` to async throws
+   - Added `finalizeTrackedRecords()` private method
+   - Finalization ensures all tracked records are in their caree's arrays
+
+2. `CareKeeper/iOS/Services/CloudKitDataService.swift`
+   - Changed `defer` to explicit `try await` call
+   - Added error handling to ensure cleanup
+
+3. `CareKeeperTests/LocalCacheServiceTests.swift`
+   - Updated all `endBackgroundRefresh()` calls to `try await`
+
+### Unit Tests
+
+Existing tests now verify finalization:
+- `testBackgroundRefreshPreservesLocalActivity` - verifies late-arrival activity is finalized
+- `testBackgroundRefreshPreservesLocalActivityType` - verifies late-arrival type is finalized
+- `testBackgroundRefreshMergesCloudKitAndLocalRecords` - verifies merge after finalization
+- `testBackgroundRefreshWithoutLocalChanges` - verifies finalization doesn't break normal flow
+
+## Alternative Considered: Separate Finalization Call
+
+**Rejected approach:**
+```swift
+await cacheService.withBatch { ... }
+await cacheService.finalizeTrackedRecords()  // ← Easy to forget!
+cacheService.endBackgroundRefresh()
+```
+
+**Why rejected:**
+- ❌ Easy to forget separate finalization step
+- ❌ Multiple steps instead of one atomic operation
+- ❌ Unclear semantics (what does "end" mean if not finalized?)
+
+## Performance Impact (Fix #3)
+
+**Code complexity:** Medium (~75 lines for finalization logic)
+**Risk level:** Low (surgical addition to existing flow)
+**Memory impact:** None (uses existing tracking sets)
+**CPU impact:** Low (O(n) iteration over tracked IDs, typically 1-2 activities)
+
+**UX improvement:**
+- **Consistent behavior** - activities always appear and stay visible
+- No more pop-in/pop-out flickering
+- No more missing activities requiring manual refresh
 
 ## Future Enhancements
 

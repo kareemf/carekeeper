@@ -1104,48 +1104,57 @@ class CloudKitDataService: ObservableObject {
 
         // Begin tracking local changes to preserve them from deletion during background refresh
         cacheService.beginBackgroundRefresh()
-        defer {
-            cacheService.endBackgroundRefresh()
-        }
 
         // Perform cache mutations in a single coalesced batch to avoid per-write refreshes.
-        await cacheService.withBatch {
-            // Remove owned carees from cache that no longer exist remotely
-            let fetchedOwnedIDs = Set(careesByID.keys)
-            let existingOwned = cacheService.myCarees
-            for cached in existingOwned where !fetchedOwnedIDs.contains(cached.id) {
-                do {
-                    logger.info("🧹 Removing deleted owned caree from cache: \(cached.name)")
-                    try await cacheService.removeCachedCaree(cached)
-                } catch {
-                    logger.warning("⚠️ Failed removing cached owned caree: \(error.localizedDescription)")
+        do {
+            await cacheService.withBatch {
+                // Remove owned carees from cache that no longer exist remotely
+                let fetchedOwnedIDs = Set(careesByID.keys)
+                let existingOwned = cacheService.myCarees
+                for cached in existingOwned where !fetchedOwnedIDs.contains(cached.id) {
+                    do {
+                        logger.info("🧹 Removing deleted owned caree from cache: \(cached.name)")
+                        try await cacheService.removeCachedCaree(cached)
+                    } catch {
+                        logger.warning("⚠️ Failed removing cached owned caree: \(error.localizedDescription)")
+                    }
+                }
+
+                // Upsert everything into cache
+                for caree in careesByID.values.sorted(by: { $0.listOrder < $1.listOrder }) {
+                    do {
+                        let cacheCaree = cloneCareeForCaching(caree, isShared: false)
+                        let types = activityTypesByCaree[caree.id] ?? []
+                        let activities = activitiesByCaree[caree.id] ?? []
+                        let mapping = Dictionary(uniqueKeysWithValues: activities.compactMap { activity in
+                            activityTypeIDByActivity[activity.id].map { (activity.id, $0) }
+                        })
+                        try await cacheService.replaceCaree(
+                            cacheCaree,
+                            activityTypes: types,
+                            activities: activities,
+                            activityTypeIDsByActivity: mapping
+                        )
+                    } catch {
+                        logger.warning("⚠️ Failed caching owned records: \(error.localizedDescription)")
+                    }
                 }
             }
 
-            // Upsert everything into cache
-            for caree in careesByID.values.sorted(by: { $0.listOrder < $1.listOrder }) {
-                do {
-                    let cacheCaree = cloneCareeForCaching(caree, isShared: false)
-                    let types = activityTypesByCaree[caree.id] ?? []
-                    let activities = activitiesByCaree[caree.id] ?? []
-                    let mapping = Dictionary(uniqueKeysWithValues: activities.compactMap { activity in
-                        activityTypeIDByActivity[activity.id].map { (activity.id, $0) }
-                    })
-                    try await cacheService.replaceCaree(
-                        cacheCaree,
-                        activityTypes: types,
-                        activities: activities,
-                        activityTypeIDsByActivity: mapping
-                    )
-                } catch {
-                    logger.warning("⚠️ Failed caching owned records: \(error.localizedDescription)")
-                }
-            }
+            // CRITICAL: Finalize tracked records before clearing
+            // This ensures late-arrival activities (cached after their caree's replaceCaree) are merged
+            try await cacheService.endBackgroundRefresh()
+
+            // No explicit refreshPublishedProperties call needed; the batch coalesces a single refresh.
+            NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
+            logger.info("✅ Owned records refreshed and cache updated")
+
+        } catch {
+            // Ensure cleanup even on error
+            logger.error("❌ Background refresh failed: \(error.localizedDescription)")
+            try? await cacheService.endBackgroundRefresh()
+            throw error
         }
-
-        // No explicit refreshPublishedProperties call needed; the batch coalesces a single refresh.
-        NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
-        logger.info("✅ Owned records refreshed and cache updated")
     }
 
     private func fetchAllRecords(

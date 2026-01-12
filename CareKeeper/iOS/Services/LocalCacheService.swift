@@ -743,16 +743,97 @@ class LocalCacheService: ObservableObject {
         logger.info("🔄 Begin background refresh - tracking local changes")
     }
 
-    /// End background refresh tracking and clear preserved IDs
-    func endBackgroundRefresh() {
+    /// End background refresh: finalize tracked records, then clear tracking state
+    /// CRITICAL: This must be called to ensure tracked records are merged before clearing
+    func endBackgroundRefresh() async throws {
         let activityCount = pendingLocalActivityIDs.count
         let typeCount = pendingLocalActivityTypeIDs.count
 
+        logger.info("🔄 Finalizing background refresh - merging \(activityCount) tracked activities, \(typeCount) tracked types")
+
+        // CRITICAL: Ensure all tracked records are attached to their carees
+        // This handles "late arrivals" - records cached after their caree's replaceCaree() ran
+        try await finalizeTrackedRecords()
+
+        // Now safe to clear and mark as done
         isBackgroundRefreshing = false
         pendingLocalActivityIDs.removeAll()
         pendingLocalActivityTypeIDs.removeAll()
 
-        logger.info("✅ End background refresh - preserved \(activityCount) activities, \(typeCount) activity types")
+        logger.info("✅ Background refresh complete - all tracked records finalized")
+    }
+
+    /// Finalize tracked records: ensure all tracked activities/types are attached to their carees
+    /// This handles the race where cacheActivity/cacheActivityType completes AFTER replaceCaree runs
+    private func finalizeTrackedRecords() async throws {
+        // For each tracked activity, ensure it's in its caree's activities list
+        for activityID in pendingLocalActivityIDs {
+            let fetchDescriptor = FetchDescriptor<Activity>(
+                predicate: #Predicate { $0.id == activityID }
+            )
+
+            guard let activity = try modelContext.fetch(fetchDescriptor).first else {
+                logger.warning("⚠️ Tracked activity \(activityID) not found in cache during finalization")
+                continue
+            }
+
+            guard let caree = activity.caree else {
+                logger.warning("⚠️ Tracked activity \(activityID) has no caree during finalization")
+                continue
+            }
+
+            // Ensure activity is in caree's activities list
+            var careeActivities = caree.activities ?? []
+            if !careeActivities.contains(where: { $0.id == activityID }) {
+                careeActivities.append(activity)
+                careeActivities.sort { $0.dateTime > $1.dateTime }
+                caree.activities = careeActivities
+                logger.info("📎 Finalized late-arrival activity \(activityID) to caree \(caree.name)")
+            }
+
+            // Ensure activity is in its activity type's activities list
+            if let activityType = activity.activityType {
+                var typeActivities = activityType.activities ?? []
+                if !typeActivities.contains(where: { $0.id == activityID }) {
+                    typeActivities.append(activity)
+                    typeActivities.sort { $0.dateTime > $1.dateTime }
+                    activityType.activities = typeActivities
+                    logger.info("📎 Finalized late-arrival activity \(activityID) to type \(activityType.name)")
+                }
+            }
+        }
+
+        // For each tracked activity type, ensure it's in its caree's activityTypes list
+        for typeID in pendingLocalActivityTypeIDs {
+            let fetchDescriptor = FetchDescriptor<ActivityType>(
+                predicate: #Predicate { $0.id == typeID }
+            )
+
+            guard let activityType = try modelContext.fetch(fetchDescriptor).first else {
+                logger.warning("⚠️ Tracked activity type \(typeID) not found in cache during finalization")
+                continue
+            }
+
+            guard let caree = activityType.caree else {
+                logger.warning("⚠️ Tracked activity type \(typeID) has no caree during finalization")
+                continue
+            }
+
+            // Ensure activity type is in caree's activityTypes list
+            var careeTypes = caree.activityTypes ?? []
+            if !careeTypes.contains(where: { $0.id == typeID }) {
+                careeTypes.append(activityType)
+                careeTypes.sort { $0.listOrder < $1.listOrder }
+                caree.activityTypes = careeTypes
+                logger.info("📎 Finalized late-arrival activity type \(activityType.name) to caree \(caree.name)")
+            }
+        }
+
+        // Save any finalization changes
+        if !pendingLocalActivityIDs.isEmpty || !pendingLocalActivityTypeIDs.isEmpty {
+            try modelContext.save()
+            logger.info("💾 Saved finalization changes to cache")
+        }
     }
 
     private func attachActivityType(_ activityType: ActivityType, to caree: Caree) {

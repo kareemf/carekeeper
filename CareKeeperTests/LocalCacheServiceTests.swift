@@ -320,7 +320,7 @@ final class LocalCacheServiceTests: XCTestCase {
             activities: [], // Empty - represents stale CloudKit snapshot
             activityTypeIDsByActivity: [:]
         )
-        cacheService.endBackgroundRefresh()
+        try await cacheService.endBackgroundRefresh()
 
         await cacheService.refreshImmediately(reason: "backgroundRefreshComplete")
 
@@ -361,7 +361,7 @@ final class LocalCacheServiceTests: XCTestCase {
             activities: [],
             activityTypeIDsByActivity: [:]
         )
-        cacheService.endBackgroundRefresh()
+        try await cacheService.endBackgroundRefresh()
 
         await cacheService.refreshImmediately(reason: "backgroundRefreshComplete")
 
@@ -411,7 +411,7 @@ final class LocalCacheServiceTests: XCTestCase {
             activities: [cloudActivity], // Only the old activity from CloudKit
             activityTypeIDsByActivity: [cloudActivity.id: cloudActivityType.id]
         )
-        cacheService.endBackgroundRefresh()
+        try await cacheService.endBackgroundRefresh()
 
         await cacheService.refreshImmediately(reason: "backgroundRefreshComplete")
 
@@ -462,7 +462,7 @@ final class LocalCacheServiceTests: XCTestCase {
                 newActivity.id: activityType.id
             ]
         )
-        cacheService.endBackgroundRefresh()
+        try await cacheService.endBackgroundRefresh()
 
         await cacheService.refreshImmediately(reason: "backgroundRefreshComplete")
 
