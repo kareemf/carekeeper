@@ -152,18 +152,11 @@ struct CareKeeperApp: App {
 
         do {
             // Persisted on disk so cache survives relaunch; no cloudKitDatabase means local-only.
-            let config = if let groupContainer = Self.resolvedGroupContainer() {
-                ModelConfiguration(
-                    schema: schema,
-                    isStoredInMemoryOnly: false,
-                    groupContainer: groupContainer
-                )
-            } else {
-                ModelConfiguration(
-                    schema: schema,
-                    isStoredInMemoryOnly: false
-                )
-            }
+            let config = ModelConfiguration(
+                schema: schema,
+                url: Self.cacheStoreURL(),
+                isStoredInMemoryOnly: false
+            )
             let container = try ModelContainer(
                 for: schema,
                 configurations: [config]
@@ -201,6 +194,18 @@ struct CareKeeperApp: App {
                 )
             return nil
         }
+    }
+
+    private static func cacheStoreURL() -> URL {
+        let fileManager = FileManager.default
+        if let groupURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: CloudKitConfig.appGroupID) {
+            let supportURL = groupURL.appendingPathComponent("Library/Application Support", isDirectory: true)
+            try? fileManager.createDirectory(at: supportURL, withIntermediateDirectories: true, attributes: nil)
+            return supportURL.appendingPathComponent("cache.store")
+        }
+        let supportURL = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        try? fileManager.createDirectory(at: supportURL, withIntermediateDirectories: true, attributes: nil)
+        return supportURL.appendingPathComponent("cache.store")
     }
 
     var body: some Scene {
