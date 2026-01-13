@@ -332,13 +332,11 @@ struct CareeDetailView: View {
             }
         }
         .onReceive(cacheService?.$cacheRevision.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()) { _ in
-            if let current = resolvedCaree, !current.isShared {
-                resolvedCaree = resolveCareeFromCache()
-                if let caree = resolvedCaree {
-                    Task { await loadCounts(for: caree) }
-                }
-                refreshID = UUID()
+            resolvedCaree = resolveCareeFromCache()
+            if let caree = resolvedCaree {
+                Task { await loadCounts(for: caree) }
             }
+            refreshID = UUID()
         }
         // REACTIVE: Listen for shared caree data updates (immediate notification)
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SharedCareeDataUpdated"))) { notification in
