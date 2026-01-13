@@ -331,6 +331,54 @@ final class LocalCacheServiceTests: XCTestCase {
         XCTAssertEqual(finalCaree?.activities?.first?.notes, "User created during refresh")
     }
 
+    func testBackgroundRefreshPreservesLocalActivityCreatedBeforeRefresh() async throws {
+        // Simulates activity creation just before a background refresh starts
+
+        // Given: A caree already in cache
+        let caree = Caree(name: "Test Caree", listOrder: 0)
+        caree.isOwned = true
+        modelContext.insert(caree)
+
+        let activityType = ActivityType(name: "Feeding", icon: "🍼", caree: caree, listOrder: 0)
+        modelContext.insert(activityType)
+
+        try modelContext.save()
+
+        try await cacheService.cacheCaree(caree, isShared: false)
+        await cacheService.refreshImmediately(reason: "setup")
+
+        guard let cachedCaree = cacheService.getCachedCaree(id: caree.id) else {
+            XCTFail("Caree should be in cache")
+            return
+        }
+
+        try await cacheService.cacheActivityType(activityType, for: cachedCaree)
+
+        // And: User creates an activity before refresh begins
+        let localActivity = Activity(dateTime: Date(), notes: "User created before refresh")
+        cacheService.markPendingLocalActivity(id: localActivity.id)
+        try await cacheService.cacheActivity(localActivity, for: cachedCaree, activityTypeID: activityType.id)
+        await cacheService.refreshImmediately(reason: "createActivity")
+
+        // When: Background refresh completes with stale CloudKit data
+        cacheService.beginBackgroundRefresh()
+        try await cacheService.replaceCaree(
+            caree,
+            activityTypes: [activityType],
+            activities: [],
+            activityTypeIDsByActivity: [:]
+        )
+        try await cacheService.endBackgroundRefresh()
+
+        await cacheService.refreshImmediately(reason: "backgroundRefreshComplete")
+
+        // Then: The locally-created activity should still be in cache
+        let finalCaree = cacheService.getCachedCaree(id: caree.id)
+        XCTAssertNotNil(finalCaree, "Caree should still be in cache")
+        XCTAssertEqual(finalCaree?.activities?.count, 1, "Should preserve local activity")
+        XCTAssertEqual(finalCaree?.activities?.first?.notes, "User created before refresh")
+    }
+
     func testBackgroundRefreshPreservesLocalActivityType() async throws {
         // Given: A caree already in cache
         let caree = Caree(name: "Test Caree", listOrder: 0)

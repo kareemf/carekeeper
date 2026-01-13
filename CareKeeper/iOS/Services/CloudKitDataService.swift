@@ -492,6 +492,7 @@ class CloudKitDataService: ObservableObject {
             if let cacheService,
                let cachedCaree = cacheService.getCachedCaree(id: caree.id)
             {
+                cacheService.markPendingLocalActivityType(id: syncedActivityType.id)
                 try await cacheService.cacheActivityType(syncedActivityType, for: cachedCaree)
                 logger.info("✅ ActivityType cached locally")
             }
@@ -685,6 +686,7 @@ class CloudKitDataService: ObservableObject {
                     }
 
                     if let cachedActivityType = cachedActivityTypes.first(where: { $0.id == activityType.id }) {
+                        cacheService.markPendingLocalActivity(id: syncedActivity.id)
                         try await cacheService.cacheActivity(syncedActivity, for: cachedCaree, activityTypeID: cachedActivityType.id)
                         logger.info("✅ Activity cached locally")
 

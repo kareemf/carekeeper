@@ -111,6 +111,7 @@ class LocalCacheService: ObservableObject {
         modelContext.delete(activityType)
         try modelContext.save()
 
+        pendingLocalActivityTypeIDs.remove(activityType.id)
         scheduleRefresh(reason: "removeCachedActivityType")
     }
 
@@ -121,6 +122,7 @@ class LocalCacheService: ObservableObject {
         modelContext.delete(activity)
         try modelContext.save()
 
+        pendingLocalActivityIDs.remove(activity.id)
         scheduleRefresh(reason: "removeCachedActivity")
     }
     
@@ -158,6 +160,13 @@ class LocalCacheService: ObservableObject {
         // Remove existing children so we can rebuild authoritative lists.
         // PRESERVE locally-created records during background refresh
         let incomingActivitiesByID = Dictionary(uniqueKeysWithValues: activities.map { ($0.id, $0) })
+        if !pendingLocalActivityIDs.isEmpty {
+            pendingLocalActivityIDs.subtract(incomingActivitiesByID.keys)
+        }
+        if !pendingLocalActivityTypeIDs.isEmpty {
+            let incomingTypeIDs = Set(activityTypes.map(\.id))
+            pendingLocalActivityTypeIDs.subtract(incomingTypeIDs)
+        }
         var preservedActivities: [Activity] = []
         var preservedActivityTypes: [ActivityType] = []
 
@@ -738,8 +747,6 @@ class LocalCacheService: ObservableObject {
     /// Preserves locally-created records that haven't been fetched from CloudKit yet
     func beginBackgroundRefresh() {
         isBackgroundRefreshing = true
-        pendingLocalActivityIDs.removeAll()
-        pendingLocalActivityTypeIDs.removeAll()
         logger.info("🔄 Begin background refresh - tracking local changes")
     }
 
@@ -757,10 +764,16 @@ class LocalCacheService: ObservableObject {
 
         // Now safe to clear and mark as done
         isBackgroundRefreshing = false
-        pendingLocalActivityIDs.removeAll()
-        pendingLocalActivityTypeIDs.removeAll()
 
         logger.info("✅ Background refresh complete - all tracked records finalized")
+    }
+
+    func markPendingLocalActivity(id: UUID) {
+        pendingLocalActivityIDs.insert(id)
+    }
+
+    func markPendingLocalActivityType(id: UUID) {
+        pendingLocalActivityTypeIDs.insert(id)
     }
 
     /// Finalize tracked records: ensure all tracked activities/types are attached to their carees
