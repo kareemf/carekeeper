@@ -354,7 +354,7 @@ final class LocalCacheServiceTests: XCTestCase {
 
         try await cacheService.cacheActivityType(activityType, for: cachedCaree)
 
-        // And: User creates an activity before refresh begins
+        // And: User creates an activity before refresh begins (local only, not yet in remote snapshot)
         let localActivity = Activity(dateTime: Date(), notes: "User created before refresh")
         cacheService.markPendingLocalActivity(id: localActivity.id)
         try await cacheService.cacheActivity(localActivity, for: cachedCaree, activityTypeID: activityType.id)
@@ -377,6 +377,56 @@ final class LocalCacheServiceTests: XCTestCase {
         XCTAssertNotNil(finalCaree, "Caree should still be in cache")
         XCTAssertEqual(finalCaree?.activities?.count, 1, "Should preserve local activity")
         XCTAssertEqual(finalCaree?.activities?.first?.notes, "User created before refresh")
+    }
+
+    func testBackgroundRefreshPreservesActivityTypeForPendingActivity() async throws {
+        // Simulates keeping an activity type alive when a pending activity references it
+
+        // Given: A caree and activity type already in cache
+        let caree = Caree(name: "Test Caree", listOrder: 0)
+        caree.isOwned = true
+        modelContext.insert(caree)
+
+        let activityType = ActivityType(name: "Bath", icon: "🛁", caree: caree, listOrder: 0)
+        modelContext.insert(activityType)
+
+        try modelContext.save()
+
+        try await cacheService.cacheCaree(caree, isShared: false)
+        await cacheService.refreshImmediately(reason: "setup")
+
+        guard let cachedCaree = cacheService.getCachedCaree(id: caree.id) else {
+            XCTFail("Caree should be in cache")
+            return
+        }
+
+        try await cacheService.cacheActivityType(activityType, for: cachedCaree)
+
+        // And: User creates an activity before refresh begins
+        let localActivity = Activity(dateTime: Date(), notes: "Pending activity")
+        cacheService.markPendingLocalActivity(id: localActivity.id)
+        try await cacheService.cacheActivity(localActivity, for: cachedCaree, activityTypeID: activityType.id)
+        await cacheService.refreshImmediately(reason: "createActivity")
+
+        // When: Background refresh completes with stale CloudKit data (change token doesn't include the type yet)
+        cacheService.beginBackgroundRefresh()
+        try await cacheService.replaceCaree(
+            caree,
+            activityTypes: [],
+            activities: [],
+            activityTypeIDsByActivity: [:]
+        )
+        try await cacheService.endBackgroundRefresh()
+
+        await cacheService.refreshImmediately(reason: "backgroundRefreshComplete")
+
+        // Then: The activity type should be preserved for the pending activity
+        let finalCaree = cacheService.getCachedCaree(id: caree.id)
+        XCTAssertNotNil(finalCaree, "Caree should still be in cache")
+        XCTAssertEqual(finalCaree?.activityTypes?.count, 1, "Should preserve activity type for pending activity")
+        XCTAssertEqual(finalCaree?.activityTypes?.first?.name, "Bath")
+        XCTAssertEqual(finalCaree?.activities?.count, 1, "Should preserve pending activity")
+        XCTAssertEqual(finalCaree?.activities?.first?.activityType?.id, activityType.id)
     }
 
     func testBackgroundRefreshPreservesLocalActivityType() async throws {
