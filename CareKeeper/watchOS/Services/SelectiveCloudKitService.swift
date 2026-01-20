@@ -57,6 +57,10 @@ class SelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
         try await retryService.retryableRequest(operation: operation, block)
     }
 
+    private func fetchCurrentUserRecordName() async -> String? {
+        await CloudKitUserIdentityService.shared.currentUserRecordName(in: container)
+    }
+
     // MARK: - Caree Queries (Small Dataset - Load All)
 
     private let careeNonImageKeys = ["CD_name", "CD_listOrder", "CD_dateCreated"]
@@ -500,7 +504,9 @@ class SelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
         record["CD_dateCreated"] = activity.dateCreated
 
         // Creator tracking (for notification filtering and shared activity attribution)
-        record["CD_creatorUserRecordID"] = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
+        let creatorRecordName = await fetchCurrentUserRecordName()
+        let resolvedCreatorRecordName = creatorRecordName ?? CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
+        record["CD_creatorUserRecordID"] = resolvedCreatorRecordName
 
         // Set references (in the same zone)
         let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(activity.careeID.uuidString)", zoneID: zoneID)

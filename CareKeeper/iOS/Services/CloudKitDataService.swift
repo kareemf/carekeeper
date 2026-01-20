@@ -103,6 +103,10 @@ class CloudKitDataService: ObservableObject {
         logger.info("Pending activity buffer integrated with CloudKitDataService")
     }
 
+    private func fetchCurrentUserRecordName() async -> String? {
+        await CloudKitUserIdentityService.shared.currentUserRecordName(in: container)
+    }
+
     // MARK: - Sync Status
 
     enum SyncStatus {
@@ -668,11 +672,13 @@ class CloudKitDataService: ObservableObject {
             let activityTypeRecord = try await fetchWithRetry(recordID: activityTypeRecordID, from: db)
 
             // Convert to CKRecord with parent references in custom zone
+            let creatorRecordName = await fetchCurrentUserRecordName()
             let record = try converter.activityToRecord(
                 activity,
                 parentCaree: careeRecord,
                 activityTypeRecord: activityTypeRecord,
-                zoneID: zoneID
+                zoneID: zoneID,
+                creatorRecordName: creatorRecordName
             )
 
             // Save to CloudKit
@@ -1499,7 +1505,7 @@ class CloudKitDataService: ObservableObject {
         }
 
         // Check each new activity record and notify if from another user
-        let currentUserID = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
+        let currentUserID = await fetchCurrentUserRecordName()
 
         for record in newActivityRecords {
             await notifyForPrivateActivityIfNeeded(record, currentUserID: currentUserID)
@@ -1511,14 +1517,17 @@ class CloudKitDataService: ObservableObject {
     }
 
     /// Check if an activity record was created by another user and present a notification if so.
-    private func notifyForPrivateActivityIfNeeded(_ record: CKRecord, currentUserID: String) async {
+    private func notifyForPrivateActivityIfNeeded(_ record: CKRecord, currentUserID: String?) async {
         // Extract creator ID
         let creatorIDField = record["CD_creatorUserRecordID"] as? String
         let creatorRecordID = record.creatorUserRecordID?.recordName
-        let creatorID = creatorIDField ?? creatorRecordID
 
         // Skip if created by current user
-        if creatorID == currentUserID {
+        if !CloudKitNotificationAuthorFilter.shouldNotify(
+            creatorRecordID: creatorRecordID,
+            creatorIDField: creatorIDField,
+            currentUserRecordName: currentUserID
+        ) {
             logger.debug("🔕 Skipping notification for self-authored activity in private zone")
             return
         }

@@ -58,14 +58,14 @@ class UserNotificationPreferences: ObservableObject {
 
 Changes needed:
 - Add `CD_creatorUserRecordID` field when creating activities
-- Use `CKCurrentUserDefaultName` to capture creator identity
-- Store creator's CKRecord.ID for filtering
+- Resolve the **real** CloudKit user record ID via `CKContainer.fetchUserRecordID`
+- Store the creator's record name for filtering
+- **No backfill/migration** for existing records; only new activities will carry the correct creator ID
 
 ```swift
 // In convertActivityToRecord():
-record["CD_creatorUserRecordID"] = CKRecord.ID(
-    recordName: CKCurrentUserDefaultName
-).recordName
+let recordID = try await container.fetchUserRecordID()
+record["CD_creatorUserRecordID"] = recordID.recordName
 ```
 
 #### 3. Local Notification Service
@@ -171,7 +171,7 @@ private func setupActivityNotificationSubscription() async {
 4. **Add creator tracking to activities**
    - Modify `CloudKitSharedDataService.createActivity()`
    - Add `CD_creatorUserRecordID` field to CKRecord
-   - Store creator's record ID
+   - Store creator's **real** record name (from `fetchUserRecordID`)
 
 ### Phase 2: Notification Logic
 **Goal**: Connect CloudKit notifications to local notifications
@@ -184,7 +184,7 @@ private func setupActivityNotificationSubscription() async {
 6. **Enhance CloudKitSharedRecordsService**
    - Parse query notifications for new activities
    - Extract activity details from CKQueryNotification
-   - Implement creator filtering logic
+   - Implement creator filtering logic (prefer `CD_creatorUserRecordID`, fallback to `record.creatorUserRecordID`)
    - Integrate with UserNotificationPreferences
 
 7. **Implement notification presentation**
@@ -254,8 +254,15 @@ private func setupActivityNotificationSubscription() async {
 ```swift
 CD_Activity:
   - CD_creatorUserRecordID: String (CKRecord.ID.recordName)
-    // Stores the creator's CloudKit user record ID
+    // Stores the creator's CloudKit user record ID (real record name)
     // Used to filter out notifications for user's own activities
+```
+
+### Identity Resolution
+```swift
+CloudKitUserIdentityService:
+  - Caches current user record name via CKContainer.fetchUserRecordID
+  - Shared across iOS/watchOS services to avoid repeated lookups
 ```
 
 ### Notification Content Format

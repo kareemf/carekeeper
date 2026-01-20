@@ -30,6 +30,10 @@ class CloudKitSharedDataService: ObservableObject {
         self.cacheService = cacheService
     }
 
+    private func fetchCurrentUserRecordName() async -> String? {
+        await CloudKitUserIdentityService.shared.currentUserRecordName(in: container)
+    }
+
     // MARK: - ActivityType Operations
 
     /// Create a new ActivityType in the shared database
@@ -458,12 +462,14 @@ class CloudKitSharedDataService: ObservableObject {
             }
 
         // Build the record directly in the correct zone via the converter
+        let creatorRecordName = await fetchCurrentUserRecordName()
         let record = try converter.activityToRecord(
             activity,
             parentCaree: parentCareeRecord,
             activityTypeRecord: activityTypeRecord,
             zoneID: zoneID,
-            existingRecord: nil
+            existingRecord: nil,
+            creatorRecordName: creatorRecordName
         )
 
         logger.info("✅ Created Activity record with parent for shared database at: \(activity.dateTime)")

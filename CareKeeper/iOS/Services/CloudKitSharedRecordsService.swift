@@ -37,6 +37,10 @@ class CloudKitSharedRecordsService: ObservableObject {
         self.cacheService = cacheService
     }
 
+    private func fetchCurrentUserRecordName() async -> String? {
+        await CloudKitUserIdentityService.shared.currentUserRecordName(in: container)
+    }
+
     /// Remove the current user from a shared caree.
     func leaveShare(for caree: Caree) async throws {
         guard let share = sharesByCareeID[caree.id] else {
@@ -186,9 +190,14 @@ class CloudKitSharedRecordsService: ObservableObject {
 
             let creatorIDField = record["CD_creatorUserRecordID"] as? String
             let creatorRecordID = record.creatorUserRecordID?.recordName
-            let creatorID = creatorIDField ?? creatorRecordID
-            let currentUserID = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
-            if creatorID == currentUserID { return }
+            let currentUserRecordName = await fetchCurrentUserRecordName()
+            if !CloudKitNotificationAuthorFilter.shouldNotify(
+                creatorRecordID: creatorRecordID,
+                creatorIDField: creatorIDField,
+                currentUserRecordName: currentUserRecordName
+            ) {
+                return
+            }
 
             guard let cdId = record["CD_id"] as? String,
                   let activityID = UUID(uuidString: cdId),
@@ -337,9 +346,12 @@ class CloudKitSharedRecordsService: ObservableObject {
     func notifyForActivityRecord(_ record: CKRecord) async -> Bool {
         let creatorIDField = record["CD_creatorUserRecordID"] as? String
         let creatorRecordID = record.creatorUserRecordID?.recordName
-        let creatorID = creatorIDField ?? creatorRecordID
-        let currentUserID = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
-        if creatorID == currentUserID {
+        let currentUserRecordName = await fetchCurrentUserRecordName()
+        if !CloudKitNotificationAuthorFilter.shouldNotify(
+            creatorRecordID: creatorRecordID,
+            creatorIDField: creatorIDField,
+            currentUserRecordName: currentUserRecordName
+        ) {
             logger.debug("🔕 Skipping notification (self-authored activity)")
             return false
         }

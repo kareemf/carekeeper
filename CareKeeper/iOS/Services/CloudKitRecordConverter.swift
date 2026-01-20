@@ -73,7 +73,8 @@ class CloudKitRecordConverter {
         _ activityType: ActivityType,
         parentCaree: CKRecord,
         zoneID: CKRecordZone.ID? = nil,
-        existingRecord: CKRecord? = nil
+        existingRecord: CKRecord? = nil,
+        creatorRecordName: String? = nil
     ) throws -> CKRecord {
         let recordID: CKRecord.ID = if let existing = existingRecord {
             existing.recordID
@@ -151,7 +152,8 @@ class CloudKitRecordConverter {
         record["CD_longitude"] = activity.longitude as CKRecordValue?
 
         // Creator tracking (for notifications)
-        record["CD_creatorUserRecordID"] = CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName as CKRecordValue
+        let resolvedCreatorRecordName = creatorRecordName ?? CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
+        record["CD_creatorUserRecordID"] = resolvedCreatorRecordName as CKRecordValue
 
         // Relationship references
         record["CD_caree"] = CKRecord.Reference(record: parentCaree, action: .deleteSelf)
