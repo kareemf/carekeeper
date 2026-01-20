@@ -22,6 +22,8 @@
 	<string>1</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>CareKeeper can optionally track location for activities when you enable location tracking for specific activity types.</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>CareKeeper can optionally use Reminders to notify you about scheduled activities.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
