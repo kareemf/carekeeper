@@ -169,12 +169,16 @@ class LocalCacheService: ObservableObject {
         }
         var preservedActivities: [Activity] = []
         var preservedActivityTypes: [ActivityType] = []
+        var preservedActivityTypeIDs: Set<UUID> = pendingLocalActivityTypeIDs
 
         if let existingActivities = managedCaree.activities {
             for activity in existingActivities {
                 if pendingLocalActivityIDs.contains(activity.id) {
                     // Preserve this activity - was created locally during background refresh
                     preservedActivities.append(activity)
+                    if let activityTypeID = activity.activityType?.id {
+                        preservedActivityTypeIDs.insert(activityTypeID)
+                    }
                     logger.info("💾 Preserved local activity from background refresh deletion: \(activity.id)")
                 } else {
                     // Safe to delete - came from CloudKit
@@ -190,7 +194,7 @@ class LocalCacheService: ObservableObject {
 
         if let existingTypes = managedCaree.activityTypes {
             for type in existingTypes {
-                if pendingLocalActivityTypeIDs.contains(type.id) {
+                if preservedActivityTypeIDs.contains(type.id) {
                     // Preserve this activity type - was created locally during background refresh
                     preservedActivityTypes.append(type)
                     logger.info("💾 Preserved local activity type from background refresh deletion: \(type.name)")
@@ -201,13 +205,25 @@ class LocalCacheService: ObservableObject {
             }
         }
 
-        managedCaree.activityTypes = []
-        managedCaree.activities = []
-
         // Recreate activity types, preserving order.
         var managedTypesByID: [UUID: ActivityType] = [:]
         var managedTypeList: [ActivityType] = []
+
+        for preservedType in preservedActivityTypes {
+            preservedType.caree = managedCaree
+            managedTypesByID[preservedType.id] = preservedType
+            managedTypeList.append(preservedType)
+        }
+
         for type in activityTypes.sorted(by: { $0.listOrder < $1.listOrder }) {
+            if let existingType = managedTypesByID[type.id] {
+                existingType.applyScalarUpdates(from: type)
+                existingType.lastSyncedAt = Date()
+                existingType.cloudKitRecordID = "CD_ActivityType/\(type.id.uuidString)"
+                existingType.caree = managedCaree
+                continue
+            }
+
             let newType = ActivityType(
                 name: type.name,
                 icon: type.icon,
@@ -225,7 +241,7 @@ class LocalCacheService: ObservableObject {
             managedTypesByID[newType.id] = newType
             managedTypeList.append(newType)
         }
-        managedCaree.activityTypes = managedTypeList
+        managedCaree.activityTypes = managedTypeList.sorted { $0.listOrder < $1.listOrder }
 
         // Recreate activities, sorted newest-first for consistency with recentActivities.
         var managedActivities: [Activity] = []
@@ -258,10 +274,6 @@ class LocalCacheService: ObservableObject {
             modelContext.insert(newActivity)
             managedActivities.append(newActivity)
         }
-
-        // Merge preserved local records with CloudKit records
-        // Add preserved activity types to the managed list
-        managedCaree.activityTypes = (managedTypeList + preservedActivityTypes).sorted { $0.listOrder < $1.listOrder }
 
         // Merge preserved activities with CloudKit activities
         let allActivities = managedActivities + preservedActivities
