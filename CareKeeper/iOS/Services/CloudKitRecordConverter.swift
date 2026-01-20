@@ -122,7 +122,8 @@ class CloudKitRecordConverter {
         parentCaree: CKRecord,
         activityTypeRecord: CKRecord,
         zoneID: CKRecordZone.ID? = nil,
-        existingRecord: CKRecord? = nil
+        existingRecord: CKRecord? = nil,
+        creatorRecordName: String? = nil
     ) throws -> CKRecord {
         let recordID: CKRecord.ID = if let existing = existingRecord {
             existing.recordID
