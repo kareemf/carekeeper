@@ -153,12 +153,14 @@ struct CareKeeperApp: App {
             // Persisted on disk so cache survives relaunch; no cloudKitDatabase means local-only.
             let config = if let groupContainer = Self.resolvedGroupContainer() {
                 ModelConfiguration(
+                    "cache",
                     schema: schema,
                     isStoredInMemoryOnly: false,
                     groupContainer: groupContainer
                 )
             } else {
                 ModelConfiguration(
+                    "cache",
                     schema: schema,
                     isStoredInMemoryOnly: false
                 )
