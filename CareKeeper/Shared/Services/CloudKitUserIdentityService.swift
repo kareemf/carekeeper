@@ -2,7 +2,7 @@ import CloudKit
 import Foundation
 
 protocol CloudKitUserRecordIDFetching {
-    func fetchUserRecordID(_ completionHandler: @escaping (CKRecord.ID?, Error?) -> Void)
+    func fetchUserRecordID(completionHandler: @escaping (CKRecord.ID?, Error?) -> Void)
 }
 
 extension CKContainer: CloudKitUserRecordIDFetching {}
@@ -37,7 +37,7 @@ final class CloudKitUserIdentityService {
 
     private func fetchUserRecordID(from fetcher: CloudKitUserRecordIDFetching) async throws -> CKRecord.ID {
         try await withCheckedThrowingContinuation { continuation in
-            fetcher.fetchUserRecordID { recordID, error in
+            fetcher.fetchUserRecordID(completionHandler: { recordID, error in
                 if let error {
                     continuation.resume(throwing: error)
                 } else if let recordID {
@@ -45,7 +45,7 @@ final class CloudKitUserIdentityService {
                 } else {
                     continuation.resume(throwing: AppError.invalidInput("Missing user record ID"))
                 }
-            }
+            })
         }
     }
 }

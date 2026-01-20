@@ -25,7 +25,7 @@ private final class FakeUserRecordFetcher: CloudKitUserRecordIDFetching {
         recordID = CKRecord.ID(recordName: recordName)
     }
 
-    func fetchUserRecordID(_ completionHandler: @escaping (CKRecord.ID?, Error?) -> Void) {
+    func fetchUserRecordID(completionHandler: @escaping (CKRecord.ID?, Error?) -> Void) {
         callCount += 1
         completionHandler(recordID, nil)
     }
