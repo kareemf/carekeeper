@@ -37,6 +37,10 @@ These IDs represent local creations that may not have appeared in CloudKit yet. 
    - If a user deletes an activity/activity type locally, remove its ID from pending.
 5. **Do not blanket-clear on refresh end**
    - `endBackgroundRefresh()` no longer wipes pending sets. They only shrink via snapshot presence or local delete.
+6. **Preserve activity types for pending activities**
+   - ActivityTypes associated with pending Activities are preserved to avoid cascade deletions.
+7. **Separate cache store file**
+   - The LocalCacheService uses a dedicated store (`cache.store`) so CoreData+CloudKit mirroring cannot delete cache objects.
 
 ## Edge Case
 If an activity is:
@@ -52,6 +56,8 @@ the activity remains in `pendingLocalActivityIDs` and will be preserved.
 - Pending IDs persist across refresh boundaries.
 - Pending IDs are pruned in `replaceCaree` by subtracting incoming snapshot IDs.
 - Pending IDs are removed when `removeCachedActivity` / `removeCachedActivityType` runs.
+- Pending Activities force preservation of their ActivityTypes to keep relationships intact.
+- Cache uses a separate store file to isolate from CloudKit sync.
 
 ## Validation Checklist
 - Create an activity immediately before a background refresh: it should remain after refresh.
