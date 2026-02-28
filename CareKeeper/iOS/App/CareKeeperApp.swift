@@ -49,7 +49,7 @@ struct CareKeeperApp: App {
                 )
             } else {
                 // Configure for CloudKit sync with local storage
-                AppLogger.app.info("🔧 Initializing ModelContainer with CloudKit sync")
+                AppLogger.app.info("🔧 Initializing ModelContainer (local-only)")
                 AppLogger.app.info("   Container: \(CloudKitConfig.containerID)")
                 AppLogger.app.info("   App Group: \(CloudKitConfig.appGroupID)")
 
@@ -58,14 +58,12 @@ struct CareKeeperApp: App {
                     ModelConfiguration(
                         schema: schema,
                         isStoredInMemoryOnly: false,
-                        groupContainer: groupContainer,
-                        cloudKitDatabase: .private(CloudKitConfig.containerID)
+                        groupContainer: groupContainer
                     )
                 } else {
                     ModelConfiguration(
                         schema: schema,
-                        isStoredInMemoryOnly: false,
-                        cloudKitDatabase: .private(CloudKitConfig.containerID)
+                        isStoredInMemoryOnly: false
                     )
                 }
 
