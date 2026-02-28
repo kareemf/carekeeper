@@ -1,14 +1,8 @@
-import SwiftData
 import SwiftUI
 
 struct ActivityTypeRowView: View {
     let activityType: ActivityType
     @State private var showingEdit = false
-    @Query private var allActivities: [Activity]
-
-    private var activitiesCount: Int {
-        allActivities.count(where: { $0.activityType?.id == activityType.id })
-    }
 
     var body: some View {
         HStack {
@@ -16,11 +10,11 @@ struct ActivityTypeRowView: View {
             ActivityTypeIconView(icon: activityType.displayIcon)
                 .font(.title2)
                 .frame(width: 30)
-            
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(activityType.name)
                     .font(.headline)
-                
+
                 HStack(spacing: 12) {
                     if activityType.hasQuantity {
                         Label(
@@ -30,7 +24,7 @@ struct ActivityTypeRowView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     }
-                    
+
                     if activityType.hasLocation {
                         Label(
                             NSLocalizedString("Location", comment: "Location label"),
@@ -41,11 +35,11 @@ struct ActivityTypeRowView: View {
                     }
                 }
             }
-            
+
             Spacer()
 
             VStack(alignment: .trailing) {
-                Text("\(activitiesCount)")
+                Text("\(activityType.totalActivitiesCount)")
                     .font(.headline)
                     .foregroundColor(.secondary)
 
