@@ -103,7 +103,9 @@ class CloudKitRecordConverter {
         record["CD_dateCreated"] = activityType.dateCreated as CKRecordValue
 
         // Relationship reference
-        record["CD_caree"] = CKRecord.Reference(record: parentCaree, action: .deleteSelf)
+        // Must use .none (not .deleteSelf) for records in a CloudKit sharing hierarchy.
+        // Cascade deletion is handled manually by CloudKitDataService.deleteCaree().
+        record["CD_caree"] = CKRecord.Reference(record: parentCaree, action: .none)
 
         logger.info("Created ActivityType record with parent: \(activityType.id)")
         return record
@@ -157,8 +159,10 @@ class CloudKitRecordConverter {
         record["CD_creatorUserRecordID"] = resolvedCreatorRecordName as CKRecordValue
 
         // Relationship references
-        record["CD_caree"] = CKRecord.Reference(record: parentCaree, action: .deleteSelf)
-        record["CD_activityType"] = CKRecord.Reference(record: activityTypeRecord, action: .deleteSelf)
+        // Must use .none (not .deleteSelf) for records in a CloudKit sharing hierarchy.
+        // Cascade deletion is handled manually by CloudKitDataService.deleteCaree().
+        record["CD_caree"] = CKRecord.Reference(record: parentCaree, action: .none)
+        record["CD_activityType"] = CKRecord.Reference(record: activityTypeRecord, action: .none)
 
         logger.info("Created Activity record with parent: \(activity.id)")
         return record

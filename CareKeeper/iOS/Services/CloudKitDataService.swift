@@ -1601,6 +1601,122 @@ class CloudKitDataService: ObservableObject {
             logger.error("❌ Failed to present notification for private zone activity: \(error.localizedDescription)")
         }
     }
+
+    // MARK: - One-Time Repairs
+
+    // v2: extends v1 to also cover shared database zones.
+    private static let referenceRepairKey = "ck_reference_repair_v2"
+
+    /// Re-writes existing CD_ActivityType and CD_Activity records so their CD_caree /
+    /// CD_activityType reference fields use .none instead of .deleteSelf. The .none action
+    /// is required for records that participate in a CloudKit sharing hierarchy; .deleteSelf
+    /// was incorrect and caused "Record identifier should be a string" assertion failures
+    /// during full CoreData+CloudKit re-syncs.
+    ///
+    /// Covers both the private zone and all accessible shared zones.
+    /// Gated by a UserDefaults flag so it runs at most once per install.
+    func repairCloudKitReferenceActions() async {
+        guard !UserDefaults.standard.bool(forKey: Self.referenceRepairKey) else {
+            logger.debug("ℹ️ CloudKit reference repair already completed; skipping")
+            return
+        }
+        logger.info("🔧 Starting one-time CloudKit reference action repair (v2)")
+
+        do {
+            // --- Private zone ---
+            let privateCount = try await repairReferenceActions(in: zoneID, database: container.privateCloudDatabase)
+            logger.info("✅ Private zone repair: \(privateCount) record(s) updated")
+
+            // --- Shared zones ---
+            // Participants create CD_ActivityType / CD_Activity records in shared zones via
+            // the shared database. Repair each non-default zone; catch permission errors per
+            // zone (read-only participants cannot write) and continue to the next one.
+            let sharedDB = container.sharedCloudDatabase
+            let sharedZones = try await sharedDB.allRecordZones()
+            for zone in sharedZones where zone.zoneID.zoneName != CKRecordZone.ID.defaultZoneName {
+                do {
+                    let count = try await repairReferenceActions(in: zone.zoneID, database: sharedDB)
+                    logger.info("✅ Shared zone '\(zone.zoneID.zoneName)' repair: \(count) record(s) updated")
+                } catch {
+                    logger.warning("⚠️ Skipping shared zone '\(zone.zoneID.zoneName)' (no write access or error): \(error.localizedDescription)")
+                }
+            }
+
+            UserDefaults.standard.set(true, forKey: Self.referenceRepairKey)
+            logger.info("✅ CloudKit reference repair (v2) complete")
+        } catch {
+            logger.error("❌ CloudKit reference repair failed: \(error.localizedDescription)")
+            // Flag intentionally NOT set — repair will retry on next launch.
+        }
+    }
+
+    /// Queries a single CloudKit zone for CD_ActivityType and CD_Activity records whose
+    /// relationship reference fields use .deleteSelf, rewrites them to .none, and saves
+    /// in batches. Returns the number of records updated.
+    private func repairReferenceActions(in zoneID: CKRecordZone.ID, database: CKDatabase) async throws -> Int {
+        var toSave: [CKRecord] = []
+
+        // --- CD_ActivityType.CD_caree ---
+        let atQuery = CKQuery(recordType: "CD_ActivityType", predicate: NSPredicate(value: true))
+        var atCursor: CKQueryOperation.Cursor? = nil
+        repeat {
+            let (matchResults, cursor) = try await atCursor == nil
+                ? database.records(matching: atQuery, inZoneWith: zoneID,
+                                   desiredKeys: ["CD_caree"],
+                                   resultsLimit: CKQueryOperation.maximumResults)
+                : database.records(continuingMatchFrom: atCursor!,
+                                   desiredKeys: ["CD_caree"],
+                                   resultsLimit: CKQueryOperation.maximumResults)
+            atCursor = cursor
+            for (_, result) in matchResults {
+                guard let record = try? result.get() else { continue }
+                if let ref = record["CD_caree"] as? CKRecord.Reference, ref.action == .deleteSelf {
+                    record["CD_caree"] = CKRecord.Reference(recordID: ref.recordID, action: .none)
+                    toSave.append(record)
+                }
+            }
+        } while atCursor != nil
+
+        // --- CD_Activity.CD_caree and CD_Activity.CD_activityType ---
+        let aQuery = CKQuery(recordType: "CD_Activity", predicate: NSPredicate(value: true))
+        var aCursor: CKQueryOperation.Cursor? = nil
+        repeat {
+            let (matchResults, cursor) = try await aCursor == nil
+                ? database.records(matching: aQuery, inZoneWith: zoneID,
+                                   desiredKeys: ["CD_caree", "CD_activityType"],
+                                   resultsLimit: CKQueryOperation.maximumResults)
+                : database.records(continuingMatchFrom: aCursor!,
+                                   desiredKeys: ["CD_caree", "CD_activityType"],
+                                   resultsLimit: CKQueryOperation.maximumResults)
+            aCursor = cursor
+            for (_, result) in matchResults {
+                guard let record = try? result.get() else { continue }
+                var changed = false
+                if let ref = record["CD_caree"] as? CKRecord.Reference, ref.action == .deleteSelf {
+                    record["CD_caree"] = CKRecord.Reference(recordID: ref.recordID, action: .none)
+                    changed = true
+                }
+                if let ref = record["CD_activityType"] as? CKRecord.Reference, ref.action == .deleteSelf {
+                    record["CD_activityType"] = CKRecord.Reference(recordID: ref.recordID, action: .none)
+                    changed = true
+                }
+                if changed { toSave.append(record) }
+            }
+        } while aCursor != nil
+
+        guard !toSave.isEmpty else { return 0 }
+
+        // CloudKit allows at most 400 records per modify operation.
+        let batchSize = 400
+        var saved = 0
+        for batchStart in stride(from: 0, to: toSave.count, by: batchSize) {
+            let batchEnd = min(batchStart + batchSize, toSave.count)
+            let batch = Array(toSave[batchStart ..< batchEnd])
+            _ = try await database.modifyRecords(saving: batch, deleting: [], savePolicy: .changedKeys)
+            saved += batch.count
+        }
+        return saved
+    }
 }
 
 // MARK: - Private Zone Change Token Store
