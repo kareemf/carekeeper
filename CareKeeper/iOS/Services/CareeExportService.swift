@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 
 /// Service for exporting Caree data to JSON format (v2.0)
 /// Supports both single-caree and all-carees exports with full fidelity
@@ -28,21 +27,14 @@ struct CareeExportService {
     /// Export all Carees to JSON file (v2.0 format)
     /// - Parameters:
     ///   - url: Destination URL for JSON file
-    ///   - modelContext: SwiftData context to fetch from
-    /// - Throws: Errors during fetch or encoding
-    func exportAllCarees(to url: URL, modelContext: ModelContext) throws {
+    ///   - carees: Carees to export (pass LocalCacheService's myCarees)
+    /// - Throws: Errors during encoding
+    func exportAllCarees(to url: URL, carees: [Caree]) throws {
         logger.info("Starting export to \(url.lastPathComponent)")
-
-        // Fetch all carees
-        let fetchDescriptor = FetchDescriptor<Caree>(
-            sortBy: [SortDescriptor(\.listOrder)]
-        )
-        let allCarees = try modelContext.fetch(fetchDescriptor)
-
-        logger.info("Exporting \(allCarees.count) carees")
+        logger.info("Exporting \(carees.count) carees")
 
         // Convert to exportable format
-        let exportedCarees = allCarees.map { convertToExportFormat($0) }
+        let exportedCarees = carees.map { convertToExportFormat($0) }
 
         // Create export data structure
         let exportData = ExportedData(

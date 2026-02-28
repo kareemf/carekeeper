@@ -496,7 +496,7 @@ struct CareeListView: View {
                 let filename = exportService.generateFilename(careeCount: allCarees.count)
                 let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
 
-                try exportService.exportAllCarees(to: tempURL, modelContext: modelContext)
+                try exportService.exportAllCarees(to: tempURL, carees: allCarees)
 
                 exportFileURL = tempURL
                 showingExport = true
