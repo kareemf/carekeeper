@@ -1,10 +1,7 @@
 import Combine
-import SwiftData
 import SwiftUI
 
 struct ActivityListView: View {
-    @Environment(\.modelContext) private var modelContext
-
     let careeID: UUID
 
     // Use shared services from environment
@@ -38,25 +35,18 @@ struct ActivityListView: View {
         self.careeID = careeID
     }
 
-    // Fetch fresh Activity objects from modelContext based on stored IDs
-    // This prevents crashes from stale SwiftData object references
+    // Resolve Activity objects from caree.activities (populated by LocalCacheService).
+    // Order is preserved by using activityIDs as the source of truth.
     private var activities: [Activity] {
-        guard !activityIDs.isEmpty else { return [] }
-        let ids = activityIDs
-        let predicate = #Predicate<Activity> { activity in
-            ids.contains(activity.id)
-        }
-        var fetch = FetchDescriptor<Activity>(predicate: predicate)
-        fetch.fetchLimit = ids.count
-
-        do {
-            let fetched = try modelContext.fetch(fetch)
-            // Maintain the order from activityIDs
-            let idToActivity = Dictionary(uniqueKeysWithValues: fetched.map { ($0.id, $0) })
-            return ids.compactMap { idToActivity[$0] }
-        } catch {
-            return []
-        }
+        guard !activityIDs.isEmpty, let caree else { return [] }
+        let idSet = Set(activityIDs)
+        let idToActivity = Dictionary(
+            uniqueKeysWithValues: (caree.activities ?? []).compactMap { a -> (UUID, Activity)? in
+                guard idSet.contains(a.id) else { return nil }
+                return (a.id, a)
+            }
+        )
+        return activityIDs.compactMap { idToActivity[$0] }
     }
 
     // Helper publishers to observe cache changes
@@ -369,70 +359,43 @@ struct ActivityListView: View {
         isLoadingPage = true
         defer { isLoadingPage = false }
 
-        let careeID = caree.id
         let selectedTypeID = selectedActivityType?.id
         let cursorDate = lastCursorDate
 
-        // Build predicate - use cursor date with tiebreaker to handle same-time activities
-        let predicate: Predicate<Activity>
-        if let typeID = selectedTypeID, let cursorDate {
-            predicate = #Predicate<Activity> { activity in
-                activity.caree?.id == careeID
-                    && activity.activityType?.id == typeID
-                    && activity.dateTime <= cursorDate
-            }
-        } else if let typeID = selectedTypeID {
-            predicate = #Predicate<Activity> { activity in
-                activity.caree?.id == careeID
-                    && activity.activityType?.id == typeID
-            }
-        } else if let cursorDate {
-            predicate = #Predicate<Activity> { activity in
-                activity.caree?.id == careeID
-                    && activity.dateTime <= cursorDate
-            }
-        } else {
-            predicate = #Predicate<Activity> { activity in
-                activity.caree?.id == careeID
+        // Filter in-memory from caree.activities (populated by LocalCacheService)
+        let sorted = (caree.activities ?? []).sorted { lhs, rhs in
+            if lhs.dateTime != rhs.dateTime { return lhs.dateTime > rhs.dateTime }
+            return lhs.id.uuidString > rhs.id.uuidString
+        }
+        let typeFiltered: [Activity] = if let typeID = selectedTypeID {
+            sorted.filter { $0.activityType?.id == typeID }
+        } else { sorted }
+        let page: [Activity] = if let cursorDate {
+            typeFiltered.filter { $0.dateTime <= cursorDate }
+        } else { typeFiltered }
+
+        // Filter out already loaded activities and take pageSize new ones
+        var newIDs: [UUID] = []
+        for activity in page {
+            if !loadedActivityIDSet.contains(activity.id) {
+                newIDs.append(activity.id)
+                loadedActivityIDSet.insert(activity.id)
+                if newIDs.count >= pageSize {
+                    break
+                }
             }
         }
 
-        var fetch = FetchDescriptor<Activity>(
-            predicate: predicate,
-            sortBy: [SortDescriptor(\.dateTime, order: .reverse), SortDescriptor(\.id, order: .reverse)]
-        )
-        // Fetch more than page size to account for filtering out already-loaded items
-        fetch.fetchLimit = pageSize + loadedActivityIDSet.count
+        activityIDs.append(contentsOf: newIDs)
 
-        do {
-            let page = try modelContext.fetch(fetch)
+        // Update cursor to last loaded activity
+        if let lastID = newIDs.last,
+           let lastActivity = page.first(where: { $0.id == lastID })
+        {
+            lastCursorDate = lastActivity.dateTime
+        }
 
-            // Filter out already loaded activities and take pageSize new ones
-            var newIDs: [UUID] = []
-            for activity in page {
-                if !loadedActivityIDSet.contains(activity.id) {
-                    newIDs.append(activity.id)
-                    loadedActivityIDSet.insert(activity.id)
-                    if newIDs.count >= pageSize {
-                        break
-                    }
-                }
-            }
-
-            activityIDs.append(contentsOf: newIDs)
-
-            // Update cursor to last loaded activity
-            if let lastID = newIDs.last,
-               let lastActivity = page.first(where: { $0.id == lastID })
-            {
-                lastCursorDate = lastActivity.dateTime
-            }
-
-            if newIDs.count < pageSize {
-                hasMorePages = false
-            }
-        } catch {
-            self.error = error
+        if newIDs.count < pageSize {
             hasMorePages = false
         }
     }
