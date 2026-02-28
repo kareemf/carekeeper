@@ -1,13 +1,17 @@
 import CloudKit
+import Combine
 import SwiftData
 import SwiftUI
 
 struct SharingView: View {
     @Environment(\.modelContext) private var modelContext
-    
-    // Query private database (my own records)
-    @Query(sort: \Caree.listOrder) private var myCarees: [Caree]
-    
+    @EnvironmentObject private var cloudKitService: CloudKitDataService
+
+    // Populated via dual publisher: subscribes to cacheService becoming available
+    // AND to cacheService.myCarees changes (handles nil cacheService at view init)
+    @State private var myCarees: [Caree] = []
+
+
     @State private var careeToStopSharing: Caree?
     @State private var showingStopSharingConfirmation = false
     @State private var error: Error?
@@ -167,6 +171,15 @@ struct SharingView: View {
             await sharedRecordsService.fetchSharedCarees()
             await refreshShares()
             isInitialLoad = false
+        }
+        .onReceive(cloudKitService.$cacheService.compactMap { $0 }) { cache in
+            myCarees = cache.myCarees.sorted { $0.listOrder < $1.listOrder }
+        }
+        .onReceive(
+            cloudKitService.cacheService?.$myCarees.eraseToAnyPublisher()
+                ?? Empty().eraseToAnyPublisher()
+        ) { carees in
+            myCarees = carees.sorted { $0.listOrder < $1.listOrder }
         }
         .onChange(of: myCarees) {
             Task {
@@ -346,5 +359,7 @@ private struct SharedWithMeRowView: View {
 
 #Preview {
     SharingView()
+        .environmentObject(CloudKitDataService())
+        .environmentObject(CloudKitSharedRecordsService())
         .modelContainer(PreviewContainer.shared)
 }
