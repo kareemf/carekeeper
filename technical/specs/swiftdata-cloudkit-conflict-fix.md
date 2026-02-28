@@ -312,7 +312,7 @@ try exportService.exportAllCarees(to: tempURL, carees: allCarees)
 - [x] Fix 2d: Replace `modelContext.fetch` pagination with in-memory `caree.activities` in `ActivityListView`
 - [x] Fix 2e: Replace `@Query myCarees` with dual-publisher `@State` in `SharingView`
 - [x] Fix 2f: Replace `exportAllCarees(to:modelContext:)` with `(to:carees:)` in `CareeExportService` + `CareeListView`
-- [ ] Update `CLAUDE.md` iOS architecture documentation
+- [x] Update `CLAUDE.md` iOS architecture documentation
 
 ## Files to Modify
 
