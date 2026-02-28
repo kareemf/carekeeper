@@ -1,9 +1,6 @@
-import SwiftData
 import SwiftUI
 
 struct CareeListRowView: View {
-    @Environment(\.modelContext) private var modelContext
-
     let caree: Caree
     var isShared: Bool = false
 
@@ -106,12 +103,8 @@ struct CareeListRowView: View {
 
     @MainActor
     private func loadCounts() async {
-        guard activityCount == nil || activityTypeCount == nil else { return }
-        let careeID = caree.id
-        let activityPredicate = #Predicate<Activity> { $0.caree?.id == careeID }
-        let typePredicate = #Predicate<ActivityType> { $0.caree?.id == careeID }
-        activityCount = try? modelContext.fetchCount(FetchDescriptor(predicate: activityPredicate))
-        activityTypeCount = try? modelContext.fetchCount(FetchDescriptor(predicate: typePredicate))
+        activityCount = caree.activities?.count ?? 0
+        activityTypeCount = caree.activityTypes?.count ?? 0
     }
 }
 

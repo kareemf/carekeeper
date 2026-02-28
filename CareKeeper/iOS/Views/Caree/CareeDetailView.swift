@@ -732,15 +732,8 @@ struct CareeDetailView: View {
 
     @MainActor
     private func loadCounts(for caree: Caree) async {
-        let careeID = caree.id
-        do {
-            let activityPredicate = #Predicate<Activity> { $0.caree?.id == careeID }
-            let typePredicate = #Predicate<ActivityType> { $0.caree?.id == careeID }
-            activityCount = try modelContext.fetchCount(FetchDescriptor(predicate: activityPredicate))
-            activityTypeCount = try modelContext.fetchCount(FetchDescriptor(predicate: typePredicate))
-        } catch {
-            // Leave counts untouched on failure
-        }
+        activityCount = caree.activities?.count ?? 0
+        activityTypeCount = caree.activityTypes?.count ?? 0
     }
 }
 
