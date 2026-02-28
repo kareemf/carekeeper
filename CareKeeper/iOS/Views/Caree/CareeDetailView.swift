@@ -1,10 +1,7 @@
 import Combine
-import SwiftData
 import SwiftUI
 
 struct CareeDetailView: View {
-    @Environment(\.modelContext) private var modelContext
-
     let careeID: UUID
 
     // Use services from environment
