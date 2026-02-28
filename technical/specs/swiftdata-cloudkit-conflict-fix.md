@@ -306,12 +306,12 @@ try exportService.exportAllCarees(to: tempURL, carees: allCarees)
 
 ## Tasks
 
-- [ ] Fix 1: Remove `cloudKitDatabase` sync from `sharedModelContainer` (`CareKeeperApp.swift`)
-- [ ] Fix 2a+2b: Replace `loadCounts` with `caree.activities?.count` in `CareeDetailView` + `CareeListRowView`
-- [ ] Fix 2c: Replace `@Query allActivities` with `activityType.totalActivitiesCount` in `ActivityTypeRowView`
-- [ ] Fix 2d: Replace `modelContext.fetch` pagination with in-memory `caree.activities` in `ActivityListView`
-- [ ] Fix 2e: Replace `@Query myCarees` with dual-publisher `@State` in `SharingView`
-- [ ] Fix 2f: Replace `exportAllCarees(to:modelContext:)` with `(to:carees:)` in `CareeExportService` + `CareeListView`
+- [x] Fix 1: Remove `cloudKitDatabase` sync from `sharedModelContainer` (`CareKeeperApp.swift`)
+- [x] Fix 2a+2b: Replace `loadCounts` with `caree.activities?.count` in `CareeDetailView` + `CareeListRowView`
+- [x] Fix 2c: Replace `@Query allActivities` with `activityType.totalActivitiesCount` in `ActivityTypeRowView`
+- [x] Fix 2d: Replace `modelContext.fetch` pagination with in-memory `caree.activities` in `ActivityListView`
+- [x] Fix 2e: Replace `@Query myCarees` with dual-publisher `@State` in `SharingView`
+- [x] Fix 2f: Replace `exportAllCarees(to:modelContext:)` with `(to:carees:)` in `CareeExportService` + `CareeListView`
 - [ ] Update `CLAUDE.md` iOS architecture documentation
 
 ## Files to Modify

@@ -170,9 +170,9 @@ The app uses SwiftData with three main model entities:
 
 ### iOS: SwiftData + CloudKit Hybrid
 **Persistence**: Dual ModelContainer architecture
-- **Main container**: CloudKit-synced with `cloudKitDatabase: .private()`
-- **Cache container**: Local-only SwiftData for fast offline reads
-- SwiftData as source of truth, automatic background sync
+- **Main container**: Local-only SwiftData (no `cloudKitDatabase` — removed to prevent `PFCloudKitSerializer` assertion failures from `.none` reference actions on child records)
+- **Cache container**: Local-only SwiftData for fast offline reads (used by `LocalCacheService`)
+- `LocalCacheService` is the source of truth for all views; populated by `CloudKitDataService` custom fetch code
 
 **Services**: Multi-service architecture (5+ specialized services)
 - CloudKitDataService: CRUD for owned carees
@@ -388,9 +388,8 @@ Enable multiple caregivers to track activities for the same caree(s) across thei
 **CloudKit Container**: `iCloud.com.kareemf.CareKeeper2`
 
 **SwiftData Configuration**:
-- Add CloudKit option to ModelConfiguration
-- Use `cloudKitDatabase: .private` for user's private data
-- Use `cloudKitDatabase: .shared` for shared carees
+- Main container is local-only (no `cloudKitDatabase` parameter) — CloudKit sync handled entirely by `CloudKitDataService`
+- ⚠️ Do NOT add `cloudKitDatabase: .private` to the main `ModelConfiguration`; it conflicts with `.none` reference actions on child records and causes `PFCloudKitSerializer` assertion failures
 
 **Sync Status Component**:
 - Observable service monitoring CloudKit sync state
