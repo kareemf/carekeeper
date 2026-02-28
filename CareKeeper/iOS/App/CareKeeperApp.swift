@@ -54,16 +54,21 @@ struct CareKeeperApp: App {
                 AppLogger.app.info("   App Group: \(CloudKitConfig.appGroupID)")
 
                 // Configure with app group for iOS↔️watchOS file sharing (local store only)
+                // CRITICAL: cloudKitDatabase must be explicitly .none — the default
+                // is .automatic which auto-detects CloudKit entitlements and enables
+                // mirroring, causing PFCloudKitSerializer assertion failures.
                 let modelConfiguration = if let groupContainer = Self.resolvedGroupContainer() {
                     ModelConfiguration(
                         schema: schema,
                         isStoredInMemoryOnly: false,
-                        groupContainer: groupContainer
+                        groupContainer: groupContainer,
+                        cloudKitDatabase: .none
                     )
                 } else {
                     ModelConfiguration(
                         schema: schema,
-                        isStoredInMemoryOnly: false
+                        isStoredInMemoryOnly: false,
+                        cloudKitDatabase: .none
                     )
                 }
 
@@ -140,19 +145,22 @@ struct CareKeeperApp: App {
         ])
 
         do {
-            // Persisted on disk so cache survives relaunch; no cloudKitDatabase means local-only.
+            // Persisted on disk so cache survives relaunch; explicitly .none to prevent
+            // auto-detection of CloudKit entitlements (default .automatic would enable mirroring).
             let config = if let groupContainer = Self.resolvedGroupContainer() {
                 ModelConfiguration(
                     "Cache",
                     schema: schema,
                     isStoredInMemoryOnly: false,
-                    groupContainer: groupContainer
+                    groupContainer: groupContainer,
+                    cloudKitDatabase: .none
                 )
             } else {
                 ModelConfiguration(
                     "Cache",
                     schema: schema,
-                    isStoredInMemoryOnly: false
+                    isStoredInMemoryOnly: false,
+                    cloudKitDatabase: .none
                 )
             }
             let container = try ModelContainer(
