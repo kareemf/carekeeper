@@ -48,12 +48,12 @@ struct CareKeeperApp: App {
                     configurations: [modelConfiguration]
                 )
             } else {
-                // Configure for CloudKit sync with local storage
+                // Configure local-only main container (no CloudKit mirroring).
+                // All CloudKit sync is handled by CloudKitDataService + LocalCacheService.
                 AppLogger.app.info("🔧 Initializing ModelContainer (local-only)")
-                AppLogger.app.info("   Container: \(CloudKitConfig.containerID)")
                 AppLogger.app.info("   App Group: \(CloudKitConfig.appGroupID)")
 
-                // Configure for both local (iOS↔️watchOS) and cloud (iCloud) sync
+                // Configure with app group for iOS↔️watchOS file sharing (local store only)
                 let modelConfiguration = if let groupContainer = Self.resolvedGroupContainer() {
                     ModelConfiguration(
                         schema: schema,
@@ -114,15 +114,6 @@ struct CareKeeperApp: App {
                             AppLogger.cloudkit.info("✏️ UPDATE DETECTED: \(updated.count) objects updated")
                         }
                     }
-                }
-
-                // Monitor for CloudKit import/export events
-                NotificationCenter.default.addObserver(
-                    forName: NSNotification.Name("NSPersistentCloudKitContainer.eventChangedNotification"),
-                    object: nil,
-                    queue: nil
-                ) { notification in
-                    AppLogger.cloudkit.info("☁️ CloudKit event notification: \(String(describing: notification))")
                 }
 
                 return container
