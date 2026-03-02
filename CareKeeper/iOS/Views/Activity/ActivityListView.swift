@@ -20,6 +20,7 @@ struct ActivityListView: View {
     @State private var caree: Caree?
     @State private var activityIDs: [UUID] = []
     @State private var loadedActivityIDSet: Set<UUID> = []
+    @State private var knownCacheActivityIDs: Set<UUID> = []
     @State private var lastCursorDate: Date?
     @State private var hasMorePages = true
     @State private var isLoadingPage = false
@@ -229,6 +230,7 @@ struct ActivityListView: View {
             caree = nil
             activityIDs = []
             loadedActivityIDSet = []
+            knownCacheActivityIDs = []
             hasLoadedInitialPage = false
             return
         }
@@ -243,6 +245,7 @@ struct ActivityListView: View {
             logger.info("📋 [LIST] updateActivities: caree \(careeID) not found in cache — clearing state")
             activityIDs = []
             loadedActivityIDSet = []
+            knownCacheActivityIDs = []
             hasLoadedInitialPage = false
             return
         }
@@ -354,15 +357,17 @@ struct ActivityListView: View {
             caree = nil
             activityIDs = []
             loadedActivityIDSet = []
+            knownCacheActivityIDs = []
             hasLoadedInitialPage = false
             return
         }
 
         caree = cacheService.getCachedCaree(id: careeID)
-        let cacheCount = (caree?.activities ?? []).count
-        logger.info("📋 [LIST] loadInitialPage: RESETTING pagination (cache has \(cacheCount, privacy: .public) activities)")
+        let allCacheIDs = Set((caree?.activities ?? []).map(\.id))
+        logger.info("📋 [LIST] loadInitialPage: RESETTING pagination (cache has \(allCacheIDs.count, privacy: .public) activities)")
         activityIDs = []
         loadedActivityIDSet = []
+        knownCacheActivityIDs = allCacheIDs
         lastCursorDate = nil
         hasMorePages = true
         await loadNextPage()
@@ -383,21 +388,28 @@ struct ActivityListView: View {
         }
 
         let allIDs = Set((caree.activities ?? []).map(\.id))
-        logger.info("📋 [LIST] refreshCareeReference: cache has \(allIDs.count, privacy: .public) activities, loaded set has \(loadedActivityIDSet.count, privacy: .public), displayed \(activityIDs.count, privacy: .public)")
+        logger.info("📋 [LIST] refreshCareeReference: cache has \(allIDs.count, privacy: .public) activities, known=\(knownCacheActivityIDs.count, privacy: .public), loaded=\(loadedActivityIDSet.count, privacy: .public), displayed=\(activityIDs.count, privacy: .public)")
 
-        // Prepend genuinely new activities (from sync/creation)
-        let newIDs = allIDs.subtracting(loadedActivityIDSet)
-        if !newIDs.isEmpty {
+        // Only prepend activities that are genuinely new (not in knownCacheActivityIDs).
+        // Activities that exist in cache but haven't been paginated to yet are NOT new —
+        // they'll appear when the user taps "Load More".
+        let genuinelyNewIDs = allIDs.subtracting(knownCacheActivityIDs)
+        if !genuinelyNewIDs.isEmpty {
             let newActivities = (caree.activities ?? [])
-                .filter { newIDs.contains($0.id) }
+                .filter { genuinelyNewIDs.contains($0.id) }
                 .sorted { lhs, rhs in
                     if lhs.dateTime != rhs.dateTime { return lhs.dateTime > rhs.dateTime }
                     return lhs.id.uuidString > rhs.id.uuidString
                 }
             activityIDs = newActivities.map(\.id) + activityIDs
-            loadedActivityIDSet.formUnion(newIDs)
-            logger.info("📋 [LIST] refreshCareeReference: prepended \(newIDs.count, privacy: .public) new activities")
+            loadedActivityIDSet.formUnion(genuinelyNewIDs)
+            knownCacheActivityIDs.formUnion(genuinelyNewIDs)
+            logger.info("📋 [LIST] refreshCareeReference: prepended \(genuinelyNewIDs.count, privacy: .public) genuinely new activities")
         }
+
+        // Update known set with any new IDs from cache (e.g. background sync added
+        // activities that aren't "genuinely new" because they predate our view session)
+        knownCacheActivityIDs = allIDs
 
         // Remove deleted activities
         let removedIDs = loadedActivityIDSet.subtracting(allIDs)
@@ -409,7 +421,7 @@ struct ActivityListView: View {
 
         hasMorePages = loadedActivityIDSet.count < allIDs.count
 
-        if newIDs.isEmpty && removedIDs.isEmpty {
+        if genuinelyNewIDs.isEmpty && removedIDs.isEmpty {
             logger.info("📋 [LIST] refreshCareeReference: no changes to activity set")
         }
 
