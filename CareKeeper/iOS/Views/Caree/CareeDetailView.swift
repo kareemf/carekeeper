@@ -18,8 +18,6 @@ struct CareeDetailView: View {
 
     // Keep a resilient, last-known reference to the Caree while refreshes occur
     @State private var resolvedCaree: Caree?
-    // Refresh trigger to force view updates when relationships change
-    @State private var refreshID = UUID()
 
     // Fast accessor to try resolving from cache
     private func resolveCareeFromCache() -> Caree? {
@@ -139,7 +137,6 @@ struct CareeDetailView: View {
                     }
                 }
                 .listStyle(.plain)
-                .id(refreshID) // Refresh List content without re-running .task blocks
                 .navigationTitle(caree.name)
                 .navigationBarTitleDisplayMode(.large)
                 .refreshable {
@@ -243,11 +240,14 @@ struct CareeDetailView: View {
                     .foregroundColor(.secondary)
             }
         }
-        .task {
-            // Initial resolve
+        .task(id: careeID) {
+            // Resolve caree from cache (runs on appear and when careeID changes)
             resolvedCaree = resolveCareeFromCache()
             if let caree = resolvedCaree {
                 await loadCounts(for: caree)
+            } else {
+                activityCount = nil
+                activityTypeCount = nil
             }
 
             // Light-weight cache refresh (debounced/coalesced)
@@ -267,27 +267,6 @@ struct CareeDetailView: View {
 
             if let caree = self.resolvedCaree {
                 await checkSyncStatus(for: caree)
-            }
-        }
-        .task(id: careeID) {
-            // Refresh when caree ID changes
-            resolvedCaree = resolveCareeFromCache()
-            if let caree = resolvedCaree {
-                await loadCounts(for: caree)
-            } else {
-                activityCount = nil
-                activityTypeCount = nil
-            }
-            try? await cacheService?.refreshCache()
-
-            if resolvedCaree == nil || resolvedCaree?.isShared == true {
-                isLoadingSharedCaree = true
-                await sharedRecordsService.fetchSharedCarees()
-                resolvedCaree = resolveCareeFromCache()
-                if let caree = resolvedCaree {
-                    await loadCounts(for: caree)
-                }
-                isLoadingSharedCaree = false
             }
         }
         .onReceive(cloudKitService.$cacheService.compactMap(\.self)) { _ in
@@ -333,15 +312,12 @@ struct CareeDetailView: View {
             if let caree = resolvedCaree {
                 Task { await loadCounts(for: caree) }
             }
-            refreshID = UUID()
         }
         // REACTIVE: Listen for shared caree data updates (immediate notification)
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SharedCareeDataUpdated"))) { notification in
             // Check if this notification is for our caree
             if let updatedCareeID = notification.object as? UUID, updatedCareeID == careeID {
                 resolvedCaree = resolveCareeFromCache()
-                // Force view refresh to see updated relationships
-                refreshID = UUID()
             }
         }
         .errorAlert($error)

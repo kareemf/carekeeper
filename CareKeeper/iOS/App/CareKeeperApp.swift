@@ -1,5 +1,4 @@
 import CloudKit
-import CoreData
 import SwiftData
 import SwiftUI
 
@@ -80,45 +79,6 @@ struct CareKeeperApp: App {
                 AppLogger.app.info("✅ ModelContainer created successfully")
                 if let url = container.configurations.first?.url {
                     AppLogger.app.info("   📦 Container URL: \(url.path)")
-                }
-
-                // Monitor for sync errors
-                NotificationCenter.default.addObserver(
-                    forName: Notification.Name("NSPersistentStoreRemoteChange"),
-                    object: nil,
-                    queue: nil
-                ) { notification in
-                    AppLogger.cloudkit.info("📡 Persistent store remote change notification: \(String(describing: notification))")
-                }
-
-                // Monitor for delete operations and CloudKit export
-                NotificationCenter.default.addObserver(
-                    forName: .NSManagedObjectContextDidSave,
-                    object: nil,
-                    queue: nil
-                ) { notification in
-                    if let deleted = notification.userInfo?[NSDeletedObjectsKey] as? Set<NSManagedObject> {
-                        if !deleted.isEmpty {
-                            AppLogger.cloudkit.info("⚠️ DELETE DETECTED: \(deleted.count) objects deleted")
-                            for obj in deleted {
-                                AppLogger.cloudkit.debug("   - Deleted: \(type(of: obj)) - \(String(describing: obj))")
-                            }
-                        }
-                    }
-                    if let inserted = notification.userInfo?[NSInsertedObjectsKey] as? Set<NSManagedObject> {
-                        if !inserted.isEmpty {
-                            AppLogger.cloudkit.info("➕ INSERT DETECTED: \(inserted.count) objects inserted")
-                            for obj in inserted {
-                                AppLogger.cloudkit.debug("   - Inserted: \(type(of: obj)) - \(String(describing: obj))")
-                            }
-                            AppLogger.cloudkit.info("   ⏳ Waiting for CloudKit export (should happen within 5-30 seconds)...")
-                        }
-                    }
-                    if let updated = notification.userInfo?[NSUpdatedObjectsKey] as? Set<NSManagedObject> {
-                        if !updated.isEmpty {
-                            AppLogger.cloudkit.info("✏️ UPDATE DETECTED: \(updated.count) objects updated")
-                        }
-                    }
                 }
 
                 return container
