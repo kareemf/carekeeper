@@ -43,6 +43,16 @@ class CloudKitDataService: ObservableObject {
     private(set) var sharedDataService: CloudKitSharedDataService?
     private var pendingActivityBuffer: PendingActivityBuffer?
 
+    // MARK: - Refresh Coalescing
+
+    /// Currently running refresh task, if any. Concurrent callers await this
+    /// instead of starting a duplicate CloudKit fetch.
+    private var activeRefreshTask: Task<Void, Error>?
+    /// Set to `true` while `activeRefreshTask` is running if another caller
+    /// requests a refresh. When the active task finishes it will start one more
+    /// run to pick up any changes made since the query began.
+    private var refreshRequestedDuringRun = false
+
     // MARK: - Initialization
 
     init(
@@ -662,6 +672,7 @@ class CloudKitDataService: ObservableObject {
                     createdAt: Date()
                 )
                 pendingActivityBuffer.enqueue(mutation)
+                logger.info("🔵 [PENDING] Enqueued activity \(activity.id) for caree \(caree.id) (buffer count: \(pendingActivityBuffer.pendingMutations(for: caree.id).count, privacy: .public))")
             }
 
             // Fetch parent records
@@ -695,14 +706,22 @@ class CloudKitDataService: ObservableObject {
             let syncedActivity = try converter.recordToActivity(savedRecord)
 
             // Cache the activity if cache service is available
+            // Note: pending buffer entry is NOT removed here — it stays until the next
+            // refreshOwnedCareesFromCloudKit() confirms the activity exists in cache via
+            // applyPendingActivityMutations(). This prevents dropped writes when a concurrent
+            // refresh's replaceCaree() wipes the cache before the CloudKit query sees the new record.
             if let cacheService,
                let cachedCaree = cacheService.getCachedCaree(id: caree.id)
             {
                 let cachedActivityTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
                 if let cachedActivityType = cachedActivityTypes.first(where: { $0.id == activityType.id }) {
-                    try await cacheService.cacheActivity(syncedActivity, for: cachedCaree, activityTypeID: cachedActivityType.id)
-                    pendingActivityBuffer?.remove(activityID: syncedActivity.id, careeID: caree.id)
-                    logger.info("✅ Activity cached locally")
+                    do {
+                        try await cacheService.cacheActivity(syncedActivity, for: cachedCaree, activityTypeID: cachedActivityType.id)
+                        let cachedCount = (cachedCaree.activities ?? []).count
+                        logger.info("✅ Activity \(syncedActivity.id) cached locally (pending retained until next refresh, caree now has \(cachedCount, privacy: .public) activities)")
+                    } catch {
+                        logger.warning("⚠️ Failed to cache activity \(syncedActivity.id) locally: \(error.localizedDescription)")
+                    }
                 }
             }
 
@@ -981,7 +1000,45 @@ class CloudKitDataService: ObservableObject {
 
     /// Fetch all owned (private DB) carees, activity types, and activities and update LocalCacheService.
     /// Posts "CloudKitBackgroundRefreshFinished" when done so AppDelegate can finish the background task.
+    ///
+    /// Concurrent calls are coalesced: if a refresh is already running, the caller awaits
+    /// the active task and a follow-up run is scheduled to pick up any changes made since
+    /// the active query began. This prevents redundant CloudKit fetches during cold start
+    /// (where `.task`, `.onReceive(cacheService)`, and the initial seed all fire at once).
     func refreshOwnedCareesFromCloudKit() async throws {
+        // If a refresh is already in flight, mark that we want another run after it
+        // finishes, then just await the active task.
+        if let active = activeRefreshTask {
+            refreshRequestedDuringRun = true
+            logger.info("🔄 Refresh already in flight — coalescing (will run again after current)")
+            try await active.value
+            return
+        }
+
+        // Launch the actual refresh and store the task handle.
+        let task = Task { @MainActor [weak self] in
+            guard let self else { return }
+            try await self.performOwnedRefresh()
+
+            // If another caller arrived while we were running, do one more pass.
+            if self.refreshRequestedDuringRun {
+                self.refreshRequestedDuringRun = false
+                self.logger.info("🔄 Running coalesced follow-up refresh")
+                try await self.performOwnedRefresh()
+            }
+        }
+        activeRefreshTask = task
+
+        defer {
+            activeRefreshTask = nil
+            refreshRequestedDuringRun = false
+        }
+
+        try await task.value
+    }
+
+    /// Internal implementation of the owned-records refresh.
+    private func performOwnedRefresh() async throws {
         logger.info("🔄 Refreshing owned records from private database (reactive)")
 
         // Ensure zone exists
@@ -1119,6 +1176,13 @@ class CloudKitDataService: ObservableObject {
             logger.warning("⚠️ Failed to fetch reminder metadata for owned carees: \(error.localizedDescription)")
         }
 
+        // Collect all activity IDs that CloudKit returned in this refresh.
+        // Only remove pending entries for activities that appear in these results,
+        // since that proves CloudKit has propagated the record and future refreshes
+        // will include it. Otherwise, concurrent refreshes would wipe re-applied
+        // pending activities that CloudKit hasn't returned yet.
+        let fetchedActivityIDs = Set(activitiesByCaree.values.flatMap { $0 }.map(\.id))
+
         // Perform cache mutations in a single coalesced batch to avoid per-write refreshes.
         await cacheService.withBatch {
             // Remove owned carees from cache that no longer exist remotely
@@ -1142,55 +1206,99 @@ class CloudKitDataService: ObservableObject {
                     let mapping = Dictionary(uniqueKeysWithValues: activities.compactMap { activity in
                         activityTypeIDByActivity[activity.id].map { (activity.id, $0) }
                     })
+                    logger.info("🔄 [REFRESH] replaceCaree \(caree.name): \(activities.count, privacy: .public) activities from CloudKit query")
                     try await cacheService.replaceCaree(
                         cacheCaree,
                         activityTypes: types,
                         activities: activities,
                         activityTypeIDsByActivity: mapping
                     )
+                    let postReplaceCount = (cacheService.getCachedCaree(id: caree.id)?.activities ?? []).count
+                    logger.info("🔄 [REFRESH] replaceCaree \(caree.name): cache now has \(postReplaceCount, privacy: .public) activities")
                 } catch {
                     logger.warning("⚠️ Failed caching owned records: \(error.localizedDescription)")
                 }
             }
-        }
 
-        await applyPendingActivityMutations()
+            // Apply pending mutations inside the batch so they appear in the same
+            // cacheRevision as the refresh — preventing a window where replaceCaree
+            // wiped the cache but pending entries haven't been re-applied yet.
+            logger.info("🔵 [PENDING] Applying pending mutations inside batch...")
+            await applyPendingActivityMutations(fetchedActivityIDs: fetchedActivityIDs)
+        }
 
         // No explicit refreshPublishedProperties call needed; the batch coalesces a single refresh.
         NotificationCenter.default.post(name: NSNotification.Name("CloudKitBackgroundRefreshFinished"), object: nil)
         logger.info("✅ Owned records refreshed and cache updated")
     }
 
+    /// Re-apply pending activity mutations to the cache after a `replaceCaree` wipe.
+    ///
+    /// - Parameter fetchedActivityIDs: Activity IDs that CloudKit returned in this refresh.
+    ///   A pending entry is only removed when its ID appears in this set, proving CloudKit
+    ///   has propagated the record. Until then, the entry stays in the buffer so that
+    ///   subsequent concurrent refreshes will keep re-applying it.
     @MainActor
-    private func applyPendingActivityMutations() async {
-        guard let pendingActivityBuffer, let cacheService else { return }
+    private func applyPendingActivityMutations(fetchedActivityIDs: Set<UUID> = []) async {
+        guard let pendingActivityBuffer, let cacheService else {
+            logger.info("🔵 [PENDING] applyPendingActivityMutations: no buffer or cacheService — skipping")
+            return
+        }
 
         let pendingCareeIDs = pendingActivityBuffer.pendingCareeIDs
-        guard !pendingCareeIDs.isEmpty else { return }
+        guard !pendingCareeIDs.isEmpty else {
+            logger.info("🔵 [PENDING] applyPendingActivityMutations: no pending caree IDs — nothing to apply")
+            return
+        }
+
+        logger.info("🔵 [PENDING] applyPendingActivityMutations: processing \(pendingCareeIDs.count, privacy: .public) carees (fetchedActivityIDs: \(fetchedActivityIDs.count, privacy: .public))")
 
         for careeID in pendingCareeIDs {
-            guard let cachedCaree = cacheService.getCachedCaree(id: careeID) else { continue }
+            guard let cachedCaree = cacheService.getCachedCaree(id: careeID) else {
+                logger.warning("🔵 [PENDING] Caree \(careeID) not found in cache — skipping pending mutations")
+                continue
+            }
             let cachedTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
             let typeByID: [UUID: ActivityType] = Dictionary(uniqueKeysWithValues: cachedTypes.map { ($0.id, $0) })
             let mutations = pendingActivityBuffer.pendingMutations(for: careeID)
 
             if mutations.isEmpty { continue }
 
+            let preApplyCount = (cachedCaree.activities ?? []).count
+            logger.info("🔵 [PENDING] Caree \(cachedCaree.name): \(mutations.count, privacy: .public) pending mutations, cache has \(preApplyCount, privacy: .public) activities before apply")
+
             await cacheService.withBatch {
                 for mutation in mutations {
-                    guard let cachedType = typeByID[mutation.activityTypeID] else { continue }
+                    // If CloudKit query results already include this activity, it has
+                    // propagated — replaceCaree already inserted it, so just clean up.
+                    if fetchedActivityIDs.contains(mutation.id) {
+                        pendingActivityBuffer.remove(activityID: mutation.id, careeID: careeID)
+                        logger.info("🔵 [PENDING] Activity \(mutation.id) found in CloudKit results — removed from buffer (no re-apply needed)")
+                        continue
+                    }
+
+                    // CloudKit hasn't returned this activity yet — re-apply to cache
+                    // but keep in the buffer so the next refresh re-applies it again.
+                    guard let cachedType = typeByID[mutation.activityTypeID] else {
+                        logger.warning("🔵 [PENDING] Activity \(mutation.id): activityType \(mutation.activityTypeID) not in cache — skipping")
+                        continue
+                    }
                     do {
                         try await cacheService.cacheActivity(
                             mutation.activity,
                             for: cachedCaree,
                             activityTypeID: cachedType.id
                         )
-                        pendingActivityBuffer.remove(activityID: mutation.id, careeID: careeID)
+                        logger.info("🔵 [PENDING] Activity \(mutation.id) re-applied to cache (not yet in CloudKit — keeping in buffer)")
                     } catch {
                         logger.warning("⚠️ Failed to cache pending activity \(mutation.id): \(error.localizedDescription)")
                     }
                 }
             }
+
+            let postApplyCount = (cachedCaree.activities ?? []).count
+            let remainingPending = pendingActivityBuffer.pendingMutations(for: careeID).count
+            logger.info("🔵 [PENDING] Caree \(cachedCaree.name): cache now has \(postApplyCount, privacy: .public) activities, \(remainingPending, privacy: .public) mutations still pending")
         }
     }
 

@@ -11,6 +11,9 @@ enum AppLogger {
 
     /// Logger for share acceptance and management
     static let sharing = Logger(subsystem: "com.kareemf.CareKeeper", category: "Sharing")
+
+    /// Logger for UI/View layer diagnostics
+    static let ui = Logger(subsystem: "com.kareemf.CareKeeper", category: "UI")
 }
 
 // MARK: - Console.app Filtering Guide

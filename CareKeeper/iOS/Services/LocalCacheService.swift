@@ -152,6 +152,8 @@ class LocalCacheService: ObservableObject {
         }
 
         // Remove existing children so we can rebuild authoritative lists.
+        let existingActivityCount = (managedCaree.activities ?? []).count
+        logger.info("🗑️ [REPLACE] \(caree.name): deleting \(existingActivityCount) existing activities, will re-insert \(activities.count) from CloudKit")
         let incomingActivitiesByID = Dictionary(uniqueKeysWithValues: activities.map { ($0.id, $0) })
         if let existingActivities = managedCaree.activities {
             for activity in existingActivities {

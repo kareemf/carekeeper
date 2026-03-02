@@ -102,6 +102,17 @@ final class ActivityReminderMetadataStore: ReminderMetadataStoreProtocol {
         guard !activityIDs.isEmpty else { return [:] }
         try await ensureZoneExists()
 
+        let batchSize = 400
+        var allMetadata: [UUID: ActivityReminderMetadata] = [:]
+        for batchStart in stride(from: 0, to: activityIDs.count, by: batchSize) {
+            let batch = Array(activityIDs[batchStart..<min(batchStart + batchSize, activityIDs.count)])
+            let result = try await fetchMetadataBatch(for: batch)
+            allMetadata.merge(result) { _, new in new }
+        }
+        return allMetadata
+    }
+
+    private func fetchMetadataBatch(for activityIDs: [UUID]) async throws -> [UUID: ActivityReminderMetadata] {
         return try await withCheckedThrowingContinuation { continuation in
             let recordIDs = activityIDs.map(self.recordID(for:))
             let operation = CKFetchRecordsOperation(recordIDs: recordIDs)

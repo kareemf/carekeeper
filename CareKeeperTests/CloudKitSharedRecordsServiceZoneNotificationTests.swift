@@ -33,9 +33,10 @@ private final class TestSharedRecordsService: CloudKitSharedRecordsService {
         super.init(container: CKContainer(identifier: CloudKitConfig.containerID))
     }
 
-    override func fetchSharedChanges(for zoneID: CKRecordZone.ID, existingActivityIDs: Set<UUID>) async {
+    override func fetchSharedChanges(for zoneID: CKRecordZone.ID, existingActivityIDs: Set<UUID>) async -> CKServerChangeToken? {
         fetchedZoneID = zoneID
         fetchSharedChangesCalled = true
+        return nil
     }
 
     override func fetchSharedCarees(force: Bool, reason: String) async {
