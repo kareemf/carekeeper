@@ -1,10 +1,8 @@
 import Combine
-import os
 import SwiftUI
 
 struct ActivityListView: View {
     let careeID: UUID
-    private let logger = AppLogger.ui
 
     // Use shared services from environment
     @EnvironmentObject private var cloudKitService: CloudKitDataService
@@ -163,25 +161,20 @@ struct ActivityListView: View {
             await refreshData()
         }
         .onReceive(cloudKitService.$cacheService.compactMap(\.self)) { _ in
-            logger.info("📋 [LIST] onReceive cacheService published → refreshData()")
             Task {
                 await refreshData()
             }
         }
         .onReceive(myCareesPublisher) { _ in
-            logger.info("📋 [LIST] onReceive myCarees changed → updateActivities()")
             updateActivities()
         }
         .onReceive(sharedCareesPublisher) { _ in
-            logger.info("📋 [LIST] onReceive sharedCarees changed → updateActivities()")
             updateActivities()
         }
         .onReceive(sharedRecordsService.$sharedCarees.eraseToAnyPublisher()) { _ in
-            logger.info("📋 [LIST] onReceive sharedRecordsService.sharedCarees → updateActivities()")
             updateActivities()
         }
         .onReceive(cacheService?.$cacheRevision.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()) { _ in
-            logger.info("📋 [LIST] onReceive cacheRevision → refreshCareeReference()")
             Task {
                 await refreshCareeReference()
             }
@@ -226,7 +219,6 @@ struct ActivityListView: View {
     @MainActor
     private func updateActivities() {
         guard let cacheService else {
-            logger.info("📋 [LIST] updateActivities: no cacheService — clearing state")
             caree = nil
             activityIDs = []
             loadedActivityIDSet = []
@@ -242,7 +234,6 @@ struct ActivityListView: View {
         caree = foundCaree
 
         if caree == nil {
-            logger.info("📋 [LIST] updateActivities: caree \(careeID) not found in cache — clearing state")
             activityIDs = []
             loadedActivityIDSet = []
             knownCacheActivityIDs = []
@@ -250,12 +241,8 @@ struct ActivityListView: View {
             return
         }
 
-        let cacheActivityCount = (foundCaree?.activities ?? []).count
-        logger.info("📋 [LIST] updateActivities: caree has \(cacheActivityCount, privacy: .public) activities in cache, hasLoadedInitial=\(hasLoadedInitialPage, privacy: .public), careeChanged=\(careeChanged, privacy: .public)")
-
         // Only load initial page if we haven't loaded yet or caree changed
         if !hasLoadedInitialPage || careeChanged {
-            logger.info("📋 [LIST] updateActivities: triggering loadInitialPage (hasLoaded=\(hasLoadedInitialPage, privacy: .public), changed=\(careeChanged, privacy: .public))")
             Task {
                 await loadInitialPage()
             }
@@ -353,7 +340,6 @@ struct ActivityListView: View {
     @MainActor
     private func loadInitialPage() async {
         guard let cacheService else {
-            logger.info("📋 [LIST] loadInitialPage: no cacheService — clearing")
             caree = nil
             activityIDs = []
             loadedActivityIDSet = []
@@ -364,7 +350,6 @@ struct ActivityListView: View {
 
         caree = cacheService.getCachedCaree(id: careeID)
         let allCacheIDs = Set((caree?.activities ?? []).map(\.id))
-        logger.info("📋 [LIST] loadInitialPage: RESETTING pagination (cache has \(allCacheIDs.count, privacy: .public) activities)")
         activityIDs = []
         loadedActivityIDSet = []
         knownCacheActivityIDs = allCacheIDs
@@ -372,7 +357,6 @@ struct ActivityListView: View {
         hasMorePages = true
         await loadNextPage()
         hasLoadedInitialPage = true
-        logger.info("📋 [LIST] loadInitialPage: done — showing \(activityIDs.count, privacy: .public) activities")
     }
 
     /// Incrementally update the loaded activity set when the cache changes,
@@ -382,13 +366,9 @@ struct ActivityListView: View {
     private func refreshCareeReference() async {
         guard let cacheService else { return }
         caree = cacheService.getCachedCaree(id: careeID)
-        guard let caree, hasLoadedInitialPage else {
-            logger.info("📋 [LIST] refreshCareeReference: skipping (caree=\(self.caree != nil, privacy: .public), hasLoadedInitial=\(hasLoadedInitialPage, privacy: .public))")
-            return
-        }
+        guard let caree, hasLoadedInitialPage else { return }
 
         let allIDs = Set((caree.activities ?? []).map(\.id))
-        logger.info("📋 [LIST] refreshCareeReference: cache has \(allIDs.count, privacy: .public) activities, known=\(knownCacheActivityIDs.count, privacy: .public), loaded=\(loadedActivityIDSet.count, privacy: .public), displayed=\(activityIDs.count, privacy: .public)")
 
         // Only prepend activities that are genuinely new (not in knownCacheActivityIDs).
         // Activities that exist in cache but haven't been paginated to yet are NOT new —
@@ -404,7 +384,6 @@ struct ActivityListView: View {
             activityIDs = newActivities.map(\.id) + activityIDs
             loadedActivityIDSet.formUnion(genuinelyNewIDs)
             knownCacheActivityIDs.formUnion(genuinelyNewIDs)
-            logger.info("📋 [LIST] refreshCareeReference: prepended \(genuinelyNewIDs.count, privacy: .public) genuinely new activities")
         }
 
         // Update known set with any new IDs from cache (e.g. background sync added
@@ -416,20 +395,9 @@ struct ActivityListView: View {
         if !removedIDs.isEmpty {
             activityIDs.removeAll { removedIDs.contains($0) }
             loadedActivityIDSet.subtract(removedIDs)
-            logger.info("📋 [LIST] refreshCareeReference: removed \(removedIDs.count, privacy: .public) deleted activities")
         }
 
         hasMorePages = loadedActivityIDSet.count < allIDs.count
-
-        if genuinelyNewIDs.isEmpty && removedIDs.isEmpty {
-            logger.info("📋 [LIST] refreshCareeReference: no changes to activity set")
-        }
-
-        // Log pending buffer state for correlation
-        let pendingCount = pendingActivityBuffer.pendingActivities(for: careeID).count
-        if pendingCount > 0 {
-            logger.info("📋 [LIST] refreshCareeReference: \(pendingCount, privacy: .public) activities still in pending buffer (shown via mergeActivities)")
-        }
     }
 
     @MainActor

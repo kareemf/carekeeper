@@ -699,8 +699,11 @@ struct CareeDetailView: View {
     }
 
     private func displayActivityCount(for caree: Caree) -> Int {
-        let pendingCount = pendingActivityBuffer.pendingActivities(for: caree.id).count
-        return (activityCount ?? 0) + pendingCount
+        let cachedIDs = Set((caree.activities ?? []).map(\.id))
+        let uniquePendingCount = pendingActivityBuffer.pendingActivities(for: caree.id)
+            .filter { !cachedIDs.contains($0.id) }
+            .count
+        return (activityCount ?? 0) + uniquePendingCount
     }
 
     @MainActor

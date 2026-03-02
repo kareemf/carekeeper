@@ -672,7 +672,6 @@ class CloudKitDataService: ObservableObject {
                     createdAt: Date()
                 )
                 pendingActivityBuffer.enqueue(mutation)
-                logger.info("🔵 [PENDING] Enqueued activity \(activity.id) for caree \(caree.id) (buffer count: \(pendingActivityBuffer.pendingMutations(for: caree.id).count, privacy: .public))")
             }
 
             // Fetch parent records
@@ -717,8 +716,7 @@ class CloudKitDataService: ObservableObject {
                 if let cachedActivityType = cachedActivityTypes.first(where: { $0.id == activityType.id }) {
                     do {
                         try await cacheService.cacheActivity(syncedActivity, for: cachedCaree, activityTypeID: cachedActivityType.id)
-                        let cachedCount = (cachedCaree.activities ?? []).count
-                        logger.info("✅ Activity \(syncedActivity.id) cached locally (pending retained until next refresh, caree now has \(cachedCount, privacy: .public) activities)")
+                        logger.debug("✅ Activity \(syncedActivity.id) cached locally (pending retained until next refresh)")
                     } catch {
                         logger.warning("⚠️ Failed to cache activity \(syncedActivity.id) locally: \(error.localizedDescription)")
                     }
@@ -1206,15 +1204,12 @@ class CloudKitDataService: ObservableObject {
                     let mapping = Dictionary(uniqueKeysWithValues: activities.compactMap { activity in
                         activityTypeIDByActivity[activity.id].map { (activity.id, $0) }
                     })
-                    logger.info("🔄 [REFRESH] replaceCaree \(caree.name): \(activities.count, privacy: .public) activities from CloudKit query")
                     try await cacheService.replaceCaree(
                         cacheCaree,
                         activityTypes: types,
                         activities: activities,
                         activityTypeIDsByActivity: mapping
                     )
-                    let postReplaceCount = (cacheService.getCachedCaree(id: caree.id)?.activities ?? []).count
-                    logger.info("🔄 [REFRESH] replaceCaree \(caree.name): cache now has \(postReplaceCount, privacy: .public) activities")
                 } catch {
                     logger.warning("⚠️ Failed caching owned records: \(error.localizedDescription)")
                 }
@@ -1223,7 +1218,6 @@ class CloudKitDataService: ObservableObject {
             // Apply pending mutations inside the batch so they appear in the same
             // cacheRevision as the refresh — preventing a window where replaceCaree
             // wiped the cache but pending entries haven't been re-applied yet.
-            logger.info("🔵 [PENDING] Applying pending mutations inside batch...")
             await applyPendingActivityMutations(fetchedActivityIDs: fetchedActivityIDs)
         }
 
@@ -1240,22 +1234,14 @@ class CloudKitDataService: ObservableObject {
     ///   subsequent concurrent refreshes will keep re-applying it.
     @MainActor
     private func applyPendingActivityMutations(fetchedActivityIDs: Set<UUID> = []) async {
-        guard let pendingActivityBuffer, let cacheService else {
-            logger.info("🔵 [PENDING] applyPendingActivityMutations: no buffer or cacheService — skipping")
-            return
-        }
+        guard let pendingActivityBuffer, let cacheService else { return }
 
         let pendingCareeIDs = pendingActivityBuffer.pendingCareeIDs
-        guard !pendingCareeIDs.isEmpty else {
-            logger.info("🔵 [PENDING] applyPendingActivityMutations: no pending caree IDs — nothing to apply")
-            return
-        }
-
-        logger.info("🔵 [PENDING] applyPendingActivityMutations: processing \(pendingCareeIDs.count, privacy: .public) carees (fetchedActivityIDs: \(fetchedActivityIDs.count, privacy: .public))")
+        guard !pendingCareeIDs.isEmpty else { return }
 
         for careeID in pendingCareeIDs {
             guard let cachedCaree = cacheService.getCachedCaree(id: careeID) else {
-                logger.warning("🔵 [PENDING] Caree \(careeID) not found in cache — skipping pending mutations")
+                logger.warning("Caree \(careeID) not found in cache — skipping pending mutations")
                 continue
             }
             let cachedTypes = cacheService.getCachedActivityTypes(for: cachedCaree)
@@ -1264,23 +1250,15 @@ class CloudKitDataService: ObservableObject {
 
             if mutations.isEmpty { continue }
 
-            let preApplyCount = (cachedCaree.activities ?? []).count
-            logger.info("🔵 [PENDING] Caree \(cachedCaree.name): \(mutations.count, privacy: .public) pending mutations, cache has \(preApplyCount, privacy: .public) activities before apply")
-
             await cacheService.withBatch {
                 for mutation in mutations {
-                    // If CloudKit query results already include this activity, it has
-                    // propagated — replaceCaree already inserted it, so just clean up.
                     if fetchedActivityIDs.contains(mutation.id) {
                         pendingActivityBuffer.remove(activityID: mutation.id, careeID: careeID)
-                        logger.info("🔵 [PENDING] Activity \(mutation.id) found in CloudKit results — removed from buffer (no re-apply needed)")
                         continue
                     }
 
-                    // CloudKit hasn't returned this activity yet — re-apply to cache
-                    // but keep in the buffer so the next refresh re-applies it again.
                     guard let cachedType = typeByID[mutation.activityTypeID] else {
-                        logger.warning("🔵 [PENDING] Activity \(mutation.id): activityType \(mutation.activityTypeID) not in cache — skipping")
+                        logger.warning("Pending activity \(mutation.id): activityType \(mutation.activityTypeID) not in cache — skipping")
                         continue
                     }
                     do {
@@ -1289,16 +1267,11 @@ class CloudKitDataService: ObservableObject {
                             for: cachedCaree,
                             activityTypeID: cachedType.id
                         )
-                        logger.info("🔵 [PENDING] Activity \(mutation.id) re-applied to cache (not yet in CloudKit — keeping in buffer)")
                     } catch {
                         logger.warning("⚠️ Failed to cache pending activity \(mutation.id): \(error.localizedDescription)")
                     }
                 }
             }
-
-            let postApplyCount = (cachedCaree.activities ?? []).count
-            let remainingPending = pendingActivityBuffer.pendingMutations(for: careeID).count
-            logger.info("🔵 [PENDING] Caree \(cachedCaree.name): cache now has \(postApplyCount, privacy: .public) activities, \(remainingPending, privacy: .public) mutations still pending")
         }
     }
 

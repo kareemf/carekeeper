@@ -1,6 +1,6 @@
 # Fix: Post-CloudKit-Sync Regressions
 
-**Status**: Implemented
+**Status**: Complete
 **Created**: 2026-02-28
 **Branch**: `fix/creator-notification-identity`
 
@@ -357,3 +357,17 @@ No caller changes needed — batching is internal to the method.
 ### Iteration 5 — APPROVED (plan logic confirmed sound)
 
 Codex verified the formIntersection fix and confirmed all three fixes are logically correct. Noted that code changes haven't been applied yet (expected — this is plan review, not implementation review). Ready for implementation.
+
+---
+
+## Post-Implementation Notes
+
+### Additional fixes discovered during implementation
+
+1. **Load More regression (`knownCacheActivityIDs`)**: After implementing the `knownActivityIDs` approach from the spec (renamed to `knownCacheActivityIDs`), testing revealed that `refreshCareeReference()` was still collapsing pagination when background syncs added activities that predated the view session. Fixed by tracking all cache IDs at initial load and only prepending IDs genuinely absent from the snapshot.
+
+2. **Refresh coalescing**: Not in the original spec. During cold start, multiple `.task` / `.onReceive` handlers fired simultaneously, causing redundant `refreshOwnedCareesFromCloudKit()` calls. Added `activeRefreshTask` / `refreshRequestedDuringRun` coalescing in `CloudKitDataService` to collapse concurrent refresh requests into at most two passes (current + follow-up).
+
+3. **`displayActivityCount` dedup (Fix 1d)**: Pending activities that had already been cached were double-counted in the CareeDetailView header. Fixed by filtering pending activities against cached IDs before adding to the count.
+
+4. **Diagnostic logs**: Verbose emoji-prefixed logs (`📋 [LIST]`, `🔵 [PENDING]`, `🔄 [REFRESH]`, `🗑️ [REPLACE]`) were added during debugging and removed in the cleanup pass. Warnings for real issues (caree not in cache, activityType not in cache) and coalescing info logs were retained.
