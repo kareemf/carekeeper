@@ -148,8 +148,6 @@ CareKeeper requires you to be signed into iCloud:
 - Two-factor authentication if enabled
 - Managed through iOS Settings
 
-[SCREENSHOT: iCloud sign-in requirement]
-
 !!! tip "Two-Factor Authentication"
     Enable 2FA on your Apple ID for additional security: Settings > [Your Name] > Password & Security > Two-Factor Authentication.
 

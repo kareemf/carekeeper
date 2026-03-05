@@ -159,7 +159,7 @@ Put your most-used activity types at the top:
 2. Drag the ☰ handle to reorder
 3. Tap **Done**
 
-[SCREENSHOT: Reordering activity types]
+![Reordering with drag handles](../screenshots/reordering-with-drag-handles.png){: .doc-screenshot }
 
 !!! tip "Watch App Order"
     The order you set on iPhone is reflected on your watch, so put frequently-used types at the top for quick access.

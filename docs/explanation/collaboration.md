@@ -147,7 +147,7 @@ Get notified when other participants track activities:
 - ❌ Carees where notifications are disabled
 - ❌ Edits to existing activities (only new activities)
 
-[SCREENSHOT: Example activity notification]
+![Example activity notification](../screenshots/shared-activity-notification-ios.png)
 
 ### Notification Settings
 
@@ -160,23 +160,13 @@ Get notified when other participants track activities:
 **iOS System Permissions:**
 - Settings > CareKeeper > Notifications > Must be enabled
 
-[SCREENSHOT: Notification settings]
-
 ### Notification Content
 
 Notifications show:
 - 📱 Caree name
 - 🏷️ Activity type
 - 📊 Quantity (if applicable)
-- 👤 Who tracked it (if identifiable)
 - ⏰ When it was tracked
-
-Tap notification to:
-- 🔍 View activity details
-- ✏️ Edit if needed
-- 📋 See recent activity list
-
-[SCREENSHOT: Notification with tap action]
 
 ## Best Practices
 

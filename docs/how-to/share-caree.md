@@ -160,7 +160,7 @@ You won't be notified about:
 - Your own activities
 - Carees you haven't enabled notifications for
 
-[SCREENSHOT: Example notification]
+![Example activity notification](../screenshots/shared-activity-notification-ios.png)
 
 ### Managing Notification Settings
 
