@@ -209,13 +209,6 @@ struct CareKeeperApp: App {
                         } catch {
                             AppLogger.app.warning("⚠️ Initial owned refresh failed: \(error.localizedDescription)")
                         }
-
-                        // One-time repair: re-write any existing CloudKit records that used
-                        // the incorrect .deleteSelf reference action. Runs in background so
-                        // it doesn't block the UI; gated by UserDefaults so it only fires once.
-                        Task.detached(priority: .background) {
-                            await cloudKitService.repairCloudKitReferenceActions()
-                        }
                     }
                 }
                 .onAppear {
