@@ -1,0 +1,284 @@
+# Caregiver Display Names for Push Notifications
+
+## Overview and Motivation
+
+Currently, push notifications for shared caree activities read: "Another caregiver logged Nap at 10:14 AM". This is unhelpful when multiple caregivers share a caree — you cannot tell who performed the activity without opening the app. This spec adds caregiver display names so notifications read something like "Sarah logged Nap at 10:14 AM".
+
+The approach stores the display name in two places:
+1. **App group UserDefaults** — so both iOS and watchOS can read it locally
+2. **`CD_creatorDisplayName` field on CD_Activity CKRecords** — so the name travels with the activity and is available at notification time without extra CloudKit lookups
+
+## Storage Design
+
+### App Group UserDefaults (local)
+
+Follow the exact pattern in `UserNotificationPreferences.swift`:
+
+- **Key**: `"caregiverDisplayName"` in app group `CloudKitConfig.appGroupID`
+- **Service**: New class `CaregiverDisplayNameService`
+- **Location**: `/CareKeeper/Shared/Services/CaregiverDisplayNameService.swift` (shared between iOS and watchOS targets)
+
+```swift
+@MainActor
+class CaregiverDisplayNameService: ObservableObject {
+    static let shared = CaregiverDisplayNameService()
+
+    private let appGroupDefaults: UserDefaults
+    private enum Keys {
+        static let displayName = "caregiverDisplayName"
+        static let hasBeenPrompted = "caregiverDisplayNamePrompted"
+    }
+
+    @Published var displayName: String? {
+        didSet { appGroupDefaults.set(displayName, forKey: Keys.displayName) }
+    }
+
+    var hasDisplayName: Bool { displayName != nil && !displayName!.isEmpty }
+
+    /// Returns displayName if set, otherwise fallback
+    var resolvedDisplayName: String {
+        if let name = displayName, !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return name
+        }
+        return "A caregiver"
+    }
+
+    var shouldPromptForDisplayName: Bool {
+        !hasDisplayName && !appGroupDefaults.bool(forKey: Keys.hasBeenPrompted)
+    }
+
+    func markPrompted() {
+        appGroupDefaults.set(true, forKey: Keys.hasBeenPrompted)
+    }
+
+    private init() {
+        if let defaults = UserDefaults(suiteName: CloudKitConfig.appGroupID) {
+            self.appGroupDefaults = defaults
+        } else {
+            self.appGroupDefaults = .standard
+        }
+        self.displayName = self.appGroupDefaults.string(forKey: Keys.displayName)
+    }
+}
+```
+
+Key design decisions:
+- Singleton pattern matches `UserNotificationPreferences.shared`
+- `@Published` so SwiftUI views can react to changes
+- App group storage means watchOS reads the same value
+- `resolvedDisplayName` provides the fallback so callers never pass nil
+- `shouldPromptForDisplayName` / `markPrompted()` ensure one-time prompt behavior
+
+### CloudKit Schema Change
+
+Add a new string field `CD_creatorDisplayName` to the `CD_Activity` record type.
+
+- **Type**: String (nullable)
+- **When set**: At activity creation time only (not updated retroactively)
+- **Value**: The creator's display name from `CaregiverDisplayNameService.shared.resolvedDisplayName`
+
+This field does NOT need to be added to the SwiftData `Activity` model since it is only used for notification display, not stored locally. It lives only on the CKRecord.
+
+## CloudKit Record Changes
+
+### iOS: `CloudKitRecordConverter.activityToRecord()`
+
+**File**: `/CareKeeper/iOS/Services/CloudKitRecordConverter.swift` (line ~157)
+
+After setting `CD_creatorUserRecordID`, add:
+
+```swift
+record["CD_creatorDisplayName"] = CaregiverDisplayNameService.shared.resolvedDisplayName as CKRecordValue
+```
+
+### watchOS: `SelectiveCloudKitService.createActivity()`
+
+**File**: `/CareKeeper/watchOS/Services/SelectiveCloudKitService.swift` (line ~509)
+
+After the existing `record["CD_creatorUserRecordID"]` line, add:
+
+```swift
+record["CD_creatorDisplayName"] = CaregiverDisplayNameService.shared.resolvedDisplayName
+```
+
+## Notification Resolution Changes
+
+There are **three** call sites where notifications are built, and all have the `CKRecord` available. At each site, replace the hardcoded `"Another caregiver"` with a read from the record:
+
+### Pattern (same at all three sites)
+
+```swift
+let creatorDisplayName = record["CD_creatorDisplayName"] as? String ?? "A caregiver"
+```
+
+Then pass `creatorDisplayName` to `presentNewActivityNotification(creatorName:)`.
+
+### Site 1: `CloudKitSharedRecordsService.handleNewActivityNotification()` (line ~237)
+
+**File**: `/CareKeeper/iOS/Services/CloudKitSharedRecordsService.swift`
+
+### Site 2: `CloudKitSharedRecordsService.notifyForActivityRecord()` (line ~401)
+
+**File**: `/CareKeeper/iOS/Services/CloudKitSharedRecordsService.swift`
+
+### Site 3: `CloudKitDataService` private zone notification handler (line ~1675)
+
+**File**: `/CareKeeper/iOS/Services/CloudKitDataService.swift`
+
+### Default value change
+
+**File**: `/CareKeeper/Shared/Services/UserNotificationService.swift` (line ~129)
+
+Update default parameter from `"Another caregiver"` to `"A caregiver"` for consistency.
+
+## UI Changes
+
+### 1. SharingView: "Your Display Name" field
+
+**File**: `/CareKeeper/iOS/Views/Sharing/SharingView.swift`
+
+Add a new section at the top of the `List` (before "Shared by Me"):
+
+```swift
+Section {
+    HStack {
+        Text("Your Display Name")
+        Spacer()
+        TextField("Enter your name", text: Binding(
+            get: { displayNameService.displayName ?? "" },
+            set: { displayNameService.displayName = $0.isEmpty ? nil : $0 }
+        ))
+        .multilineTextAlignment(.trailing)
+        .textContentType(.name)
+    }
+} header: {
+    Text("Your Identity")
+} footer: {
+    Text("This name is shown to other caregivers in activity notifications.")
+}
+```
+
+Add `@StateObject private var displayNameService = CaregiverDisplayNameService.shared` to the view.
+
+### 2. One-Time Display Name Prompt
+
+**New file**: `/CareKeeper/iOS/Components/DisplayNamePromptView.swift`
+
+An `.alert` with a `TextField` (iOS 16+):
+- Title: "Set Your Display Name"
+- Message: "Other caregivers will see this name in notifications when you track activities."
+- A `TextField` for the name
+- "Save" and "Skip" buttons
+
+The prompt only appears once. Uses `CaregiverDisplayNameService.shared.shouldPromptForDisplayName` as guard. Both "Save" and "Skip" call `markPrompted()`.
+
+### 3. Prompt Trigger Points
+
+#### Trigger A: When sharing a caree (owner sharing flow)
+
+**File**: `/CareKeeper/iOS/Components/CareeShareButton.swift`
+
+In `prepareShare()`, before opening the `CloudSharingView`, check if display name is set:
+
+```swift
+private func prepareShare() async {
+    if CaregiverDisplayNameService.shared.shouldPromptForDisplayName {
+        showingDisplayNamePrompt = true
+        return  // Continue to share after prompt is dismissed
+    }
+    // ... existing share logic
+}
+```
+
+After prompt dismissal, proceed with the share flow.
+
+#### Trigger B: When tracking an activity on a shared caree
+
+**File**: `/CareKeeper/iOS/Views/Activity/TrackActivityView.swift`
+
+In `saveActivity()`, before the actual save, check if:
+1. The caree is shared
+2. Display name is not yet set and user hasn't been prompted
+
+```swift
+private func saveActivity() {
+    guard let activityType = selectedActivityType else { return }
+
+    if isSharedCaree && CaregiverDisplayNameService.shared.shouldPromptForDisplayName {
+        showingDisplayNamePrompt = true
+        return  // Will retry save after prompt
+    }
+    // ... existing save logic
+}
+```
+
+#### Trigger flow summary
+
+The prompt shows at most once across the lifetime of the app. Once `markPrompted()` is called (via Save or Skip), no trigger point shows the prompt again. The user can always edit their name in SharingView.
+
+### 4. watchOS: No prompt, read-only
+
+No UI changes on watchOS. The watch reads `CaregiverDisplayNameService.shared.resolvedDisplayName` from app group UserDefaults when creating activities. If not set, falls back to "A caregiver".
+
+## Implementation Checklist
+
+### Step 1: Storage service
+- [ ] Create `CaregiverDisplayNameService` in `/CareKeeper/Shared/Services/CaregiverDisplayNameService.swift`
+- [ ] Add to both iOS and watchOS targets in `project.yml`
+
+### Step 2: CloudKit schema — write side
+- [ ] In `CloudKitRecordConverter.activityToRecord()`, add `record["CD_creatorDisplayName"]`
+- [ ] In `SelectiveCloudKitService.createActivity()`, add `record["CD_creatorDisplayName"]`
+
+### Step 3: Notification resolution — read side
+- [ ] In `CloudKitSharedRecordsService.handleNewActivityNotification()`, read `CD_creatorDisplayName` from record
+- [ ] In `CloudKitSharedRecordsService.notifyForActivityRecord()`, read `CD_creatorDisplayName` from record
+- [ ] In `CloudKitDataService` private zone notification handler, read `CD_creatorDisplayName` from record
+- [ ] Update default parameter in `UserNotificationService.presentNewActivityNotification()` from "Another caregiver" to "A caregiver"
+
+### Step 4: UI — SharingView display name field
+- [ ] Add "Your Identity" section at top of `SharingView` list
+- [ ] Wire up `TextField` to `CaregiverDisplayNameService.shared`
+
+### Step 5: UI — Display name prompt
+- [ ] Create `DisplayNamePromptView` (alert with text field)
+- [ ] Add prompt trigger in `CareeShareButton.prepareShare()` (owner sharing flow)
+- [ ] Add prompt trigger in `TrackActivityView.saveActivity()` (shared caree activity tracking)
+- [ ] Ensure prompt only shows once via `shouldPromptForDisplayName` / `markPrompted()`
+
+### Step 6: Testing
+- [ ] Unit test `CaregiverDisplayNameService` (read/write, fallback, prompted flag)
+- [ ] Verify `CD_creatorDisplayName` is set on activities created from iOS
+- [ ] Verify `CD_creatorDisplayName` is set on activities created from watchOS
+- [ ] Verify notification body shows creator name when field is present
+- [ ] Verify notification body shows "A caregiver" when field is absent (backward compatibility)
+- [ ] Verify prompt appears on first share attempt without display name
+- [ ] Verify prompt appears on first activity track on shared caree without display name
+- [ ] Verify prompt does not appear after being dismissed (skip or save)
+- [ ] Verify SharingView shows editable display name field
+
+## Edge Cases and Considerations
+
+### Backward compatibility
+Activities created before this feature will not have `CD_creatorDisplayName`. The notification code falls back to "A caregiver" when the field is nil. This is an improvement over the current "Another caregiver" since it does not imply we know there is a different person — we simply do not know.
+
+### Name changes
+If a user changes their display name in SharingView, only **future** activities carry the new name. Existing activity records retain the old name. This is acceptable since notifications are ephemeral and the name was correct at the time of activity creation.
+
+### Empty or whitespace-only names
+`resolvedDisplayName` trims whitespace and returns "A caregiver" for empty/whitespace-only strings. The `TextField` in SharingView allows clearing the name (sets to nil).
+
+### watchOS without iOS setup
+If a user only uses the watch and never sets their display name on iOS, activities will be attributed to "A caregiver". The user must set their name on iOS. The watch does not prompt.
+
+### Multiple iOS devices
+The display name is stored in app group UserDefaults, which syncs between iOS and watchOS on the same device but does NOT sync across separate iOS devices via iCloud. Each device needs the name set independently via SharingView. A future enhancement could store the name in a CloudKit user record, but that is out of scope.
+
+### Privacy
+Display names are stored as plain strings on CKRecords, visible to all share participants. This is consistent with how CloudKit sharing works (participants can already see each other's names via CKShare.Participant). The user explicitly enters this name knowing it will be shown to other caregivers.
+
+### CloudKit schema deployment
+The `CD_creatorDisplayName` field will be auto-created in the Development environment when the first record with this field is saved. For Production, the schema must be promoted via CloudKit Dashboard before the App Store release.
+
+### Prompt UX
+The "Skip" option on the prompt is non-aggressive. If the user skips, `markPrompted()` is called and the prompt will not appear again. The user can always set their name later via SharingView's "Your Identity" section.
