@@ -20,6 +20,8 @@ struct TrackActivityView: View {
     @State private var reminderEnabled: Bool = false
     @State private var reminderDate: Date = .init().addingTimeInterval(300)
     @State private var reminderInfoMessage: String?
+    @State private var showingDisplayNamePrompt = false
+    @State private var pendingSaveAfterPrompt = false
 
     // Use unified API from CloudKitDataService
     @EnvironmentObject private var cloudKitService: CloudKitDataService
@@ -80,9 +82,15 @@ struct TrackActivityView: View {
                 error = locationManager.error
             }
         }
+        .displayNamePrompt(isPresented: $showingDisplayNamePrompt) {
+            if pendingSaveAfterPrompt {
+                pendingSaveAfterPrompt = false
+                saveActivity()
+            }
+        }
         .errorAlert($error)
     }
-    
+
     private var activityTypeSection: some View {
         Section(NSLocalizedString("Activity Type", comment: "Activity type section title")) {
             if sortedActivityTypes.isEmpty {
@@ -239,6 +247,13 @@ struct TrackActivityView: View {
     
     private func saveActivity() {
         guard let activityType = selectedActivityType else { return }
+
+        // Prompt for display name on first activity track for a shared caree
+        if caree.isShared && CaregiverDisplayNameService.shared.shouldPromptForDisplayName {
+            pendingSaveAfterPrompt = true
+            showingDisplayNamePrompt = true
+            return
+        }
 
         // Parse quantity if provided
         var quantityValue: Double? = nil

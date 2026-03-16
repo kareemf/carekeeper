@@ -126,7 +126,7 @@ class UserNotificationService: ObservableObject {
         careeID: UUID,
         careeName: String,
         activityTypeName: String,
-        creatorName: String = "Another caregiver",
+        creatorName: String = "A caregiver",
         timestamp: Date
     ) async {
         // Check authorization status

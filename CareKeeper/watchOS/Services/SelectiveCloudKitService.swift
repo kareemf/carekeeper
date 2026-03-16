@@ -507,6 +507,7 @@ class SelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
         let creatorRecordName = await fetchCurrentUserRecordName()
         let resolvedCreatorRecordName = creatorRecordName ?? CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
         record["CD_creatorUserRecordID"] = resolvedCreatorRecordName
+        record["CD_creatorDisplayName"] = CaregiverDisplayNameService.shared.resolvedDisplayName
 
         // Set references (in the same zone)
         let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(activity.careeID.uuidString)", zoneID: zoneID)

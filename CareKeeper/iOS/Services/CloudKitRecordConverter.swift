@@ -157,6 +157,7 @@ class CloudKitRecordConverter {
         // Creator tracking (for notifications)
         let resolvedCreatorRecordName = creatorRecordName ?? CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
         record["CD_creatorUserRecordID"] = resolvedCreatorRecordName as CKRecordValue
+        record["CD_creatorDisplayName"] = CaregiverDisplayNameService.shared.resolvedDisplayName as CKRecordValue
 
         // Relationship references
         // Must use .none (not .deleteSelf) for records in a CloudKit sharing hierarchy.
