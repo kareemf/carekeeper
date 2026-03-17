@@ -688,7 +688,8 @@ class CloudKitDataService: ObservableObject {
                 parentCaree: careeRecord,
                 activityTypeRecord: activityTypeRecord,
                 zoneID: zoneID,
-                creatorRecordName: creatorRecordName
+                creatorRecordName: creatorRecordName,
+                creatorDisplayName: CaregiverDisplayNameService.shared.resolvedDisplayName
             )
 
             // Save to CloudKit

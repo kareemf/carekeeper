@@ -250,6 +250,10 @@ class CloudKitSharedRecordsService: ObservableObject {
             return
         }
 
+        await handleSharedZoneChange(for: zoneID)
+    }
+
+    func handleSharedZoneChange(for zoneID: CKRecordZone.ID) async {
         let existingActivityIDs: Set<UUID> = Set(
             sharedCarees
                 .flatMap { $0.activities ?? [] }

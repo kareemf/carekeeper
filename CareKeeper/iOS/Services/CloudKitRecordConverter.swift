@@ -125,7 +125,8 @@ class CloudKitRecordConverter {
         activityTypeRecord: CKRecord,
         zoneID: CKRecordZone.ID? = nil,
         existingRecord: CKRecord? = nil,
-        creatorRecordName: String? = nil
+        creatorRecordName: String? = nil,
+        creatorDisplayName: String? = nil
     ) throws -> CKRecord {
         let recordID: CKRecord.ID = if let existing = existingRecord {
             existing.recordID
@@ -157,7 +158,7 @@ class CloudKitRecordConverter {
         // Creator tracking (for notifications)
         let resolvedCreatorRecordName = creatorRecordName ?? CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
         record["CD_creatorUserRecordID"] = resolvedCreatorRecordName as CKRecordValue
-        record["CD_creatorDisplayName"] = CaregiverDisplayNameService.shared.resolvedDisplayName as CKRecordValue
+        record["CD_creatorDisplayName"] = (creatorDisplayName ?? "A caregiver") as CKRecordValue
 
         // Relationship references
         // Must use .none (not .deleteSelf) for records in a CloudKit sharing hierarchy.
