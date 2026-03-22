@@ -223,41 +223,51 @@ No UI changes on watchOS. The watch reads `CaregiverDisplayNameService.shared.re
 ## Implementation Checklist
 
 ### Step 1: Storage service
-- [ ] Create `CaregiverDisplayNameService` in `/CareKeeper/Shared/Services/CaregiverDisplayNameService.swift`
-- [ ] Add to both iOS and watchOS targets in `project.yml`
+- [x] Create `CaregiverDisplayNameService` in `/CareKeeper/Shared/Services/CaregiverDisplayNameService.swift`
+- [x] Add to both iOS and watchOS targets (already in `Shared/Services`, included by `project.yml`)
+- [x] Add `init(testing:)` for isolated unit tests
 
 ### Step 2: CloudKit schema — write side
-- [ ] In `CloudKitRecordConverter.activityToRecord()`, add `record["CD_creatorDisplayName"]`
-- [ ] In `SelectiveCloudKitService.createActivity()`, add `record["CD_creatorDisplayName"]`
+- [x] In `CloudKitRecordConverter.activityToRecord()`, add `record["CD_creatorDisplayName"]`
+- [x] In `SelectiveCloudKitService.createActivity()`, add `record["CD_creatorDisplayName"]`
 
 ### Step 3: Notification resolution — read side
-- [ ] In `CloudKitSharedRecordsService.handleNewActivityNotification()`, read `CD_creatorDisplayName` from record
-- [ ] In `CloudKitSharedRecordsService.notifyForActivityRecord()`, read `CD_creatorDisplayName` from record
-- [ ] In `CloudKitDataService` private zone notification handler, read `CD_creatorDisplayName` from record
-- [ ] Update default parameter in `UserNotificationService.presentNewActivityNotification()` from "Another caregiver" to "A caregiver"
+- [x] In `CloudKitSharedRecordsService.handleNewActivityNotification()`, read `CD_creatorDisplayName` from record
+- [x] In `CloudKitSharedRecordsService.notifyForActivityRecord()`, read `CD_creatorDisplayName` from record
+- [x] In `CloudKitDataService` private zone notification handler, read `CD_creatorDisplayName` from record
+- [x] Update default parameter in `UserNotificationService.presentNewActivityNotification()` from "Another caregiver" to "A caregiver"
 
 ### Step 4: UI — SharingView display name field
-- [ ] Add "Your Identity" section at top of `SharingView` list
-- [ ] Wire up `TextField` to `CaregiverDisplayNameService.shared`
+- [x] Add "Your Identity" section at top of `SharingView` list
+- [x] Wire up `TextField` to `CaregiverDisplayNameService.shared`
 
 ### Step 5: UI — Display name prompt
-- [ ] Create `DisplayNamePromptView` (alert with text field)
-- [ ] Add prompt trigger in `CareeShareButton.prepareShare()` (owner sharing flow)
-- [ ] Add prompt trigger in `TrackActivityView.saveActivity()` (shared caree activity tracking)
-- [ ] Ensure prompt only shows once via `shouldPromptForDisplayName` / `markPrompted()`
+- [x] Create `DisplayNamePromptModifier` (alert with text field, `.displayNamePrompt()` view modifier)
+- [x] Add prompt trigger in `CareeShareButton.prepareShare()` (owner sharing flow)
+- [x] Add prompt trigger in `TrackActivityView.saveActivity()` (shared caree activity tracking)
+- [x] Ensure prompt only shows once via `shouldPromptForDisplayName` / `markPrompted()`
 
-### Step 6: Testing
-- [ ] Unit test `CaregiverDisplayNameService` (read/write, fallback, prompted flag)
-- [ ] Verify `CD_creatorDisplayName` is set on activities created from iOS
-- [ ] Verify `CD_creatorDisplayName` is set on activities created from watchOS
-- [ ] Verify notification body shows creator name when field is present
-- [ ] Verify notification body shows "A caregiver" when field is absent (backward compatibility)
-- [ ] Verify prompt appears on first share attempt without display name
-- [ ] Verify prompt appears on first activity track on shared caree without display name
-- [ ] Verify prompt does not appear after being dismissed (skip or save)
-- [ ] Verify SharingView shows editable display name field
+### Step 6: Fix watchOS self-notification bug
+- [x] Fix `CloudKitNotificationAuthorFilter` to treat `CKCurrentUserDefaultName` as unreliable fallback
+- [x] When `CD_creatorUserRecordID` is `__defaultOwner__`, fall through to `record.creatorUserRecordID` metadata
+
+### Step 7: Testing
+- [x] Unit test `CaregiverDisplayNameService` (read/write, fallback, prompted flag, persistence)
+- [x] Unit test `CloudKitNotificationAuthorFilter` — expanded to 8 cases covering `CKCurrentUserDefaultName` fallback
+- [ ] Verify `CD_creatorDisplayName` is set on activities created from iOS (manual/device testing)
+- [ ] Verify `CD_creatorDisplayName` is set on activities created from watchOS (manual/device testing)
+- [ ] Verify notification body shows creator name when field is present (manual/device testing)
+- [ ] Verify notification body shows "A caregiver" when field is absent — backward compatibility (manual/device testing)
+- [ ] Verify prompt appears on first share attempt without display name (manual/device testing)
+- [ ] Verify prompt appears on first activity track on shared caree without display name (manual/device testing)
+- [ ] Verify prompt does not appear after being dismissed — skip or save (manual/device testing)
+- [ ] Verify SharingView shows editable display name field (manual/device testing)
+- [ ] Verify watchOS no longer receives self-notifications for own activities (manual/device testing)
 
 ## Edge Cases and Considerations
+
+### watchOS self-notification bug (fixed)
+When the watch creates an activity, `SelectiveCloudKitService` calls `fetchCurrentUserRecordName()` which may return `nil` (network issues on watch). The fallback writes `CKCurrentUserDefaultName` (`"__defaultOwner__"`) as `CD_creatorUserRecordID`. On iOS, the filter previously saw this field didn't match the real user ID and short-circuited to "notify", ignoring the CloudKit `record.creatorUserRecordID` metadata which correctly identifies the same user. Fix: `CloudKitNotificationAuthorFilter` now treats `CKCurrentUserDefaultName` as unreliable and falls through to check `record.creatorUserRecordID`.
 
 ### Backward compatibility
 Activities created before this feature will not have `CD_creatorDisplayName`. The notification code falls back to "A caregiver" when the field is nil. This is an improvement over the current "Another caregiver" since it does not imply we know there is a different person — we simply do not know.

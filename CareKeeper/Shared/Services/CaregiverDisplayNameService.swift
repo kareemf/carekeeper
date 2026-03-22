@@ -62,4 +62,10 @@ class CaregiverDisplayNameService: ObservableObject {
         }
         self.displayName = self.appGroupDefaults.string(forKey: Keys.displayName)
     }
+
+    /// Testable initializer that uses the provided UserDefaults instead of app group
+    init(testing defaults: UserDefaults) {
+        self.appGroupDefaults = defaults
+        self.displayName = defaults.string(forKey: Keys.displayName)
+    }
 }
