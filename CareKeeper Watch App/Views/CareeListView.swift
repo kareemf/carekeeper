@@ -118,12 +118,32 @@ struct CareeListView: View {
     }
 
     private var careeList: some View {
-        List(dataProvider.carees) { caree in
-            NavigationLink {
-                CareeDetailView(careeSnapshot: caree)
-                    .environmentObject(dataProvider)
-            } label: {
-                CareeRowView(snapshot: caree)
+        List {
+            ForEach(dataProvider.carees) { caree in
+                NavigationLink {
+                    CareeDetailView(careeSnapshot: caree)
+                        .environmentObject(dataProvider)
+                } label: {
+                    CareeRowView(snapshot: caree)
+                }
+            }
+
+            // MARK: - Diagnostic (temporary)
+            Section {
+                let svc = CaregiverDisplayNameService.shared
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Display Name Diagnostic")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                    Text("raw: \(svc.displayName ?? "nil")")
+                        .font(.system(.caption2, design: .monospaced))
+                    Text("resolved: \(svc.resolvedDisplayName)")
+                        .font(.system(.caption2, design: .monospaced))
+                    Text("appGroup: \(CloudKitConfig.appGroupID)")
+                        .font(.system(.caption2, design: .monospaced))
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
             }
         }
         .refreshable {
