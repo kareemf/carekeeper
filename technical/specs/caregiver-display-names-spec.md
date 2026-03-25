@@ -80,7 +80,32 @@ The display name is synced from iOS to watchOS via a `CD_UserSettings` record in
 - **Zone**: Private zone (`CloudKitConfig.zoneName`)
 - **Field**: `CD_value` = the display name string
 
-**Read (watchOS)**: `SelectiveCloudKitService.fetchDisplayName()` fetches the record. Called by `WatchDataProvider.loadCarees()` on startup when no display name is cached locally.
+**Read (watchOS)**: `SelectiveCloudKitService.fetchDisplayName()` fetches the record. Called by `WatchDataProvider.loadCarees()` when no local cache exists or on pull-to-refresh.
+
+### Caching Strategy
+
+Display names change rarely (set once, maybe edited occasionally), so the caching strategy prioritizes avoiding unnecessary CloudKit operations over real-time propagation.
+
+#### iOS: Debounced writes
+
+`CaregiverDisplayNameService.syncToCloudKit()` (called from `displayName`'s `didSet`) uses a 2-second debounce to coalesce rapid keystrokes from the SharingView TextField into a single CloudKit write. Typing "Sarah" produces 1 CloudKit round-trip, not 5.
+
+For explicit save actions (e.g., the display name prompt's Save button), `syncToCloudKitImmediately()` bypasses the debounce and writes immediately. This ensures the name is available in CloudKit right away when the user has deliberately confirmed it.
+
+#### watchOS: Cache-first with pull-to-refresh invalidation
+
+On initial launch, the watch uses the display name cached in local UserDefaults (persisted from the last CloudKit fetch). A CloudKit fetch only occurs when:
+
+1. **No cached name** (`!hasDisplayName`) — first launch or fresh install
+2. **Pull-to-refresh** on CareeListView — user explicitly requests fresh data (calls `loadCarees(force: true)`)
+
+This avoids adding latency to normal app launches. The trade-off: if a user changes their name on iOS, the watch won't pick it up until the next pull-to-refresh. This is acceptable because display name changes are rare and pull-to-refresh is a natural "give me fresh data" gesture.
+
+When a remote value is fetched, it is compared to the local cache and only written if different, avoiding unnecessary UserDefaults writes and `@Published` change notifications.
+
+#### iOS: No read-back
+
+iOS is the sole writer of display names and does not read back from CloudKit. If multi-device iOS support is needed in the future, a read-back on launch can be added.
 
 ### CloudKit Schema Change
 
@@ -265,6 +290,14 @@ No UI changes on watchOS. The watch reads `CaregiverDisplayNameService.shared.re
 - [x] Add `fetchDisplayName()` to `SelectiveCloudKitServiceProtocol` and implementation
 - [x] Fetch display name in `WatchDataProvider.loadCarees()` on startup when not cached locally
 - [x] Update mock in `WatchDataProviderTests` to conform to updated protocol
+
+### Step 6b: Caching strategy
+- [x] Add 2-second debounce to `syncToCloudKit()` for SharingView TextField keystroke coalescing
+- [x] Add `syncToCloudKitImmediately()` for explicit Save actions (DisplayNamePromptModifier)
+- [x] Extract `performCloudKitSync()` shared implementation
+- [x] Update `WatchDataProvider.loadCarees()` to fetch display name on pull-to-refresh (`force`) or no cache
+- [x] Compare remote vs local before updating to avoid unnecessary writes
+- [x] Update spec with caching strategy section
 
 ### Step 7: Fix watchOS self-notification bug
 - [x] Fix `CloudKitNotificationAuthorFilter` to treat `CKCurrentUserDefaultName` as unreliable fallback

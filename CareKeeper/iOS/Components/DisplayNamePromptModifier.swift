@@ -24,6 +24,7 @@ struct DisplayNamePromptModifier: ViewModifier {
                     let trimmed = draftName.trimmingCharacters(in: .whitespacesAndNewlines)
                     if !trimmed.isEmpty {
                         CaregiverDisplayNameService.shared.displayName = trimmed
+                        CaregiverDisplayNameService.shared.syncToCloudKitImmediately()
                     }
                     CaregiverDisplayNameService.shared.markPrompted()
                     onComplete()

@@ -63,10 +63,31 @@ class CaregiverDisplayNameService: ObservableObject {
 
     // MARK: - CloudKit Sync
 
-    /// Fire-and-forget sync of display name to CloudKit private zone.
-    /// This makes the name available to watchOS via SelectiveCloudKitService.fetchDisplayName().
+    private var syncTask: Task<Void, Never>?
+
+    /// Debounced sync — called from `didSet` on `displayName`.
+    /// Coalesces rapid keystrokes (e.g. SharingView TextField) into a single CloudKit write.
     private func syncToCloudKit() {
+        syncTask?.cancel()
         let value = displayName
+        syncTask = Task { @MainActor [value] in
+            try? await Task.sleep(for: .seconds(2))
+            guard !Task.isCancelled else { return }
+            performCloudKitSync(value: value)
+        }
+    }
+
+    /// Immediate sync — call from explicit Save actions (e.g. DisplayNamePromptModifier).
+    /// Cancels any pending debounced sync and writes immediately.
+    func syncToCloudKitImmediately() {
+        syncTask?.cancel()
+        let value = displayName
+        performCloudKitSync(value: value)
+    }
+
+    /// Fire-and-forget write of display name to CloudKit private zone.
+    /// Makes the name available to watchOS via SelectiveCloudKitService.fetchDisplayName().
+    private func performCloudKitSync(value: String?) {
         Task.detached { [value] in
             do {
                 let container = CKContainer(identifier: CloudKitConfig.containerID)
