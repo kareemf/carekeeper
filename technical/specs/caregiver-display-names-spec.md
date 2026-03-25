@@ -80,7 +80,7 @@ The display name is synced from iOS to watchOS via a `CD_UserSettings` record in
 - **Zone**: Private zone (`CloudKitConfig.zoneName`)
 - **Field**: `CD_value` = the display name string
 
-**Read (watchOS)**: `SelectiveCloudKitService.fetchDisplayName()` fetches the record. Called by `WatchDataProvider.loadCarees()` when no local cache exists or on pull-to-refresh.
+**Read (iOS and watchOS)**: `CaregiverDisplayNameService.fetchFromCloudKit()` fetches the record. On iOS, called at app launch when no local cache (reinstall recovery). On watchOS, called by `WatchDataProvider.loadCarees()` when no local cache exists or on pull-to-refresh.
 
 ### Caching Strategy
 
@@ -103,9 +103,11 @@ This avoids adding latency to normal app launches. The trade-off: if a user chan
 
 When a remote value is fetched, it is compared to the local cache and only written if different, avoiding unnecessary UserDefaults writes and `@Published` change notifications.
 
-#### iOS: No read-back
+#### iOS: Read-back on launch when no local cache
 
-iOS is the sole writer of display names and does not read back from CloudKit. If multi-device iOS support is needed in the future, a read-back on launch can be added.
+On app launch, if no display name is cached locally (`!hasDisplayName`), iOS fetches from CloudKit via `CaregiverDisplayNameService.fetchFromCloudKit()`. This handles the reinstall scenario — the user previously set a name, uninstalled, and reinstalled. Without this, the app would re-prompt for a name that already exists in CloudKit.
+
+This is not multi-device sync (no cache invalidation or periodic polling). iOS remains the single writer — this is purely a recovery read when local state is lost.
 
 ### CloudKit Schema Change
 
@@ -285,11 +287,12 @@ No UI changes on watchOS. The watch reads `CaregiverDisplayNameService.shared.re
 - [x] Add prompt trigger in `TrackActivityView.saveActivity()` (shared caree activity tracking)
 - [x] Ensure prompt only shows once via `shouldPromptForDisplayName` / `markPrompted()`
 
-### Step 6: CloudKit cross-device sync (iOS → watchOS)
+### Step 6: CloudKit cross-device sync
 - [x] Add `syncToCloudKit()` to `CaregiverDisplayNameService` — saves `CD_UserSettings` record on display name change
-- [x] Add `fetchDisplayName()` to `SelectiveCloudKitServiceProtocol` and implementation
-- [x] Fetch display name in `WatchDataProvider.loadCarees()` on startup when not cached locally
-- [x] Update mock in `WatchDataProviderTests` to conform to updated protocol
+- [x] Add `fetchFromCloudKit()` to `CaregiverDisplayNameService` — shared read logic for iOS and watchOS
+- [x] iOS: fetch display name on app launch when no local cache (reinstall recovery) in `CareKeeperApp`
+- [x] watchOS: fetch display name in `WatchDataProvider.loadCarees()` on startup when not cached or on pull-to-refresh
+- [x] Remove `fetchDisplayName()` from `SelectiveCloudKitServiceProtocol` (consolidated into shared service)
 
 ### Step 6b: Caching strategy
 - [x] Add 2-second debounce to `syncToCloudKit()` for SharingView TextField keystroke coalescing

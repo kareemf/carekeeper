@@ -33,7 +33,9 @@ class CaregiverDisplayNameService: ObservableObject {
     @Published var displayName: String? {
         didSet {
             appGroupDefaults.set(displayName, forKey: Keys.displayName)
-            syncToCloudKit()
+            if !isSuppressingSync {
+                syncToCloudKit()
+            }
         }
     }
 
@@ -63,6 +65,8 @@ class CaregiverDisplayNameService: ObservableObject {
 
     // MARK: - CloudKit Sync
 
+    /// When true, suppresses `didSet` sync-back to CloudKit (used during fetchFromCloudKit)
+    private var isSuppressingSync = false
     private var syncTask: Task<Void, Never>?
 
     /// Debounced sync — called from `didSet` on `displayName`.
@@ -85,8 +89,35 @@ class CaregiverDisplayNameService: ObservableObject {
         performCloudKitSync(value: value)
     }
 
+    /// Fetch display name from CloudKit private zone and update local cache if different.
+    /// Call on launch when no local cache exists (e.g. fresh install or reinstall).
+    /// Suppresses sync-back to CloudKit since we just read from there.
+    /// Returns the fetched name, or nil if not found.
+    @discardableResult
+    func fetchFromCloudKit() async -> String? {
+        do {
+            let container = CKContainer(identifier: CloudKitConfig.containerID)
+            let database = container.privateCloudDatabase
+            let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
+            let recordID = CKRecord.ID(
+                recordName: CaregiverDisplayNameService.recordName,
+                zoneID: zoneID
+            )
+            let record = try await database.record(for: recordID)
+            let value = record[CaregiverDisplayNameService.valueField] as? String
+            if value != displayName {
+                isSuppressingSync = true
+                displayName = value
+                isSuppressingSync = false
+            }
+            return value
+        } catch {
+            return nil
+        }
+    }
+
     /// Fire-and-forget write of display name to CloudKit private zone.
-    /// Makes the name available to watchOS via SelectiveCloudKitService.fetchDisplayName().
+    /// Makes the name available cross-device via fetchFromCloudKit().
     private func performCloudKitSync(value: String?) {
         Task.detached { [value] in
             do {

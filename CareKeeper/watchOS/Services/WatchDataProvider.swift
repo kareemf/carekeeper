@@ -175,11 +175,8 @@ class WatchDataProvider: ObservableObject {
                 // Fetch display name from CloudKit (set on iOS, needed for watch-created activities)
                 // Cache-first: only fetch when no local cache or on pull-to-refresh (force)
                 if force || !CaregiverDisplayNameService.shared.hasDisplayName {
-                    if let name = await selectiveService.fetchDisplayName() {
-                        if name != CaregiverDisplayNameService.shared.displayName {
-                            CaregiverDisplayNameService.shared.displayName = name
-                            logger.info("✅ Synced display name from CloudKit: \(name, privacy: .public)")
-                        }
+                    if let name = await CaregiverDisplayNameService.shared.fetchFromCloudKit() {
+                        logger.info("✅ Synced display name from CloudKit: \(name, privacy: .public)")
                     }
                 }
 
