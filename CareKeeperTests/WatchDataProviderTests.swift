@@ -494,4 +494,6 @@ final class MockSelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
     }
 
     func deleteActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws {}
+
+    func fetchDisplayName() async -> String? { nil }
 }

@@ -65,9 +65,22 @@ class CaregiverDisplayNameService: ObservableObject {
 Key design decisions:
 - Singleton pattern matches `UserNotificationPreferences.shared`
 - `@Published` so SwiftUI views can react to changes
-- App group storage means watchOS reads the same value
+- App group storage for local persistence on each device
 - `resolvedDisplayName` provides the fallback so callers never pass nil
 - `shouldPromptForDisplayName` / `markPrompted()` ensure one-time prompt behavior
+
+**Important**: App group UserDefaults does NOT sync between iOS and watchOS (they are separate physical devices). App groups only share between processes on the *same* device (e.g., iOS app ↔ iOS widget). Cross-device sync uses CloudKit — see below.
+
+### CloudKit Cross-Device Sync
+
+The display name is synced from iOS to watchOS via a `CD_UserSettings` record in the CloudKit private zone.
+
+**Write (iOS)**: `CaregiverDisplayNameService.syncToCloudKit()` fires on every `displayName` change. Saves a `CD_UserSettings` record with:
+- **Record ID**: `CD_UserSettings/displayName` (fixed, one per user)
+- **Zone**: Private zone (`CloudKitConfig.zoneName`)
+- **Field**: `CD_value` = the display name string
+
+**Read (watchOS)**: `SelectiveCloudKitService.fetchDisplayName()` fetches the record. Called by `WatchDataProvider.loadCarees()` on startup when no display name is cached locally.
 
 ### CloudKit Schema Change
 
@@ -247,11 +260,17 @@ No UI changes on watchOS. The watch reads `CaregiverDisplayNameService.shared.re
 - [x] Add prompt trigger in `TrackActivityView.saveActivity()` (shared caree activity tracking)
 - [x] Ensure prompt only shows once via `shouldPromptForDisplayName` / `markPrompted()`
 
-### Step 6: Fix watchOS self-notification bug
+### Step 6: CloudKit cross-device sync (iOS → watchOS)
+- [x] Add `syncToCloudKit()` to `CaregiverDisplayNameService` — saves `CD_UserSettings` record on display name change
+- [x] Add `fetchDisplayName()` to `SelectiveCloudKitServiceProtocol` and implementation
+- [x] Fetch display name in `WatchDataProvider.loadCarees()` on startup when not cached locally
+- [x] Update mock in `WatchDataProviderTests` to conform to updated protocol
+
+### Step 7: Fix watchOS self-notification bug
 - [x] Fix `CloudKitNotificationAuthorFilter` to treat `CKCurrentUserDefaultName` as unreliable fallback
 - [x] When `CD_creatorUserRecordID` is `__defaultOwner__`, fall through to `record.creatorUserRecordID` metadata
 
-### Step 7: Testing
+### Step 8: Testing
 - [x] Unit test `CaregiverDisplayNameService` (read/write, fallback, prompted flag, persistence)
 - [x] Unit test `CloudKitNotificationAuthorFilter` — expanded to 8 cases covering `CKCurrentUserDefaultName` fallback
 - [ ] Verify `CD_creatorDisplayName` is set on activities created from iOS (manual/device testing)
@@ -279,10 +298,13 @@ If a user changes their display name in SharingView, only **future** activities 
 `resolvedDisplayName` trims whitespace and returns "A caregiver" for empty/whitespace-only strings. The `TextField` in SharingView allows clearing the name (sets to nil).
 
 ### watchOS without iOS setup
-If a user only uses the watch and never sets their display name on iOS, activities will be attributed to "A caregiver". The user must set their name on iOS. The watch does not prompt.
+If a user only uses the watch and never sets their display name on iOS, activities will be attributed to "A caregiver". The user must set their name on iOS. The watch does not prompt but will pick up the name from CloudKit on next launch.
 
 ### Multiple iOS devices
-The display name is stored in app group UserDefaults, which syncs between iOS and watchOS on the same device but does NOT sync across separate iOS devices via iCloud. Each device needs the name set independently via SharingView. A future enhancement could store the name in a CloudKit user record, but that is out of scope.
+The display name is stored in app group UserDefaults locally and synced via CloudKit. All devices (iOS and watchOS) read from the same `CD_UserSettings/displayName` CloudKit record. Setting the name on any iOS device propagates to all devices via CloudKit.
+
+### App group UserDefaults does NOT sync cross-device
+App groups only share data between processes on the same physical device (e.g., iOS app ↔ iOS widget). iPhone and Apple Watch are separate devices, so app group UserDefaults does NOT sync between them. This is why CloudKit sync was added for the display name. The same limitation affects `UserNotificationPreferences` — watchOS toggles write to the watch's local UserDefaults and are not visible to iOS (separate issue, separate spec).
 
 ### Privacy
 Display names are stored as plain strings on CKRecords, visible to all share participants. This is consistent with how CloudKit sharing works (participants can already see each other's names via CKShare.Participant). The user explicitly enters this name knowing it will be shown to other caregivers.

@@ -19,6 +19,7 @@ protocol SelectiveCloudKitServiceProtocol: AnyObject {
     func createActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws -> ActivitySnapshot
     func updateActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws -> ActivitySnapshot
     func deleteActivity(_ activity: ActivitySnapshot, isShared: Bool) async throws
+    func fetchDisplayName() async -> String?
 }
 
 /// Watch-optimized CloudKit queries with aggressive filtering
@@ -59,6 +60,28 @@ class SelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
 
     private func fetchCurrentUserRecordName() async -> String? {
         await CloudKitUserIdentityService.shared.currentUserRecordName(in: container)
+    }
+
+    // MARK: - User Settings
+
+    /// Fetch the caregiver display name from the CloudKit private zone.
+    /// Returns nil if no display name has been saved yet.
+    func fetchDisplayName() async -> String? {
+        let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
+        let recordID = CKRecord.ID(
+            recordName: CaregiverDisplayNameService.recordName,
+            zoneID: zoneID
+        )
+
+        do {
+            let record = try await container.privateCloudDatabase.record(for: recordID)
+            let value = record[CaregiverDisplayNameService.valueField] as? String
+            logger.info("✅ Fetched display name from CloudKit: \(value ?? "nil", privacy: .public)")
+            return value
+        } catch {
+            logger.info("ℹ️ No display name record in CloudKit (expected on first use): \(error.localizedDescription)")
+            return nil
+        }
     }
 
     // MARK: - Caree Queries (Small Dataset - Load All)
@@ -507,9 +530,7 @@ class SelectiveCloudKitService: SelectiveCloudKitServiceProtocol {
         let creatorRecordName = await fetchCurrentUserRecordName()
         let resolvedCreatorRecordName = creatorRecordName ?? CKRecord.ID(recordName: CKCurrentUserDefaultName).recordName
         record["CD_creatorUserRecordID"] = resolvedCreatorRecordName
-        let displayName = CaregiverDisplayNameService.shared.resolvedDisplayName
-        record["CD_creatorDisplayName"] = displayName
-        logger.info("📝 Activity creator: displayName='\(displayName, privacy: .public)', rawValue='\(CaregiverDisplayNameService.shared.displayName ?? "nil", privacy: .public)', creatorID='\(resolvedCreatorRecordName, privacy: .public)'")
+        record["CD_creatorDisplayName"] = CaregiverDisplayNameService.shared.resolvedDisplayName
 
         // Set references (in the same zone)
         let careeRecordID = CKRecord.ID(recordName: "CD_Caree/\(activity.careeID.uuidString)", zoneID: zoneID)

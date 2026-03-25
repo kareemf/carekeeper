@@ -172,6 +172,14 @@ class WatchDataProvider: ObservableObject {
                 lastCareesRefreshDate = Date()
                 logger.info("✅ Loaded \(self.carees.count) carees")
 
+                // Fetch display name from CloudKit (set on iOS, needed for watch-created activities)
+                if !CaregiverDisplayNameService.shared.hasDisplayName {
+                    if let name = await selectiveService.fetchDisplayName() {
+                        CaregiverDisplayNameService.shared.displayName = name
+                        logger.info("✅ Synced display name from CloudKit: \(name, privacy: .public)")
+                    }
+                }
+
             } catch is CancellationError {
                 logger.info("⏹️ loadCarees cancelled")
                 signposter.emitEvent("loadCarees.cancelled", id: signpostID)

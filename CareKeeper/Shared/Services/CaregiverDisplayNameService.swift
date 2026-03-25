@@ -1,12 +1,20 @@
+import CloudKit
 import Foundation
 
 /// Service for managing the caregiver's display name shown in push notifications
-/// Stores the name in app group UserDefaults for iOS/watchOS sync
+/// Stores the name locally in app group UserDefaults and syncs to CloudKit
+/// for cross-device availability (iOS → watchOS).
 @MainActor
 class CaregiverDisplayNameService: ObservableObject {
     // MARK: - Shared Instance
 
     static let shared = CaregiverDisplayNameService()
+
+    // MARK: - Constants
+
+    static let recordType = "CD_UserSettings"
+    static let recordName = "CD_UserSettings/displayName"
+    static let valueField = "CD_value"
 
     // MARK: - App Group UserDefaults
 
@@ -25,6 +33,7 @@ class CaregiverDisplayNameService: ObservableObject {
     @Published var displayName: String? {
         didSet {
             appGroupDefaults.set(displayName, forKey: Keys.displayName)
+            syncToCloudKit()
         }
     }
 
@@ -50,6 +59,42 @@ class CaregiverDisplayNameService: ObservableObject {
     /// Mark that the user has been prompted (call on both Save and Skip)
     func markPrompted() {
         appGroupDefaults.set(true, forKey: Keys.hasBeenPrompted)
+    }
+
+    // MARK: - CloudKit Sync
+
+    /// Fire-and-forget sync of display name to CloudKit private zone.
+    /// This makes the name available to watchOS via SelectiveCloudKitService.fetchDisplayName().
+    private func syncToCloudKit() {
+        let value = displayName
+        Task.detached { [value] in
+            do {
+                let container = CKContainer(identifier: CloudKitConfig.containerID)
+                let database = container.privateCloudDatabase
+                let zoneID = CKRecordZone.ID(zoneName: CloudKitConfig.zoneName)
+                let recordID = CKRecord.ID(
+                    recordName: CaregiverDisplayNameService.recordName,
+                    zoneID: zoneID
+                )
+
+                // Try to fetch existing record to update, or create new
+                let record: CKRecord
+                do {
+                    record = try await database.record(for: recordID)
+                } catch {
+                    record = CKRecord(
+                        recordType: CaregiverDisplayNameService.recordType,
+                        recordID: recordID
+                    )
+                }
+
+                record[CaregiverDisplayNameService.valueField] = value as CKRecordValue?
+                try await database.save(record)
+            } catch {
+                // Fire-and-forget: log but don't propagate
+                AppLogger.cloudkit.warning("Failed to sync display name to CloudKit: \(error.localizedDescription)")
+            }
+        }
     }
 
     // MARK: - Initialization
