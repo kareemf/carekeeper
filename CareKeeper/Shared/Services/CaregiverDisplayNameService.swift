@@ -157,12 +157,18 @@ class CaregiverDisplayNameService: ObservableObject {
         } else {
             self.appGroupDefaults = .standard
         }
+        // Suppress sync: @Published didSet fires during init (unlike regular stored properties).
+        // Without this, the stale local cache would overwrite the CloudKit value on every launch.
+        self.isSuppressingSync = true
         self.displayName = self.appGroupDefaults.string(forKey: Keys.displayName)
+        self.isSuppressingSync = false
     }
 
     /// Testable initializer that uses the provided UserDefaults instead of app group
     init(testing defaults: UserDefaults) {
         self.appGroupDefaults = defaults
+        self.isSuppressingSync = true
         self.displayName = defaults.string(forKey: Keys.displayName)
+        self.isSuppressingSync = false
     }
 }
