@@ -118,22 +118,12 @@ struct CareeListView: View {
     }
 
     private var careeList: some View {
-        List {
-            // MARK: - Temporary Debug UI (remove after verification)
-            Section("Display Name Debug") {
-                let service = CaregiverDisplayNameService.shared
-                LabeledContent("Local", value: service.displayName ?? "nil")
-                LabeledContent("Resolved", value: service.resolvedDisplayName)
-                LabeledContent("Has Name", value: service.hasDisplayName ? "yes" : "no")
-            }
-
-            ForEach(dataProvider.carees) { caree in
-                NavigationLink {
-                    CareeDetailView(careeSnapshot: caree)
-                        .environmentObject(dataProvider)
-                } label: {
-                    CareeRowView(snapshot: caree)
-                }
+        List(dataProvider.carees) { caree in
+            NavigationLink {
+                CareeDetailView(careeSnapshot: caree)
+                    .environmentObject(dataProvider)
+            } label: {
+                CareeRowView(snapshot: caree)
             }
         }
         .refreshable {
