@@ -688,7 +688,8 @@ class CloudKitDataService: ObservableObject {
                 parentCaree: careeRecord,
                 activityTypeRecord: activityTypeRecord,
                 zoneID: zoneID,
-                creatorRecordName: creatorRecordName
+                creatorRecordName: creatorRecordName,
+                creatorDisplayName: CaregiverDisplayNameService.shared.resolvedDisplayName
             )
 
             // Save to CloudKit
@@ -1666,13 +1667,14 @@ class CloudKitDataService: ObservableObject {
             notifiedActivityIDs.insert(activityID)
 
             // Present the notification
+            let creatorDisplayName = record["CD_creatorDisplayName"] as? String ?? "A caregiver"
             let notificationService = UserNotificationService.shared
             await notificationService.presentNewActivityNotification(
                 activityID: activityID,
                 careeID: careeID,
                 careeName: careeName,
                 activityTypeName: activityTypeName,
-                creatorName: "Another caregiver",
+                creatorName: creatorDisplayName,
                 timestamp: dateTime
             )
 

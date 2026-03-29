@@ -228,13 +228,14 @@ class CloudKitSharedRecordsService: ObservableObject {
                 }
             }
 
+            let creatorDisplayName = record["CD_creatorDisplayName"] as? String ?? "A caregiver"
             let notificationService = UserNotificationService.shared
             await notificationService.presentNewActivityNotification(
                 activityID: activityID,
                 careeID: careeID,
                 careeName: careeName,
                 activityTypeName: activityTypeName,
-                creatorName: "Another caregiver",
+                creatorName: creatorDisplayName,
                 timestamp: dateTime
             )
 
@@ -249,6 +250,10 @@ class CloudKitSharedRecordsService: ObservableObject {
             return
         }
 
+        await handleSharedZoneChange(for: zoneID)
+    }
+
+    func handleSharedZoneChange(for zoneID: CKRecordZone.ID) async {
         let existingActivityIDs: Set<UUID> = Set(
             sharedCarees
                 .flatMap { $0.activities ?? [] }
@@ -392,13 +397,14 @@ class CloudKitSharedRecordsService: ObservableObject {
                 }
             }
 
+            let creatorDisplayName = record["CD_creatorDisplayName"] as? String ?? "A caregiver"
             let notificationService = UserNotificationService.shared
             await notificationService.presentNewActivityNotification(
                 activityID: activityID,
                 careeID: careeID,
                 careeName: careeName,
                 activityTypeName: activityTypeName,
-                creatorName: "Another caregiver",
+                creatorName: creatorDisplayName,
                 timestamp: dateTime
             )
             return true

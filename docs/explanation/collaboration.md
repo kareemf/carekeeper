@@ -28,7 +28,7 @@ When someone tracks an activity:
 - Notifications sent (if enabled)
 - Conflict resolution handles concurrent edits
 
-!!! success "Resoonsive Feel"
+!!! success "Responsive Feel"
     CareKeeper uses optimistic UI—your changes appear immediately while syncing happens in the background. This makes the app feel instant even with slow connections.
 
 ## Sharing Model

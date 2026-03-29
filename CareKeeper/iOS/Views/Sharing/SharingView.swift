@@ -12,6 +12,8 @@ struct SharingView: View {
     @State private var myCarees: [Caree] = []
 
 
+    @StateObject private var displayNameService = CaregiverDisplayNameService.shared
+
     @State private var careeToStopSharing: Caree?
     @State private var showingStopSharingConfirmation = false
     @State private var error: Error?
@@ -44,6 +46,30 @@ struct SharingView: View {
                     }
                 } else {
                     List {
+                        // Your Identity section
+                        Section {
+                            HStack {
+                                Text(NSLocalizedString("Your Display Name", comment: "Display name label"))
+                                Spacer()
+                                TextField(
+                                    NSLocalizedString("Enter your name", comment: "Display name placeholder"),
+                                    text: Binding(
+                                        get: { displayNameService.displayName ?? "" },
+                                        set: { displayNameService.displayName = $0.isEmpty ? nil : $0 }
+                                    )
+                                )
+                                .multilineTextAlignment(.trailing)
+                                .textContentType(.name)
+                            }
+                        } header: {
+                            Text(NSLocalizedString("Your Identity", comment: "Your identity section header"))
+                        } footer: {
+                            Text(NSLocalizedString(
+                                "This name is shown to other caregivers in activity notifications.",
+                                comment: "Display name footer"
+                            ))
+                        }
+
                         // Shared by Me section
                         if !sharedByMe.isEmpty {
                             Section {

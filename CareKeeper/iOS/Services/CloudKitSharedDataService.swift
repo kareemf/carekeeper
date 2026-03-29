@@ -469,7 +469,8 @@ class CloudKitSharedDataService: ObservableObject {
             activityTypeRecord: activityTypeRecord,
             zoneID: zoneID,
             existingRecord: nil,
-            creatorRecordName: creatorRecordName
+            creatorRecordName: creatorRecordName,
+            creatorDisplayName: CaregiverDisplayNameService.shared.resolvedDisplayName
         )
 
         logger.info("✅ Created Activity record with parent for shared database at: \(activity.dateTime)")

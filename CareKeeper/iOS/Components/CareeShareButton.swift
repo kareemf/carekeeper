@@ -16,6 +16,7 @@ struct CareeShareButton: View {
     @State private var isLoading = false
     @State private var showingSyncAlert = false
     @State private var isShared = false
+    @State private var showingDisplayNamePrompt = false
 
     private let sharingService = CloudKitSharingService()
     private let container = CKContainer(identifier: CloudKitConfig.containerID)
@@ -78,10 +79,22 @@ struct CareeShareButton: View {
             // Load/refresh share status when the view appears or caree changes
             self.isShared = await sharingService.isShared(caree, in: modelContext)
         }
+        .displayNamePrompt(isPresented: $showingDisplayNamePrompt) {
+            // After prompt is dismissed, continue with the share flow
+            Task {
+                await prepareShare()
+            }
+        }
         .errorAlert($error)
     }
 
     private func prepareShare() async {
+        // Prompt for display name on first share if not yet set
+        if CaregiverDisplayNameService.shared.shouldPromptForDisplayName {
+            showingDisplayNamePrompt = true
+            return
+        }
+
         isLoading = true
         defer { isLoading = false }
 

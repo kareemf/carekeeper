@@ -181,7 +181,7 @@ By default, activities are tracked at the current time. To change:
 
 <div class="app-overview-grid">
   <img src="/screenshots/watch-activity-list-button.png" alt="Button to load watch activity list" />
-  <img src="/screenshots/watch-activity-list.png" alt="Watch activity list" />
+  <img src="docs/screenshots/watch-activity-list.png" alt="Watch activity list" />
 </div>
 
 ## Editing Activities

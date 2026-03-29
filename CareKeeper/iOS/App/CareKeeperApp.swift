@@ -209,6 +209,13 @@ struct CareKeeperApp: App {
                         } catch {
                             AppLogger.app.warning("⚠️ Initial owned refresh failed: \(error.localizedDescription)")
                         }
+
+                        // Recover display name from CloudKit if no local cache (e.g. reinstall)
+                        if !CaregiverDisplayNameService.shared.hasDisplayName {
+                            if let name = await CaregiverDisplayNameService.shared.fetchFromCloudKit() {
+                                AppLogger.app.info("✅ Recovered display name from CloudKit: \(name, privacy: .public)")
+                            }
+                        }
                     }
                 }
                 .onAppear {
