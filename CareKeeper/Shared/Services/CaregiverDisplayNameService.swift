@@ -12,9 +12,9 @@ class CaregiverDisplayNameService: ObservableObject {
 
     // MARK: - Constants
 
-    static let recordType = "CD_UserSettings"
-    static let recordName = "CD_UserSettings/displayName"
-    static let valueField = "CD_value"
+    nonisolated static let recordType = "CD_UserSettings"
+    nonisolated static let recordName = "CD_UserSettings/displayName"
+    nonisolated static let valueField = "CD_value"
 
     // MARK: - App Group UserDefaults
 
