@@ -163,6 +163,7 @@
 		DD39EE6D934D4373C14E86EA /* CloudSharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01E9F52871581DD633FCE80 /* CloudSharingView.swift */; };
 		DD767D182D049F0F3637E62B /* ActivityTypeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96A6784B396063FE17BEC14 /* ActivityTypeUITests.swift */; };
 		DE4108F4D16876C2387A2541 /* TrackActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB799BD4D39BD6CEAB99CBC /* TrackActivityView.swift */; };
+		DEC3D7160A23B2D967A5B14B /* CaregiverDisplayNameServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FDD5616910469391921CCEB /* CaregiverDisplayNameServiceTests.swift */; };
 		DF947EA7517442C5444A611F /* CloudKitUserIdentityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 463CCDB1E2153D7D791165DC /* CloudKitUserIdentityService.swift */; };
 		E0481B49CBB5ACDC0C088608 /* CloudKitNotificationAuthorFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E716C2C388DE5CE91B5AA48 /* CloudKitNotificationAuthorFilter.swift */; };
 		E133DFD237FAC2AB60072D84 /* CareeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F4AFF9F279FD468529AC8C /* CareeListView.swift */; };
@@ -324,6 +325,7 @@
 		896A15EFFAAFEF3EC31F83BA /* CloudKitSharingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSharingService.swift; sourceTree = "<group>"; };
 		8A15DD7991742E0B0DA3CCA2 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = WebKit.framework; sourceTree = "<group>"; };
 		8DC51FA60C9EA12EEA25706E /* ShareThumbnailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareThumbnailProvider.swift; sourceTree = "<group>"; };
+		8FDD5616910469391921CCEB /* CaregiverDisplayNameServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaregiverDisplayNameServiceTests.swift; sourceTree = "<group>"; };
 		909E249A28330C66DACA9391 /* CareeImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeImportService.swift; sourceTree = "<group>"; };
 		96578314089DB5262D6BF105 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		97C3E57DFB34FB3E1A7DDCFA /* CareeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareeListView.swift; sourceTree = "<group>"; };
@@ -419,6 +421,7 @@
 				B9427CFA7993E809BA9C6AD5 /* ActivityTests.swift */,
 				F7FC66039C53C043A170CDEB /* ActivityTypeTests.swift */,
 				602A75653E2F86CB58273405 /* CareeTests.swift */,
+				8FDD5616910469391921CCEB /* CaregiverDisplayNameServiceTests.swift */,
 				B6D51CC5BA7BB6ED7403E730 /* CloudKitNotificationAuthorFilterTests.swift */,
 				57D2F2EDD1E6B686E235E060 /* CloudKitSharedRecordsServiceConversionTests.swift */,
 				63A64F944DF0ED2602D80339 /* CloudKitSharedRecordsServiceZoneNotificationTests.swift */,
@@ -1116,6 +1119,7 @@
 				3AEE7A85BBCB19513CFD61CB /* Caree.swift in Sources */,
 				F308997BB6F53ACB26559A33 /* CareeTests.swift in Sources */,
 				12A8D428BD7CF17039A101A6 /* CaregiverDisplayNameService.swift in Sources */,
+				DEC3D7160A23B2D967A5B14B /* CaregiverDisplayNameServiceTests.swift in Sources */,
 				A6125B4652A81ED6CDD21B83 /* CloudKitConfig.swift in Sources */,
 				4ABB816B82F95F2C924B3378 /* CloudKitNotificationAuthorFilter.swift in Sources */,
 				2836957475CAA1275203E0CC /* CloudKitNotificationAuthorFilterTests.swift in Sources */,
