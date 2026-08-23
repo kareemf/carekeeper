@@ -39,7 +39,7 @@ final class CloudKitSharedRecordsServiceConversionTests: XCTestCase {
                 activityTypeRecords: sample.activityTypeRecords,
                 activityRecords: sample.activityRecords
             )
-            return !Thread.isMainThread
+            return Self.isOffMainThread()
         }.value
 
         XCTAssertTrue(ranOffMain, "convertRecordsSync should be usable from a background thread")
@@ -49,6 +49,10 @@ final class CloudKitSharedRecordsServiceConversionTests: XCTestCase {
 // MARK: - Helpers
 
 private extension CloudKitSharedRecordsServiceConversionTests {
+    /// Samples the current thread synchronously; `Thread.isMainThread` is unavailable from
+    /// async contexts, where the answer would only be a snapshot between suspensions.
+    nonisolated static func isOffMainThread() -> Bool { !Thread.isMainThread }
+
     struct SampleRecords {
         let careeID: UUID
         let activityTypeID: UUID
