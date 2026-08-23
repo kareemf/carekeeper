@@ -121,10 +121,37 @@ Confirm with a before/after grep of the build log for
 - [x] Replace the async-context `Thread.isMainThread` check with a synchronous helper
   - branch: `impl/ismainthread-sync-helper`
   - status: `complete`
-- [ ] Remove the redundant `await` on the `convertRecordsOffMain` call
+- [x] Remove the redundant `await` on the `convertRecordsOffMain` call
   - branch: `impl/remove-redundant-await`
-  - status: `claimed`
-- [ ] Clean build and confirm zero Swift 6 warnings project-wide, 119 tests still passing
+  - status: `complete`
+- [x] Clean build and confirm zero Swift 6 warnings project-wide, 119 tests still passing
+  - result: BUILD/TEST SUCCEEDED, 119 tests 0 failures, 0 Swift errors,
+    0 Swift 6 warnings project-wide, no warnings left in the file
+
+## Follow-up Findings (from review, not actioned)
+
+Raised by the reviewer during this work. None blocked the change; all are outside the
+scope approved for this spec.
+
+1. **The off-main test discards its result.** `_ = try convertRecordsSync(...)` — nothing
+   asserts the conversion is *correct* while running off-main. The sibling test checks
+   correctness but calls the instance wrapper from the `@MainActor` test method, so it
+   runs on main. Nothing in the file asserts correct relationships while genuinely
+   off-main.
+2. **The thread guarantee is positional, not structural.** It holds only because no
+   `await` sits between the work and the sample. Insert one later and the sample silently
+   decouples from where the work ran — the test keeps passing while measuring nothing, a
+   quiet false pass. A helper returning `(result, ranOffMain)` from one synchronous frame
+   would make it structural and fix finding 1 at the same time.
+3. **The new doc comment explains the diagnostic, not the invariant.** What makes the call
+   site sound is the absence of a suspension between work and sample — that is what a
+   future editor must not break, so that is what the comment should say.
+4. **`convertRecordsOffMain` is a misleading name** (`CloudKitSharedRecordsService.swift:656`).
+   Its own doc comment concedes it "Runs inline". The production call site at line 608 in
+   `fetchSharedCarees` invokes it on the main actor — the place to look if large shared
+   record sets ever cause UI hitches. Production concern, unrelated to the warnings.
+5. **`async` on `testConvertRecordsOffMainBuildsRelationships` is now dead** — no
+   suspension points remain. Harmless; Swift does not warn.
 
 ## Out of Scope
 
