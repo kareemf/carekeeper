@@ -2,7 +2,7 @@ import CloudKit
 import Foundation
 
 protocol CloudKitUserRecordIDFetching {
-    func fetchUserRecordID(completionHandler: @escaping (CKRecord.ID?, Error?) -> Void)
+    func fetchUserRecordID(completionHandler: @escaping @Sendable (CKRecord.ID?, Error?) -> Void)
 }
 
 extension CKContainer: CloudKitUserRecordIDFetching {}
