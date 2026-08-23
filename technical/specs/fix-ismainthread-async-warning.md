@@ -118,10 +118,12 @@ Confirm with a before/after grep of the build log for
 
 ## Tasks
 
-- [ ] Replace the async-context `Thread.isMainThread` check with a synchronous helper
+- [x] Replace the async-context `Thread.isMainThread` check with a synchronous helper
   - branch: `impl/ismainthread-sync-helper`
-  - status: `claimed`
+  - status: `complete`
 - [ ] Remove the redundant `await` on the `convertRecordsOffMain` call
+  - branch: `impl/remove-redundant-await`
+  - status: `claimed`
 - [ ] Clean build and confirm zero Swift 6 warnings project-wide, 119 tests still passing
 
 ## Out of Scope
