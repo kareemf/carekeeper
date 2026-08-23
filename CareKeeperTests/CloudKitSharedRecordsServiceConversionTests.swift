@@ -8,7 +8,7 @@ final class CloudKitSharedRecordsServiceConversionTests: XCTestCase {
         let service = CloudKitSharedRecordsService(container: CKContainer(identifier: CloudKitConfig.containerID))
 
         let sample = makeSampleRecords()
-        let (carees, typesByCaree, activitiesByCaree, mapping) = try await service.convertRecordsOffMain(
+        let (carees, typesByCaree, activitiesByCaree, mapping) = try service.convertRecordsOffMain(
             sample.careeRecords,
             activityTypeRecords: sample.activityTypeRecords,
             activityRecords: sample.activityRecords
