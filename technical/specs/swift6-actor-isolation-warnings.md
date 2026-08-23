@@ -96,9 +96,11 @@ the plist in first. Unrelated to this spec, but it blocks verification.
 
 ## Tasks
 
-- [ ] Mark CaregiverDisplayNameService record constants nonisolated
-- [ ] Add @Sendable to CloudKitUserRecordIDFetching protocol requirement
-- [ ] Clean build and confirm all four warnings are resolved with no new ones
+- [x] Mark CaregiverDisplayNameService record constants nonisolated
+- [x] Add @Sendable to CloudKitUserRecordIDFetching protocol requirement
+- [x] Clean build and confirm all four warnings are resolved with no new ones
+  - result: BUILD/TEST SUCCEEDED, 119 tests 0 failures, 4/4 warnings gone,
+    0 new warnings; one unrelated warning remains (see Out of Scope)
 
 ## Out of Scope
 
