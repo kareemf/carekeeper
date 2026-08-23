@@ -71,8 +71,28 @@ func fetchUserRecordID(completionHandler: @escaping @Sendable (CKRecord.ID?, Err
 Check whether the test double conforming to this protocol (used by
 `currentUserRecordName(fetcher:)`) needs the same annotation.
 
-**Verification**: requires the iOS/watchOS 26.5 simulator runtimes, still downloading at
-time of writing. Confirm via a clean build that the warning count drops by four.
+**Verification**: DONE. Both fixes were applied in a scratch worktree and built against
+iPhone 16 Pro / iOS 18.6:
+
+- `** BUILD SUCCEEDED **`, `** TEST SUCCEEDED **`, 119 tests, 0 failures
+- 0 Swift compile errors
+- All four targeted warnings eliminated (confirmed by before/after diff of the logs)
+- `nonisolated static let` is accepted on the `@MainActor` class in Swift 5.0 mode
+- `FakeUserRecordFetcher` (`CloudKitUserIdentityServiceTests.swift:20`) needs NO change:
+  its plain `@escaping` parameter is broader than the now-`@Sendable` requirement, and
+  function parameters are contravariant, so it still satisfies the protocol
+
+Reviewer note (claude, after the build): both changes are semantically correct rather
+than incidentally compiling. Static `let` init is `swift_once`-guarded, so the thread
+safety already held at runtime and the isolation was only ever a compile-time rule. The
+`@Sendable` addition corrects a protocol that was under-declaring `CKContainer`'s actual
+signature, so it tightens the contract rather than hiding a race. Caveat: validated in
+Swift 5 mode only; full Swift 6 adoption may want a matching `@Sendable` on the test fake.
+
+**Note on a fresh worktree/clone**: `scripts/ensure-config.sh` aborts unless
+`CareKeeper/Shared/Config.plist` (gitignored) exists or `CLOUDKIT_CONTAINER_ID` is set,
+so the build fails at `PhaseScriptExecution Ensure Config.plist` before compiling. Copy
+the plist in first. Unrelated to this spec, but it blocks verification.
 
 ## Tasks
 
@@ -85,4 +105,9 @@ time of writing. Confirm via a clean build that the warning count drops by four.
 - Migrating the project to the Swift 6 language mode.
 - Enabling `SWIFT_STRICT_CONCURRENCY` at any level.
 - Any other Swift 6 warnings not in the four listed above (a full audit may surface more
-  once strict concurrency is actually enabled).
+  once strict concurrency is actually enabled). One is already known and remains after
+  this work: `CloudKitSharedRecordsServiceConversionTests.swift:42` — `isMainThread` is
+  unavailable from asynchronous contexts. Xcode Cloud did not report it because it builds
+  the app targets, not the test target.
+- Adding `@Sendable` to `FakeUserRecordFetcher` — unnecessary in Swift 5 mode, may be
+  wanted for full Swift 6 adoption.
