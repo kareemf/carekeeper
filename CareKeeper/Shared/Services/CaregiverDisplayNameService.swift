@@ -65,6 +65,8 @@ class CaregiverDisplayNameService: ObservableObject {
 
     // MARK: - CloudKit Sync
 
+    /// Whether this instance may write display name changes to CloudKit.
+    private let isCloudKitSyncEnabled: Bool
     /// When true, suppresses `didSet` sync-back to CloudKit (used during fetchFromCloudKit)
     private var isSuppressingSync = false
     private var syncTask: Task<Void, Never>?
@@ -72,6 +74,7 @@ class CaregiverDisplayNameService: ObservableObject {
     /// Debounced sync — called from `didSet` on `displayName`.
     /// Coalesces rapid keystrokes (e.g. SharingView TextField) into a single CloudKit write.
     private func syncToCloudKit() {
+        guard isCloudKitSyncEnabled else { return }
         syncTask?.cancel()
         let value = displayName
         syncTask = Task { @MainActor [value] in
@@ -84,6 +87,7 @@ class CaregiverDisplayNameService: ObservableObject {
     /// Immediate sync — call from explicit Save actions (e.g. DisplayNamePromptModifier).
     /// Cancels any pending debounced sync and writes immediately.
     func syncToCloudKitImmediately() {
+        guard isCloudKitSyncEnabled else { return }
         syncTask?.cancel()
         let value = displayName
         performCloudKitSync(value: value)
@@ -157,6 +161,7 @@ class CaregiverDisplayNameService: ObservableObject {
         } else {
             self.appGroupDefaults = .standard
         }
+        self.isCloudKitSyncEnabled = true
         // Suppress sync: @Published didSet fires during init (unlike regular stored properties).
         // Without this, the stale local cache would overwrite the CloudKit value on every launch.
         self.isSuppressingSync = true
@@ -167,6 +172,7 @@ class CaregiverDisplayNameService: ObservableObject {
     /// Testable initializer that uses the provided UserDefaults instead of app group
     init(testing defaults: UserDefaults) {
         self.appGroupDefaults = defaults
+        self.isCloudKitSyncEnabled = false
         self.isSuppressingSync = true
         self.displayName = defaults.string(forKey: Keys.displayName)
         self.isSuppressingSync = false
