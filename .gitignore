@@ -170,3 +170,4 @@ Dependencies/
 
 # MkDocs documentation
 site/
+.worktrees/
