@@ -73,6 +73,8 @@ until they have been.
 ## Tasks
 
 - [ ] Suppress CloudKit sync in the testing initializer of CaregiverDisplayNameService
+  - branch: `impl/suppress-cloudkit-sync-in-tests`
+  - status: `claimed`
 - [ ] Fix UserDefaults suite cleanup in CaregiverDisplayNameServiceTests tearDown
 - [ ] Run the CareKeeperTests suite and confirm all CaregiverDisplayNameService tests pass
 
