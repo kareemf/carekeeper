@@ -4,7 +4,7 @@
 
 `CareKeeperTests/CaregiverDisplayNameServiceTests.swift` was added in PR #4 but was
 never a member of the `CareKeeperTests` target — `project.pbxproj` was not regenerated.
-The file was wired into the target in commit `bc93246`, so these 13 tests are about to
+The file was wired into the target in commit `bc93246`, so these 14 tests are about to
 execute for the first time.
 
 Reading the file against `CaregiverDisplayNameService` surfaced two defects that will
@@ -30,7 +30,7 @@ take effect the moment the tests actually run:
 
 ## Success Criteria
 
-1. The 13 tests in `CaregiverDisplayNameServiceTests` compile and pass.
+1. The 14 tests in `CaregiverDisplayNameServiceTests` compile and pass.
 2. Running the suite issues **zero** CloudKit requests.
 3. Each test's UserDefaults suite is actually removed in `tearDown`.
 4. Production behaviour of `CaregiverDisplayNameService` is unchanged — the real
@@ -75,10 +75,12 @@ until they have been.
 - [x] Suppress CloudKit sync in the testing initializer of CaregiverDisplayNameService
   - branch: `impl/suppress-cloudkit-sync-in-tests`
   - status: `complete`
-- [ ] Fix UserDefaults suite cleanup in CaregiverDisplayNameServiceTests tearDown
+- [x] Fix UserDefaults suite cleanup in CaregiverDisplayNameServiceTests tearDown
   - branch: `impl/fix-userdefaults-suite-cleanup`
-  - status: `claimed`
-- [ ] Run the CareKeeperTests suite and confirm all CaregiverDisplayNameService tests pass
+  - status: `complete`
+- [x] Run the CareKeeperTests suite and confirm all CaregiverDisplayNameService tests pass
+  - result: 14/14 passed; full target 119 tests, 0 failures; zero CloudKit sync
+    warnings logged; no new compiler warnings introduced
 
 ## Out of Scope
 
